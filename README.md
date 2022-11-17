@@ -8,8 +8,8 @@
 
 The analysis code is available and can run on MiniAOD data tier.
 A Reco version is available @: https://github.com/Threshic/TrackingPerf
-Look for the _RECO version or "Version-05_10_2022-AVF (Pour présentation TPS)" of TrackingPerf.cc (in plugins) on the history version of the repo.
-
+Look for the _RECO file or "Version-05_10_2022-AVF (Pour présentation TPS)" of TrackingPerf.cc (in plugins) on the history version of the repo.
+For the _RECO file, there are two versions : 16/11/22 and 17/11/22. Both are quite the same, the first is more of a draft than the second one. You'd rather use the second one (Daniel).
 For people @IPHC that want access to the code:
 
 # Release 10_6_20_FLY : 
