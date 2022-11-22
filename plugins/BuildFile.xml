@@ -16,5 +16,7 @@
 <use name="TrackingTools/TransientTrack"/>
 <use name="TrackingTools/Records"/>
 <use name="RecoTracker/TransientTrackingRecHit"/>
+<use name="roottmva"/>
+<use name="RecoVertex/AdaptiveVertexFit"/>
 <flags EDM_PLUGIN="1"/>
 <Flags CXXFLAGS="-g"/> 
