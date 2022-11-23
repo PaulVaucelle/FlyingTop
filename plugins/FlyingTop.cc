@@ -216,6 +216,7 @@
 // class declaration
 //
 
+// skeleton from https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD2017#4_7_MiniAOD_Analysis_Documentati
 // If the analyzer does not use TFileService, please remove
 // the template argument to the base class so the class inherits
 // from  edm::one::EDAnalyzer<>
@@ -248,7 +249,8 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     edm::EDGetTokenT<edm::View<reco::GenJet> > genJetToken_;
     edm::EDGetTokenT<pat::ElectronCollection> electronToken_;
     edm::EDGetTokenT<pat::MuonCollection> muonToken_;
-//$$    edm::EDGetTokenT<pat::PackedCandidateCollection> pfToken_;
+//$$    edm::EDGetTokenT<pat::PackedCandidateCollection> pcToken_;
+
 //$$
     edm::EDGetTokenT<pat::PackedCandidateCollection> pc_;
     edm::EDGetTokenT<edm::Association<reco::PFCandidateCollection>> pc2pf_;
@@ -371,15 +373,15 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     //http://cmsdoxygen.web.cern.ch/cmsdoxygen/CMSSW_10_1_3/doc/html/d8/df2/classreco_1_1TrackBase.html#aca7611bd1a33d535cefc72b6e497ece8
     std::vector<unsigned int>    tree_track_algo;
     std::vector<unsigned short>  tree_track_stopReason;
-    
-    std::vector<int>     tree_track_nHit;
-    std::vector<int>     tree_track_nHitPixel;
-    std::vector<int>     tree_track_nHitTIB;
-    std::vector<int>     tree_track_nHitTID;
-    std::vector<int>     tree_track_nHitTOB;
-    std::vector<int>     tree_track_nHitTEC;
-    std::vector<int>     tree_track_nHitPXB;
-    std::vector<int>     tree_track_nHitPXF;
+    std::vector< float>  tree_track_drSig;    
+    std::vector<int>      tree_track_nhits;
+    std::vector<int>      tree_track_nHitPixel;
+    std::vector<int>      tree_track_nHitTIB;
+    std::vector<int>      tree_track_nHitTID;
+    std::vector<int>      tree_track_nHitTOB;
+    std::vector<int>      tree_track_nHitTEC;
+    std::vector<int>      tree_track_nHitPXB;
+    std::vector<int>      tree_track_nHitPXF;
     std::vector<int>     tree_track_isHitL1;
     std::vector<int>     tree_track_nLayers;
     std::vector<int>     tree_track_nLayersPixel;
@@ -395,9 +397,9 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float>    tree_track_firsthit_Y;
     std::vector<float>    tree_track_firsthit_Z;
     std::vector<float>    tree_track_region;
-    std::vector<float>    tree_track_ntrk10;
-    std::vector<float>    tree_track_ntrk20;
-    std::vector<float>    tree_track_ntrk30;
+    std::vector< float >  tree_track_ntrk10;
+    std::vector< float >  tree_track_ntrk20;
+    std::vector< float >  tree_track_ntrk30;
 
     //!!!!
  
@@ -619,7 +621,6 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
 // constructors and destructor
 //
 FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
-//  
     weightFile_(                                                 iConfig.getUntrackedParameter<std::string>("weightFileMVA") ),
     prunedGenToken_(consumes<edm::View<reco::GenParticle> >(     iConfig.getParameter<edm::InputTag>("genpruned"))),
     packedGenToken_(consumes<edm::View<pat::PackedGenParticle> >(iConfig.getParameter<edm::InputTag>("genpacked"))),
@@ -711,8 +712,8 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_muon_isGlobal",   &tree_muon_isGlobal);
     
     // track
-    smalltree->Branch("tree_nTracks", &tree_nTracks, "tree_nTracks/I");
-    smalltree->Branch("tree_track_iJet",&tree_track_iJet);
+    smalltree->Branch("tree_nTracks",                &tree_nTracks, "tree_nTracks/I");
+    smalltree->Branch("tree_track_iJet",     &tree_track_iJet);
     smalltree->Branch("tree_track_pt",            &tree_track_pt);
     smalltree->Branch("tree_track_outerPt",           &tree_track_outerPt );
     smalltree->Branch("tree_track_eta",                  &tree_track_eta );
@@ -731,8 +732,9 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_track_algo",             &tree_track_algo);
     smalltree->Branch("tree_track_stopReason",        &tree_track_stopReason);
     smalltree->Branch("tree_track_isSimMatched",      &tree_track_isSimMatched    );
+    smalltree->Branch("tree_track_drSig", &tree_track_drSig);
     
-    smalltree->Branch("tree_track_nHit",         &tree_track_nHit);
+    smalltree->Branch("tree_track_nhits",         &tree_track_nhits);
     smalltree->Branch("tree_track_nHitPixel",    &tree_track_nHitPixel);
     smalltree->Branch("tree_track_nHitTIB",      &tree_track_nHitTIB);
     smalltree->Branch("tree_track_nHitTID",      &tree_track_nHitTID);
@@ -741,6 +743,7 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_track_nHitPXB",      &tree_track_nHitPXB);
     smalltree->Branch("tree_track_nHitPXF",      &tree_track_nHitPXF);
     smalltree->Branch("tree_track_isHitL1",      &tree_track_isHitL1);
+
     smalltree->Branch("tree_track_nLayers",      &tree_track_nLayers);
     smalltree->Branch("tree_track_nLayersPixel", &tree_track_nLayersPixel);
     smalltree->Branch("tree_track_stripTECLayersWithMeasurement", &tree_track_stripTECLayersWithMeasurement);
@@ -755,9 +758,9 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_track_firsthit_Y",   &tree_track_firsthit_Y);
     smalltree->Branch("tree_track_firsthit_Z",   &tree_track_firsthit_Z);
     smalltree->Branch("tree_track_region",&tree_track_region);
-    smalltree->Branch("tree_track_ntrk10",&tree_track_ntrk10);
-    smalltree->Branch("tree_track_ntrk20",&tree_track_ntrk20);
-    smalltree->Branch("tree_track_ntrk30",&tree_track_ntrk30);
+    smalltree->Branch("tree_track_ntrk10",       &tree_track_ntrk10);
+    smalltree->Branch("tree_track_ntrk20",       &tree_track_ntrk20);
+    smalltree->Branch("tree_track_ntrk30",       &tree_track_ntrk30);
 
     //!!!!
  
@@ -1040,6 +1043,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     tree_PV_ndf   = (*primaryVertex)[0].ndof();
   }
   const reco::Vertex &PV = primaryVertex->front();
+
 
   //////////////////////////////////
   //////////////////////////////////
@@ -1535,12 +1539,11 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   
     // loop on pf candidates
 
-
-
 // from /PhysicsTools/PatAlgos/plugins/PATIsolatedTrackProducer.cc
 // and
 // from /DQM/TrackingMonitor/src/PackedCandidateTrackValidator.cc
 
+//$$$$
     for (unsigned int ipc = 0; ipc < pc->size(); ipc++) {
       // const pat::PackedCandidate& pfCand = pc->at(ipc);
       pat::PackedCandidateRef pcref = pat::PackedCandidateRef(pc_h, ipc);
@@ -1550,32 +1553,10 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
       const reco::Track& trackPc = *trackPcPtr;
 
-    //---------------------------Je to track mathcign==> isinjet BDT varaible-----//
-      int idxSlimmedJet = 0;
-      bool found_match = false;
-      for (const pat::Jet &jet : *jets) {
-      // for (unsigned int ij=0;ij<ak4slimmedJets->size();ij++) {
-      //   const Jet& jet = ak4slimmedJets->at(ij);
-      if ( jet.pt() < 20 ) continue;
-        TLorentzVector jet4m, track4m;
-        jet4m.SetPtEtaPhiM(jet.pt(), jet.eta(), jet.phi(), 0);
-        track4m.SetPtEtaPhiM(trackPc.pt(), trackPc.eta(), trackPc.phi(), 0);
-        if ( jet4m.DeltaR(track4m) < 0.4 ) {
-          found_match = true;
-          break;
-        }
-        else idxSlimmedJet++;
-      }
-      if (found_match) trackToAK4SlimmedJetMap[ipc] = idxSlimmedJet;
-      else	       trackToAK4SlimmedJetMap[ipc] = -1;
-      tree_track_iJet.push_back(trackToAK4SlimmedJetMap[ipc]);
-
-      //------------------------End of Jet to track matching---------------//
-
     if ( trackPc.hitPattern().numberOfValidHits() == 0 ) continue;
 
     if ( trackPc.charge() == 0 || trackPc.pt() < 1. ) continue;
-
+      // const std::string name = trackPc.algoName();
       tree_nTracks++; 
       tree_track_pt.push_back             (trackPc.pt());
       tree_track_eta.push_back            (trackPc.eta());
@@ -1589,7 +1570,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       tree_track_dxyError.push_back       (trackPc.dxyError());
       tree_track_dz.push_back             (trackPc.dz((*primaryVertex)[0].position()));
 //       tree_track_isHighQuality               (trackPc.highPurity());//All tracks are high quality in MINIAOD
-      tree_track_nHit.push_back           (trackPc.numberOfValidHits());
+      tree_track_nhits.push_back           (trackPc.numberOfValidHits());
       tree_track_nHitPixel.push_back      (trackPc.hitPattern().numberOfValidPixelHits());
       tree_track_nHitTIB.push_back        (trackPc.hitPattern().numberOfValidStripTIBHits());
       tree_track_nHitTID.push_back        (trackPc.hitPattern().numberOfValidStripTIDHits());
@@ -1602,7 +1583,6 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       tree_track_nLayersPixel.push_back   (trackPc.hitPattern().pixelLayersWithMeasurement());
       tree_track_algo.push_back(trackPc.algo());
       tree_track_originalAlgo.push_back(trackPc.originalAlgo());
-      
       //!!!!
       //----------------MINIAOD_Firsthit-----------//
                   //-----------------IMPORTANT----------------//
@@ -1632,6 +1612,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       // double pz = trackPc.pz();
       //------Propagation with new interface --> See ../interface/PropaHitPattern.h-----//
       PropaHitPattern* PHP = new PropaHitPattern();
+      //Only the disk's part is working, barrel part is bugged somehow
       std::pair<int,GloballyPositioned<float>::PositionType> FHPosition = PHP->Main(firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
       tree_track_firsthit_X.push_back(FHPosition.second.x());
       tree_track_firsthit_Y.push_back(FHPosition.second.y());
@@ -1641,10 +1622,31 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       //-----------------------END OF MINIAOD firsthit-----------------------//
       //!!!!
 
+          //---------------------------Je to track mathcign==> isinjet BDT varaible-----//
+      int idxSlimmedJet = 0;
+      bool found_match = false;
+      for (const pat::Jet &jet : *jets) {
+      // for (unsigned int ij=0;ij<ak4slimmedJets->size();ij++) {
+      //   const Jet& jet = ak4slimmedJets->at(ij);
+      if ( jet.pt() < 20 ) continue;
+        TLorentzVector jet4m, track4m;
+        jet4m.SetPtEtaPhiM(jet.pt(), jet.eta(), jet.phi(), 0);
+        track4m.SetPtEtaPhiM(trackPc.pt(), trackPc.eta(), trackPc.phi(), 0);
+        if ( jet4m.DeltaR(track4m) < 0.4 ) {
+          found_match = true;
+          break;
+        }
+        else idxSlimmedJet++;
+      }
+      if (found_match) trackToAK4SlimmedJetMap[ipc] = idxSlimmedJet;
+      else	       trackToAK4SlimmedJetMap[ipc] = -1;
+      tree_track_iJet.push_back(trackToAK4SlimmedJetMap[ipc]);
+
+      //------------------------End of Jet to track matching---------------//
 
     }
-
-  } // endif HT filter (+Zmu)
+  }
+  
 //$$
   
     /////////////////////////////////////////////////////////
@@ -1830,7 +1832,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     reader->AddVariable( "mva_track_eta", &eta );
     reader->AddVariable( "mva_track_nchi2", &NChi2 );
     reader->AddVariable( "mva_track_nhits", &nhits );
-    reader->AddVariable( "mva_track_algo", &algo);
+    // reader->AddVariable( "mva_track_algo", &algo);
     //add the variables from my BDT(Paul)
     reader->AddVariable( "mva_ntrk10", &ntrk10);
     reader->AddVariable( "mva_drSig", &drSig); /*!*/
@@ -1844,18 +1846,27 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     float pt_Cut = 1.;
     float NChi2_Cut = 5.;
     float drSig_Cut = 5.;
-    double bdtcut = 0.0057; // optimal value for TMVAClassification_BDTG50cm.weights.xml
+    double bdtcut = -0.0815; 
+    //optimal value : -0.0815 for TMVAClassification_BDTG50sansalgo.weights.xml
+    // optimal value 0.0057 for TMVAClassification_BDTG50cm.weights.xml
     // optimal value w/o track association to axis: -0.0401: TMVAbgctau50withnhits.xml
 
 //$$    double bdtcut = -10.; // if NO BDT cut !**
 
     int counter_track = -1;
     //---------------------------//
+    if (tree_passesHTFilter){
+
+    
     for (unsigned int ipc = 0; ipc < pc->size(); ipc++) 
     {
       pat::PackedCandidateRef pcref = pat::PackedCandidateRef(pc_h, ipc);
       const reco::Track *trackPcPtr = pcref->bestTrack();
       if( !trackPcPtr ) continue;//happens (~5%) 
+      const reco::Track& trackPc = *trackPcPtr;
+      if ( trackPc.hitPattern().numberOfValidHits() == 0 ) continue;
+
+      if ( trackPc.charge() == 0 || trackPc.pt() < 1. ) continue;
     // for (size_t iTrack = 0; iTrack<trackRefs.size(); ++iTrack)  // Loop on all the tracks
     // {
       counter_track++;
@@ -1870,15 +1881,15 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       eta	 = tree_track_eta[counter_track];
       phi	 = tree_track_phi[counter_track];
       NChi2	 = tree_track_NChi2[counter_track];
-      nhits	 = tree_track_nHit[counter_track];
+      nhits	 = tree_track_nhits[counter_track];
       algo	 = tree_track_algo[counter_track];
       // float dptSig=-1;
       // if (pt>0) dptSig=ptError/pt;
-      
+      std::cout<<algo<<std::endl;
       //Ajoute par Paul /*!*/
       drSig = -1.;
       if ( dxyError > 0 ) drSig = abs(dxy) / dxyError; /*!*/
-//       tree_track_drSig.push_back(drSig);
+      tree_track_drSig.push_back(drSig);
       ntrk10 = 0;
       ntrk20 = 0;
       ntrk30 = 0;
@@ -1995,7 +2006,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       else		           tree_track_Hemi_LLP.push_back(0);
       
     } //End loop on all the tracks
-
+    // }//ENd of Passes HTfilter
         // cout << " displaced tracks LLP1 " << LLP1_nTrks << " and with mva" << displacedTracks_llp1_mva.size() << endl;
         // cout << " displaced tracks LLP2 " << LLP2_nTrks << " and with mva" << displacedTracks_llp2_mva.size() << endl;
         // cout << " displaced tracks Hemi1 " << nTrks_axis1 << " and with mva" << displacedTracks_Hemi1_mva.size() << endl;
@@ -2203,8 +2214,19 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
     counter_track = -1;
     // for (size_t iTrack = 0; iTrack<trackRefs.size(); ++iTrack) {
+    // if (tree_passesHTFilter)
+      // {
+
+
               for (unsigned int ipc = 0; ipc < pc->size(); ipc++) // Loop on all the tracks
-    {       
+    {    
+      pat::PackedCandidateRef pcref = pat::PackedCandidateRef(pc_h, ipc);
+      const reco::Track *trackPcPtr = pcref->bestTrack();
+      if( !trackPcPtr ) continue;//happens (~5%) 
+      const reco::Track& trackPc = *trackPcPtr;
+      if ( trackPc.hitPattern().numberOfValidHits() == 0 ) continue;
+
+      if ( trackPc.charge() == 0 || trackPc.pt() < 1. ) continue;   
       counter_track++;
       int hemi      = tree_track_Hemi[counter_track];
       double MVAval = tree_track_MVAval[counter_track];
@@ -2213,7 +2235,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       else if ( hemi == 2 && MVAval > bdtcut ) Vtx_chi = Vtx_chi2;
       tree_track_Hemi_mva_NChi2.push_back(Vtx_chi);
     } //End loop on all the tracks
-    
+      }
     tree_Hemi_dR12.push_back(dR_axis12);
     tree_Hemi_dR12.push_back(dR_axis12);
     tree_Hemi_LLP_dR12.push_back(dRneuneu);
@@ -2221,7 +2243,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
 
   //////////////////////////////////
-
+  
   smalltree->Fill();
 }
 
@@ -2318,7 +2340,8 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_track_numberOfLostHits.clear();
     tree_track_originalAlgo.clear();
     tree_track_algo.clear();
-    tree_track_nHit.clear();
+    tree_track_drSig.clear();
+    tree_track_nhits.clear();
     tree_track_nHitPixel.clear();
     tree_track_nHitTIB.clear();
     tree_track_nHitTID.clear();
