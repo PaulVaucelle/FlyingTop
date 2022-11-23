@@ -66,7 +66,7 @@ class PropaHitPattern{
             }
           else
             {
-              FHPosition = make_pair(0,PropagateToDisk( firsthit, eta, phi, vz, PV, p ));
+              FHPosition = make_pair(0,PropagateToCylinder( firsthit, Prop, tsos, eta, phi, vz ));
               return FHPosition;
             }
         }
