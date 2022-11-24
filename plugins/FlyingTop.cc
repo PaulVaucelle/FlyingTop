@@ -45,13 +45,7 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 
-//$$
-// #include "DataFormats/Common/interface/Handle.h"
-// #include "DataFormats/TrackReco/interface/Track.h"
-// #include "DataFormats/TrackReco/interface/HitPattern.h"
-// #include "DataFormats/TrackingRecHit/interface/TrackingRecHit.h"
-// #include "DataFormats/DetId/interface/DetId.h"
-
+//!!!!!!
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -72,7 +66,7 @@
 
 #include "DataFormats/TrackerCommon/interface/TrackerTopology.h"
 #include "Geometry/Records/interface/TrackerTopologyRcd.h"
-//$$
+//!!!!
 
 #include "MagneticField/Engine/interface/MagneticField.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
@@ -80,86 +74,6 @@
 #include "FlyingTop/FlyingTop/interface/Proto.h"
 #include "FlyingTop/FlyingTop/interface/DeltaFunc.h"
 
-
-//$$
-// #include "CondFormats/GeometryObjects/interface/HcalParameters.h"
-// #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
-// #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
-// 
-// #include "DataFormats/BTauReco/interface/CATopJetTagInfo.h"
-// #include "DataFormats/Candidate/interface/Candidate.h"
-// #include "DataFormats/Common/interface/MergeableCounter.h"
-// #include "DataFormats/Common/interface/TriggerResults.h"
-// #include "DataFormats/Common/interface/View.h"
-// #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
-// #include "DataFormats/GeometryCommonDetAlgo/interface/Measurement1D.h"
-// #include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
-// #include "DataFormats/GsfTrackReco/interface/GsfTrackFwd.h"
-// #include "DataFormats/HepMCCandidate/interface/GenStatusFlags.h"
-// #include "DataFormats/HLTReco/interface/TriggerEvent.h"
-// #include "DataFormats/HLTReco/interface/TriggerObject.h"
-// #include "DataFormats/JetReco/interface/PFJet.h"
-// #include "DataFormats/JetReco/interface/PFJetCollection.h"
-// #include "DataFormats/L1Trigger/interface/Jet.h"
-// #include "DataFormats/L1Trigger/interface/Tau.h"
-// #include "DataFormats/Math/interface/deltaR.h"
-// #include "DataFormats/Math/interface/LorentzVector.h"
-// #include "DataFormats/MuonReco/interface/MuonSelectors.h"
-// #include "DataFormats/METReco/interface/CaloMET.h"
-// #include "DataFormats/METReco/interface/CaloMETFwd.h"
-// #include "DataFormats/METReco/interface/CaloMETCollection.h"
-// #include "DataFormats/METReco/interface/MET.h"
-// #include "DataFormats/METReco/interface/METFwd.h"
-// #include "DataFormats/METReco/interface/PFMET.h"
-// #include "DataFormats/METReco/interface/PFMETFwd.h"
-// #include "DataFormats/METReco/interface/PFMETCollection.h"
-// #include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
-// #include "DataFormats/PatCandidates/interface/GenericParticle.h"
-// #include "DataFormats/PatCandidates/interface/Tau.h"
-// #include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
-// #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
-// #include "DataFormats/SiPixelDetId/interface/PXBDetId.h"
-// #include "DataFormats/SiPixelDetId/interface/PXFDetId.h"
-// #include "DataFormats/SiPixelDetId/interface/PixelSubdetector.h"
-// #include "DataFormats/SiStripDetId/interface/SiStripDetId.h"
-// #include "DataFormats/SiStripDetId/interface/SiStripSubStructure.h"
-// #include "DataFormats/SiStripDetId/interface/StripSubdetector.h"
-// #include "DataFormats/TrackCandidate/interface/TrackCandidateCollection.h"
-// #include "DataFormats/TrackReco/interface/Track.h"
-// #include "DataFormats/TrackReco/interface/TrackFwd.h"
-// 
-// #include "DetectorDescription/Core/interface/DDCompactView.h"
-// 
-// #include "FWCore/Common/interface/TriggerNames.h"
-// #include "FWCore/Framework/interface/eventsetuprecord_registration_macro.h"
-// #include "FWCore/Framework/interface/EventSetup.h"
-// #include "FWCore/Framework/interface/ESHandle.h"
-// #include "FWCore/Framework/interface/ESTransientHandle.h"
-// #include "FWCore/Framework/interface/LuminosityBlock.h"
-// #include "FWCore/Utilities/interface/InputTag.h"
-// #include "FWCore/Utilities/interface/RegexMatch.h"
-// 
-// #include "GeneratorInterface/LHEInterface/interface/LHERunInfo.h"
-// 
-// #include "Geometry/HcalCommonData/interface/HcalParametersFromDD.h"
-// #include "Geometry/Records/interface/HcalParametersRcd.h"
-// #include "Geometry/Records/interface/IdealGeometryRecord.h"
-// #include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
-// #include "Geometry/TrackerGeometryBuilder/interface/PixelGeomDetUnit.h"
-// #include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
-// 
-// #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
-// 
-// #include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
-// #include "JetMETCorrections/Objects/interface/JetCorrector.h"
-// #include "JetMETCorrections/Modules/interface/JetResolution.h"
-// 
-// #include "RecoLocalTracker/ClusterParameterEstimator/interface/StripClusterParameterEstimator.h"
-// #include "RecoLocalTracker/ClusterParameterEstimator/interface/PixelClusterParameterEstimator.h"
-// #include "RecoLocalTracker/SiStripClusterizer/interface/SiStripClusterInfo.h"
-// 
-// #include "RecoTracker/FinalTrackSelectors/plugins/getBestVertex.h"
-// 
 #include "RecoVertex/AdaptiveVertexFit/interface/AdaptiveVertexFitter.h"
 #include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
 #include "RecoVertex/KalmanVertexFit/interface/KalmanVertexSmoother.h"
@@ -168,25 +82,6 @@
 #include "RecoVertex/VertexPrimitives/interface/ConvertToFromReco.h"
 #include "RecoVertex/VertexPrimitives/interface/TransientVertex.h"
 // 
-// #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-// #include "SimDataFormats/GeneratorProducts/interface/GenFilterInfo.h"
-// #include "SimDataFormats/GeneratorProducts/interface/GenLumiInfoHeader.h"
-// #include "SimDataFormats/GeneratorProducts/interface/GenRunInfoProduct.h"
-// #include "SimDataFormats/GeneratorProducts/interface/LHECommonBlocks.h"
-// #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
-// #include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
-// #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
-// 
-// #include "TrackingTools/GeomPropagators/interface/AnalyticalImpactPointExtrapolator.h"
-// #include "TrackingTools/GeomPropagators/interface/AnalyticalTrajectoryExtrapolatorToLine.h"
-// #include "TrackingTools/IPTools/interface/IPTools.h"
-// #include "TrackingTools/PatternTools/interface/Trajectory.h"
-// #include "TrackingTools/Records/interface/TrackingComponentsRecord.h"
-// #include "TrackingTools/Records/interface/TransientTrackRecord.h"
-// #include "TrackingTools/TrajectoryState/interface/TrajectoryStateTransform.h"
-// #include "TrackingTools/TrajectoryState/interface/TrajectoryStateOnSurface.h"
-// #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
-//$$
 //---------------------------------Paul-----------------------------//
                       //-----------Transient Track/Vtx--------//
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
@@ -216,6 +111,7 @@
 // class declaration
 //
 
+// skeleton from https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD2017#4_7_MiniAOD_Analysis_Documentati
 // If the analyzer does not use TFileService, please remove
 // the template argument to the base class so the class inherits
 // from  edm::one::EDAnalyzer<>
@@ -470,10 +366,10 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector< float > tree_genParticle_phi;
     std::vector< float > tree_genParticle_charge;
     std::vector< int >   tree_genParticle_pdgId;
+    std::vector< float > tree_genParticle_mass;
     std::vector< float > tree_genParticle_x;
     std::vector< float > tree_genParticle_y;
-    std::vector< float > tree_genParticle_z;
-    std::vector< float > tree_genParticle_mass;
+    std::vector< float > tree_genParticle_z;    
     std::vector< int >   tree_genParticle_statusCode;
     std::vector< int >   tree_genParticle_mother_pdgId;
 
@@ -1041,6 +937,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   }
   const reco::Vertex &PV = primaryVertex->front();
 
+
   //////////////////////////////////
   //////////////////////////////////
   ///////   Gen Particles   ////////
@@ -1068,7 +965,6 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   for (int k=0; k<2; k++) {
     neu[k] = -1;
   }
-  /////////////////////////////////////////////////////////
   
   if ( !runOnData_ ) {
  
@@ -1535,8 +1431,6 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   
     // loop on pf candidates
 
-
-
 // from /PhysicsTools/PatAlgos/plugins/PATIsolatedTrackProducer.cc
 // and
 // from /DQM/TrackingMonitor/src/PackedCandidateTrackValidator.cc
@@ -1830,7 +1724,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     reader->AddVariable( "mva_track_eta", &eta );
     reader->AddVariable( "mva_track_nchi2", &NChi2 );
     reader->AddVariable( "mva_track_nhits", &nhits );
-    reader->AddVariable( "mva_track_algo", &algo);
+    // reader->AddVariable( "mva_track_algo", &algo);
     //add the variables from my BDT(Paul)
     reader->AddVariable( "mva_ntrk10", &ntrk10);
     reader->AddVariable( "mva_drSig", &drSig); /*!*/
@@ -1844,7 +1738,9 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     float pt_Cut = 1.;
     float NChi2_Cut = 5.;
     float drSig_Cut = 5.;
-    double bdtcut = 0.0057; // optimal value for TMVAClassification_BDTG50cm.weights.xml
+    double bdtcut = -0.0815; 
+    //optimal value : -0.0815 for TMVAClassification_BDTG50sansalgo.weights.xml
+    // optimal value 0.0057 for TMVAClassification_BDTG50cm.weights.xml
     // optimal value w/o track association to axis: -0.0401: TMVAbgctau50withnhits.xml
 
 //$$    double bdtcut = -10.; // if NO BDT cut !**
@@ -1856,6 +1752,10 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       pat::PackedCandidateRef pcref = pat::PackedCandidateRef(pc_h, ipc);
       const reco::Track *trackPcPtr = pcref->bestTrack();
       if( !trackPcPtr ) continue;//happens (~5%) 
+            const reco::Track& trackPc = *trackPcPtr;
+      if ( trackPc.hitPattern().numberOfValidHits() == 0 ) continue;
+
+      if ( trackPc.charge() == 0 || trackPc.pt() < 1. ) continue;
     // for (size_t iTrack = 0; iTrack<trackRefs.size(); ++iTrack)  // Loop on all the tracks
     // {
       counter_track++;
@@ -1885,7 +1785,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       bdtval = -10.;
       dR = -1.;
       int tracks_axis = 0; // flag to check which axis is the closest from the track
-
+      algo=algo+1;
 //$$
       if ( pt > pt_Cut && NChi2 < NChi2_Cut && drSig > drSig_Cut ) // preselection : pt > 1. && NChi2 < 5. && drSig > 5.
 //$$
@@ -2205,6 +2105,13 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     // for (size_t iTrack = 0; iTrack<trackRefs.size(); ++iTrack) {
               for (unsigned int ipc = 0; ipc < pc->size(); ipc++) // Loop on all the tracks
     {       
+            pat::PackedCandidateRef pcref = pat::PackedCandidateRef(pcs, ipc);
+      const reco::Track *trackPcPtr = pcref->bestTrack();
+      if( !trackPcPtr ) continue;//happens (~5%) 
+      const reco::Track& trackPc = *trackPcPtr;
+      if ( trackPc.hitPattern().numberOfValidHits() == 0 ) continue;
+
+      if ( trackPc.charge() == 0 || trackPc.pt() < 1. ) continue; 
       counter_track++;
       int hemi      = tree_track_Hemi[counter_track];
       double MVAval = tree_track_MVAval[counter_track];
@@ -2218,7 +2125,6 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     tree_Hemi_dR12.push_back(dR_axis12);
     tree_Hemi_LLP_dR12.push_back(dRneuneu);
     tree_Hemi_LLP_dR12.push_back(dRneuneu);
-
 
   //////////////////////////////////
 
