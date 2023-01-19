@@ -24,7 +24,7 @@
 
 #include "CondCore/DBOutputService/interface/PoolDBOutputService.h"
               //CMSSW13 interface//
-#include "../interface/PackedCandidate.h"
+// #include "../interface/PackedCandidate.h"
 //------------------------------------
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
@@ -38,7 +38,7 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
-// #include "DataFormats/PatCandidates/interface/PackedCandidate.h"//!!!!!!!!!!!!!!!!!!!!
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"//!!!!!!!!!!!!!!!!!!!!
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
@@ -312,21 +312,21 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float>    tree_track_ntrk30;
     std::vector< double > tree_track_MVAval;
     
-             std::vector<float>    tree_track_Error_qoverp;
-     std::vector<float> tree_track_Error_pt2;
-     std::vector<float> tree_track_Error_pt;
-     std::vector<float> tree_track_Error_theta;
-     std::vector<float> tree_track_Error_lambda;
-     std::vector<float> tree_track_Error_eta;
-     std::vector<float> tree_track_Error_phi;
-     std::vector<float> tree_track_Error_dxy;
-     std::vector<float> tree_track_Error_d0;
-     std::vector<float> tree_track_Error_dsz;
-     std::vector<float> tree_track_Error_dz;
-     std::vector<float> tree_track_Error_t0;
-     std::vector<float> tree_track_Error_beta;
-           //std::vector<float> tree_track_Error_dxyRef;dxyError(););
-     std::vector<float> tree_track_Error_dxyBS;
+    //          std::vector<float>    tree_track_Error_qoverp;
+    //  std::vector<float> tree_track_Error_pt2;
+    //  std::vector<float> tree_track_Error_pt;
+    //  std::vector<float> tree_track_Error_theta;
+    //  std::vector<float> tree_track_Error_lambda;
+    //  std::vector<float> tree_track_Error_eta;
+    //  std::vector<float> tree_track_Error_phi;
+    //  std::vector<float> tree_track_Error_dxy;
+    //  std::vector<float> tree_track_Error_d0;
+    //  std::vector<float> tree_track_Error_dsz;
+    //  std::vector<float> tree_track_Error_dz;
+    //  std::vector<float> tree_track_Error_t0;
+    //  std::vector<float> tree_track_Error_beta;
+    //        //std::vector<float> tree_track_Error_dxyRef;dxyError(););
+    //  std::vector<float> tree_track_Error_dxyBS;
 
     std::vector< int >    tree_track_Hemi;
     std::vector< double > tree_track_Hemi_dR;
@@ -654,21 +654,21 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
 
     smalltree->Branch("tree_track_MVAval",         &tree_track_MVAval);
     
-    smalltree->Branch("tree_track_Error_qoverp",&tree_track_Error_qoverp);
-     smalltree->Branch("tree_track_Error_pt2",&tree_track_Error_pt2);
-     smalltree->Branch("tree_track_Error_pt",&tree_track_Error_pt);
-     smalltree->Branch("tree_track_Error_theta",&tree_track_Error_theta);
-     smalltree->Branch("tree_track_Error_lambda",&tree_track_Error_lambda);
-     smalltree->Branch("tree_track_Error_eta",&tree_track_Error_eta);
-     smalltree->Branch("tree_track_Error_phi",&tree_track_Error_phi);
-     smalltree->Branch("tree_track_Error_dxy",&tree_track_Error_dxy);
-     smalltree->Branch("tree_track_Error_d0",&tree_track_Error_d0);
-     smalltree->Branch("tree_track_Error_dsz",&tree_track_Error_dsz);
-     smalltree->Branch("tree_track_Error_dz",&tree_track_Error_dz);
-     smalltree->Branch("tree_track_Error_t0",&tree_track_Error_t0);
-     smalltree->Branch("tree_track_Error_beta",&tree_track_Error_beta);
-      //smalltree->Branch(" tree_track_Error_dxyRef",&dxyError()",&)",&
-     smalltree->Branch("tree_track_Error_dxyBS",&tree_track_Error_dxyBS);
+    // smalltree->Branch("tree_track_Error_qoverp",&tree_track_Error_qoverp);
+    //  smalltree->Branch("tree_track_Error_pt2",&tree_track_Error_pt2);
+    //  smalltree->Branch("tree_track_Error_pt",&tree_track_Error_pt);
+    //  smalltree->Branch("tree_track_Error_theta",&tree_track_Error_theta);
+    //  smalltree->Branch("tree_track_Error_lambda",&tree_track_Error_lambda);
+    //  smalltree->Branch("tree_track_Error_eta",&tree_track_Error_eta);
+    //  smalltree->Branch("tree_track_Error_phi",&tree_track_Error_phi);
+    //  smalltree->Branch("tree_track_Error_dxy",&tree_track_Error_dxy);
+    //  smalltree->Branch("tree_track_Error_d0",&tree_track_Error_d0);
+    //  smalltree->Branch("tree_track_Error_dsz",&tree_track_Error_dsz);
+    //  smalltree->Branch("tree_track_Error_dz",&tree_track_Error_dz);
+    //  smalltree->Branch("tree_track_Error_t0",&tree_track_Error_t0);
+    //  smalltree->Branch("tree_track_Error_beta",&tree_track_Error_beta);
+    //   //smalltree->Branch(" tree_track_Error_dxyRef",&dxyError()",&)",&
+    //  smalltree->Branch("tree_track_Error_dxyBS",&tree_track_Error_dxyBS);
 
      
     smalltree->Branch("tree_track_Hemi",           &tree_track_Hemi);
@@ -927,7 +927,27 @@ std::vector<bool> PassTrigger;
 }
 tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet!!
 
-
+TEfficiency* EffvsObs=new TEfficiency("Eff","Efficiency;patate;#epsilon",707,0,706);
+TFile* pFile = new TFile("myfile.root","recreate");
+  TDirectory* drt = new TDirectory(); 
+EffvsObs->SetDirectory(drt);
+TRandom3 rand3;
+double PATATE;
+// bool bPassed;
+for (unsigned int j=0;j< triggerH->size();j++)
+  {
+    PATATE = rand3.Uniform(707);
+      for (int i = 0 ; i <100 ; i++)
+        {
+        EffvsObs->TEfficiency::Fill(triggerH->accept(j),PATATE);
+        }
+      // bPassed = rand3.Rndm() < TMath::Gaus(PATATE,5,4);
+     
+      //triggerH->accept(0)
+      
+  }
+EffvsObs->Write();
+// EffvsObs->Draw("AP");
 
 //trig
 
@@ -1670,19 +1690,19 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
       // TrackBase::ParameterVector CovVector = tk.TrackBase::parameters();
             // std::cout<<"(qoverp, lambda, phi, dxy, dsz) = "<<CovVector[0]<<" / "<<CovVector[1]<<" / "<<CovVector[2]<<" / "<<CovVector[3]<<" / "<<CovVector[4]<<" ... "<<std::endl;
 
-      tree_track_Error_qoverp.push_back(tk.qoverpError());
-      // tree_track_Error_pt2.push_back(tk.ptError2());
-      tree_track_Error_pt.push_back(tk.ptError());
-      tree_track_Error_theta.push_back(tk.thetaError());
-      tree_track_Error_lambda.push_back(tk.lambdaError());
-      tree_track_Error_eta.push_back(tk.etaError());
-      tree_track_Error_phi.push_back(tk.phiError());
-      tree_track_Error_dxy.push_back(tk.dxyError());
-      tree_track_Error_d0.push_back(tk.d0Error());
-      tree_track_Error_dsz.push_back(tk.dszError());
-      tree_track_Error_dz.push_back(tk.dzError());
-      tree_track_Error_t0.push_back(tk.t0Error());
-      tree_track_Error_beta.push_back(tk.betaError());
+      // tree_track_Error_qoverp.push_back(tk.qoverpError());
+      // // tree_track_Error_pt2.push_back(tk.ptError2());
+      // tree_track_Error_pt.push_back(tk.ptError());
+      // tree_track_Error_theta.push_back(tk.thetaError());
+      // tree_track_Error_lambda.push_back(tk.lambdaError());
+      // tree_track_Error_eta.push_back(tk.etaError());
+      // tree_track_Error_phi.push_back(tk.phiError());
+      // tree_track_Error_dxy.push_back(tk.dxyError());
+      // tree_track_Error_d0.push_back(tk.d0Error());
+      // tree_track_Error_dsz.push_back(tk.dszError());
+      // tree_track_Error_dz.push_back(tk.dzError());
+      // tree_track_Error_t0.push_back(tk.t0Error());
+      // tree_track_Error_beta.push_back(tk.betaError());
       // tree_track_Error_dxyRef.push_back(tk.dxyError(););
       // tree_track_Error_dxyBS.push_back(tk.dxyError(bs));
                  //----------------MINIAOD_Firsthit-----------//
@@ -2486,7 +2506,7 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
           
           //-----------------------WIP-Hemi1----------------------------//
           std::vector<TransientTrack> vTT;
-          ntracks=2;
+
           tempchi2=0.;
           if (Vtx_chi<0)
           {
@@ -2502,6 +2522,7 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
                   TransientVertex TV = theFitter_Vertex_Hemi1_mva.vertex(vTT);//We take the first "good-looking" seed to start
                   if (TV.isValid() && TV.normalisedChiSquared()>0)//&& TV.normalisedChiSquared()>0 && abs(TV.normalisedChiSquared())<10
                     { 
+                      ntracks=2;
                       if (showlog) std::cout<<"1st LLP seed is created for k and p : "<<k<<" / "<<p<<" with chi2: "<<TV.normalisedChiSquared()<<std::endl;
                       for(int m = 0; m < Vtx_ntk ; m++)// We then add track by track to the vertex and check the validity of the vertex
                         {
@@ -2547,7 +2568,6 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
             else
       {
          std::vector<TransientTrack> vTT;
-          ntracks=2;
           tempchi2=0.;
           for  (int p = 0; p<Vtx_ntk;p++ ) //loop on all the TT
             {
@@ -2561,6 +2581,7 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
                   TransientVertex TV = theFitter_Vertex_Hemi1_mva.vertex(vTT);//We take the first "good-looking" seed to start
                   if (TV.isValid() && TV.normalisedChiSquared()>0)//&& TV.normalisedChiSquared()>0 && abs(TV.normalisedChiSquared())<10
                     { 
+                      ntracks=2;
                       if (showlog) std::cout<<"1st LLP seed is created for k and p : "<<k<<" / "<<p<<" with chi2: "<<TV.normalisedChiSquared()<<std::endl;
                       for(int m = 0; m < Vtx_ntk ; m++)// We then add track by track to the vertex and check the validity of the vertex
                         {
@@ -2701,7 +2722,7 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
           }
                     //-----------------------WIP-Hemi2---------------------------//
           std::vector<TransientTrack> vTT;
-          ntracks=2;
+
           tempchi2=0.;
           if (Vtx_chi<0)
           {
@@ -2717,6 +2738,7 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
                   TransientVertex TV = theFitter_Vertex_Hemi2_mva.vertex(vTT);//We take the first "good-looking" seed to start,
                   if (TV.isValid() && TV.normalisedChiSquared()>0)//&& TV.normalisedChiSquared()>0 && abs(TV.normalisedChiSquared())<10
                     { 
+                       ntracks=2;
                       if (showlog) std::cout<<"2nd LLP seed is created for k and p : "<<k<<" / "<<p<<" with chi2: "<<TV.normalisedChiSquared()<<std::endl;
                       for(int m = 0; m < Vtx_ntk ; m++) // We then add track by track to the vertex and check the validity of the vertex
                         {
@@ -2759,7 +2781,7 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
                   else
       {
          std::vector<TransientTrack> vTT;
-          ntracks=2;
+
           tempchi2=0.;
           for  (int p = 0; p<Vtx_ntk;p++ ) //loop on all the TT
             {
@@ -2773,6 +2795,7 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
                   TransientVertex TV = theFitter_Vertex_Hemi2_mva.vertex(vTT);//We take the first "good-looking" seed to start, 
                   if (TV.isValid() && TV.normalisedChiSquared()>0)//&& TV.normalisedChiSquared()>0 && abs(TV.normalisedChiSquared())<10
                     { 
+                      ntracks=2;
                       if (showlog) std::cout<<"2nd LLP seed is created for k and p : "<<k<<" / "<<p<<" with chi2: "<<TV.normalisedChiSquared()<<std::endl;
                       for(int m = 0; m < Vtx_ntk ; m++)// We then add track by track to the vertex and check the validity of the vertex
                         {
