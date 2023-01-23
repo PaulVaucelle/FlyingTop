@@ -491,6 +491,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector< bool >  tree_Hemi_LLP_ping;
     std::vector< int >   tree_event_LLP_ping;
 //$$
+    std::vector< float > tree_Hemi_Vtx_MeanBdtVal;
 };
 
 //
@@ -645,21 +646,6 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_track_ntrk30",       &tree_track_ntrk30);
     smalltree->Branch("tree_track_MVAval",         &tree_track_MVAval);
     
-//     smalltree->Branch("tree_track_Error_qoverp",&tree_track_Error_qoverp);
-//     // smalltree->Branch("tree_track_Error_pt2",&tree_track_Error_pt2);
-//     smalltree->Branch("tree_track_Error_pt",&tree_track_Error_pt);
-//     smalltree->Branch("tree_track_Error_theta",&tree_track_Error_theta);
-//     smalltree->Branch("tree_track_Error_lambda",&tree_track_Error_lambda);
-//     smalltree->Branch("tree_track_Error_eta",&tree_track_Error_eta);
-//     smalltree->Branch("tree_track_Error_phi",&tree_track_Error_phi);
-//     smalltree->Branch("tree_track_Error_dxy",&tree_track_Error_dxy);
-//     smalltree->Branch("tree_track_Error_d0",&tree_track_Error_d0);
-//     smalltree->Branch("tree_track_Error_dsz",&tree_track_Error_dsz);
-//     smalltree->Branch("tree_track_Error_dz",&tree_track_Error_dz);
-//     smalltree->Branch("tree_track_Error_t0",&tree_track_Error_t0);
-//     smalltree->Branch("tree_track_Error_beta",&tree_track_Error_beta);
-//     // smalltree->Branch(" tree_track_Error_dxyRef",&dxyError()",&)",&
-//     smalltree->Branch("tree_track_Error_dxyBS",&tree_track_Error_dxyBS);
 
     smalltree->Branch("tree_track_Hemi",           &tree_track_Hemi);
     smalltree->Branch("tree_track_Hemi_dR",        &tree_track_Hemi_dR);
@@ -819,6 +805,7 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_Hemi_Vtx_trackWeight", &tree_Hemi_Vtx_trackWeight);
     smalltree->Branch("tree_Hemi_LLP_ping",  &tree_Hemi_LLP_ping);
     smalltree->Branch("tree_event_LLP_ping", &tree_event_LLP_ping);
+    smalltree->Branch("tree_Hemi_Vtx_MeanBdtVal", &tree_Hemi_Vtx_MeanBdtVal);
 //$$
 
 //$$
@@ -1650,7 +1637,7 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
       tree_track_y.push_back            (tk_vy);
       tree_track_z.push_back            (tk_vz);
 
-      //----------------MINIAOD_Firsthit-----------//
+                  //----------------MINIAOD_Firsthit----------//
                   //-----------------IMPORTANT----------------//
                   // TSOS is said to be better for the -------//
                   // propagators (see Propagator.h)...--------//
@@ -1978,8 +1965,6 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
 
     vector<reco::TransientTrack> displacedTracks_llp1_mva, displacedTracks_llp2_mva; // Control Tracks
     vector<reco::TransientTrack> displacedTracks_Hemi1_mva, displacedTracks_Hemi2_mva; // Tracks selected wrt the hemisphere
-    std::vector<reco::TransientTrack> SortedHemi1;
-    std::vector<reco::TransientTrack> SortedHemi2;
     std::pair<vector<reco::TransientTrack>, std::vector<float>> PairSortedHemi1;
     std::pair<vector<reco::TransientTrack>, std::vector<float>> PairSortedHemi2;
 
@@ -2218,6 +2203,8 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
     float recX, recY, recZ, dSV, recD;
     float Vtx_TotalChi=0.;
     float Vtx_DOF=0.;
+    float MeanBdtValue = 0.1;
+    float UpperLimit = 10.;
 //$$
     // parameters for the Adaptive Vertex Fitter (AVF)
     double maxshift        = 0.0001;
@@ -2381,7 +2368,8 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
     float tempx = -100.;
     float tempy = -100.;
     float tempz = -100.;
-	
+    float mean= -2.;
+    bool Vtx_Valid = false;
     if ( Vtx_ntk > 1 )
     {
       // TransientVertex displacedVertex_Hemi1_mva = theFitter_Vertex_Hemi1_mva.vertex(displacedTracks_Hemi1_mva); // fitted vertex
@@ -2394,64 +2382,59 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
         Vtx_z = displacedVertex_Hemi1_mva.position().z();
         Vtx_chi = displacedVertex_Hemi1_mva.normalisedChiSquared();
         Vtx_ntk = displacedTracks_Hemi1_mva.size();
-        for (int p=0; p<Vtx_ntk; p++)
+        for (int p = 0; p < Vtx_ntk; p++)
         {
           // tree_LLP_Vtx_trackWeight.push_back(displacedVertex_Hemi1_mva.trackWeight(displacedTracks_Hemi1_mva[p]));
           tree_LLP_Vtx_trackWeight.push_back(displacedVertex_Hemi1_mva.trackWeight(PairSortedHemi1.first[p]));
-          // if (showlog) std::cout<<"1st vtx_chi / weight / chi2 / ndof / NCHi2: "<<Vtx_chi<<" / " <<displacedVertex_Hemi1_mva.trackWeight(displacedTracks_Hemi1_mva[p])<<" / "<<displacedTracks_Hemi1_mva[p].ndof()<<" / "<<displacedTracks_Hemi1_mva[p].normalizedChi2()<<std::endl;  	  
         }
-          
-                            //-----------------------IAVF----------------------------//
+        mean=0;
+        for (int y = 0; y < Vtx_ntk ; y++)
+          {
+            mean = mean + PairSortedHemi1.second[y];
+          }
+          mean = mean/Vtx_ntk;
+                            //-----------------------IAVF-Hemi1----------------------------//
         std::vector<TransientTrack> vTT;
 
-        tempchi2=0.;
         if ( Vtx_chi < 0 )
         {
-          for ( int p = 0; p < Vtx_ntk; p++ ) //loop on all the TT
+          for ( int p = 0; p < Vtx_ntk; p++ ) // loop on all the TT
           {
-            for  ( int k = p+1; k < Vtx_ntk; k++ ) //loop on all the other TT
+            for  ( int k = p+1; k < Vtx_ntk; k++ ) // loop on all the other TT
             {            
-              // vTT.push_back(displacedTracks_Hemi1_mva[p]);
-              // vTT.push_back(displacedTracks_Hemi1_mva[k]);
               vTT.push_back(PairSortedHemi1.first[p]);
               vTT.push_back(PairSortedHemi1.first[k]);
               TransientVertex TV = theFitter_Vertex_Hemi1_mva.vertex(vTT); // We take the first "good-looking" seed to start but does not discard any track from the collection
-              if (TV.isValid() && TV.normalisedChiSquared() > 0) // && TV.normalisedChiSquared()>0 && abs(TV.normalisedChiSquared())<10
+              if (TV.isValid() && TV.normalisedChiSquared() > 0  && TV.normalisedChiSquared() < UpperLimit) // && TV.normalisedChiSquared()>0 && abs(TV.normalisedChiSquared())<10
               { 
-                ntracks=2;
-                if (showlog) std::cout<<"1st LLP seed is created for k and p : "<<k<<" / "<<p<<" with chi2: "<<TV.normalisedChiSquared()<<std::endl;
+                mean = (PairSortedHemi1.second[k]+PairSortedHemi1.second[p]);
                 for (int m = 0; m < Vtx_ntk; m++)// We then add track by track to the vertex and check the validity of the vertex
                 {
                 if (m == k || m == p) continue;
-                  ntracks++;
-                  // vTT.push_back(displacedTracks_Hemi1_mva[m]);
                   vTT.push_back(PairSortedHemi1.first[m]);
                   TransientVertex updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
-                  if (showlog) std::cout<<"m = "<<m<<"/ chi2 of the vetex constructed with this seed : "<<updatedTV.normalisedChiSquared()<<" originally : "<<Vtx_chi<<std::endl;
-                  tempchi2=updatedTV.normalisedChiSquared();
+                  tempchi2 = updatedTV.normalisedChiSquared();
                   DOF = updatedTV.degreesOfFreedom();
                   temptChi2 = updatedTV.totalChiSquared();
-                  // || updatedTV.normalisedChiSquared()<0
-                  // || abs(updatedTV.normalisedChiSquared())>10
-                  if ( !updatedTV.isValid() || updatedTV.normalisedChiSquared()<0 ) 
-		  {  
-		    vTT.pop_back();
-		    ntracks--;
-		    updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
-		    tempchi2 = updatedTV.normalisedChiSquared();
-		    tempx=updatedTV.position().x();
-		    tempy=updatedTV.position().y();
-                    tempz=updatedTV.position().z(); 
-		    DOF = updatedTV.degreesOfFreedom();
-		    temptChi2 = updatedTV.totalChiSquared();
-		    continue;
-		  } 
+                  if ( !updatedTV.isValid() || updatedTV.normalisedChiSquared() < 0 || updatedTV.normalisedChiSquared() > UpperLimit ) 
+		                {  
+		   		   		   		    vTT.pop_back();
+		    		   		   		  updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
+		    		   		   		  tempchi2 = updatedTV.normalisedChiSquared();
+		    		   		   		  tempx=updatedTV.position().x();
+		    		   		   		  tempy=updatedTV.position().y();
+                    		  tempz=updatedTV.position().z(); 
+		    		   		   		  DOF = updatedTV.degreesOfFreedom();
+		    		   		   		  temptChi2 = updatedTV.totalChiSquared();
+		    		   		   		  continue;
+		  		   		   } 
                   else
-		  {
-		    tempx=updatedTV.position().x();
-		    tempy=updatedTV.position().y();
-		    tempz=updatedTV.position().z();
-		  }
+		               {
+        		   		    mean = mean + PairSortedHemi1.second[m];        
+		                  tempx=updatedTV.position().x();
+		                  tempy=updatedTV.position().y();
+		                  tempz=updatedTV.position().z();
+		               }
                 }
                 Vtx_chi = tempchi2;
                 Vtx_TotalChi = temptChi2;
@@ -2459,18 +2442,24 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
                 Vtx_x = tempx;
                 Vtx_y = tempy;
                 Vtx_z = tempz;
-                // if (showlog) std::cout << "OriginalTracks : " << Vtx_ntk << " vs Actual tracks : "<<ntracks<<"and Final chi2 of : "<<Vtx_chi<<std::endl; 
-                break;  	   
+                ntracks=vTT.size();
+                mean = mean/vTT.size();
+                Vtx_Valid = true;//Final vertex is valid
+                break;  //can potentially give a bad seed	=> usually happens for a low a amount of tracks (few % of the event)   
               }
               else
               { // If not valid : we build a new seed
                 ntracks=0;
                 vTT.clear();
-                continue;
+                Vtx_Valid = false;//FInal Vertex is not valid with the considered seed, so try a new seed
+                continue;// can have no output
               }
-              break;
+              // break; //never encountered
             }
-            break;
+            // break;//This has to be changed, can give a bad seed (espcially when there is low number of track)
+            if (Vtx_Valid==false || mean <MeanBdtValue) continue ;//MeanBdtValue is arbitrary : ttree->Draw("tree_Hemi_Vtx_dd","abs(tree_Hemi_Vtx_NChi2)<10 && tree_Hemi_Vtx_MeanBdtVal<MeanBdtValue")
+            else if (Vtx_Valid==true && mean < MeanBdtValue) continue;
+            else if (Vtx_Valid==true && mean > MeanBdtValue) break;// (Vtx_Valid==true && mean > MeanBdtValue)
           }
         }
       }
@@ -2478,52 +2467,44 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
       {
         std::vector<TransientTrack> vTT;
 
-        tempchi2=0.;
+
         for (int p = 0; p < Vtx_ntk; p++) // loop on all the TT
         {
           for  (int k = p+1; k < Vtx_ntk; k++ ) //loop on all the other TT
           {
-            // vTT.push_back(displacedTracks_Hemi1_mva[p]);
-            // vTT.push_back(displacedTracks_Hemi1_mva[k]);
             vTT.push_back(PairSortedHemi1.first[p]);
             vTT.push_back(PairSortedHemi1.first[k]);
             TransientVertex TV = theFitter_Vertex_Hemi1_mva.vertex(vTT); // We take the first "good-looking" seed to start
-            if ( TV.isValid() && TV.normalisedChiSquared() > 0 ) // && TV.normalisedChiSquared()>0 && abs(TV.normalisedChiSquared())<10
+            if ( TV.isValid() && TV.normalisedChiSquared() > 0 && TV.normalisedChiSquared() < UpperLimit) // && TV.normalisedChiSquared()>0 && abs(TV.normalisedChiSquared())<10
             { 
-              ntracks=2;
-              if (showlog) std::cout << "1st LLP seed is created for k and p : "<<k<<" / "<<p<<" with chi2: "<<TV.normalisedChiSquared()<<std::endl;
+              mean = (PairSortedHemi1.second[k]+PairSortedHemi1.second[p]);
               for (int m = 0; m < Vtx_ntk ; m++)// We then add track by track to the vertex and check the validity of the vertex
               {
               if (m == k || m == p) continue;
-                ntracks++;
-                // vTT.push_back(displacedTracks_Hemi1_mva[m]);
                 vTT.push_back(PairSortedHemi1.first[m]);
                 TransientVertex updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
-                if (showlog) std::cout << "m = "<<m<<"/ chi2 of the vetex constructed with this seed : "<<updatedTV.normalisedChiSquared()<<" originally : "<<Vtx_chi<<std::endl;
                 tempchi2 = updatedTV.normalisedChiSquared();
                 DOF = updatedTV.degreesOfFreedom();
                 temptChi2 = updatedTV.totalChiSquared();
-                // || updatedTV.normalisedChiSquared()<0
-                // || abs(updatedTV.normalisedChiSquared())>10
-                if (!updatedTV.isValid() || updatedTV.normalisedChiSquared()<0) 
-		{
-		  vTT.pop_back();
-		  ntracks--;
-		  updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
-		  tempchi2=updatedTV.normalisedChiSquared();
-		  tempx=updatedTV.position().x();
-		  tempy=updatedTV.position().y();
-                  tempz=updatedTV.position().z();
-		  DOF = updatedTV.degreesOfFreedom();
-		  temptChi2 = updatedTV.totalChiSquared();
-		  continue;
-		}
+                if (!updatedTV.isValid() || updatedTV.normalisedChiSquared()<0 || updatedTV.normalisedChiSquared()>UpperLimit) 
+		              {
+		                vTT.pop_back();
+		  		  		  	updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
+		  		  		    tempchi2=updatedTV.normalisedChiSquared();
+		  		  		    tempx=updatedTV.position().x();
+		  		  		    tempy=updatedTV.position().y();
+                    tempz=updatedTV.position().z();
+		  		  		    DOF = updatedTV.degreesOfFreedom();
+		  		  		    temptChi2 = updatedTV.totalChiSquared();
+		  		  		    continue;
+		              }
                 else
-		{
-		  tempx=updatedTV.position().x();
-		  tempy=updatedTV.position().y();
-		  tempz=updatedTV.position().z();
-		}  
+		              {
+                    mean = mean + PairSortedHemi1.second[m];
+		                tempx=updatedTV.position().x();
+		                tempy=updatedTV.position().y();
+		                tempz=updatedTV.position().z();
+		              }  
               }
               Vtx_chi = tempchi2;
               Vtx_TotalChi = temptChi2;
@@ -2531,23 +2512,31 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
               Vtx_x = tempx;
               Vtx_y = tempy;
               Vtx_z = tempz;
-              // if (showlog) std::cout << "OriginalTracks : "<<Vtx_ntk<<" vs Actual tracks : "<<ntracks<<"and Final chi2 of : "<<Vtx_chi<<std::endl; 
+              ntracks=vTT.size();
+              mean = mean/vTT.size();
+              // if (showlog) std::cout << "OriginalTracks : "<<Vtx_ntk<<" vs Actual tracks : "<<ntracks<<"and Final chi2 of : "<<Vtx_chi<<std::endl;
+              Vtx_Valid = true;
               break;		 
             }
             else
             {// If not valid : we build a new seed
               ntracks=0;
+              Vtx_Valid = false;
               vTT.clear();
               continue;
             }
-            break;
+            // break;//never encountered
           }
-          break;
+          // break;//this need to be changed
+            if (Vtx_Valid==false || mean <MeanBdtValue) continue ;//MeanBdtValue is arbitrary : ttree->Draw("tree_Hemi_Vtx_dd","abs(tree_Hemi_Vtx_NChi2)<10 && tree_Hemi_Vtx_MeanBdtVal<MeanBdtValue")
+            else if (Vtx_Valid==true && mean < MeanBdtValue) continue;
+            else if (Vtx_Valid==true && mean > MeanBdtValue) break;// (Vtx_Valid==true && mean > MeanBdtValue)
         }
       }
                     //--------------------ENDOF IAVF--------------------------//
     }
-
+    std::cout<<"the mean of the tracks used : "<<mean<<std::endl;
+    tree_Hemi_Vtx_MeanBdtVal.push_back(mean);
     // !! New information caused by iterative AVF !! //
     tree_Hemi_Vtx_UpdatedChi2.push_back(tempchi2);
     tree_Hemi_Vtx_ntrk.push_back(ntracks);
@@ -2645,7 +2634,9 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
     Vtx_z = -100.;
     Vtx_chi = -10.;
     ntracks=-2;
-    tempchi2= -10.;    
+    tempchi2= -10.;
+    mean = -2.;
+    Vtx_Valid = false; 
     if ( Vtx_ntk > 1 )
     {
       TransientVertex displacedVertex_Hemi2_mva = theFitter_Vertex_Hemi2_mva.vertex(displacedTracks_Hemi2_mva); // fitted vertex
@@ -2656,16 +2647,20 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
         Vtx_y = displacedVertex_Hemi2_mva.position().y();
         Vtx_z = displacedVertex_Hemi2_mva.position().z();
         Vtx_chi = displacedVertex_Hemi2_mva.normalisedChiSquared();
+        mean=0;
+        for (int y = 0; y < Vtx_ntk ; y++)
+          {
+            mean = mean + PairSortedHemi2.second[y];
+          }
+          mean = mean/Vtx_ntk;
         for (int p =0; p<Vtx_ntk; p++)
         {
           // tree_LLP_Vtx_trackWeight.push_back(displacedVertex_Hemi2_mva.trackWeight(displacedTracks_Hemi2_mva[p]));
           tree_LLP_Vtx_trackWeight.push_back(displacedVertex_Hemi2_mva.trackWeight(PairSortedHemi2.first[p]));
           //  if(showlog) std::cout<<"2nd vtx_chi  / weight / chi2 / ndof / NChi2 : "<<Vtx_chi<<" / " <<displacedVertex_Hemi2_mva.trackWeight(displacedTracks_Hemi2_mva[p])<<" / "<<displacedTracks_Hemi2_mva[p].chi2()<<" / "<<displacedTracks_Hemi2_mva[p].ndof()<<" / "<<displacedTracks_Hemi2_mva[p].normalizedChi2()<<std::endl;
         }
-                    //-----------------------IAVF---------------------------//
+                    //-----------------------IAVF-Hemi2---------------------------//
         std::vector<TransientTrack> vTT;
-
-        tempchi2=0.;
         if (Vtx_chi<0)
         {
           for  (int p = 0; p<Vtx_ntk; p++) //loop on all the TT
@@ -2676,15 +2671,14 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
               // vTT.push_back(displacedTracks_Hemi2_mva[k]);
               vTT.push_back(PairSortedHemi2.first[p]);
               vTT.push_back(PairSortedHemi2.first[k]);
-              ntracks=2;
               TransientVertex TV = theFitter_Vertex_Hemi2_mva.vertex(vTT);//We take the first "good-looking" seed to start,
-              if (TV.isValid() && TV.normalisedChiSquared()>0) // && TV.normalisedChiSquared()>0 && abs(TV.normalisedChiSquared())<10
+              if (TV.isValid() && TV.normalisedChiSquared()>0 && TV.normalisedChiSquared()<UpperLimit) // && TV.normalisedChiSquared()>0 && abs(TV.normalisedChiSquared())<10
               { 
+                mean = (PairSortedHemi2.second[k]+PairSortedHemi2.second[p]);
                 if (showlog) std::cout << "2nd LLP seed is created for k and p : "<<k<<" / "<<p<<" with chi2: "<<TV.normalisedChiSquared()<<std::endl;
                 for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
                 {
                 if (m == k || m == p) continue;
-                  ntracks++;
                   // vTT.push_back(displacedTracks_Hemi2_mva[m]);
                   vTT.push_back(PairSortedHemi2.first[m]);
                   TransientVertex updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
@@ -2694,10 +2688,9 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
                   temptChi2 = updatedTV.totalChiSquared();
                   // || updatedTV.normalisedChiSquared()<0
                   // || abs(updatedTV.normalisedChiSquared())>10
-                  if ( !updatedTV.isValid() || updatedTV.normalisedChiSquared()<0 ) 
+                  if ( !updatedTV.isValid() || updatedTV.normalisedChiSquared()<0 || updatedTV.normalisedChiSquared()>UpperLimit) 
 		  {
 		    vTT.pop_back();
-		    ntracks--;
 		    updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
 		    tempchi2=updatedTV.normalisedChiSquared();
 		    tempx=updatedTV.position().x();
@@ -2705,10 +2698,11 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
                     tempz=updatedTV.position().z();
 		    DOF = updatedTV.degreesOfFreedom();
 		    temptChi2 = updatedTV.totalChiSquared();
-		    continue;
+		    continue;//pas utile
 		  } 
                   else
 		  {
+        mean = mean + PairSortedHemi2.second[m];
 		    tempx=updatedTV.position().x();
 		    tempy=updatedTV.position().y();
 		    tempz=updatedTV.position().z();
@@ -2720,43 +2714,46 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
                 Vtx_x = tempx;
                 Vtx_y = tempy;
                 Vtx_z = tempz;
+                Vtx_Valid = true;
+                ntracks=vTT.size();
+                mean = mean/vTT.size();
                 if (showlog) std::cout << "OriginalTracks : "<<Vtx_ntk<<" vs Actual tracks : "<<ntracks<<"and Final chi2 of : "<<Vtx_chi<<std::endl;      
                 break;	    
               }
               else
               { // If not valid : we build a new seed
                 ntracks = 0;
+                Vtx_Valid = false;
                 vTT.clear();
                 continue;
               }
-              break;
+              // break;//nerver encountered
             }
-            break;   
+            // break;   
+            if (Vtx_Valid==false || mean <MeanBdtValue) continue ;//MeanBdtValue is arbitrary : ttree->Draw("tree_Hemi_Vtx_dd","abs(tree_Hemi_Vtx_NChi2)<10 && tree_Hemi_Vtx_MeanBdtVal<MeanBdtValue")
+            else if (Vtx_Valid==true && mean < MeanBdtValue) continue;
+            else if (Vtx_Valid==true && mean > MeanBdtValue) break;// (Vtx_Valid==true && mean > MeanBdtValue)
           }
         }
       }
       else
       {
         std::vector<TransientTrack> vTT;
-        
-        tempchi2=0.;
         for  (int p = 0; p < Vtx_ntk; p++) //loop on all the TT
         {
           for  (int k = p+1; k < Vtx_ntk; k++ ) //loop on all the other TT
           {
-            // vTT.push_back(displacedTracks_Hemi2_mva[p]);
-            // vTT.push_back(displacedTracks_Hemi2_mva[k]);
             vTT.push_back(PairSortedHemi2.first[p]);
             vTT.push_back(PairSortedHemi2.first[k]);
             TransientVertex TV = theFitter_Vertex_Hemi2_mva.vertex(vTT);//We take the first "good-looking" seed to start, 
-            if ( TV.isValid() && TV.normalisedChiSquared() > 0 )// && TV.normalisedChiSquared()>0 && abs(TV.normalisedChiSquared())<10
+            if ( TV.isValid() && TV.normalisedChiSquared() > 0 && TV.normalisedChiSquared() < UpperLimit )// && TV.normalisedChiSquared()>0 && abs(TV.normalisedChiSquared())<10
             { 
+              mean = PairSortedHemi2.second[k]+PairSortedHemi2.second[p];
               ntracks=2;
               if (showlog) std::cout << " 2nd LLP seed is created for k and p : "<<k<<" / "<<p<<" with chi2: "<<TV.normalisedChiSquared()<<std::endl;
               for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
               {
               if ( m == k || m == p ) continue;
-                ntracks++;
                 // vTT.push_back(displacedTracks_Hemi2_mva[m]);
                 vTT.push_back(PairSortedHemi2.first[m]);
                 TransientVertex updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
@@ -2764,12 +2761,9 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
                 tempchi2 = updatedTV.normalisedChiSquared();
                 DOF = updatedTV.degreesOfFreedom();
                 temptChi2 = updatedTV.totalChiSquared();
-                // || updatedTV.normalisedChiSquared()<0
-                // || abs(updatedTV.normalisedChiSquared())>10
-                if ( !updatedTV.isValid() || updatedTV.normalisedChiSquared()<0 ) 
+                if ( !updatedTV.isValid() || updatedTV.normalisedChiSquared()<0  || updatedTV.normalisedChiSquared()> UpperLimit) 
 		{
 		  vTT.pop_back();
-		  ntracks--;
 		  updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
 		  tempchi2=updatedTV.normalisedChiSquared();
 		  tempx=updatedTV.position().x();
@@ -2781,6 +2775,7 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
 		}
                 else
 		{
+      mean = mean + PairSortedHemi2.second[m];
 		  tempx=updatedTV.position().x();
 		  tempy=updatedTV.position().y();
 		  tempz=updatedTV.position().z();
@@ -2792,22 +2787,30 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
               Vtx_x = tempx;
               Vtx_y = tempy;
               Vtx_z = tempz;
-              // if (showlog) std::cout << " OriginalTracks : " << Vtx_ntk << " vs Actual tracks : "<<ntracks<<"and Final chi2 of : "<<Vtx_chi<<std::endl; 
+              Vtx_Valid = true;
+              ntracks=vTT.size();
+              mean = mean/vTT.size();
               break;		 
             }
             else
             { // If not valid : we build a new seed
               ntracks = 0;
               vTT.clear();
+              Vtx_Valid = false;
               continue;
             }
-            break;
+            // break;//never encountered
           }
-          break;
+          // break;//this needs to be changed
+            if (Vtx_Valid==false || mean <MeanBdtValue) continue ;//MeanBdtValue is arbitrary : ttree->Draw("tree_Hemi_Vtx_dd","abs(tree_Hemi_Vtx_NChi2)<10 && tree_Hemi_Vtx_MeanBdtVal<MeanBdtValue")
+            else if (Vtx_Valid==true && mean < MeanBdtValue) continue;
+            else if (Vtx_Valid==true && mean > MeanBdtValue) break;// (Vtx_Valid==true && mean > MeanBdtValue)
         }
-      //-----------------------ENFO OF IAVF---------------------//
+      //-----------------------ENFO OF IAVF HEMI2---------------------//
       }
-    }    
+    } 
+              std::cout<<"the mean of the tracks used : "<<mean<<std::endl;
+    tree_Hemi_Vtx_MeanBdtVal.push_back(mean);  
     // !!New information caused by iterative AVF !! //
     tree_Hemi_Vtx_UpdatedChi2.push_back(tempchi2);
     tree_Hemi_Vtx_ntrk.push_back(ntracks); 
@@ -2907,62 +2910,6 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
     else if ( ping_Hemi1 || ping_Hemi2 ) ping_event = 1;
     tree_event_LLP_ping.push_back( ping_event );
 //$$
-
-//&&&&&
-//     // some informations from gen particles from LLP 
-// //   if ( dump ) {
-//     cout << endl;
-//     for (int k = 0; k < tree_ngenFromLLP; k++) // loop on final gen part from LLP
-//     {
-//       float qGen   = tree_genFromLLP_charge[k];
-//       float ptGen  = tree_genFromLLP_pt[k];
-//       float etaGen = tree_genFromLLP_eta[k];
-//       float phiGen = tree_genFromLLP_phi[k]; // given at production point
-//       float xGen   = tree_genFromLLP_x[k];
-//       float yGen   = tree_genFromLLP_y[k];
-//       float zGen   = tree_genFromLLP_z[k];
-// 	// compute phi at PV for the gen particle (instead of production point)
-//         float qR = qGen * ptGen * 100 / 0.3 / 3.8;
-//         float sin0 = qR * sin( phiGen ) + (xGen - tree_GenPVx);
-//         float cos0 = qR * cos( phiGen ) - (yGen - tree_GenPVy);
-//         float phi0 = TMath::ATan2( sin0, cos0 ); // but note that it can be wrong by +_pi ! 
-// //       if ( dump ) {
-//         cout << " Gen " << k << " from LLP " << tree_genFromLLP_LLP[k]
-// 	     << " pt eta phi phi0 q " << ptGen << " " << etaGen << " " << phiGen << " " << phi0 << " " << qGen 
-// 	     << " x y z " << xGen << " " << yGen << " " << zGen 
-// 	     << endl; 
-// //       }
-//     } // end loop on final gen part from LLP
-// //   }
-// 
-//     cout << endl;
-//     // some informations for tracks 
-//     counter_track = -1;
-//     for (unsigned int ipc = 0; ipc < pc->size()+lostpc->size(); ipc++) {
-//       // pat::PackedCandidateRef pcref = pat::PackedCandidateRef(pcs, ipc);
-//       pat::PackedCandidateRef pcref = MINIgeneralTracks[ipc];
-//       const reco::Track *trackPcPtr = pcref->bestTrack();
-//     if( !trackPcPtr ) continue;
-//       const reco::Track& tk = *trackPcPtr;
-//       int   tk_nHit   = tk.hitPattern().numberOfValidHits();
-//       int   tk_charge = tk.charge();
-//     if ( tk_nHit == 0 ) continue;
-//     if ( tk_charge == 0 ) continue;
-//       counter_track++;
-//       if ( tree_track_sim_LLP[counter_track] > 0 
-//            && tree_track_pt[counter_track] > pt_Cut 
-// 	   && tree_track_NChi2[counter_track] < NChi2_Cut 
-// 	   && tree_track_drSig[counter_track] > drSig_Cut ) {
-//         cout << " Track " << counter_track << " LLP " << tree_track_sim_LLP[counter_track] 
-// 	     << " pt eta phi q " << tree_track_pt[counter_track] << " " << tree_track_eta[counter_track] << " " << tree_track_phi[counter_track] << " " << tree_track_charge[counter_track] 
-// 	     << " chi2 drSig " << tree_track_NChi2[counter_track] << " " << tree_track_drSig[counter_track] 
-// 	     << " 1rst x y z " << tree_track_firstHit_x[counter_track] << " " << tree_track_firstHit_y[counter_track] << " " << tree_track_firstHit_z[counter_track] 
-// 	     << " LOST " << tree_track_lost[counter_track] 
-// 	     << endl; 
-//       }
-//     } //End loop on all the tracks
-//     cout << endl;
-//&&&&&
       
     // some informations for tracks in their hemisphere
 //$$
@@ -3005,25 +2952,7 @@ tree_trigger_size.push_back(VTrigger.size());//should be the same for each evnet
     tree_Hemi_Vtx_ntrk20.push_back(ntrk20_vtx_hemi2);
 //$$
 
-//&&&&&
-//     // some informations for tracks 
-//     for (int counter_track = 0; counter_track < tree_nTracks; counter_track++) 
-//     {
-// //       if ( dump && tree_track_sim_LLP[counter_track] <= 0 
-//       if ( tree_track_sim_LLP[counter_track] <= 0 
-//            && tree_track_pt[counter_track] > pt_Cut 
-// 	   && tree_track_NChi2[counter_track] < NChi2_Cut 
-// 	   && tree_track_drSig[counter_track] > drSig_Cut ) {
-//         cout << " Track " << counter_track << " LLP " << tree_track_sim_LLP[counter_track] 
-// 	     << " pt eta phi q " << tree_track_pt[counter_track] << " " << tree_track_eta[counter_track] << " " << tree_track_phi[counter_track] << " " << tree_track_charge[counter_track] 
-// 	     << " chi2 drSig " << tree_track_NChi2[counter_track] << " " << tree_track_drSig[counter_track] 
-// 	     << " 1rst x y z " << tree_track_firstHit_x[counter_track] << " " << tree_track_firstHit_y[counter_track] << " " << tree_track_firstHit_z[counter_track] 
-// 	     << " LOST " << tree_track_lost[counter_track] 
-// 	     << endl; 
-//       }
-//     } //End loop on all the tracks
-//&&&&&
-      
+     
   //////////////////////////////////
   // }//end passes htfilter
   smalltree->Fill();
@@ -3040,7 +2969,32 @@ FlyingTopAnalyzer::beginJob()
 void
 FlyingTopAnalyzer::endJob()
 {
+  float countChi2 = 0.;
+  float countEff = 0.;
+  float effChi2;
+  float Vtxeff;
+  std::cout<<"size : "<<tree_Hemi.size()<<std::endl;
+for(unsigned int i=0;i<20000;i++)
+  {
+    if (abs(tree_Hemi_Vtx_NChi2[i])<10)
+      {
+        countChi2=countChi2+1;
+        if (tree_Hemi_Vtx_dd[i]<0.1)
+          {
+            countEff=countEff+1;
+          }
+      }
+  }
+  effChi2= countChi2/20000.;
+  Vtxeff = countEff/20000.;
 
+  std::cout<<"counts : "<<countChi2<<" / "<<countEff<<std::endl;
+  std::cout<<"//----------Efficiencies-----------\\"<<std::endl;
+  std::cout<<"||                                 ||"<<std::endl;
+  std::cout<<"|| Vertex w/ good Chi2 : "<<effChi2<<"% ||"<<std::endl;
+  std::cout<<"|| Vertex RecoEff : "<<Vtxeff<<"%       ||"<<std::endl;
+  std::cout<<"||                                  ||"<<std::endl;
+  std::cout<<"\\----------------------------------//"<<std::endl;
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
@@ -3296,6 +3250,7 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_Hemi_Vtx_ntrk.clear();
     tree_Hemi_Vtx_TotalChi2.clear();
     tree_Hemi_Vtx_DOF.clear();
+    tree_Hemi_Vtx_MeanBdtVal.clear();
 //$$
     tree_Hemi_Vtx_ddbad.clear();
     tree_Hemi_Vtx_ntrk10.clear();
