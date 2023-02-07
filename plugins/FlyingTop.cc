@@ -307,6 +307,8 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float>     tree_track_bkg_pt;
     std::vector<float>     tree_track_bkg_eta;
     std::vector<float>     tree_track_bkg_phi;
+    std::vector<float>     tree_track_bkg_charge;
+    std::vector<int>       tree_track_bkg_source;
     std::vector<float>     tree_track_dpt;
     std::vector<float>     tree_track_deta;
     std::vector<float>     tree_track_dphi;
@@ -1174,6 +1176,8 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_track_bkg_pt",   &tree_track_bkg_pt);
     smalltree->Branch("tree_track_bkg_eta",  &tree_track_bkg_eta);
     smalltree->Branch("tree_track_bkg_phi",  &tree_track_bkg_phi);
+    smalltree->Branch("tree_track_bkg_charge",&tree_track_bkg_charge);
+    smalltree->Branch("tree_track_bkg_source",&tree_track_bkg_source);
     smalltree->Branch("tree_track_dpt",&tree_track_dpt);
     smalltree->Branch("tree_track_deta",&tree_track_deta);
     smalltree->Branch("tree_track_dphi",&tree_track_dphi);
@@ -2659,6 +2663,8 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
           tree_track_bkg_pt.push_back((*KshortVertex)[j].daughter(i)->pt());
           tree_track_bkg_eta.push_back((*KshortVertex)[j].daughter(i)->eta());
           tree_track_bkg_phi.push_back((*KshortVertex)[j].daughter(i)->phi());
+          tree_track_bkg_charge.push_back((*KshortVertex)[j].daughter(i)->charge());
+          tree_track_bkg_source.push_back(1);
         }
 //$$$$      
       }
@@ -2702,6 +2708,8 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
           tree_track_bkg_pt.push_back((*LambdaVertex)[j].daughter(i)->pt());
           tree_track_bkg_eta.push_back((*LambdaVertex)[j].daughter(i)->eta());
           tree_track_bkg_phi.push_back((*LambdaVertex)[j].daughter(i)->phi());
+          tree_track_bkg_charge.push_back((*LambdaVertex)[j].daughter(i)->charge());
+          tree_track_bkg_source.push_back(2);
         }
 //$$$$      
       }
@@ -2763,24 +2771,25 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
           {
             if ((*PhotonConversion)[j].pairInvariantMass()<1 )
               {
+                  for (unsigned int i=0 ; i < YcTracks.size() ; i++)
+                    {
+                      tree_Yc_tracks_pt.push_back( YcTracks[i].pt());
+                      tree_Yc_tracks_eta.push_back(YcTracks[i].eta());
+                      tree_Yc_tracks_phi.push_back(YcTracks[i].phi());
+                      tree_track_bkg_pt.push_back( YcTracks[i].pt());
+                      tree_track_bkg_eta.push_back(YcTracks[i].eta());
+                      tree_track_bkg_phi.push_back(YcTracks[i].phi());
+                      tree_track_bkg_charge.push_back(YcTracks[i].charge());
+                      tree_track_bkg_source.push_back(3);
+                      //we have access to the same amount of information for the covnersion as the tracks in pfcandidate
+                      //aka TrackBase.h
+                    }
                 tree_Yc_mass.push_back((*PhotonConversion)[j].pairInvariantMass());
               }
           }
         else tree_Yc_mass.push_back(-1);
       }
     }
-  }
-
-  for (unsigned int i=0 ; i < YcTracks.size() ; i++)
-  {
-    tree_Yc_tracks_pt.push_back( YcTracks[i].pt());
-    tree_Yc_tracks_eta.push_back(YcTracks[i].eta());
-    tree_Yc_tracks_phi.push_back(YcTracks[i].phi());
-    tree_track_bkg_pt.push_back( YcTracks[i].pt());
-    tree_track_bkg_eta.push_back(YcTracks[i].eta());
-    tree_track_bkg_phi.push_back(YcTracks[i].phi());
-    //we have access to the same amount of information for the covnersion as the tracks in pfcandidate
-    //aka TrackBase.h
   }
 
 
@@ -3465,12 +3474,13 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
   for (unsigned int i = 0; i< tree_track_bkg_pt.size() ; i++ ) 
     {
       float dpt = tree_track_bkg_pt[i]-tk_pt;
-      float dphi = tree_track_bkg_eta[i]-tk_eta;
-      float deta = tree_track_bkg_phi[i]-tk_phi;
+      float deta = tree_track_bkg_eta[i]-tk_eta;
+      float dphi = tree_track_bkg_phi[i]-tk_phi;
+      float bkg_charge = tree_track_bkg_charge[i];
       tree_track_dpt.push_back(dpt);
       tree_track_deta.push_back(deta);
       tree_track_dphi.push_back(dphi);
-      if ( abs(deta) < 0.01 && abs(dphi) < 0.01 && abs(dpt) < 0.01 && TrackMatchingToV0)   { matchTObkg = true;}
+      if ( abs(deta) < 0.01 && abs(dphi) < 0.01 && abs(dpt) < 0.01 && bkg_charge == tk_charge && TrackMatchingToV0)   { matchTObkg = true;}
     }
     tree_track_bkg.push_back(matchTObkg);
     if (matchTObkg)continue;
@@ -5140,6 +5150,8 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_track_bkg_pt.clear();
     tree_track_bkg_eta.clear();
     tree_track_bkg_phi.clear();
+    tree_track_bkg_charge.clear();
+    tree_track_bkg_source.clear();
     tree_track_dpt.clear();
     tree_track_deta.clear();
     tree_track_dphi.clear();
