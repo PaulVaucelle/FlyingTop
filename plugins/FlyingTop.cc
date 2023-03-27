@@ -42,7 +42,7 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
-#include "DataFormats/PatCandidates/interface/PackedCandidate.h"//!!!!!!!!!!!!!!!!!!!!
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
@@ -133,9 +133,6 @@
  
  //-------------CaloCluster---------------------//
 #include "DataFormats/CaloRecHit/interface/CaloCluster.h"
-#include  "RecoEgamma/EgammaPhotonAlgos/interface/ConversionVertexFinder.h"
-#include "CommonTools/Statistics/interface/ChiSquaredProbability.h"
-#include "RecoEgamma/EgammaPhotonAlgos/interface/TangentApproachInRPhi.h"
 // #include "../interface/OwnConversion.cc"
 //------------------------------End of Paul------------------------//
 
@@ -193,7 +190,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     
     edm::ESHandle<MagneticField> bField;
     
-   
+    edm::ParameterSet kvfPSet;
     //trig
     edm::EDGetTokenT<edm::TriggerResults> triggerResultsToken_;
     //trig
@@ -208,7 +205,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     edm::EDGetTokenT<reco::CaloClusterCollection> showerToken_;
     edm::EDGetTokenT<reco::SuperClusterCollection>superclusterToken_;
     // edm::EDGetTokenT<pat::PackedTriggerPrescales> PrescaleToken_;
-    edm::ParameterSet kvfPSet; 
+
   
     int runNumber, eventNumber, lumiBlock;
     int  tree_NbrOfZCand;
@@ -258,12 +255,21 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     float ntrk40; /*!*/
     float dR; /*!*/
     float dRmax; /*!*/
+    float dzTopu;
+    float dzSigTopu;
     TMVA::Reader *reader = new TMVA::Reader( "!Color:Silent" );
 
-    bool NewCovMat = true;//Allow for Covariance Matrix correction due to the MiniAOD dataformat apporixmation
+    //   Booleans to activate/desactivate part of the code //
+    bool NewCovMat = true;//Keep True : Allow for Covariance Matrix correction due to the MiniAOD dataformat apporixmation
     bool IterAVF = true; // Activate IAVF step of the vertexing 
-    bool ActivateTrigger = true;
-    bool TrackMatchingToV0 = true; //Matching between tracks from V0Candidates collection and pfcandidate
+    bool ActivateTrigger = true;// Keep true, else there is nothing done in the code :D 
+          //Vetos to find vertices from different seondary interactions
+    bool DetailedMap = true;// Detailed map of the CMS tracker to apply a veto on the tracks of the vertices that belong to this map
+    bool ActivateV0Veto = true;
+    bool ActivateYcVeto = true;
+    bool ActivateSecIntVeto = false;
+
+
     int index[1000];
     double MVAval[1000];
 
@@ -343,6 +349,9 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float>     tree_V0_reco_phi;
     std::vector<int>       tree_V0_reco_source;
     std::vector<bool>      tree_V0_reco_badTkHit;
+    //$$$$
+    std::vector<float>     tree_V0_reco_dca;
+//$$$$
 
     // reconstructed Secondary Interactions
     int tree_nSecInt;
@@ -365,6 +374,9 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float>     tree_SecInt_dca;
     std::vector<bool>      tree_SecInt_selec;
     std::vector<int>       tree_SecInt_layer;
+    std::vector<int>       tree_SecInt_LLP;
+    std::vector<float>     tree_SecInt_LLP_dr;
+    std::vector<float>     tree_SecInt_LLP_dz;
 
     int tree_nYConv;
     std::vector<float>     tree_Yc_x; 
@@ -632,6 +644,9 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector< float > tree_LLP_Vtx_dz;
     std::vector< float > tree_LLP_Vtx_dist;
     std::vector< float > tree_LLP_Vtx_dd;
+    std::vector< float > tree_LLP12_dR;
+    std::vector< float > tree_LLP12_deta;
+    std::vector< float > tree_LLP12_dphi;
     
     //-----------------------
     //Analysis with the two hemispheres
@@ -1151,9 +1166,8 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     ,beamSpotToken_(     consumes<reco::BeamSpot>(               iConfig.getUntrackedParameter<edm::InputTag>("beamSpot"))),
     clusterToken_ (consumes<reco::CaloClusterCollection>(edm::InputTag(std::string("reducedEgamma"),std::string("reducedEBEEClusters"),std::string("RECO")))),
     showerToken_ (consumes<reco::CaloClusterCollection>(edm::InputTag(std::string("reducedEgamma"),std::string("educedESClusters"),std::string("RECO")))),
-    superclusterToken_ (consumes<reco::SuperClusterCollection>(edm::InputTag(std::string("reducedEgamma"),std::string("reducedSuperClusters"),std::string("RECO")))),
+    superclusterToken_ (consumes<reco::SuperClusterCollection>(edm::InputTag(std::string("reducedEgamma"),std::string("reducedSuperClusters"),std::string("RECO"))))
     // , PrescaleToken_( consumes<pat::PackedTriggerPrescales>(edm::InputTag(std::string("patTrigger"),std::string("")))  )
-    kvfPSet( iConfig.getParameter<edm::ParameterSet>("KVFParameters"))
 {
    //now do what ever initialization is needed
     nEvent = 0;
@@ -1238,6 +1252,9 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_V0_reco_phi",        &tree_V0_reco_phi);
     smalltree->Branch("tree_V0_reco_source",     &tree_V0_reco_source);
     smalltree->Branch("tree_V0_reco_badTkHit",   &tree_V0_reco_badTkHit);
+    //$$$$
+    smalltree->Branch("tree_V0_reco_dca",        &tree_V0_reco_dca);
+//$$$$
 
     // reco Secondary Interaction
     smalltree->Branch("tree_nSecInt",           &tree_nSecInt);
@@ -1260,6 +1277,9 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_SecInt_dca",        &tree_SecInt_dca);
     smalltree->Branch("tree_SecInt_selec",      &tree_SecInt_selec);
     smalltree->Branch("tree_SecInt_layer",      &tree_SecInt_layer);
+    smalltree->Branch("tree_SecInt_LLP",        &tree_SecInt_LLP);
+    smalltree->Branch("tree_SecInt_LLP_dr",     &tree_SecInt_LLP_dr);
+    smalltree->Branch("tree_SecInt_LLP_dz",     &tree_SecInt_LLP_dz);
 
     smalltree->Branch("tree_nYConv",        &tree_nYConv);
     smalltree->Branch("tree_Yc_x",          &tree_Yc_x); 
@@ -1519,6 +1539,9 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_LLP_Vtx_dz",    &tree_LLP_Vtx_dz);
     smalltree->Branch("tree_LLP_Vtx_dist",  &tree_LLP_Vtx_dist);
     smalltree->Branch("tree_LLP_Vtx_dd",    &tree_LLP_Vtx_dd);
+    smalltree->Branch("tree_LLP12_dR",      &tree_LLP12_dR);
+    smalltree->Branch("tree_LLP12_deta",    &tree_LLP12_deta);
+    smalltree->Branch("tree_LLP12_dphi",    &tree_LLP12_dphi);
 
     smalltree->Branch("tree_Hemi",       &tree_Hemi);
     smalltree->Branch("tree_Hemi_njet",  &tree_Hemi_njet);
@@ -2006,6 +2029,8 @@ smalltree->Branch("HLT_PFHT800_PFMET75_PFMHT75_IDTight_v",&HLT_PFHT800_PFMET75_P
 
     reader->AddVariable( "mva_track_dR", &isinjet); /*!*/
     reader->AddVariable( "mva_track_dRmax", &isinjet); /*!*/
+    reader->AddVariable("mva_track_dzTOpu",&dzTopu);//added on 24/03/2023 : if using bdts generated before this date, =>crash
+    reader->AddVariable("mva_track_dzSigTOpu",&dzSigTopu);//added on 24/03/2023
 
     reader->BookMVA( "BDTG", weightFile_ ); // root 6.14/09, care compatiblity of versions for tmva
 //$$
@@ -2804,8 +2829,11 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
 
       PropaHitPattern* NI = new PropaHitPattern();
       int VtxLayerNI = -10;
-      VtxLayerNI = NI->VertexBelongsToBarrelLayer(Yr,Yz);
-      if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr,Yz);
+if ( DetailedMap ) {VtxLayerNI = NI->VertexBelongsToTracker(Yr, Yz);}
+else {
+VtxLayerNI = NI->VertexBelongsToBarrelLayer(Yr, Yz);
+if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
+}
       tree_Yc_layer.push_back(     VtxLayerNI);
 
       float Ynchi2 = (*PhotonConversion)[j].conversionVertex().normalizedChi2();
@@ -3367,7 +3395,8 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
   ////////   Electrons   ///////////
   //////////////////////////////////
   //////////////////////////////////
-    //One could consider the emu channel, or even ee channel
+  //One could consider the emu channel, or even ee channel
+
   // float Eiso=0;  
   for (const pat::Electron &el: *electrons)
   {
@@ -3556,540 +3585,8 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
     // and
     // from /DQM/TrackingMonitor/src/PackedCandidateTrackValidator.cc
 
-       //---------------------------------------------------------------//
-        //-----------------------ConversionProducer----------------------//
-        //---------------------------------------------------------------//
-// https://cmssdt.cern.ch/lxr/source/RecoEgamma/EgammaPhotonProducers/python/allConversions_cfi.py
-// https://cmssdt.cern.ch/lxr/source/RecoEgamma/EgammaPhotonProducers/interface/ConversionProducer.h?v=CMSSW_10_6_20
-// https://cmssdt.cern.ch/lxr/source/RecoEgamma/EgammaPhotonProducers/src/ConversionProducer.cc?%21v=CMSSW_10_6_20
-// https://github.com/cms-sw/cmssw/blob/master/DataFormats/CaloRecHit/interface/CaloID.h
-
-//          float deltaEta_ = 0.4; //track pair search range in eta (applied even in case of preselection bypass)
- 
-//          float halfWayEta_ = .1;// Track-bc matching search range on Eta
-//     //      int maxNumOfTrackInPU =  999999;
-//          float maxTrackRho_ =  120.;
-//          float maxTrackZ_ =  300.;                                    
-//          float minSCEt_ = 10.0;
-//          float dEtacutForSCmatching_ = 0.03;
-//          float dPhicutForSCmatching_ = 0.05;                                       
-//          float dEtaTkBC_ = .2; // Track-Basic cluster matching, position diff on eta
-//          float dPhiTkBC_ = 1.; // Track-Basic cluster matching, position diff on phi
-//          float energyBC_ = 0.3; // Track-Basic cluster matching, BC energy lower cut
-//         //  float energyTotalBC_ = .3; // Track-Basic cluster matching, two BC energy summation cut
-//     //      //tight cuts
-//          float d0Cut_ = 0.; //d0*charge cut
-//          float maxChi2Left_ = 10.; //Track quality
-//          float maxChi2Right_ = 10.;
-//          int minHitsLeft_ = 4;
-//          int minHitsRight_ = 2;
-//          float deltaCotTheta_ = 0.1; //Track pair opening angle on R-Z
-//     //      float DeltaPhi = .2; //Track pair opening angle on X-Y (not a final selection cut)
-//          float vtxChi2_ = 0.0005;
-//          float minApproachLow_ = -.25; //Track pair min distance at approaching point on X-Y      
-//          float minApproachHigh_ = 1.0; //Track pair min distance at approaching point on X-Y
-//          float r_cut = 2.0;//analytical track cross point
-//          float dzCut_ = 5.0;//track pair inner position difference
-     
-//     // //  // kinematic vertex fit parameters
-//     //      float maxDelta = 0.01;//delta of parameters
-//     //      float maxReducedChiSq = 225.;//maximum chi^2 per degree of freedom before fit is terminated
-//     //      float minChiSqImprovement = 50.;//threshold for "significant improvement" in the fit termination logic
-//     //      int maxNbrOfIterations = 40;//maximum number of convergence iterations
-     
-//     //      bool UsePvtx = true;
-         
-//          bool allowD0_ = true; //Allow d0*charge cut
-//     //      bool AllowDeltaPhi = false;
-//          bool allowTrackBC_ = false; //Allow to match track-basic cluster
-//          bool allowDeltaCot_ = true; //Allow pairing using delta cot theta cut
-//          bool allowMinApproach_ = true; //Allow pairing using min approach cut
-//          bool allowOppCharge_ = true; //use opposite charge tracks to pair
-//     //      bool AllowVertex = true;
-//          bool bypassPreselGsf_ = true; //bypass preselection for gsf + X pairs
-//          bool bypassPreselEcal_ = false; //bypass preselection for ecal-seeded + X pairs
-//          bool bypassPreselEcalEcal_ = true; //bypass preselection for ecal-seeded + ecal-seeded pairs    
-//     //      bool AllowSingleLeg = false; //Allow single track conversion
-//     //      bool AllowRightBC = false; //Require second leg matching basic cluster
 
 
-//                       //----------------------------------------------------------------------//
-//                       //------------------------------CLUSTERS -------------------------------//
-//                       //----------------------------------------------------------------------//
-
-//     std::multimap<double, reco::CaloCluster> basicClusterPtrs;
-//     std::multimap<double, reco::CaloCluster> superClusterPtrs;
-//     // ConversionProducerMethod=> buildSuperAndBasicClusterGeoMap(iEvent,basicClusterPtrs,superClusterPtrs);
-
-//     //-------------------------get the BasicCLuster Collection in the Barrel && Endcap
-//       for (const reco::CaloCluster &CC : *CaloClusters)
-//       {
-//         const CaloID& ClusterID = CC.caloID();//ClusterID gives the index of the detector :      DET_ECAL_BARREL = 0, DET_ECAL_ENDCAP, DET_PS1, DET_PS2,DET_HCAL_BARREL, DET_HCAL_ENDCAP,DET_HF,DET_HF_EM,DET_HF_HAD,DET_HO,DET_HGCAL_ENDCAP,DET_NONE
-//         if (ClusterID.detector(reco::CaloID::DET_ECAL_ENDCAP) || ClusterID.detector(reco::CaloID::DET_ECAL_BARREL))
-//           {
-//             if(CC.energy() > energyBC_) basicClusterPtrs.emplace(CC.position().eta(), CC);
-//           }
-//       }
-    
-//     // -----------------------------SClusters => access preshower
-//     //-------------------------------get the SuperCLuster Collection in the Barrel && Endcap with Preshowers
-
-//       for (const reco::SuperCluster &SC : *SClusters)
-//       {
-//         if (SC.clustersSize()==0)continue;
-//         const reco::CaloClusterPtrVector& ClusterList = SC.clusters();
-//         for (unsigned int i =0; i< SC.clustersSize(); i++)
-//           {
-//             reco::CaloCluster Cluster = *ClusterList[i];
-//             std::cout<<"ClusterList[i] :"<<Cluster.seed().null()<<std::endl;// TO DO informations is not registered for some of the sueprclusters, need to find  flag, else it is doomed
-//             const CaloID& ClusterID = ClusterList[i]->caloID();//ClusterID gives the index of the detector : sometimes does not work
-//             std::cout<<"get in here 3"<<std::endl;
-//             CaloCluster subCC = *ClusterList[i];   
-//             if (ClusterID.detector(reco::CaloID::DET_ECAL_ENDCAP) || ClusterID.detector(reco::CaloID::DET_ECAL_BARREL) || ClusterID.detector(reco::CaloID::DET_PS1)|| ClusterID.detector(reco::CaloID::DET_PS2) )
-//               {
-//                 if(subCC.energy() > minSCEt_) superClusterPtrs.emplace(subCC.position().eta(), subCC);
-//               }
-//           }
-
-//       }
-
-// std::cout<<"cloop clusters"<<std::endl;
-//     //---------------------reco::track collection ordred in eta---------------------//
-//     std::multimap<float, reco::Track* > convTrackMap;//build map of ConversionTracks (the implemantation in CMSSW is using ConversionTracks => extension of track with extra infos), track ojects can be used
-//     // ordered in eta (float)
-//     for (unsigned int k=0; k<pc->size()+lostpc->size();k++)
-//     {
-//       pat::PackedCandidateRef pcref = MINIgeneralTracks[k];
-//       const reco::Track *trackPcPtr = pcref->bestTrack(); // const
-//       if ( !trackPcPtr) continue;
-//       reco::Track tk;
-//       tk = *trackPcPtr;
-//       convTrackMap.emplace(trackPcPtr->eta(),&tk);
-//     }
-
-
-//     std::map<reco::Track*, math::XYZPointF> trackImpactPosition;
-//     std::map<reco::Track*, reco::CaloCluster> trackMatchedBC;
-
-//     //   //  ConversionHitChecker hitChecker; //i think it is reco information
-
-//    //2 propagate all tracks into ECAL, record its eta and phi
-      
-//     for (std::multimap<float, reco::Track* >::const_iterator tk_ref = convTrackMap.begin(); tk_ref != convTrackMap.end(); ++tk_ref ){        
-//         const reco::Track* tk = tk_ref->second  ;//>trackRef().get()
-//         //check impact position then match with BC
-//         math::XYZPointF ew;
-           
-// //------------ ConversionProducer method => bool getTrackImpactPosition(trackPcPtr,trackerGeom, theMagneticField,math::XYZPointF& ew)
-
-//   PropagatorWithMaterial propag( alongMomentum, 0.000511, theMagneticField );
-  
-//   ReferenceCountingPointer<Surface> ecalWall(
-//                                              new  BoundCylinder(129.f, GlobalPoint(0.,0.,0.), TkRotation<float>(),
-//                                                                  new SimpleCylinderBounds( 129, 129, -320.5, 320.5 ) ) );
-//   const float epsilon = 0.001;
-//   Surface::RotationType rot; // unit rotation matrix
-//   const float barrelRadius = 129.f;
-//   const float barrelHalfLength = 270.9f;
-//   const float endcapRadius = 171.1f;
-//   const float endcapZ = 320.5f;
-//   ReferenceCountingPointer<BoundCylinder>  theBarrel_(new BoundCylinder(barrelRadius, Surface::PositionType(0,0,0), rot,
-//                                                                          new SimpleCylinderBounds( barrelRadius-epsilon, barrelRadius+epsilon, 
-// -barrelHalfLength, barrelHalfLength)));
-//   ReferenceCountingPointer<BoundDisk>      theNegativeEtaEndcap_(
-//                                                                  new BoundDisk( Surface::PositionType( 0, 0, -endcapZ), rot,
-//                                                                                 new SimpleDiskBounds( 0, endcapRadius, -epsilon, epsilon)));
-//   ReferenceCountingPointer<BoundDisk>      thePositiveEtaEndcap_(
-//                                                                  new BoundDisk( Surface::PositionType( 0, 0, endcapZ), rot,
-//                                                                                 new SimpleDiskBounds( 0, endcapRadius, -epsilon, epsilon)));
-
-//   //------------------------//
-//   reco::TransientTrack TTEcal = theTransientTrackBuilder->build(*tk);
-//   GlobalPoint vert (tk->vx(),tk->vy(),tk->vz()); // Point where the propagation will start (Reference Point)
-//   const TrajectoryStateOnSurface myTSOS = TTEcal.stateOnSurface(vert); // TSOS of this point
-//   // const TrajectoryStateOnSurface myTSOS = trajectoryStateTransform::outerStateOnSurface(*tk, *trackerGeom, theMagneticField);//CMSSW impelmantation (trackextra)
-//   //Current implemantation in CMSSW is in reco using trackextra information => outerstateonSurface. Since we work in MINIAOD, this
-//   // is not available. THerefore, we are using the TSOS at the reference point (we can also use the TSOS at first hit (we get this information from the hit pattern but not with lostTracks using ProppaHitpattern)
-//   // then we use the basic code of CMSSW => stateAtECAL
-  
-//   TrajectoryStateOnSurface  stateAtECAL;
-//   stateAtECAL = propag.propagate(myTSOS, *theBarrel_);
-//   if (!stateAtECAL.isValid() || ( stateAtECAL.isValid() && fabs(stateAtECAL.globalPosition().eta() ) >1.479f )  ) {
-//     //endcap propagator
-//     if (myTSOS.globalPosition().z() > 0.) {
-// 	    stateAtECAL = propag.propagate(myTSOS, *thePositiveEtaEndcap_);
-//     } else {
-// 	    stateAtECAL = propag.propagate(myTSOS, *theNegativeEtaEndcap_);
-//     }
-//   }       
-//   if (stateAtECAL.isValid())
-//     {
-//       ew = stateAtECAL.globalPosition();
-//       trackImpactPosition[tk_ref->second] = ew;//tk_ref->second
-//       reco::CaloCluster closest_bc;//the closest matching BC to track
-//       const double track_eta = ew.eta();
-//       const double track_phi = ew.phi(); 
-//       double min_eta = 999., min_phi = 999.;
-//       reco::CaloCluster tempclosest_bc;
-//       for (std::multimap<double, reco::CaloCluster>::const_iterator bc = basicClusterPtrs.lower_bound(track_eta - halfWayEta_); bc != basicClusterPtrs.upper_bound(track_eta + halfWayEta_); ++bc)
-//             {//use eta map to select possible BC collection then loop in
-//               const reco::CaloCluster& ebc = bc->second;
-//               const double delta_eta = track_eta-(ebc.position().eta());
-//               const double delta_phi = reco::deltaPhi(track_phi, (ebc.position().phi()));
-//               if (fabs(delta_eta)<dEtaTkBC_ && fabs(delta_phi)<dPhiTkBC_)
-//                 {
-//                   if (fabs(min_eta)>fabs(delta_eta) && fabs(min_phi)>fabs(delta_phi))
-//                     {//take the closest to track BC
-//                       min_eta = delta_eta;
-//                       min_phi = delta_phi;
-//                       tempclosest_bc = bc->second;
-//                       //TODO check if min_eta>delta_eta but min_phi<delta_phi
-//                     }
-//                 }
-//             }
-//           if (min_eta < 999.)
-//             {
-//               closest_bc = tempclosest_bc;
-//               trackMatchedBC[tk_ref->second] = closest_bc;
-//             }
-//     }
-
-//   //-----------End of - ConversionProducer method => bool getTrackImpactPosition(trackPcPtr,trackerGeom, theMagneticField,math::XYZPointF& ew)
-// }
-
-//   //3. pair up tracks: 
-//   //TODO it is k-Closest pair of point problem
-// for(std::multimap<float, reco::Track*>::const_iterator ll = convTrackMap.begin(); ll != convTrackMap.end();  ++ll ) 
-//   {
-//     bool track1HighPurity=true;
-//       reco::Track* left = ll->second;
-//     // const  edm::RefToBase<reco::Track> & left = ll->second->trackRef();
-//     reco::TransientTrack ttk_l;
-//     //(Note that the TrackRef and GsfTrackRef versions of the constructor are needed
-//     // to properly get refit tracks in the output vertex)
-//     const reco::GsfTrack* GsfTrackLeft = dynamic_cast<reco::GsfTrack*>(left);
-//      reco::TrackRef* TrackRefLeft = dynamic_cast<reco::TrackRef*>(left);
-//     // const reco::TrackRef* TrackRefLeftconst = dynamic_cast<reco::TrackRef*>(left);
-//     if (dynamic_cast<const reco::GsfTrack*>(left)) 
-//       {
-//         ttk_l = theTransientTrackBuilder->build(GsfTrackLeft);//left->castTo<reco::GsfTrackRef>() 
-//       }
-//     else 
-//       {
-//        ttk_l = theTransientTrackBuilder->build(left);//supposed to be TrackRefLeft according to the Note above but does not work, the one coding is at fault 
-//       }
-    
-//     bool TrackPurity = false;
-//      if (PV.isValid())
-//       {
-//       //  if (!(trackD0Cut(left, the_pvtx)))   track1HighPurity=false;
-//       //ref==> left or right // the_pvtx=>PV
-//         TrackPurity =((!allowD0_) || !(-left->dxy(PV.position())*left->charge()/left->dxyError()<d0Cut_));
-//         if(!TrackPurity) track1HighPurity=false;
-//       } 
-//     else 
-//       {
-//         // if (!(trackD0Cut(left)))  track1HighPurity=false;
-//        TrackPurity =  ((!allowD0_) || !(left->d0()*left->charge()/left->d0Error()<d0Cut_));
-//        if(!TrackPurity) track1HighPurity=false;
-//       }
-
-//     std::vector<int> right_candidates;//store all right legs passed the cut (theta/approach and ref pair)
-//     std::vector<double> right_candidate_theta, right_candidate_approach;
-//     std::vector<std::pair<bool, reco::Vertex> > vertex_candidates;
-
-//     float etasearch = ll->first + deltaEta_;
-//     std::multimap<float, reco::Track* >::const_iterator rr = ll;
-//     ++rr;
-//     for (; rr != convTrackMap.lower_bound(etasearch); ++rr ) 
-//       {
-//         bool track2HighPurity = true;
-//         bool highPurityPair = true;
-//           reco::Track* right = rr->second;
-//         reco::TransientTrack ttk_r;
-//         const reco::GsfTrack* GsfTrackRight = dynamic_cast<const reco::GsfTrack*>(right);
-//          reco::TrackRef* TrackRefRight= dynamic_cast<reco::TrackRef*>(right);
-
-//        if (dynamic_cast<const reco::GsfTrack*>(right)) 
-//         {
-//          ttk_r = theTransientTrackBuilder->build(GsfTrackRight);
-//         }
-//        else 
-//         {
-//          ttk_r = theTransientTrackBuilder->build(right);//supposed to be TrackRefRight
-//         }
-
-//       //all vertexing preselection should go here      
-//       //check for opposite charge
-//        if (  allowOppCharge_ && (left->charge()*right->charge() > 0) ) continue; //same sign, reject pair
-
-//       //  double approachDist = -999.;
-//       //apply preselection to track pair, overriding preselection for gsf+X or ecalseeded+X pairs if so configured
-//       bool preselected = true;
-//       // left , right , appoachDist//
-//       double dCotTheta =  1./tan(ttk_l.track().innerMomentum().theta()) - 1./tan(ttk_r.track().innerMomentum().theta());
-//       //This function is not over ... 
-//       if (allowDeltaCot_ && (std::abs(dCotTheta) > deltaCotTheta_)) {
-//             preselected= false;
-//       }
-
-//       //non-conversion hypothesis, reject prompt track pairs
-//       ClosestApproachInRPhi closest;
-//        closest.calculate(ttk_l.innermostMeasurementState(),ttk_r.innermostMeasurementState());
-//        if (!closest.status()) {
-//          preselected= false;
-//        }
-       
-//        if (closest.crossingPoint().perp() < r_cut) {
-//          preselected= false;
-//        }
-     
-//        //compute tangent point btw tracks (conversion hypothesis)
-//        TangentApproachInRPhi tangent;
-//        tangent.calculate(ttk_l.innermostMeasurementState(),ttk_r.innermostMeasurementState());
-//        if (!tangent.status()) {
-//           preselected= false;
-//        }
-       
-//        GlobalPoint tangentPoint = tangent.crossingPoint();
-//        double rho = tangentPoint.perp();
-       
-//        //reject candidates well outside of tracker bounds
-//        if (rho > maxTrackRho_) {
-//          preselected= false;
-//        }
-       
-//        if (std::abs(tangentPoint.z()) > maxTrackZ_) {
-//          preselected= false;
-//        }
-       
-//        std::pair<GlobalTrajectoryParameters,GlobalTrajectoryParameters> trajs = tangent.trajectoryParameters();
-       
-//        //very large separation in z, no hope
-//        if (std::abs(trajs.first.position().z() - trajs.second.position().z()) > dzCut_) {
-//          preselected= false;
-//        }
-          
-//        float minApproach = tangent.perpdist();
-//       //  approachDist = minApproach;
-       
-//        if (allowMinApproach_ && (minApproach < minApproachLow_ || minApproach > minApproachHigh_) ) {
-//          preselected= false;
-//        }
-       
-//       //end of preselected function
-
-//        preselected = preselected || (bypassPreselGsf_ && (left->algo()==reco::TrackBase::gsf || right->algo()==reco::TrackBase::gsf));
-//        preselected = preselected || (bypassPreselEcal_ && (left->algo()==reco::TrackBase::outInEcalSeededConv || right->algo()==reco::TrackBase::outInEcalSeededConv || left->algo()==reco::TrackBase::inOutEcalSeededConv || right->algo()==reco::TrackBase::inOutEcalSeededConv));
-//        preselected = preselected || (bypassPreselEcalEcal_ && (left->algo()==reco::TrackBase::outInEcalSeededConv || left->algo()==reco::TrackBase::inOutEcalSeededConv) && (right->algo()==reco::TrackBase::outInEcalSeededConv || right->algo()==reco::TrackBase::inOutEcalSeededConv));
-      
-//       if (!preselected) { continue;}
-
-//       //do the actual vertex fit
-//       reco::Vertex theConversionVertex;//by default it is invalid   
-//       bool goodVertex = false; //checkVertex(ttk_l, ttk_r, magField, theConversionVertex);
-//        //because reco::vertex uses track ref, so have to keep them (left,right,theMagneticField,theConversionVertex)
-
-//       std::vector<reco::TransientTrack>  pair;
-//       pair.push_back(ttk_l);
-//       pair.push_back(ttk_r);
-//       ConversionVertexFinder*   theVertexFinder_= new ConversionVertexFinder ( kvfPSet);
-//       goodVertex = theVertexFinder_->run(pair, theConversionVertex);
-
-//       //bail as early as possible in case the fit didn't return a good vertex
-//       if (!goodVertex) {continue;}
-
-//       //track pair pass the quality cut (left, true)&& (right , false)
-//       // THERE ARE BETTER WAYS TO IMPLEMENT THIS!!!! JUST DIDN'T TKAE THE TIME YET
-
-//     bool Pass1 = true;
-//     bool Pass2 = false;
-//     bool trackQualityFilter1 = true;//pass
-//     //-----------------------------------------------------//
-//     if (Pass1){
-//     trackQualityFilter1 = (left->normalizedChi2() < maxChi2Left_ && left->found() >= minHitsLeft_);
-//        } 
-//     else {
-//          trackQualityFilter1 = (left->normalizedChi2() < maxChi2Right_ && left->found() >= minHitsRight_);
-//        }
-//     //-----------------------------------------------------//
-//     bool trackQualityFilter2 = true;//pass
-//     if (Pass2){
-//     trackQualityFilter2 = (right->normalizedChi2() < maxChi2Left_ && right->found() >= minHitsLeft_);
-//        } 
-//     else {
-//          trackQualityFilter2 = (right->normalizedChi2() < maxChi2Right_ && right->found() >= minHitsRight_);
-//        }
-//     //-----------------------------------------------------//
-//     bool trackQualityFilter3 = true;//pass
-//     if (Pass2){
-//     trackQualityFilter3 = (left->normalizedChi2() < maxChi2Left_ && left->found() >= minHitsLeft_);
-//        } 
-//     else {
-//          trackQualityFilter3 = (left->normalizedChi2() < maxChi2Right_ && left->found() >= minHitsRight_);
-//        }
-//     //-----------------------------------------------------//  
-//     bool trackQualityFilter4 = true;//pass
-//       if (Pass1){
-//     trackQualityFilter3 = (right->normalizedChi2() < maxChi2Left_ && right->found() >= minHitsLeft_);
-//        } 
-//     else {
-//          trackQualityFilter3 = (right->normalizedChi2() < maxChi2Right_ && right->found() >= minHitsRight_);
-//        }
-//   //--------------------------------------//
-//   bool temp_HPPair = (  !( (trackQualityFilter1 && trackQualityFilter2)  || (trackQualityFilter3 && trackQualityFilter4) ) ) ;
-//   if (temp_HPPair) highPurityPair = false;
-
-//   bool Track2Purity = false;
-//   if (PV.isValid())
-//       {
-//        //  if (!(trackD0Cut(right, the_pvtx)))   track2HighPurity=false;
-//        //ref==> left or right // the_pvtx=>PV
-//         Track2Purity =((!allowD0_) || !(-right->dxy(PV.position())*right->charge()/right->dxyError()<d0Cut_));
-//         if(!Track2Purity) track2HighPurity=false;
-//       } 
-//     else 
-//       {
-//         // if (!(trackD0Cut(left)))  track1HighPurity=false;
-//        Track2Purity =  ((!allowD0_) || !(right->d0()*right->charge()/right->d0Error()<d0Cut_));
-//        if(!Track2Purity) track2HighPurity=false;
-//       }
-
-
-//            //if all cuts passed, go ahead to make conversion candidates
-//            std::vector<reco::Track*> trackPairRef;
-//            std::vector<reco::TrackRef> trackPairRef2;
-//            std::vector<reco::Track*> trackpair;
-//           //  std::vector<reco::TrackRef>& or  const std::vector<edm::RefToBase<reco::Track> >& 
-//           // no matching function for call to 'std::vector<edm::Ref<std::vector<reco::Track> > >::push_back(const TrackRef*&)'
-//             trackPairRef2.push_back(*TrackRefLeft);
-//             trackPairRef2.push_back(*TrackRefRight);
-//           //  trackPairRef.push_back(left);//left track
-//           //  trackPairRef.push_back(right);//right track
-
-// //We don't care about the informations of Position In and Out, Momentum In and Out, these are Track::Extra informations, hits infos etc.. (that we can see in the CMSSW code)
-
-//            //if using kinematic fit, check with chi2 post cut
-//            if (theConversionVertex.isValid()){
-//              const float chi2Prob = ChiSquaredProbability(theConversionVertex.chi2(), theConversionVertex.ndof());
-//              if (chi2Prob<vtxChi2_)  highPurityPair=false;
-//            }
-
-//       // std::vector<math::XYZPointF> trkPositionAtEcal;
-//       // std::vector<reco::CaloCluster*> matchingBC;
-
-//       // if (allowTrackBC_)//it is false by default,so this loop does not occur 
-//       //   {//TODO find out the BC ptrs if not doing matching, otherwise, leave it empty
-//       //        //const int lbc_handle = bcHandleId[ll-allTracks.begin()],
-//       //        //        rbc_handle = bcHandleId[rr-allTracks.begin()];
-     
-//       //        std::map<edm::Ptr<reco::ConversionTrack>, math::XYZPointF>::const_iterator trackImpactPositionLeft = trackImpactPosition.find(ll->second);
-//       //        std::map<edm::Ptr<reco::ConversionTrack>, math::XYZPointF>::const_iterator trackImpactPositionRight = trackImpactPosition.find(rr->second);
-//       //        std::map<edm::Ptr<reco::ConversionTrack>, reco::CaloClusterPtr>::const_iterator trackMatchedBCLeft = trackMatchedBC.find(ll->second);        
-//       //        std::map<edm::Ptr<reco::ConversionTrack>, reco::CaloClusterPtr>::const_iterator trackMatchedBCRight = trackMatchedBC.find(rr->second);        
-             
-//       //        if (trackImpactPositionLeft!=trackImpactPosition.end()) {
-//       //          trkPositionAtEcal.push_back(trackImpactPositionLeft->second);//left track
-//       //        }
-//       //        else {
-//       //          trkPositionAtEcal.push_back(math::XYZPointF());//left track
-//       //        }
-//       //        if (trackImpactPositionRight!=trackImpactPosition.end()) {//second track ECAL position may be invalid
-//       //          trkPositionAtEcal.push_back(trackImpactPositionRight->second);
-//       //        }
-     
-//       //        double total_e_bc = 0.;
-//       //        if (trackMatchedBCLeft!=trackMatchedBC.end()) {
-//       //          matchingBC.push_back(trackMatchedBCLeft->second);//left track
-//       //          total_e_bc += trackMatchedBCLeft->second->energy();
-//       //        }
-//       //        else {
-//       //          matchingBC.push_back( reco::CaloClusterPtr() );//left track
-//       //        }
-//       //        if (trackMatchedBCRight!=trackMatchedBC.end()) {//second track ECAL position may be invalid
-//       //          matchingBC.push_back(trackMatchedBCRight->second);
-//       //          total_e_bc += trackMatchedBCRight->second->energy();
-//       //        }
-             
-//       //        if (total_e_bc<energyTotalBC_) {
-//       //          highPurityPair = false;
-//       //        }
-//       //   }
-
-
-// //signature cuts, then check if vertex, then post-selection cuts (implement checkPhi if really needed (requires extra infos but it is do able))
-
-//        highPurityPair = highPurityPair && track1HighPurity && track2HighPurity && goodVertex  ;//&&  checkPhi(left, right, trackerGeom, magField, theConversionVertex)
-//         // const float minAppDist = approachDist;
-//         std::string algoName_ = "mixed";
-//            reco::Conversion::ConversionAlgorithm algo = reco::Conversion::algoByName(algoName_);
-//           //  float dummy=0;
-//            reco::CaloClusterPtrVector scPtrVec;
-//           //  reco::Conversion  newCandidate(scPtrVec,  trackPairRef, trkPositionAtEcal, theConversionVertex, matchingBC, minAppDist,  trackInnPos, trackPin, trackPout, nHitsBeforeVtx, dlClosestHitToVtx, nSharedHits, dummy, algo );
-//             reco::Conversion  newCandidate(scPtrVec,  trackPairRef2, theConversionVertex, algo );//fills our MINIAod requirements
-//            // Fill in scPtrVec with the macthing SC
-
-//           //  if ( matchingSC ( superClusterPtrs, newCandidate, scPtrVec) )    newCandidate.setMatchingSuperCluster( scPtrVec);
-    
-//       // double dRMin=999.;
-//        double detaMin=999.;
-//        double dphiMin=999.;
-//        bool SCmatch = false;
-//        std::vector<reco::CaloCluster*> mSC;
-//        reco::CaloCluster* match;
-//        for (std::multimap<double, reco::CaloCluster>::const_iterator scItr = superClusterPtrs.begin();  scItr != superClusterPtrs.end(); scItr++) {
-//           reco::CaloCluster sc = scItr->second; 
-//          const double delta_phi = reco::deltaPhi( newCandidate.refittedPairMomentum().phi(), sc.phi());
-//          double sceta = sc.eta();
-//         //  double conveta = etaTransformation(aConv.refittedPairMomentum().eta(), aConv.zOfPrimaryVertexFromTracks() );
-//        //---Definitions
-//        const float PI    = 3.1415927;
-     
-//        //---Definitions for ECAL
-//        const float R_ECAL           = 136.5;
-//        const float Z_Endcap         = 328.0;
-//        const float etaBarrelEndcap  = 1.479; 
-        
-//        //---ETA correction
-     
-//        float Theta = 0.0  ; 
-//        float ZEcal = R_ECAL*sinh(newCandidate.refittedPairMomentum().eta())+newCandidate.zOfPrimaryVertexFromTracks();
-     
-//        if(ZEcal != 0.0) Theta = atan(R_ECAL/ZEcal);
-//        if(Theta<0.0) Theta = Theta+PI ;
-//        double conveta = - log(tan(0.5*Theta));
-              
-//        if( fabs(conveta) > etaBarrelEndcap )
-//          {
-//            float Zend = Z_Endcap ;
-//            if(newCandidate.refittedPairMomentum().eta()<0.0 )  Zend = -Zend ;
-//            float Zlen = Zend - newCandidate.zOfPrimaryVertexFromTracks() ;
-//            float RR = Zlen/sinh(newCandidate.refittedPairMomentum().eta()); 
-//            Theta = atan(RR/Zend);
-//            if(Theta<0.0) Theta = Theta+PI ;
-//            conveta = - log(tan(0.5*Theta));            
-//          } 
-
-//        //---end
-
-//          const double delta_eta = fabs(conveta - sceta);
-//          if ( fabs(delta_eta) < fabs(detaMin) && fabs(delta_phi) < fabs(dphiMin) ) {
-//            detaMin=  fabs(delta_eta);
-//            dphiMin=  fabs(delta_phi);
-//            match=&sc;
-//          }
-//        }
-       
-//        if ( fabs(detaMin) < dEtacutForSCmatching_ && fabs(dphiMin) < dPhicutForSCmatching_ ) {
-//          mSC.push_back(match);
-//          SCmatch = true;//It matches a SuperCLuster to a conversionVertex but we don't do anything with it => it just brings information
-//        } 
- 
-//  if (SCmatch) std::cout<<"match between ConversionCandidate and SC"<<std::endl;
-   
-//       }//end right
-
-//   }//end left
     //---------------------------------------------------------------//
     //----------------------- V0 Producer ---------------------------//
     //---------------------------------------------------------------//
@@ -4188,39 +3685,39 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
     //   }
 
 //-------------------------------- loop over tracks and vertex good charged track pairs
-    for (unsigned int trdx1 = 0; trdx1 < theTrackRefs.size()-1; ++trdx1) 
+    for (unsigned int trd1 = 0; trd1 < theTrackRefs.size()-1; ++trd1) 
     {
-      for (unsigned int trdx2 = trdx1+1; trdx2 < theTrackRefs.size(); ++trdx2) 
+      for (unsigned int trd2 = trd1+1; trd2 < theTrackRefs.size(); ++trd2) 
       {
         reco::Track positiveTrackRef;
         reco::Track negativeTrackRef;
         reco::TransientTrack* posTransTkPtr = nullptr;
         reco::TransientTrack* negTransTkPtr = nullptr;
         int Selec = 0;
-        float drsig1 = std::abs(theTrackRefs[trdx1].dxy(PV.position())/theTrackRefs[trdx1].dxyError());
-        float drsig2 = std::abs(theTrackRefs[trdx2].dxy(PV.position())/theTrackRefs[trdx2].dxyError());
+        float drsig1 = std::abs(theTrackRefs[trd1].dxy(PV.position())/theTrackRefs[trd1].dxyError());
+        float drsig2 = std::abs(theTrackRefs[trd2].dxy(PV.position())/theTrackRefs[trd2].dxyError());
         if ( useBS_ ) {
-          drsig1 = std::abs(theTrackRefs[trdx1].dxy(bs)/theTrackRefs[trdx1].dxyError());
-          drsig2 = std::abs(theTrackRefs[trdx2].dxy(bs)/theTrackRefs[trdx2].dxyError());
+          drsig1 = std::abs(theTrackRefs[trd1].dxy(bs)/theTrackRefs[trd1].dxyError());
+          drsig2 = std::abs(theTrackRefs[trd2].dxy(bs)/theTrackRefs[trd2].dxyError());
 	}
 //$$
-      if ( !(theTrackRefs[trdx1].pt() > pt_Cut && theTrackRefs[trdx1].normalizedChi2() < NChi2_Cut && drsig1 > drSig_Cut) 
-	&& !(theTrackRefs[trdx2].pt() > pt_Cut && theTrackRefs[trdx2].normalizedChi2() < NChi2_Cut && drsig2 > drSig_Cut) ) continue;
+      if ( !(theTrackRefs[trd1].pt() > pt_Cut && theTrackRefs[trd1].normalizedChi2() < NChi2_Cut && drsig1 > drSig_Cut) 
+	&& !(theTrackRefs[trd2].pt() > pt_Cut && theTrackRefs[trd2].normalizedChi2() < NChi2_Cut && drsig2 > drSig_Cut) ) continue;
 //$$
-        if ( theTrackRefs[trdx1].charge() < 0. && theTrackRefs[trdx2].charge() > 0. ) 
+        if ( theTrackRefs[trd1].charge() < 0. && theTrackRefs[trd2].charge() > 0. ) 
         {
-          negativeTrackRef = theTrackRefs[trdx1];
-          positiveTrackRef = theTrackRefs[trdx2];
-          negTransTkPtr = &theTransTracks[trdx1];
-          posTransTkPtr = &theTransTracks[trdx2];
+          negativeTrackRef = theTrackRefs[trd1];
+          positiveTrackRef = theTrackRefs[trd2];
+          negTransTkPtr = &theTransTracks[trd1];
+          posTransTkPtr = &theTransTracks[trd2];
           Selec = 1;
         } 
-        else if ( theTrackRefs[trdx1].charge() > 0. && theTrackRefs[trdx2].charge() < 0. )
+        else if ( theTrackRefs[trd1].charge() > 0. && theTrackRefs[trd2].charge() < 0. )
         {
-          negativeTrackRef = theTrackRefs[trdx2];
-          positiveTrackRef = theTrackRefs[trdx1];
-          negTransTkPtr = &theTransTracks[trdx2];
-          posTransTkPtr = &theTransTracks[trdx1];
+          negativeTrackRef = theTrackRefs[trd2];
+          positiveTrackRef = theTrackRefs[trd1];
+          negTransTkPtr = &theTransTracks[trd2];
+          posTransTkPtr = &theTransTracks[trd1];
           Selec = 2;
         } 
       if ( Selec == 0 ) continue;
@@ -4313,8 +3810,8 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
         bool badTkHit = false;
         if ( innerHitPosCut_ > 0. ) // && positiveTrackRef.innerOk() //innerOk is trackextra => not availeble in MINIaod
         {
-          int trdx = trdx1;
-          if ( Selec == 1 ) trdx = trdx2;
+          int trdx = trd1;
+          if ( Selec == 1 ) trdx = trd2;
           if ( idxMGT[trdx].second < pc->size() ) // not for the lost tracks, but as their default first hit is PIXBL1 it would not hurt...
           {
             const HitPattern hp = positiveTrackRef.hitPattern();//tk_HitPattern;
@@ -4325,7 +3822,7 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
             GlobalPoint vert (positiveTrackRef.vx(),positiveTrackRef.vy(),positiveTrackRef.vz()); // Point where the propagation will start (Reference Point)
             const TrajectoryStateOnSurface Surtraj = TTpos.stateOnSurface(vert); // TSOS of this point
             const MagneticField* B = TTpos.field(); // 3.8T
-            AnalyticalPropagator* Prop = new AnalyticalPropagator(B); // Propagator that will be used for barrel, crashes in the disks when using Plane
+            AnalyticalPropagator* Prop = new AnalyticalPropagator(B);
             Basic3DVector<float> P3D2(positiveTrackRef.vx(),positiveTrackRef.vy(),positiveTrackRef.vz());  // global frame
             Basic3DVector<float> B3DV (positiveTrackRef.px(),positiveTrackRef.py(),positiveTrackRef.pz()); // global frame 
             float Eta = positiveTrackRef.eta();
@@ -4333,16 +3830,50 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
             float vz  = positiveTrackRef.vz();
             PropaHitPattern* posPHP = new PropaHitPattern();
             std::pair<int,GloballyPositioned<float>::PositionType> posFHPosition = posPHP->Main(firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
-            double posTkHitPosD2 = (posFHPosition.second.x()-PV.x())*(posFHPosition.second.x()-PV.x()) +
-                                   (posFHPosition.second.y()-PV.y())*(posFHPosition.second.y()-PV.y());
-            if ( sqrt(posTkHitPosD2) < (distMagXY - sigmaDistMagXY*innerHitPosCut_) ) badTkHit = true;
+//$$$$
+//             double posTkHitPosD2 = (posFHPosition.second.x()-PV.x())*(posFHPosition.second.x()-PV.x()) +
+//                                    (posFHPosition.second.y()-PV.y())*(posFHPosition.second.y()-PV.y());
+//             if ( sqrt(posTkHitPosD2) < (distMagXY - sigmaDistMagXY*innerHitPosCut_) ) badTkHit = true;
+//$$$$
+            float xF = posFHPosition.second.x() - PV.x();
+            float yF = posFHPosition.second.y() - PV.y();
+	    float rF = TMath::Sqrt( xF*xF + yF*yF );
+            float zF = TMath::Abs( posFHPosition.second.z() - PV.z() );
+	    // PXB
+	    if ( rF > 2.7 && rF < 16.5 && zF < 27.0 ) {
+	      if ( rF <  distMagXY - 0.40 ) badTkHit = true;
+	    }
+	    // TIB
+	    if ( rF > 23.5 && rF < 36.2 && zF < 66.0 ) {
+	      if ( rF <  distMagXY - 0.84 ) badTkHit = true;
+	    }
+	    if ( rF > 40.0 && rF < 52.0 && zF < 66.0 ) {
+	      if ( rF <  distMagXY - 2.24 ) badTkHit = true;
+	    }
+	    // TOB
+	    if ( rF > 58.4 && rF < 62.9 && zF < 107. ) {
+	      if ( rF <  distMagXY - 2.8 ) badTkHit = true;
+	    }
+	    // PXF
+	    if ( rF > 4.5 && rF < 16.1 && zF > 29.6 && zF < 52.0 ) {
+	      if ( zF <  distMagZ - 3.2 ) badTkHit = true;
+	    }
+	    // TID
+	    if ( rF > 22.5 && rF < 50.5 && zF > 74.3 && zF < 109.7 ) {
+	      if ( zF <  distMagZ - 3.9 ) badTkHit = true;
+	    }
+	    // TEC
+	    if ( rF > 22.0 && rF < 70.0 && zF > 126.4 && zF < 193.7 ) {
+	      if ( zF <  distMagZ - 6.7 ) badTkHit = true;
+	    }
+//$$$$
           }
         }
 
         if ( innerHitPosCut_ > 0. && !badTkHit ) // && negativeTrackRef.innerOk()
         {
-          int trdx = trdx2;
-          if ( Selec == 1 ) trdx = trdx1;
+          int trdx = trd2;
+          if ( Selec == 1 ) trdx = trd1;
           if ( idxMGT[trdx].second < pc->size() ) // not for the lost tracks, but as their default first hit is PIXBL1 it would not hurt...
           {
             const HitPattern hp = negativeTrackRef.hitPattern();
@@ -4352,7 +3883,7 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
             GlobalPoint vert (negativeTrackRef.vx(),negativeTrackRef.vy(),negativeTrackRef.vz()); // Point where the propagation will start (Reference Point)
             const TrajectoryStateOnSurface Surtraj = TTneg.stateOnSurface(vert); // TSOS of this point
             const MagneticField* B = TTneg.field(); // 3.8T
-            AnalyticalPropagator* Prop = new AnalyticalPropagator(B); // Propagator that will be used for barrel, crashes in the disks when using Plane
+            AnalyticalPropagator* Prop = new AnalyticalPropagator(B);
             Basic3DVector<float> P3D2(negativeTrackRef.vx(),negativeTrackRef.vy(),negativeTrackRef.vz());  // global frame
             Basic3DVector<float> B3DV(negativeTrackRef.px(),negativeTrackRef.py(),negativeTrackRef.pz()); // global frame 
             float Eta = negativeTrackRef.eta();
@@ -4360,9 +3891,43 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
             float vz  = negativeTrackRef.vz();
             PropaHitPattern* negPHP = new PropaHitPattern();
             std::pair<int,GloballyPositioned<float>::PositionType> negFHPosition = negPHP->Main(firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
-            double negTkHitPosD2 = (negFHPosition.second.x()-PV.x())*(negFHPosition.second.x()-PV.x()) +
-              (negFHPosition.second.y()-PV.y())*(negFHPosition.second.y()-PV.y());
-            if ( sqrt(negTkHitPosD2) < (distMagXY - sigmaDistMagXY*innerHitPosCut_) ) badTkHit = true;
+//$$$$
+//             double negTkHitPosD2 = (negFHPosition.second.x()-PV.x())*(negFHPosition.second.x()-PV.x()) +
+//               (negFHPosition.second.y()-PV.y())*(negFHPosition.second.y()-PV.y());
+//             if ( sqrt(negTkHitPosD2) < (distMagXY - sigmaDistMagXY*innerHitPosCut_) ) badTkHit = true;
+//$$$$
+            float xF = negFHPosition.second.x() - PV.x();
+            float yF = negFHPosition.second.y() - PV.y();
+	    float rF = TMath::Sqrt( xF*xF + yF*yF );
+            float zF = TMath::Abs( negFHPosition.second.z() - PV.z() );
+	    // PXB
+	    if ( rF > 2.7 && rF < 16.5 && zF < 27.0 ) {
+	      if ( rF <  distMagXY - 0.40 ) badTkHit = true;
+	    }
+	    // TIB
+	    if ( rF > 23.5 && rF < 36.2 && zF < 66.0 ) {
+	      if ( rF <  distMagXY - 0.84 ) badTkHit = true;
+	    }
+	    if ( rF > 40.0 && rF < 52.0 && zF < 66.0 ) {
+	      if ( rF <  distMagXY - 2.24 ) badTkHit = true;
+	    }
+	    // TOB
+	    if ( rF > 58.4 && rF < 62.9 && zF < 107. ) {
+	      if ( rF <  distMagXY - 2.8 ) badTkHit = true;
+	    }
+	    // PXF
+	    if ( rF > 4.5 && rF < 16.1 && zF > 29.6 && zF < 52.0 ) {
+	      if ( zF <  distMagZ - 3.2 ) badTkHit = true;
+	    }
+	    // TID
+	    if ( rF > 22.5 && rF < 50.5 && zF > 74.3 && zF < 109.7 ) {
+	      if ( zF <  distMagZ - 3.9 ) badTkHit = true;
+	    }
+	    // TEC
+	    if ( rF > 22.0 && rF < 70.0 && zF > 126.4 && zF < 193.7 ) {
+	      if ( zF <  distMagZ - 6.7 ) badTkHit = true;
+	    }
+//$$$$
           }
         }
 //$$
@@ -4517,10 +4082,13 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
             tree_V0_reco_phi.push_back(   theKshort->phi());
             tree_V0_reco_source.push_back(1);
             tree_V0_reco_badTkHit.push_back(badTkHit);
+            //$$$$
+            tree_V0_reco_dca.push_back(   dca);
+//$$$$
             temp_nV0_reco++;
-            if ( abs(theKshort->mass() - kShortMass) < kShortMassSel_ ) { 
-              idxMGT[trdx1].first = true;
-              idxMGT[trdx2].first = true;
+            if ( abs(theKshort->mass() - kShortMass) < kShortMassSel_ && ActivateV0Veto) { 
+              idxMGT[trd1].first = true;
+              idxMGT[trd2].first = true;
             }
           }
         }
@@ -4556,9 +4124,12 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
             tree_V0_reco_phi.push_back(   theLambda->phi());
             tree_V0_reco_source.push_back(2);
             tree_V0_reco_badTkHit.push_back(badTkHit);
-            if ( abs(theLambda->mass() - lambdaMass) < lambdaMassSel_ ) { 
-              idxMGT[trdx1].first = true;
-              idxMGT[trdx2].first = true;
+            //$$$$
+            tree_V0_reco_dca.push_back(   dca);
+//$$$$
+            if ( abs(theLambda->mass() - lambdaMass) < lambdaMassSel_ && ActivateV0Veto) { 
+              idxMGT[trd1].first = true;
+              idxMGT[trd2].first = true;
             }
           }
         } 
@@ -4594,9 +4165,12 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
             tree_V0_reco_phi.push_back(   theLambdaBar->phi());
             tree_V0_reco_source.push_back(2);
             tree_V0_reco_badTkHit.push_back(badTkHit);
-            if ( abs(theLambdaBar->mass() - lambdaMass) < lambdaMassSel_ ) { 
-              idxMGT[trdx1].first = true;
-              idxMGT[trdx2].first = true;
+            //$$$$
+            tree_V0_reco_dca.push_back(   dca);
+//$$$$
+            if ( abs(theLambdaBar->mass() - lambdaMass) < lambdaMassSel_ && ActivateV0Veto) { 
+              idxMGT[trd1].first = true;
+              idxMGT[trd2].first = true;
             }
           }
         }
@@ -4606,8 +4180,7 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
     tree_nV0_reco = temp_nV0_reco;
 //-------------------- END OF V0 reconstruction ---------------------//
 
-    
-//$$$$
+
     //---------------------------------------------------------------//
     //----------------------- Secondary Interactions ----------------//
     //---------------------------------------------------------------//
@@ -4651,27 +4224,27 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
     }
 
 //-------------------------------- loop over tracks and vertex good charged track pairs
-    for (unsigned int trdx1 = 0; trdx1 < theIntTrackRefs.size()-1; ++trdx1) 
+    for (unsigned int trd1 = 0; trd1 < theIntTrackRefs.size()-1; ++trd1) 
     {
-      int iq1 = theIntTrackRefs[trdx1].charge();
-      for (unsigned int trdx2 = trdx1+1; trdx2 < theIntTrackRefs.size(); ++trdx2) 
+      int iq1 = theIntTrackRefs[trd1].charge();
+      for (unsigned int trd2 = trd1+1; trd2 < theIntTrackRefs.size(); ++trd2) 
       {
-        int iq2 = theIntTrackRefs[trdx2].charge();
-        float drsig1 = std::abs(theIntTrackRefs[trdx1].dxy(PV.position())/theIntTrackRefs[trdx1].dxyError());
-        float drsig2 = std::abs(theIntTrackRefs[trdx2].dxy(PV.position())/theIntTrackRefs[trdx2].dxyError());
+        int iq2 = theIntTrackRefs[trd2].charge();
+        float drsig1 = std::abs(theIntTrackRefs[trd1].dxy(PV.position())/theIntTrackRefs[trd1].dxyError());
+        float drsig2 = std::abs(theIntTrackRefs[trd2].dxy(PV.position())/theIntTrackRefs[trd2].dxyError());
         if ( useBS_ ) {
-          drsig1 = std::abs(theIntTrackRefs[trdx1].dxy(bs)/theIntTrackRefs[trdx1].dxyError());
-          drsig2 = std::abs(theIntTrackRefs[trdx2].dxy(bs)/theIntTrackRefs[trdx2].dxyError());
+          drsig1 = std::abs(theIntTrackRefs[trd1].dxy(bs)/theIntTrackRefs[trd1].dxyError());
+          drsig2 = std::abs(theIntTrackRefs[trd2].dxy(bs)/theIntTrackRefs[trd2].dxyError());
 	}
 //$$
-      if ( !(theIntTrackRefs[trdx1].pt() > pt_Cut && theIntTrackRefs[trdx1].normalizedChi2() < NChi2_Cut && drsig1 > drSig_Cut) 
-	&& !(theIntTrackRefs[trdx2].pt() > pt_Cut && theIntTrackRefs[trdx2].normalizedChi2() < NChi2_Cut && drsig2 > drSig_Cut) ) continue;
+      if ( !(theIntTrackRefs[trd1].pt() > pt_Cut && theIntTrackRefs[trd1].normalizedChi2() < NChi2_Cut && drsig1 > drSig_Cut) 
+	&& !(theIntTrackRefs[trd2].pt() > pt_Cut && theIntTrackRefs[trd2].normalizedChi2() < NChi2_Cut && drsig2 > drSig_Cut) ) continue;
 //$$
 
-        reco::Track TrackRef1 = theIntTrackRefs[trdx1];
-        reco::Track TrackRef2 = theIntTrackRefs[trdx2];
-        reco::TransientTrack* TransTkPtr1 = &theIntTransTracks[trdx1];
-        reco::TransientTrack* TransTkPtr2 = &theIntTransTracks[trdx2];
+        reco::Track TrackRef1 = theIntTrackRefs[trd1];
+        reco::Track TrackRef2 = theIntTrackRefs[trd2];
+        reco::TransientTrack* TransTkPtr1 = &theIntTransTracks[trd1];
+        reco::TransientTrack* TransTkPtr2 = &theIntTransTracks[trd2];
 
         // ---------------measure distance between tracks at their closest approach---------------
         auto const& Impact1 = TransTkPtr1->impactPointTSCP();
@@ -4684,7 +4257,7 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
       if ( !cApp.status() ) continue;
         float dca = std::abs(cApp.distance());
 //$$
-      if ( dca > 2. ) continue;
+      if ( dca > tkDCACut_ ) continue;
 //$$
 
         // the POCA should at least be in the sensitive volume
@@ -4702,7 +4275,7 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
         double PtotSq = (TSCP1.momentum() + TSCP2.momentum()).mag2();
         double mass = TMath::Sqrt(totalESq - PtotSq);
 //$$
-      if ( mass > 10. ) continue; 
+      if ( mass > 4. ) continue; 
 //$$
  
         // Fill the vector of TransientTracks to send to KVF
@@ -4754,8 +4327,8 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
         bool badTkHit = false;
         for (int k = 1; k <= 2; k++) 
 	{
-          unsigned int  trdx = trdx1;
-	  if ( k == 2 ) trdx = trdx2;
+          unsigned int  trdx = trd1;
+	  if ( k == 2 ) trdx = trd2;
         if ( idxMGT[trdx].second >= pc->size() ) continue; // not for the lost tracks, but as their default first hit is PIXBL1 it would not hurt...
           reco::Track   TrackRef = TrackRef1;
 	  if ( k == 2 ) TrackRef = TrackRef2;
@@ -4766,7 +4339,7 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
           GlobalPoint vert (TrackRef.vx(),TrackRef.vy(),TrackRef.vz()); // Point where the propagation will start (Reference Point)
           const TrajectoryStateOnSurface Surtraj = TTrack.stateOnSurface(vert); // TSOS of this point
           const MagneticField* B = TTrack.field(); // 3.8T
-          AnalyticalPropagator* Prop = new AnalyticalPropagator(B); // Propagator that will be used for barrel, crashes in the disks when using Plane
+          AnalyticalPropagator* Prop = new AnalyticalPropagator(B);
           Basic3DVector<float> P3D2(TrackRef.vx(),TrackRef.vy(),TrackRef.vz()); // global frame
           Basic3DVector<float> B3DV(TrackRef.px(),TrackRef.py(),TrackRef.pz()); // global frame 
           float Eta = TrackRef.eta();
@@ -4774,10 +4347,45 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
           float vz  = TrackRef.vz();
           PropaHitPattern* PHP = new PropaHitPattern();
           std::pair<int,GloballyPositioned<float>::PositionType> FHPosition = PHP->Main(firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
-          double TkHitPosD2 = (FHPosition.second.x()-PV.x())*(FHPosition.second.x()-PV.x()) +
-          		      (FHPosition.second.y()-PV.y())*(FHPosition.second.y()-PV.y());
-          if ( sqrt(TkHitPosD2) < (distMagXY - sigmaDistMagXY*innerHitPosCut_) ) badTkHit = true;
+//$$$$
+//           double TkHitPosD2 = (FHPosition.second.x()-PV.x())*(FHPosition.second.x()-PV.x()) +
+//           		      (FHPosition.second.y()-PV.y())*(FHPosition.second.y()-PV.y());
+//           if ( sqrt(TkHitPosD2) < (distMagXY - sigmaDistMagXY*innerHitPosCut_) ) badTkHit = true;
+//$$$$
+          float xF = FHPosition.second.x() - PV.x();
+          float yF = FHPosition.second.y() - PV.y();
+	  float rF = TMath::Sqrt( xF*xF + yF*yF );
+          float zF = TMath::Abs( FHPosition.second.z() - PV.z() );
+	  // PXB
+	  if ( rF > 2.7 && rF < 16.5 && zF < 27.0 ) {
+	    if ( rF <  distMagXY - 0.40 ) badTkHit = true;
         }
+        	  // TIB
+	  if ( rF > 23.5 && rF < 36.2 && zF < 66.0 ) {
+	    if ( rF <  distMagXY - 0.84 ) badTkHit = true;
+	  }
+	  if ( rF > 40.0 && rF < 52.0 && zF < 66.0 ) {
+	    if ( rF <  distMagXY - 2.24 ) badTkHit = true;
+	  }
+	  // TOB
+	  if ( rF > 58.4 && rF < 62.9 && zF < 107. ) {
+	    if ( rF <  distMagXY - 2.8 ) badTkHit = true;
+	  }
+	  // PXF
+	  if ( rF > 4.5 && rF < 16.1 && zF > 29.6 && zF < 52.0 ) {
+	    if ( zF <  distMagZ - 3.2 ) badTkHit = true;
+	  }
+	  // TID
+	  if ( rF > 22.5 && rF < 50.5 && zF > 74.3 && zF < 109.7 ) {
+	    if ( zF <  distMagZ - 3.9 ) badTkHit = true;
+	  }
+	  // TEC
+	  if ( rF > 22.0 && rF < 70.0 && zF > 126.4 && zF < 193.7 ) {
+	    if ( zF <  distMagZ - 6.7 ) badTkHit = true;
+	  }
+//$$$$
+        }
+
 //$$
 //       if ( badTkHit ) continue;
 //$$
@@ -4869,7 +4477,7 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
         theSecInt->setP4(p4);
         theSecInt->setCharge(charge);
 //$$
-      if ( abs(theSecInt->mass()) > 10. ) continue; 
+      if ( abs(theSecInt->mass()) > 4. ) continue; 
 //$$
         float SecInt_x = theSecInt->vertex().x();
         float SecInt_y = theSecInt->vertex().y();
@@ -4895,41 +4503,157 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
         tree_SecInt_dca.push_back(     dca);
         tree_nSecInt++;
 
+//$$$$$$
+        // get r-z distance to closest generated LLP decay point
+	float drLLP, dzLLP, ddLLP1, ddLLP2;
+	ddLLP1 = (SecInt_x - LLP1_x)*(SecInt_x - LLP1_x) + (SecInt_y - LLP1_y)*(SecInt_y - LLP1_y) + (SecInt_z - LLP1_z)*(SecInt_z - LLP1_z);
+	ddLLP2 = (SecInt_x - LLP2_x)*(SecInt_x - LLP2_x) + (SecInt_y - LLP2_y)*(SecInt_y - LLP2_y) + (SecInt_z - LLP2_z)*(SecInt_z - LLP2_z);
+	if ( ddLLP1 < ddLLP2 ) {
+	  drLLP = TMath::Sqrt( (SecInt_x - LLP1_x)*(SecInt_x - LLP1_x) + (SecInt_y - LLP1_y)*(SecInt_y - LLP1_y) );
+	  dzLLP = abs(SecInt_z - LLP1_z);
+	}
+	else {
+	  drLLP = TMath::Sqrt( (SecInt_x - LLP2_x)*(SecInt_x - LLP2_x) + (SecInt_y - LLP2_y)*(SecInt_y - LLP2_y) );
+	  dzLLP = abs(SecInt_z - LLP2_z);
+	}
+        tree_SecInt_LLP_dr.push_back(  drLLP);
+        tree_SecInt_LLP_dz.push_back(  dzLLP);
+	
+	// are the 2 tracks from LLP ?
+	float   q1 = theIntTrackRefs[trd1].charge();
+	float  pt1 = theIntTrackRefs[trd1].pt();
+	float eta1 = theIntTrackRefs[trd1].eta();
+	float phi1 = theIntTrackRefs[trd1].phi();
+	int   hit1 = theIntTrackRefs[trd1].hitPattern().numberOfValidHits();
+	float   q2 = theIntTrackRefs[trd2].charge();
+	float  pt2 = theIntTrackRefs[trd2].pt();
+	float eta2 = theIntTrackRefs[trd2].eta();
+	float phi2 = theIntTrackRefs[trd2].phi();
+	int   hit2 = theIntTrackRefs[trd2].hitPattern().numberOfValidHits();
+        int LLPtrd1 = 0, LLPtrd2 = 0;
+
+        for (int k = 0; k < tree_ngenFromLLP; k++) // loop on final gen part from LLP
+        {
+          float qGen   = tree_genFromLLP_charge[k];
+        if ( q1 != qGen && q2 != qGen ) continue;
+          int kLLP =     tree_genFromLLP_LLP[k];
+          float ptGen  = tree_genFromLLP_pt[k];
+          float etaGen = tree_genFromLLP_eta[k];
+          float phiGen = tree_genFromLLP_phi[k]; // given at production point
+          float xGen   = tree_genFromLLP_x[k];
+          float yGen   = tree_genFromLLP_y[k];
+          float qR = qGen * ptGen * 100 / 0.3 / 3.8;
+	  // compute phi0 at dca(PV) for the gen particle (instead of production point)
+          float sin0 = qR * sin( phiGen ) + (xGen - tree_GenPVx);
+          float cos0 = qR * cos( phiGen ) - (yGen - tree_GenPVy);
+          float phi0 = TMath::ATan2( sin0, cos0 ); // but note that it can be wrong by +_pi ! 
+          float dpt= 100., deta = 100., dphi = 100.;
+	  if ( q1 == qGen && LLPtrd1 == 0 ) {
+            dpt  = (pt1 - ptGen) / pt1;
+            deta = eta1 - etaGen;
+            dphi = phi1 - phi0;
+            if      ( dphi < -3.14159 / 2. ) dphi += 3.14159;
+            else if ( dphi >  3.14159 / 2. ) dphi -= 3.14159;
+	    if ( hit1 <= 10 ) {
+              if ( abs(dpt) < 0.70 && abs(deta) < 0.30 && abs(dphi) < 0.08 ) LLPtrd1 = kLLP; 
+            }
+            else if ( hit1 <= 13 ) {
+              if ( abs(dpt) < 0.20 && abs(deta) < 0.12 && abs(dphi) < 0.05 ) LLPtrd1 = kLLP; 
+            }
+            else if ( hit1 <= 17 ) {
+              if ( abs(dpt) < 0.08 && abs(deta) < 0.04 && abs(dphi) < 0.03 ) LLPtrd1 = kLLP; 
+            }
+            else {
+              if ( abs(dpt) < 0.07 && abs(deta) < 0.02 && abs(dphi) < 0.02 ) LLPtrd1 = kLLP; 
+            }
+	  }
+	  if ( q2 == qGen && LLPtrd2 == 0 ) {
+            dpt  = (pt2 - ptGen) / pt2;
+            deta = eta2 - etaGen;
+            dphi = phi2 - phi0;
+            if      ( dphi < -3.14159 / 2. ) dphi += 3.14159;
+            else if ( dphi >  3.14159 / 2. ) dphi -= 3.14159;
+	    if ( hit2 <= 10 ) {
+              if ( abs(dpt) < 0.70 && abs(deta) < 0.30 && abs(dphi) < 0.08 ) LLPtrd2 = kLLP; 
+            }
+            else if ( hit2 <= 13 ) {
+              if ( abs(dpt) < 0.20 && abs(deta) < 0.12 && abs(dphi) < 0.05 ) LLPtrd2 = kLLP; 
+            }
+            else if ( hit2 <= 17 ) {
+              if ( abs(dpt) < 0.08 && abs(deta) < 0.04 && abs(dphi) < 0.03 ) LLPtrd2 = kLLP; 
+            }
+            else {
+              if ( abs(dpt) < 0.07 && abs(deta) < 0.02 && abs(dphi) < 0.02 ) LLPtrd2 = kLLP; 
+            }
+	  }
+        } // end loop on final gen part from LLP
+	if ( LLPtrd1 != 0 && LLPtrd1 == LLPtrd2 ) {
+          tree_SecInt_LLP.push_back(LLPtrd1);
+	}
+	else {
+          tree_SecInt_LLP.push_back(0);
+	}
+
 	bool SecInt_selec = false;
 //$$
 	if ( distsigXY > 100. && angleXY > 0.9 && theSecInt->mass() < 2. &&
-	     dca < 1. && theSecInt->vertexNormalizedChi2() < 10. ) SecInt_selec = true;
+    theSecInt->vertexNormalizedChi2() < 10. ) SecInt_selec = true; //&& dca < 1.
 //$$
         tree_SecInt_selec.push_back(   SecInt_selec);
 
 	// tracker active layers
         PropaHitPattern* NI = new PropaHitPattern();
         int VtxLayerNI = -1;
-        VtxLayerNI = NI->VertexBelongsToBarrelLayer(SecInt_r,SecInt_z);
-        if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r,SecInt_z);
-	if ( SecInt_selec && VtxLayerNI != 0 ) {
-          idxMGT[trdx1].first = true;
-          idxMGT[trdx2].first = true;
+if (DetailedMap) {VtxLayerNI = NI->VertexBelongsToTracker(SecInt_r, SecInt_z);}
+else {
+VtxLayerNI = NI->VertexBelongsToBarrelLayer(SecInt_r, SecInt_z);
+if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecInt_z);
+}
+	if ( SecInt_selec && VtxLayerNI != 0 && ActivateSecIntVeto) {
+          idxMGT[trd1].first = true;
+          idxMGT[trd2].first = true;
 	}
+//$$$$
 	// beam pipe
-	if ( SecInt_selec  &&
-	     SecInt_r > 2.16 && SecInt_r < 2.26 && abs(SecInt_z) < 20. ) {
+	if ( SecInt_selec && abs(SecInt_z) < 27. &&
+	     SecInt_r > 2.16 && SecInt_r < 2.26 ) {
 	  VtxLayerNI = -1;
-          idxMGT[trdx1].first = true;
-          idxMGT[trdx2].first = true;
+          idxMGT[trd1].first = true;
+          idxMGT[trd2].first = true;
 	}
-	// TID support
-	if ( SecInt_selec  &&
-	     SecInt_r > 18. && SecInt_r < 19. && abs(SecInt_z) > 50. && abs(SecInt_z) < 100. ) {
+	// PIXB inner support
+	if ( SecInt_selec && abs(SecInt_z) < 27. &&
+	     SecInt_r > 2.49 && SecInt_r < 2.54 ) {
 	  VtxLayerNI = -2;
-          idxMGT[trdx1].first = true;
-          idxMGT[trdx2].first = true;
+          idxMGT[trd1].first = true;
+          idxMGT[trd2].first = true;
 	}
+	// PIXB outer support
+	if ( SecInt_selec &&
+	     SecInt_r > 21.55 && SecInt_r < 21.85 ) {
+	  VtxLayerNI = -3;
+          idxMGT[trd1].first = true;
+          idxMGT[trd2].first = true;
+	}
+	// PIXB rails
+	if ( SecInt_selec && abs(SecInt_z) < 27. &&
+	     abs(SecInt_x) < 10. && abs(SecInt_y) > 18.9 && abs(SecInt_y) < 19.4 ) {
+	  VtxLayerNI = -4;
+          idxMGT[trd1].first = true;
+          idxMGT[trd2].first = true;
+	}
+	// services : r 18 - 19 and z 29 - 200 according to "other" material map
+	if ( SecInt_selec && abs(SecInt_z) > 29. &&
+	     SecInt_r > 18.0 && SecInt_r < 19.0 ) {
+	  VtxLayerNI = -3;
+          idxMGT[trd1].first = true;
+          idxMGT[trd2].first = true;
+	}
+//$$$$
         tree_SecInt_layer.push_back(   VtxLayerNI);
       }
     }
 //-----------------------------END OF Sec.Int. reconstruction------------------------------------------//
-//$$$$
     
 
 //----------------------------- TRACKS -------------------------------//
@@ -5001,7 +4725,7 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
 	}
       }
 //$$
-    if ( Yc_tk ) continue;
+    if ( Yc_tk &&  ActivateYcVeto) continue;
 //$$
 
       tree_nTracks++;
@@ -5093,7 +4817,7 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
       // const FreeTrajectoryState Freetraj = TT.initialFreeState(); // Propagator in the barrel can also use FTS (WARNING: the so-called reference point (where the propagation starts might be different from the first vtx, a check should be done))
       GlobalPoint vert (tk_vx,tk_vy,tk_vz); // Point where the propagation will start (Reference Point)
       const TrajectoryStateOnSurface Surtraj = TT.stateOnSurface(vert); // TSOS of this point
-      AnalyticalPropagator* Prop = new AnalyticalPropagator(B); // Propagator that will be used for barrel, crashes in the disks when using Plane
+      AnalyticalPropagator* Prop = new AnalyticalPropagator(B);
       Basic3DVector<float> P3D2(tk_vx,tk_vy,tk_vz);  // global frame
       Basic3DVector<float> B3DV (tk_px,tk_py,tk_pz); // global frame 
       float Eta = tk_eta;
@@ -5149,8 +4873,6 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
       float    track_sim_LLP_r = 0.;
       float    track_sim_LLP_z = 0.;
 
-      float xPV = tree_GenPVx;
-      float yPV = tree_GenPVy;
       for (int k = 0; k < tree_ngenFromLLP; k++) // loop on final gen part from LLP
       {
       if ( tk_charge != tree_genFromLLP_charge[k] ) continue;
@@ -5168,8 +4890,8 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
         float deta = tk_eta - etaGen;
 	
 	// compute phi0 at dca(PV) for the gen particle (instead of production point)
-        float sin0 = qR * sin( phiGen ) + (xGen - xPV);
-        float cos0 = qR * cos( phiGen ) - (yGen - yPV);
+        float sin0 = qR * sin( phiGen ) + (xGen - tree_GenPVx);
+        float cos0 = qR * cos( phiGen ) - (yGen - tree_GenPVy);
         float phi0 = TMath::ATan2( sin0, cos0 ); // but note that it can be wrong by +_pi ! 
         float dphi = tk_phi - phi0;
         if      ( dphi < -3.14159 / 2. ) dphi += 3.14159;
@@ -5458,9 +5180,13 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
 //     double bdtcut = -0.1083; // for TMVAClassification_BDTG_FromBC.weights.xml from BDTminipf
 //     double bdtcut = -0.0067; // for TMVAClassification_BDTG50cm_sansntrk10_avecHP.weights.xml BDTrecohpsansntrk10
 //     double bdtcut = -10.; // no BDT cut
+//     double bdtcut = 0.1624; // for TMVAClassification_BDTG50cm_wVeto.weights.xml
+// TMVAClassification_BDTG50cm_V0Veto.weights.xml"),  # BDTMiniAOD //-0.0090
+// TMVAClassification_BDTG50cm_V0_YcVeto.weights.xml,  # BDTMiniAOD //0.0372
+// TMVAClassification_BDTG50cm_NoVeto.weights.xml,  # BDTMiniAOD ///0.1270
 //$$
     double bdtcut = 0.5; 
-    double bdtcut_step2 = 0.; // for TMVAClassification_BDTG50cm_HighPurity.weights.xml BDTrecohp
+    double bdtcut_step2 = -0.009; 
 //$$
 
     //---------------------------//
@@ -5482,6 +5208,8 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
       dxyError = tree_track_dxyError[counter_track];
       dz = tree_track_dz[counter_track];
       dzSig = tree_track_dzSig[counter_track];
+      dzTopu = tree_track_dzTOpu[counter_track];
+      dzSigTopu = tree_track_dzSigTOpu[counter_track];
       ntrk10 = 0;
       float ntrk10_lost = 0, ntrk20_lost = 0, ntrk30_lost = 0, ntrk40_lost = 0;
       isinjet = 0.;
@@ -5814,6 +5542,13 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
     tree_LLP_Vtx_dist.push_back( recD );
     tree_LLP_Vtx_dd.push_back( TMath::Sqrt(dSV)/LLP2_dist );
     
+    float dR_LLP12   = Deltar(LLP1_eta, LLP1_phi, LLP2_eta, LLP2_phi);
+    float deta_LLP12 = abs(LLP1_eta - LLP2_eta);
+    float dphi_LLP12 = abs(Deltaphi(LLP1_phi, LLP2_phi));
+    tree_LLP12_dR.push_back(   dR_LLP12);
+    tree_LLP12_deta.push_back( deta_LLP12);
+    tree_LLP12_dphi.push_back( dphi_LLP12);
+
 //&&&&&
 // //     if ( Vtx_chi < 0 && LLP2_nTrks > 1 ) dump = true;
 //     cout << endl;
@@ -6460,6 +6195,9 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_V0_reco_phi.clear();
     tree_V0_reco_source.clear();
     tree_V0_reco_badTkHit.clear();
+    //$$$$
+    tree_V0_reco_dca.clear();
+//$$$$
 
     tree_SecInt_x.clear();
     tree_SecInt_y.clear();
@@ -6480,6 +6218,9 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_SecInt_dca.clear();
     tree_SecInt_selec.clear();
     tree_SecInt_layer.clear();
+    tree_SecInt_LLP.clear();
+    tree_SecInt_LLP_dr.clear();
+    tree_SecInt_LLP_dz.clear();
 
     tree_Yc_x.clear(); 
     tree_Yc_y.clear();
@@ -6691,6 +6432,9 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_LLP_Vtx_dz.clear();
     tree_LLP_Vtx_dist.clear();
     tree_LLP_Vtx_dd.clear();
+    tree_LLP12_dR.clear();
+    tree_LLP12_deta.clear();
+    tree_LLP12_dphi.clear();
 
     tree_Hemi.clear();
     tree_Hemi_njet.clear();
