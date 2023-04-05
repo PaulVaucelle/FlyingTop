@@ -265,8 +265,8 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     bool ActivateTrigger = true;// Keep true, else there is nothing done in the code :D 
           //Vetos to find vertices from different seondary interactions
     bool DetailedMap = true;// Detailed map of the CMS tracker to apply a veto on the tracks of the vertices that belong to this map
-    bool ActivateV0Veto = true;
-    bool ActivateYcVeto = true;
+    bool ActivateV0Veto = false;
+    bool ActivateYcVeto = false;
     bool ActivateSecIntVeto = false;
 
 
@@ -2027,10 +2027,10 @@ smalltree->Branch("HLT_PFHT800_PFMET75_PFMHT75_IDTight_v",&HLT_PFHT800_PFMET75_P
     reader->AddVariable( "mva_drSig", &drSig); /*!*/
     reader->AddVariable( "mva_track_isinjet", &isinjet); /*!*/
 
-    reader->AddVariable( "mva_track_dR", &isinjet); /*!*/
-    reader->AddVariable( "mva_track_dRmax", &isinjet); /*!*/
-    reader->AddVariable("mva_track_dzTOpu",&dzTopu);//added on 24/03/2023 : if using bdts generated before this date, =>crash
-    reader->AddVariable("mva_track_dzSigTOpu",&dzSigTopu);//added on 24/03/2023
+    reader->AddVariable( "mva_track_dR", &dR); /*!*/
+    reader->AddVariable( "mva_track_dRmax", &dRmax); /*!*/
+    // reader->AddVariable("mva_track_dzTOpu",&dzTopu);//added on 24/03/2023 : if using bdts generated before this date, =>crash
+    // reader->AddVariable("mva_track_dzSigTOpu",&dzSigTopu);//added on 24/03/2023
 
     reader->BookMVA( "BDTG", weightFile_ ); // root 6.14/09, care compatiblity of versions for tmva
 //$$
