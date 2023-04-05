@@ -1,3 +1,9 @@
+<use name="TrackingTools/GeomPropagators"/>
+<use name="TrackingTools/MaterialEffects"/>
+<use name="TrackPropagation/RungeKutta"/>
+<use name="DataFormats/GeometryCommonDetAlgo"/>
+<use name="RecoEgamma/EgammaPhotonAlgos"/>
+
 <use name="CommonTools/UtilAlgos"/>
 <use name="CondCore/DBOutputService"/>
 <use name="FWCore/Framework"/>
@@ -15,6 +21,7 @@
 
 <use name="TrackingTools/TransientTrack"/>
 <use name="TrackingTools/Records"/>
+
 <use name="RecoTracker/TransientTrackingRecHit"/>
 <use name="roottmva"/>
 <use name="RecoVertex/AdaptiveVertexFit"/>
