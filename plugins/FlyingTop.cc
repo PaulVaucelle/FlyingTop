@@ -257,6 +257,11 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     float dRmax; /*!*/
     float dzTopu;
     float dzSigTopu;
+    float TibHit;
+    float TobHit;
+    float PixBarHit;
+    float TecHit;
+    float isLost;
     TMVA::Reader *reader = new TMVA::Reader( "!Color:Silent" );
 
     //   Booleans to activate/desactivate part of the code //
@@ -265,10 +270,15 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     bool ActivateTrigger = true;// Keep true, else there is nothing done in the code :D 
           //Vetos to find vertices from different seondary interactions
     bool DetailedMap = true;// Detailed map of the CMS tracker to apply a veto on the tracks of the vertices that belong to this map
-    bool ActivateV0Veto = false;
-    bool ActivateYcVeto = false;
-    bool ActivateSecIntVeto = false;
+    bool ActivateV0Veto     = true;
+    bool ActivateYcVeto     = true;
+    bool ActivateSecIntVeto = true;
 
+    int nST1 = 0;
+    int nST2 = 0;
+    int nST3 = 0;
+    int nST4 = 0;
+    int nST5 = 0;
 
     int index[1000];
     double MVAval[1000];
@@ -349,9 +359,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float>     tree_V0_reco_phi;
     std::vector<int>       tree_V0_reco_source;
     std::vector<bool>      tree_V0_reco_badTkHit;
-    //$$$$
     std::vector<float>     tree_V0_reco_dca;
-//$$$$
 
     // reconstructed Secondary Interactions
     int tree_nSecInt;
@@ -510,8 +518,9 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector< double > tree_track_MVAval;
     
     std::vector< int >    tree_track_Hemi;
-    std::vector< double > tree_track_Hemi_dR;
-    std::vector< double > tree_track_Hemi_mva_NChi2;
+    std::vector< float >  tree_track_Hemi_dR;
+    std::vector< float >  tree_track_Hemi_dRmax;
+    std::vector< float >  tree_track_Hemi_mva_NChi2;
     std::vector< bool >   tree_track_Hemi_ping;
     std::vector< float >  tree_track_Hemi_dFirstVtx;
     std::vector< int >    tree_track_Hemi_LLP;
@@ -1130,6 +1139,10 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
 
     // Trigger plots if needed
     TH2F* test  = new TH2F("test","test",200,0,1000,2,0,1);
+    PropaHitPattern* PHP = new PropaHitPattern();
+    PropaHitPattern* NI = new PropaHitPattern();
+    PropaHitPattern* posPHP = new PropaHitPattern();
+    PropaHitPattern* negPHP = new PropaHitPattern();
 };
 
 //
@@ -1252,9 +1265,7 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_V0_reco_phi",        &tree_V0_reco_phi);
     smalltree->Branch("tree_V0_reco_source",     &tree_V0_reco_source);
     smalltree->Branch("tree_V0_reco_badTkHit",   &tree_V0_reco_badTkHit);
-    //$$$$
     smalltree->Branch("tree_V0_reco_dca",        &tree_V0_reco_dca);
-//$$$$
 
     // reco Secondary Interaction
     smalltree->Branch("tree_nSecInt",           &tree_nSecInt);
@@ -1422,6 +1433,7 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     
     smalltree->Branch("tree_track_Hemi",           &tree_track_Hemi);
     smalltree->Branch("tree_track_Hemi_dR",        &tree_track_Hemi_dR);
+    smalltree->Branch("tree_track_Hemi_dRmax",     &tree_track_Hemi_dRmax);
     smalltree->Branch("tree_track_Hemi_mva_NChi2", &tree_track_Hemi_mva_NChi2);
     smalltree->Branch("tree_track_Hemi_ping",      &tree_track_Hemi_ping);
     smalltree->Branch("tree_track_Hemi_dFirstVtx", &tree_track_Hemi_dFirstVtx);
@@ -2032,6 +2044,12 @@ smalltree->Branch("HLT_PFHT800_PFMET75_PFMHT75_IDTight_v",&HLT_PFHT800_PFMET75_P
     // reader->AddVariable("mva_track_dzTOpu",&dzTopu);//added on 24/03/2023 : if using bdts generated before this date, =>crash
     // reader->AddVariable("mva_track_dzSigTOpu",&dzSigTopu);//added on 24/03/2023
 
+    // reader->AddVariable("mva_ValTIBHit",&TibHit);
+    // reader->AddVariable("mva_ValTOBHit",&TobHit);
+    // reader->AddVariable("mva_ValPixBarHit",&PixBarHit);
+    // reader->AddVariable("mva_nValTECHHit",&TecHit);
+
+    // reader->AddVariable("mva_track_lost",&isLost);
     reader->BookMVA( "BDTG", weightFile_ ); // root 6.14/09, care compatiblity of versions for tmva
 //$$
 }
@@ -2827,7 +2845,7 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
       tree_Yc_z.push_back(	   Yz);
       tree_Yc_r.push_back(	   Yr);
 
-      PropaHitPattern* NI = new PropaHitPattern();
+      
       int VtxLayerNI = -10;
 if ( DetailedMap ) {VtxLayerNI = NI->VertexBelongsToTracker(Yr, Yz);}
 else {
@@ -3518,11 +3536,15 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
   tree_Filter = false;
   tree_nTracks = 0;
   tree_nLostTracks = 0;
+//$$$$
+  tree_nSecInt = 0;
+  tree_nV0_reco = 0;
+//$$$$
 
   if ( tree_Mmumu > 60. )                  tree_NbrOfZCand = 1;
 //   if ( tree_Mmumu > 60. && HT_val > 180. ) tree_Filter = true;
 //$$
-  if ( (HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v || HLT_IsoMu24_v) 
+  if ( ( HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v || HLT_IsoMu24_v  ) 
        && tree_Mmumu > 10. ) tree_Filter = true;
 //$$
  
@@ -3828,13 +3850,8 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
             float Eta = positiveTrackRef.eta();
             float Phi = positiveTrackRef.phi();
             float vz  = positiveTrackRef.vz();
-            PropaHitPattern* posPHP = new PropaHitPattern();
+            
             std::pair<int,GloballyPositioned<float>::PositionType> posFHPosition = posPHP->Main(firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
-//$$$$
-//             double posTkHitPosD2 = (posFHPosition.second.x()-PV.x())*(posFHPosition.second.x()-PV.x()) +
-//                                    (posFHPosition.second.y()-PV.y())*(posFHPosition.second.y()-PV.y());
-//             if ( sqrt(posTkHitPosD2) < (distMagXY - sigmaDistMagXY*innerHitPosCut_) ) badTkHit = true;
-//$$$$
             float xF = posFHPosition.second.x() - PV.x();
             float yF = posFHPosition.second.y() - PV.y();
 	    float rF = TMath::Sqrt( xF*xF + yF*yF );
@@ -3866,7 +3883,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
 	    if ( rF > 22.0 && rF < 70.0 && zF > 126.4 && zF < 193.7 ) {
 	      if ( zF <  distMagZ - 6.7 ) badTkHit = true;
 	    }
-//$$$$
+
           }
         }
 
@@ -3889,13 +3906,8 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
             float Eta = negativeTrackRef.eta();
             float Phi = negativeTrackRef.phi();
             float vz  = negativeTrackRef.vz();
-            PropaHitPattern* negPHP = new PropaHitPattern();
+            
             std::pair<int,GloballyPositioned<float>::PositionType> negFHPosition = negPHP->Main(firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
-//$$$$
-//             double negTkHitPosD2 = (negFHPosition.second.x()-PV.x())*(negFHPosition.second.x()-PV.x()) +
-//               (negFHPosition.second.y()-PV.y())*(negFHPosition.second.y()-PV.y());
-//             if ( sqrt(negTkHitPosD2) < (distMagXY - sigmaDistMagXY*innerHitPosCut_) ) badTkHit = true;
-//$$$$
             float xF = negFHPosition.second.x() - PV.x();
             float yF = negFHPosition.second.y() - PV.y();
 	    float rF = TMath::Sqrt( xF*xF + yF*yF );
@@ -3927,7 +3939,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
 	    if ( rF > 22.0 && rF < 70.0 && zF > 126.4 && zF < 193.7 ) {
 	      if ( zF <  distMagZ - 6.7 ) badTkHit = true;
 	    }
-//$$$$
+
           }
         }
 //$$
@@ -4082,9 +4094,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
             tree_V0_reco_phi.push_back(   theKshort->phi());
             tree_V0_reco_source.push_back(1);
             tree_V0_reco_badTkHit.push_back(badTkHit);
-            //$$$$
             tree_V0_reco_dca.push_back(   dca);
-//$$$$
             temp_nV0_reco++;
             if ( abs(theKshort->mass() - kShortMass) < kShortMassSel_ && ActivateV0Veto) { 
               idxMGT[trd1].first = true;
@@ -4124,9 +4134,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
             tree_V0_reco_phi.push_back(   theLambda->phi());
             tree_V0_reco_source.push_back(2);
             tree_V0_reco_badTkHit.push_back(badTkHit);
-            //$$$$
             tree_V0_reco_dca.push_back(   dca);
-//$$$$
             if ( abs(theLambda->mass() - lambdaMass) < lambdaMassSel_ && ActivateV0Veto) { 
               idxMGT[trd1].first = true;
               idxMGT[trd2].first = true;
@@ -4165,9 +4173,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
             tree_V0_reco_phi.push_back(   theLambdaBar->phi());
             tree_V0_reco_source.push_back(2);
             tree_V0_reco_badTkHit.push_back(badTkHit);
-            //$$$$
             tree_V0_reco_dca.push_back(   dca);
-//$$$$
             if ( abs(theLambdaBar->mass() - lambdaMass) < lambdaMassSel_ && ActivateV0Veto) { 
               idxMGT[trd1].first = true;
               idxMGT[trd2].first = true;
@@ -4184,7 +4190,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
     //---------------------------------------------------------------//
     //----------------------- Secondary Interactions ----------------//
     //---------------------------------------------------------------//
-    tree_nSecInt = 0;
+//$$$$    tree_nSecInt = 0;
 
     //------------------Selection of good tracks for the vertexing---------------------//
     std::vector<reco::Track> theIntTrackRefs;
@@ -4345,13 +4351,8 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
           float Eta = TrackRef.eta();
           float Phi = TrackRef.phi();
           float vz  = TrackRef.vz();
-          PropaHitPattern* PHP = new PropaHitPattern();
+          
           std::pair<int,GloballyPositioned<float>::PositionType> FHPosition = PHP->Main(firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
-//$$$$
-//           double TkHitPosD2 = (FHPosition.second.x()-PV.x())*(FHPosition.second.x()-PV.x()) +
-//           		      (FHPosition.second.y()-PV.y())*(FHPosition.second.y()-PV.y());
-//           if ( sqrt(TkHitPosD2) < (distMagXY - sigmaDistMagXY*innerHitPosCut_) ) badTkHit = true;
-//$$$$
           float xF = FHPosition.second.x() - PV.x();
           float yF = FHPosition.second.y() - PV.y();
 	  float rF = TMath::Sqrt( xF*xF + yF*yF );
@@ -4359,7 +4360,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
 	  // PXB
 	  if ( rF > 2.7 && rF < 16.5 && zF < 27.0 ) {
 	    if ( rF <  distMagXY - 0.40 ) badTkHit = true;
-        }
+          }
         	  // TIB
 	  if ( rF > 23.5 && rF < 36.2 && zF < 66.0 ) {
 	    if ( rF <  distMagXY - 0.84 ) badTkHit = true;
@@ -4383,7 +4384,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
 	  if ( rF > 22.0 && rF < 70.0 && zF > 126.4 && zF < 193.7 ) {
 	    if ( zF <  distMagZ - 6.7 ) badTkHit = true;
 	  }
-//$$$$
+
         }
 
 //$$
@@ -4503,7 +4504,6 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
         tree_SecInt_dca.push_back(     dca);
         tree_nSecInt++;
 
-//$$$$$$
         // get r-z distance to closest generated LLP decay point
 	float drLLP, dzLLP, ddLLP1, ddLLP2;
 	ddLLP1 = (SecInt_x - LLP1_x)*(SecInt_x - LLP1_x) + (SecInt_y - LLP1_y)*(SecInt_y - LLP1_y) + (SecInt_z - LLP1_z)*(SecInt_z - LLP1_z);
@@ -4602,18 +4602,18 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
         tree_SecInt_selec.push_back(   SecInt_selec);
 
 	// tracker active layers
-        PropaHitPattern* NI = new PropaHitPattern();
+        // PropaHitPattern* NI = new PropaHitPattern();
         int VtxLayerNI = -1;
-if (DetailedMap) {VtxLayerNI = NI->VertexBelongsToTracker(SecInt_r, SecInt_z);}
-else {
-VtxLayerNI = NI->VertexBelongsToBarrelLayer(SecInt_r, SecInt_z);
-if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecInt_z);
-}
+        if (DetailedMap) {VtxLayerNI = NI->VertexBelongsToTracker(SecInt_r, SecInt_z);}
+        else {
+          VtxLayerNI = NI->VertexBelongsToBarrelLayer(SecInt_r, SecInt_z);
+          if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecInt_z);
+        }
 	if ( SecInt_selec && VtxLayerNI != 0 && ActivateSecIntVeto) {
           idxMGT[trd1].first = true;
           idxMGT[trd2].first = true;
 	}
-//$$$$
+
 	// beam pipe
 	if ( SecInt_selec && abs(SecInt_z) < 27. &&
 	     SecInt_r > 2.16 && SecInt_r < 2.26 ) {
@@ -4649,7 +4649,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecIn
           idxMGT[trd1].first = true;
           idxMGT[trd2].first = true;
 	}
-//$$$$
+
         tree_SecInt_layer.push_back(   VtxLayerNI);
       }
     }
@@ -4725,7 +4725,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecIn
 	}
       }
 //$$
-    if ( Yc_tk &&  ActivateYcVeto) continue;
+    if ( Yc_tk && ActivateYcVeto ) continue;
 //$$
 
       tree_nTracks++;
@@ -4748,7 +4748,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecIn
       tree_track_dz.push_back           (tk_dz);
       tree_track_dzError.push_back      (tk_dzError);
       tree_track_dzSig.push_back        (tk_dzSig);
-
+      nST1++;
 // Tracks from pileup
       float tk_dzmin = 100.;
       float tk_dzminSig = 100000.;
@@ -4824,7 +4824,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecIn
       float Phi = tk_phi;
       float vz  = tk_vz;
       //------Propagation with new interface --> See ../interface/PropaHitPattern.h-----//
-      PropaHitPattern* PHP = new PropaHitPattern();
+      
       std::pair<int,GloballyPositioned<float>::PositionType> FHPosition = PHP->Main(firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
    //returns 0 if in Barrel, 1 if disks with the position of the firsthit. Different porpagators are used between 
       // barrel (StraightLinePlaneCrossing/geometry if propagator does not work)
@@ -4854,7 +4854,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecIn
       }
       if ( matchTOjet ) tree_track_iJet.push_back (iJet);
       else              tree_track_iJet.push_back (-1);
-
+    nST2++;
       // match to gen particle from LLP decay
       int      kmatch = -1;
       float    dFirstGenMin = 1000000.;
@@ -5006,10 +5006,10 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecIn
       tree_track_sim_dFirstGen.push_back( dFirstGenMin );
       tree_track_sim_LLP_r.push_back(     track_sim_LLP_r );
       tree_track_sim_LLP_z.push_back(     track_sim_LLP_z );
-
+    nST2++;
     } // end loop on all track candidates
 
-
+    
     /////////////////////////////////////////////////////////
     //-------------------------------------------------------
     // Jets for event axes                                 
@@ -5184,10 +5184,10 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecIn
 // TMVAClassification_BDTG50cm_V0Veto.weights.xml"),  # BDTMiniAOD //-0.0090
 // TMVAClassification_BDTG50cm_V0_YcVeto.weights.xml,  # BDTMiniAOD //0.0372
 // TMVAClassification_BDTG50cm_NoVeto.weights.xml,  # BDTMiniAOD ///0.1270
-//$$
-    double bdtcut = 0.5; 
-    double bdtcut_step2 = -0.009; 
-//$$
+//$$$$$$
+    double bdtcut = 0.85;        // ttbar ~ 1E-3
+    double bdtcut_step2 = 0.0;   // ttbar ~ 1E-2
+//$$$$$$
 
     //---------------------------//
     // if (tree_Filter){
@@ -5197,20 +5197,26 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecIn
       firsthit_X = tree_track_firstHit_x[counter_track];
       firsthit_Y = tree_track_firstHit_y[counter_track];
       firsthit_Z = tree_track_firstHit_z[counter_track];
-      pt   = tree_track_pt[counter_track];
-      eta  = tree_track_eta[counter_track];
+      pt         = tree_track_pt[counter_track];
+      eta        = tree_track_eta[counter_track];
       phi	 = tree_track_phi[counter_track];
       NChi	   = tree_track_NChi2[counter_track];
-      nhits	   = tree_track_nHit[counter_track];
-      // algo	 = tree_track_algo[counter_track];
+      nhits	 = tree_track_nHit[counter_track];
+      // algo	    = tree_track_algo[counter_track];
       drSig	 = tree_track_drSig[counter_track];
-      dxy    = tree_track_dxy[counter_track];
-      dxyError = tree_track_dxyError[counter_track];
-      dz = tree_track_dz[counter_track];
-      dzSig = tree_track_dzSig[counter_track];
-      dzTopu = tree_track_dzTOpu[counter_track];
-      dzSigTopu = tree_track_dzSigTOpu[counter_track];
+      dxy        = abs(tree_track_dxy[counter_track]);
+      dxyError   = tree_track_dxyError[counter_track];
+      dz         = abs(tree_track_dz[counter_track]);
+      dzSig      = tree_track_dzSig[counter_track];
+      dzTopu     = tree_track_dzTOpu[counter_track];
+      dzSigTopu  = tree_track_dzSigTOpu[counter_track];
+      TibHit     = tree_track_nHitTIB[counter_track] ;
+      TobHit     =  tree_track_nHitTOB[counter_track] ;
+      PixBarHit  = tree_track_nHitPXB[counter_track];
+      TecHit     = tree_track_nHitTEC[counter_track];
+
       ntrk10 = 0;
+      isLost     = tree_track_lost[counter_track];
       float ntrk10_lost = 0, ntrk20_lost = 0, ntrk30_lost = 0, ntrk40_lost = 0;
       isinjet = 0.;
       ntrk20 = 0;
@@ -5223,7 +5229,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecIn
       jet = tree_track_iJet[counter_track];
       if ( jet >= 0 ) isinjet = 1.; /*!*/
       int isFromLLP = tree_track_sim_LLP[counter_track];
-
+      nST3++;
       // check the dR between the tracks and the second axis (without any selection on the tracks)
       float dR1  = Deltar( eta, phi, axis1_eta, axis1_phi ); // axis1_phi and axis1_eta for the first axis
       float dR2  = Deltar( eta, phi, axis2_eta, axis2_phi );
@@ -5232,9 +5238,9 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecIn
       if ( dR2 < dR1 ) { // a restriction could be added on the value of dR to assign the value Tracks_axis  (avoid some background???)
         tracks_axis = 2;
         dR = dR2;
-        dRmax=dR1;
+        dRmax = dR1;
       }
-      else{dRmax=dR2;}
+      else{ dRmax = dR2; }
 
       //Computation of the distances needed for the BDT
       for (int counter_othertrack = 0; counter_othertrack < tree_nTracks; counter_othertrack++) 
@@ -5268,7 +5274,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecIn
         if ( isFromLLP == 2 ) LLP2_nTrks++;
 
         bdtval = reader->EvaluateMVA( "BDTG" ); //default value = -10 (no -10 observed and -999 comes from EvaluateMVA)
-
+        // std::cout<<"tk pt : "<<pt<<" tk _eta : "<<eta<<" tk_phi :"<<phi<<" bdt_val :"<<bdtval<<std::endl;
         if ( tracks_axis == 1 ) {
           nTrks_axis1++;
           if ( isFromLLP == iLLPrec1 ) nTrks_axis1_sig++;
@@ -5288,6 +5294,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecIn
             else if ( isFromLLP >= 1 )   nTrks_axis2_bad_mva++;
           }
         }
+        nST4++;
       }
      
       tree_track_ntrk10.push_back(ntrk10);
@@ -5295,8 +5302,10 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecIn
       tree_track_ntrk30.push_back(ntrk30);
       tree_track_ntrk40.push_back(ntrk40);
       tree_track_MVAval.push_back(bdtval);
+      
       tree_track_Hemi.push_back(tracks_axis);
       tree_track_Hemi_dR.push_back(dR);
+      tree_track_Hemi_dRmax.push_back(dRmax);
       if      ( tracks_axis == 1 ) tree_track_Hemi_LLP.push_back(iLLPrec1);
       else if ( tracks_axis == 2 ) tree_track_Hemi_LLP.push_back(iLLPrec2);
       else		           tree_track_Hemi_LLP.push_back(0);
@@ -5393,6 +5402,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecIn
         if ( tracks_axis == 2 )
           displacedTracks_step2_Hemi2.push_back(theTransientTrackBuilder->build(&tk));
       }
+      nST5++;
     }
   
     // cout << " displaced tracks LLP1 " << LLP1_nTrks << " and with mva" << displacedTracks_llp1_mva.size() << endl;
@@ -6086,7 +6096,8 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecIn
   } // endif Filter
 
   smalltree->Fill();
-  // pFile->cd();
+  // std::cout<<"nST1 / nst2 / nst3 / nst4 / nst5 : "<<nST1<<" "<<nST2<<" "<<nST3<<" "<<nST4<<" "<<nST5<<std::endl;
+    // pFile->cd();
   // EffvsObs2->Write();
   // test->Write();
 
@@ -6195,9 +6206,7 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_V0_reco_phi.clear();
     tree_V0_reco_source.clear();
     tree_V0_reco_badTkHit.clear();
-    //$$$$
     tree_V0_reco_dca.clear();
-//$$$$
 
     tree_SecInt_x.clear();
     tree_SecInt_y.clear();
@@ -6326,6 +6335,7 @@ void FlyingTopAnalyzer::clearVariables() {
     
     tree_track_Hemi.clear();
     tree_track_Hemi_dR.clear();
+    tree_track_Hemi_dRmax.clear();
     tree_track_Hemi_mva_NChi2.clear();
     tree_track_Hemi_ping.clear();
     tree_track_Hemi_dFirstVtx.clear();
