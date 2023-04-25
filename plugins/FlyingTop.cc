@@ -134,6 +134,9 @@
  //-------------CaloCluster---------------------//
 #include "DataFormats/CaloRecHit/interface/CaloCluster.h"
 // #include "../interface/OwnConversion.cc"
+
+//--------------------Muons---------------------//
+#include "DataFormats/MuonReco/interface/MuonSelectors.h"
 //------------------------------End of Paul------------------------//
 
 //
@@ -465,6 +468,8 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<bool>  tree_muon_isTight;
     std::vector<bool>  tree_muon_isGlobal;
     std::vector<float> tree_muon_isoR3;
+    std::vector<bool>  tree_muon_trigger_dimu;  
+    std::vector<bool>  tree_muon_trigger_isomu;
 
     //-----------------------
     // per track
@@ -1382,6 +1387,8 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_muon_isTight",    &tree_muon_isTight);
     smalltree->Branch("tree_muon_isGlobal",   &tree_muon_isGlobal);
     smalltree->Branch("tree_muon_isoR3",&tree_muon_isoR3);
+    smalltree->Branch("tree_muon_trigger_dimu",&tree_muon_trigger_dimu);  
+    smalltree->Branch("tree_muon_trigger_isomu",&tree_muon_trigger_isomu);
 
     // track
     smalltree->Branch("tree_nTracks",            &tree_nTracks, "tree_nTracks/I"); 
@@ -2023,7 +2030,7 @@ smalltree->Branch("HLT_PFHT800_PFMET75_PFMHT75_IDTight_v",&HLT_PFHT800_PFMET75_P
     reader->AddVariable( "mva_track_firstHit_y", &firsthit_Y); /*!*/
     reader->AddVariable( "mva_track_firstHit_z", &firsthit_Z); /*!*/
     reader->AddVariable( "mva_track_dxy", &dxy); /*!*/
-    reader->AddVariable( "mva_track_dxyError", &dxyError); /*!*/
+//$$$$    reader->AddVariable( "mva_track_dxyError", &dxyError); /*!*/
     reader->AddVariable( "mva_track_dz", &dz); /*!*/
 
     reader->AddVariable( "mva_track_pt", &pt );
@@ -2048,8 +2055,10 @@ smalltree->Branch("HLT_PFHT800_PFMET75_PFMHT75_IDTight_v",&HLT_PFHT800_PFMET75_P
     // reader->AddVariable("mva_ValTOBHit",&TobHit);
     // reader->AddVariable("mva_ValPixBarHit",&PixBarHit);
     // reader->AddVariable("mva_nValTECHHit",&TecHit);
+//$$$$    
+    reader->AddVariable("mva_track_lost",&isLost);
+//$$$$    
 
-    // reader->AddVariable("mva_track_lost",&isLost);
     reader->BookMVA( "BDTG", weightFile_ ); // root 6.14/09, care compatiblity of versions for tmva
 //$$
 }
@@ -3465,6 +3474,8 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
     tree_muon_isTight.push_back(  mu.isTightMuon(PV));
     tree_muon_isGlobal.push_back( mu.isGlobalMuon());
     tree_muon_isoR3.push_back(mu.trackIso());
+    tree_muon_trigger_dimu.push_back(mu.triggered("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v*"));  
+    tree_muon_trigger_isomu.push_back(mu.triggered("HLT_IsoMu24_v*"));
         // isoR3 = mu.trackIso();//the summed track pt in a cone of deltaR<0.3
     //     /// Overload of pat::Lepton::trackIso(); returns the value of
     // /// the summed Et of all recHits in the ecal in a cone of
@@ -3536,10 +3547,8 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
   tree_Filter = false;
   tree_nTracks = 0;
   tree_nLostTracks = 0;
-//$$$$
   tree_nSecInt = 0;
   tree_nV0_reco = 0;
-//$$$$
 
   if ( tree_Mmumu > 60. )                  tree_NbrOfZCand = 1;
 //   if ( tree_Mmumu > 60. && HT_val > 180. ) tree_Filter = true;
@@ -3942,9 +3951,9 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
 
           }
         }
-//$$
-//       if ( badTkHit ) continue;
-//$$
+//$$$$
+      if ( badTkHit && dca > 0.1 ) continue;
+//$$$$
 
         std::unique_ptr<TrajectoryStateClosestToPoint> trajPlus;
         std::unique_ptr<TrajectoryStateClosestToPoint> trajMins;
@@ -4190,7 +4199,6 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
     //---------------------------------------------------------------//
     //----------------------- Secondary Interactions ----------------//
     //---------------------------------------------------------------//
-//$$$$    tree_nSecInt = 0;
 
     //------------------Selection of good tracks for the vertexing---------------------//
     std::vector<reco::Track> theIntTrackRefs;
@@ -4388,7 +4396,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
         }
 
 //$$
-//       if ( badTkHit ) continue;
+      if ( badTkHit && dca > 0.1 ) continue;
 //$$
 
         std::unique_ptr<TrajectoryStateClosestToPoint> traj1;
@@ -4597,7 +4605,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
 	bool SecInt_selec = false;
 //$$
 	if ( distsigXY > 100. && angleXY > 0.9 && theSecInt->mass() < 2. &&
-    theSecInt->vertexNormalizedChi2() < 10. ) SecInt_selec = true; //&& dca < 1.
+             theSecInt->vertexNormalizedChi2() < 10. ) SecInt_selec = true; //&& dca < 1.
 //$$
         tree_SecInt_selec.push_back(   SecInt_selec);
 
@@ -5158,7 +5166,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
     int jet; /*!*/
     // float ntrk20, ntrk30, ntrk40; /*!*/
     // float firsthit_X, firsthit_Y, firsthit_Z, phi;
-    double bdtval = -100.;
+//$$$$    double bdtval = -100.;
 
     int nTrks_axis1 = 0;
     int nTrks_axis1_sig=0, nTrks_axis1_bad=0;
@@ -5184,10 +5192,10 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
 // TMVAClassification_BDTG50cm_V0Veto.weights.xml"),  # BDTMiniAOD //-0.0090
 // TMVAClassification_BDTG50cm_V0_YcVeto.weights.xml,  # BDTMiniAOD //0.0372
 // TMVAClassification_BDTG50cm_NoVeto.weights.xml,  # BDTMiniAOD ///0.1270
-//$$$$$$
+//$$$$
     double bdtcut = 0.85;        // ttbar ~ 1E-3
     double bdtcut_step2 = 0.0;   // ttbar ~ 1E-2
-//$$$$$$
+//$$$$
 
     //---------------------------//
     // if (tree_Filter){
@@ -5222,7 +5230,10 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
       ntrk20 = 0;
       ntrk30 = 0;
       ntrk40 = 0;
-      bdtval = -10.;
+//$$$$
+//$$$$      bdtval = -10.;
+      double bdtval = -10.;
+//$$$$
       dR = -1.;
       int tracks_axis = 0; // flag to check which axis is the closest from the track
 
@@ -6288,6 +6299,8 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_muon_isTight.clear();
     tree_muon_isGlobal.clear();
     tree_muon_isoR3.clear();
+    tree_muon_trigger_dimu.clear();  
+    tree_muon_trigger_isomu.clear();
 //     tree_passesTrkPtr.clear();
 
     tree_track_ipc.clear();
