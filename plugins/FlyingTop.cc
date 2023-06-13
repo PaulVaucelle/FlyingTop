@@ -148,6 +148,7 @@
 // the template argument to the base class so the class inherits
 // from  edm::one::EDAnalyzer<>
 // This will improve performance in multithreaded jobs.
+// edm::one::EDAnalyzer<> will be mandatory for CMSSW_X with X>=13
 
 class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 // class FlyingTopAnalyzer : public edm::EDAnalyzer {
@@ -222,27 +223,6 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     float LLP1_dist, LLP2_dist;
     int   LLP1_nTrks = 0, LLP2_nTrks = 0;
 
-//     //-----------------------
-//     // trigger variable
-// //     std::vector<string > tree_trigger_names;
-// //     std::vector<bool >   tree_trigger_bits;
-//     std::vector<int>    tree_trigger_size;
-//     std::vector<int>    tree_passesTrigger;
-//     std::vector<string> tree_passesTriggerName;
-//     std::vector<string> tree_Trigger_Muon;//+ dilepton channel emu
-//     std::vector<string> tree_Trigger_Ele;
-//     std::vector<string> tree_Trigger_DoubleMu;
-//     std::vector<string> tree_Trigger_DoubleEle;
-//     std::vector<string> tree_Trigger_Dimuon0;
-//     std::vector<string> tree_Trigger_PFMET;
-//     std::vector<string> tree_Trigger_HT;
-//     std::vector<string> tree_Trigger_AK4;
-//     std::vector<string> tree_Trigger_PFJet;
-//     std::vector<string> tree_Trigger_DoublePFJets;
-//     std::vector<string> tree_Trigger_DiPFJet;
-//     std::vector<string> tree_Trigger_QuadPFJet;
-//     std::vector<string> tree_Trigger_BTagMu;
-    
 //$$
 //The BDT variables are declared here to reduce computation time
     float pt, eta, NChi, nhits, ntrk10, drSig, isinjet, phi;
@@ -266,6 +246,8 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     float TecHit;
     float isLost;
     TMVA::Reader *reader = new TMVA::Reader( "!Color:Silent" );
+    int index[1000];
+    double MVAval[1000];
 
     //  ---------------------------------------------------------------- //
     //  ------- Booleans to activate/desactivate part of the code ------ //
@@ -273,7 +255,6 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
 
     bool NewCovMat          = true;//Keep True : Allow for Covariance Matrix correction due to the MiniAOD dataformat apporixmation
     bool IterAVF            = true; // Activate IAVF step of the vertexing //deprecated => Keep true, it is redundondant with ActivateStep3
-    bool ActivateTrigger    = true;// Keep true, else there is nothing done in the code :D 
           //Vetos to find vertices from different seondary interactions
     bool DetailedMap        = true;// Detailed map of the CMS tracker to apply a veto on the tracks of the vertices that belong to this map
         // Vetos applied on tracks of the vertices belonging to V0Candidates, Photon conversions and Secindary Interactions
@@ -295,16 +276,16 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     float MediumWP = 0.2783;
     float TightWP  = 0.7100;
     //  ---------------------------------------------------------------- //
+ 
+
     //  ---------------------------------------------------------------- //
-
-    int index[1000];
-    double MVAval[1000];
-
-    // track preselection cuts
+    //  -------------------- track preselection cuts ------------------- //
+    //  ---------------------------------------------------------------- //
     float pt_Cut = 1.;    // default 1. 
     float NChi2_Cut = 5.; // default 5. 
     float drSig_Cut = 5.; // default 5. 
-//$$
+   //  ---------------------------------------------------------------- //
+
 
     //--------------------------------
     // primary vertex infos -------
@@ -331,6 +312,10 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float> tree_allPV_ez;
     std::vector<float> tree_allPV_NChi2;
     std::vector<int>   tree_allPV_ndf;
+
+    //--------------------------------
+    // ------ V0 Candidates  ---------
+    //--------------------------------
 
     int tree_nK0;
     std::vector<float>     tree_K0_x;
@@ -378,7 +363,9 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<bool>      tree_V0_reco_badTkHit;
     std::vector<float>     tree_V0_reco_dca;
 
-    // reconstructed Secondary Interactions
+    //--------------------------------
+    // ------ Secondary Interactions -
+    //--------------------------------
     int tree_nSecInt;
     std::vector<float>     tree_SecInt_x;
     std::vector<float>     tree_SecInt_y;
@@ -402,6 +389,11 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<int>       tree_SecInt_LLP;
     std::vector<float>     tree_SecInt_LLP_dr;
     std::vector<float>     tree_SecInt_LLP_dz;
+
+
+    //---------------------------------------------------------
+    // ------ Photon Conversions => Fomm CMSSW collection -----
+    //---------------------------------------------------------
 
     int tree_nYConv;
     std::vector<float>     tree_Yc_x; 
@@ -492,6 +484,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float> tree_muon_leadingpt;
     std::vector<float> tree_muon_leadingpt2;
     std::vector<float> tree_muon_muon_dR;
+
     //-----------------------
     // per track
     //-----------------------
@@ -661,17 +654,11 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float> tree_genJet_mass;
     std::vector<float> tree_genJet_energy;
     
-    //--------------------------------
-    // gen event info -------
-    //--------------------------------
     
     //--------------------------------
     // lhe event infos -------
     //--------------------------------
     
-    //--------------------------------
-    // PF infos -------
-    //--------------------------------
     
     //-----------------------
     // generated LLPs 
@@ -698,7 +685,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector< float > tree_LLP12_dphi;
     
     //-----------------------
-    //Analysis with the two hemispheres
+    // - Vertices information
     //-----------------------
     std::vector< int >   tree_Hemi;
     std::vector< int >   tree_Hemi_njet;
@@ -1197,8 +1184,10 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     bool HLT_PFHT350_v;
     bool HLT_PFHT350MinPFJet15_v;
 
-    // Trigger plots if needed
-    TH2F* test  = new TH2F("test","test",200,0,1000,2,0,1);
+//------------------------------------
+// - Propagators init. ---------------
+//------------------------------------
+
     PropaHitPattern* PHP = new PropaHitPattern();
     PropaHitPattern* NI = new PropaHitPattern();
     PropaHitPattern* posPHP = new PropaHitPattern();
@@ -1235,11 +1224,11 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     ,K0Token_(      consumes<reco::VertexCompositePtrCandidateCollection>(            iConfig.getParameter<edm::InputTag>("Kshorts"))),  
     LambdaToken_(   consumes<reco::VertexCompositePtrCandidateCollection>(            iConfig.getParameter<edm::InputTag>("Lambda")))
     // ,puToken_(      consumes<PileupSummaryInfo>(                                iConfig.getParameter<edm::InputTag>("pileup")))
-    ,PhotonToken_(  consumes<reco::ConversionCollection>(edm::InputTag(std::string("reducedEgamma"),std::string("reducedConversions")))) //,std::string("PAT")TTbar: "PAT" _____ Neu: "RECO" 
+    ,PhotonToken_(  consumes<reco::ConversionCollection>(edm::InputTag(std::string("reducedEgamma"),std::string("reducedConversions")))) 
     ,beamSpotToken_(     consumes<reco::BeamSpot>(               iConfig.getUntrackedParameter<edm::InputTag>("beamSpot"))),
-    clusterToken_ (consumes<reco::CaloClusterCollection>(edm::InputTag(std::string("reducedEgamma"),std::string("reducedEBEEClusters"),std::string("RECO")))),
-    showerToken_ (consumes<reco::CaloClusterCollection>(edm::InputTag(std::string("reducedEgamma"),std::string("educedESClusters"),std::string("RECO")))),
-    superclusterToken_ (consumes<reco::SuperClusterCollection>(edm::InputTag(std::string("reducedEgamma"),std::string("reducedSuperClusters"),std::string("RECO"))))
+    clusterToken_ (consumes<reco::CaloClusterCollection>(edm::InputTag(std::string("reducedEgamma"),std::string("reducedEBEEClusters"),std::string("RECO")))), //enlever les clusters
+    showerToken_ (consumes<reco::CaloClusterCollection>(edm::InputTag(std::string("reducedEgamma"),std::string("educedESClusters"),std::string("RECO")))),//enlever les clusters
+    superclusterToken_ (consumes<reco::SuperClusterCollection>(edm::InputTag(std::string("reducedEgamma"),std::string("reducedSuperClusters"),std::string("RECO"))))//enlever les clusters
     // , PrescaleToken_( consumes<pat::PackedTriggerPrescales>(edm::InputTag(std::string("patTrigger"),std::string("")))  )
 {
    //now do what ever initialization is needed
@@ -2121,6 +2110,11 @@ smalltree->Branch("HLT_PFHT800_PFMET75_PFMHT75_IDTight_v",&HLT_PFHT800_PFMET75_P
 // smalltree->Branch("HLT_PFHT350_v",&HLT_PFHT350_v);
 // smalltree->Branch("HLT_PFHT350MinPFJet15_v",&HLT_PFHT350MinPFJet15_v);
 
+
+//----------------------------------------
+// - BDT Input Variables -----------------
+//----------------------------------------
+
 //$$
     //add the variables from my BDT (Paul)
     // reader->AddVariable( "mva_track_firstHit_x", &firsthit_X); /*!*/
@@ -2162,7 +2156,7 @@ smalltree->Branch("HLT_PFHT800_PFMET75_PFMHT75_IDTight_v",&HLT_PFHT800_PFMET75_P
 //    // (e.g. close files, deallocate resources etc.)
 // }
 
-
+// - Gen Particule level info about ancestor
 bool FlyingTopAnalyzer::isAncestor(const reco::Candidate* ancestor, const reco::Candidate * particle)
 {
 //particle is already the ancestor
@@ -2267,27 +2261,12 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
  edm::ESHandle<TrackerGeometry> trackerGeomHandle;
  iSetup.get<TrackerDigiGeometryRecord>().get( trackerGeomHandle );
+
 // const TrackerGeometry* trackerGeom = trackerGeomHandle.product();
  //--------------------------------------//
  //               Trigger                //
  //--------------------------------------//
- //HLT trigger we want to keep:
-  //__________________________________//
-  //HLT_Mu* (includes dilepton channel HLT_MuXX_EleXX)
-  //HLT_Ele*
-  //HLT_DoubleEle*
-  //HLT_DoubleMu*
-  //HLT_Dimuon0
-  //HLT_PFMET*
-  //HLT_HTXX
-  //HLT_AK4
-  //HLT_PFJet
 
-  //HLT_DoublePFJets
-  //HLT_DiPFJet
-  //HLT_QuadPFJet
-  //HLT_BTagMu
-  //__________________________________//
 
   std::vector<std::string> TriggerCheck;
   std::vector<std::string> VTrigger;
@@ -2872,11 +2851,12 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
   const reco::Vertex &PV = primaryVertex->front();
 
 
-  //////////////////////////////////
-  //////////////////////////////////
-  //////    V0 Candidates     //////
-  //////////////////////////////////
-  //////////////////////////////////
+  ///////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////
+  //////    V0 Candidates  from CMSSW Collection   //////
+  ///////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////
+
   // https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideV0Producer
 
   tree_nK0= KshortVertex->size();
@@ -2922,11 +2902,11 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
   }
 
 
-  //////////////////////////////////
-  //////////////////////////////////
-  ///      Photon Conversion    ////
-  //////////////////////////////////
-  //////////////////////////////////
+  ///////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////
+  ///      Photon Conversion from CMSSW Collection   ////
+  ///////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////
   // https://github.com/cms-sw/cmssw/tree/CMSSW_10_6_X/DataFormats/EgammaCandidates/interface/Conversion.h
 
   tree_nYConv = PhotonConversion->size();
@@ -3032,7 +3012,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
   //   {
   //     PUzpos = PU->getPU_zpositions();
   //     for ( int i = 0 ; i < nPU ; i++ )
-  //       {
+  //       {dRneuneu
   //         std::cout<<"zpositions of PU : "<<PUzpos[i]<<std::endl;
   //       }
   //   }
@@ -3717,7 +3697,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
   int count =0;
   std::map<size_t , int > trackToAK4SlimmedJetMap;
 
-  if ( tree_Filter && ActivateTrigger ) 
+  if ( tree_Filter ) 
   {
 
 
@@ -3766,9 +3746,9 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
 
 
 
-    //---------------------------------------------------------------//
-    //----------------------- V0 Producer ---------------------------//
-    //---------------------------------------------------------------//
+    //---------------------------------------------------------------------------------//
+    //----------------------- V0 Producer adapted in MiniAOD---------------------------//
+    //---------------------------------------------------------------------------------//
     const double piMass = 0.13957018;
     const double piMassSquared = piMass*piMass;
     const double protonMass = 0.938272046;
@@ -4931,7 +4911,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
       const HitPattern hp = tk_HitPattern;
       uint16_t firsthit = hp.getHitPattern(HitPattern::HitCategory::TRACK_HITS,0);
 //$$
-//     Approximation for the lostTrack since the hitpattern information is not available (only 1160)      
+//     Approximation for the lostTrack since the hitpattern information is not available (only 1160, tracking POG knows about it)      
       if ( ipc >= pc->size() ) {
         if ( abs(tk_eta) < 1. ) firsthit = 1184; // PIXBL4 in barrel
         else                    firsthit = 1296; // PIXFD2 in forward
@@ -5226,7 +5206,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
     //THere should be a dependance on the decay channel of the top. in theory, the consutrction of the axes
     //should be improved by the use of the MET+lepton. The current method is good for the hradronic decay of the top
     float dR_axis, dR1 = 10., dR2 = 10.;
-    float dRcut_hemis  = 1.5; // subjective choice
+    float dRcut_hemis  = 1.5; // subjective choice default is 1.5
     float dRcut_tracks = 10.; // no cut is better (could bias low track pT and high LLP ct) 
      
     for (int i=0; i<jetidx; i++) // Loop on jet
@@ -5238,7 +5218,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
       if ( njet1 > 0 ) dR1 = Deltar( jet_eta, jet_phi, vaxis1.Eta(), vaxis1.Phi() );
       if ( njet2 > 0 ) dR2 = Deltar( jet_eta, jet_phi, vaxis2.Eta(), vaxis2.Phi() );
       // axis 1
-      if ( njet1 > 0 && !isjet2[i]  && dR1 < dRcut_hemis) {
+      if ( njet1 > 0 && !isjet2[i]  && dR1 < dRcut_hemis ) {
         njet1++;
         vaxis1 += vjet[i];
         isjet1[i] = true;
@@ -5346,7 +5326,6 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
 //$$
 
     //---------------------------//
-    // if (tree_Filter){
 
     for (int counter_track = 0; counter_track < tree_nTracks; counter_track++) 
     {
@@ -5422,6 +5401,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
         ntrk40 = ntrk40_lost;
       }
 
+      // - Apply BDT -------------------
       bdtval = reader->EvaluateMVA( "BDTG" ); // default value = -10 (no -10 observed and -999 comes from EvaluateMVA)
       // std::cout<<"tk pt : "<<pt<<" tk _eta : "<<eta<<" tk_phi :"<<phi<<" bdt_val :"<<bdtval<<std::endl;
 
@@ -5502,6 +5482,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
       reco::Track tk;
 
       //PseudoDefTrack forces the covariance matrix to be positive definite. Can be negative in MINIAod with bestTrack/pseudoTrack methods
+      //Correction defined by the BPH group => retrieve our effiency with this
       //-----------------------------------------------------
       const reco::Track& tk_temp = *trackPcPtr;//const ..;reco::Track
       reco::TrackBase::CovarianceMatrix m_ = tk_temp.covariance(); //math::Error<5>::type
@@ -5829,6 +5810,28 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
 
     }
 
+      //----------------------------------------IAVF-----------------------------------------------//
+      //                           Iterative Adaptive Vertex Fitter                                //
+      //Input : Collections od displaced Tracks ordered by decreasing values of BDT => to have the //
+      //        the best tracks at the beginning of the collection                                 //
+      //                                                                                           //
+      //Process : Within the collection of tracks, look for the first good seed made of 2 tracks,  //
+      //          (good seed : vertex valid with a chi2 within a certain range (LowerLimit and     //
+      //          UpperLimit)). From this seed, tracks are added one by one, and a vertex is built //
+      //          at each step. The vertex is either valid or not. If valid in a certain range of  //
+      //          Chi2, we keep going until there are no more tracks left                          //
+      //                                                                                           //
+      //Degrees of freedom: -LowerLimit (Chi2 restriction)                                         //
+      //                    -UpperLimit (Chi2 restriction)                                         //
+      //                    -BDtValue (Restriction on the BDT value of the tracks that formed  //
+      //                     the vertex)                                                           //
+      //                                                                                           //
+      //Why? : Address the drop in efficiency due to MiniAOD datatier, turns out it improves the   //
+      //       basic AVF implementation (even in RECO/AOD)                                         //
+      //                                                                                           //
+      //PS: Maximum efficiency is reached for MiniAOD when using the covariance matrix correction  //
+      //-------------------------------------------------------------------------------------------//
+
     // step 1 : IAVF
     int ntracks    = -2;
     float tempchi2 = -10.;
@@ -5963,27 +5966,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
       }
     }
 
-    //----------------------------------------IAVF-----------------------------------------------//
-    //                           Iterative Adaptive Vertex Fitter                                //
-    //Input : Collections od displaced Tracks ordered by decreasing values of BDT => to have the //
-    //        the best tracks at the beginning of the collection                                 //
-    //                                                                                           //
-    //Process : Within the collection of tracks, look for the first good seed made of 2 tracks,  //
-    //          (good seed : vertex valid with a chi2 within a certain range (LowerLimit and     //
-    //          UpperLimit)). From this seed, tracks are added one by one, and a vertex is built //
-    //          at each step. The vertex is either valid or not. If valid in a certain range of  //
-    //          Chi2, we keep going until there are no more tracks left                          //
-    //                                                                                           //
-    //Degrees of freedom: -LowerLimit (Chi2 restriction)                                         //
-    //                    -UpperLimit (Chi2 restriction)                                         //
-    //                    -BDtValue (Restriction on the BDT value of the tracks that formed  //
-    //                     the vertex)                                                           //
-    //                                                                                           //
-    //Why? : Address the drop in efficiency due to MiniAOD datatier, turns out it improves the   //
-    //       basic AVF implementation (even in RECO/AOD)                                         //
-    //                                                                                           //
-    //PS: Maximum efficiency is reached for MiniAOD when using the covariance matrix correction  //
-    //-------------------------------------------------------------------------------------------//
+
 
     // step 3
     // int ntracks    = -2;
