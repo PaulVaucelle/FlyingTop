@@ -1,9 +1,11 @@
 
 import FWCore.ParameterSet.Config as cms
+from Configuration.Eras.Era_Run2_2018_cff import Run2_2018
 
 #$$
-from Configuration.Eras.Era_Run2_2018_cff import Run2_2018
+# from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
 #$$
+
 
 
 process = cms.Process("FlyingTop",Run2_2018)
@@ -17,10 +19,16 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
 process.load("Configuration.Geometry.GeometryRecoDB_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
+
+#$$
+process.load("Geometry.CaloEventSetup.CaloTowerConstituents_cfi")
+#$$
+# setupEgammaPostRecoSeq(process,era='2018-Prompt')
+# process.p=cms.Path(process.egammaPostRecoSeq)
 #$$
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
+# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 # Input source
 process.source = cms.Source("PoolSource",
@@ -41,17 +49,17 @@ process.source = cms.Source("PoolSource",
     #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_9.root',
     #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_10.root'
 
-# 50cm---------------------------------------------------
-    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_1.root',
-    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_2.root',
-    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_3.root',
-    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_4.root',
-    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_5.root',
-    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_6.root',
-    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_7.root',
-    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_8.root',
-    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_9.root',
-    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_10.root'
+# # # 50cm---------------------------------------------------
+       'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_1.root',
+       'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_2.root',
+       'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_3.root',
+       'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_4.root',
+       'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_5.root',
+       'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_6.root',
+       'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_7.root',
+       'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_8.root',
+       'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_9.root',
+       'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_10.root'
 
 #30cm-------------------------
     #     'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_1.root',
@@ -80,9 +88,9 @@ process.source = cms.Source("PoolSource",
 
 ##TT samples
 ####
-
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/564C53A2-0646-A24D-B580-AEBF43B22A7B.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/6C51F452-445D-7547-B585-BDA1278294AE.root',
+#Everything takes abotu 3 hours in interactve mode
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/564C53A2-0646-A24D-B580-AEBF43B22A7B.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/6C51F452-445D-7547-B585-BDA1278294AE.root',
 
 # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/0023597E-6F49-214D-A518-CC9330A404BD.root',
 # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/00B564A1-86ED-2C45-8159-5FE8CA552C71.root',
@@ -95,7 +103,7 @@ process.source = cms.Source("PoolSource",
 # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/210F0D88-DC80-484E-BC6D-6929507FDEE2.root',
 # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/25720137-0046-D346-8451-1F3EC899F9FE.root',
 # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/30E5F4EF-74DF-4A40-9CE8-17E329305027.root',
-#328k events (30min)
+# #328k events (30min)
 # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/3440172F-14FF-9640-845A-8A7505EF06F7.root',
 # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/37134442-447E-DE48-9B51-6EDE08191165.root',
 # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/3813D538-73AF-CE48-BD3C-DCEFBFE88F9E.root',
@@ -181,9 +189,9 @@ process.options = cms.untracked.PSet(
 ## Global tag
 from Configuration.AlCa.GlobalTag import GlobalTag
 #$$
-process.GlobalTag = GlobalTag(process.GlobalTag, '106X_upgrade2018_realistic_v16_L1v1', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '106X_upgrade2018_realistic_v16_L1v1', '')##106X_upgrade2018_realistic_v16_L1v1 default one 
 #$$
-
+## 102X_dataRun2_Sep2018Rereco_v1
 # FlyingTopAnalyzer
 process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
 #$$
@@ -199,9 +207,17 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
 #BDTG_SIG50vsBKGtt_filter_NOveto_19varLOST.xml
 
 # TMVAClassification_BDTG50cm_09_04_23_NoVeto.weights.xml this one is good, latest version from Paul
-weightFileMVA = cms.untracked.string( "BDTG_SIG50vsBKGtt_filter_NOveto_19varLOST.xml"), #Latest version from Daniel, without dxyError and with lost
+# weightFileMVA = cms.untracked.string( "BDTG_SIG50vsBKGtt_filter_NOveto_19varLOST.xml"), #Latest version from Daniel, without dxyError and with lost
+ weightFileMVA = cms.untracked.string( "BDTG_SIG50vsBKGtt_filter_veto_15var.xml"),
+# TMVAClassification_BDTG50cm_05_05_23_noxyzlost_wVeto.weights.xml
+# TMVAClassification_BDTG50cm_05_05_23_noxyzlost_NoVeto.weights.xml
+# BDTG_SIG50vsBKGtt_filter_veto_15var.xml => Daniel => version sans Yc Veto bug
 
-
+#the following BDT contain the YC bug + BDt input variables bug
+#(Paul) : Latest Version Running with xyzlost : TMVAClassification_BDTG50cm_04_05_23_NoVeto.weights.xml
+#(Daniel) : Latest Version Running with xyzlost : BDTG_SIG50vsBKGtt_filter_NOveto_19varLOST.xml
+# (Daniel) Latest version Running witout xyzlost : BDTG_SIG50vsBKGtt_filter_veto_15var.xml : 
+#(Paul)   : Latest Version Running without xyzlost : TMVAClassification_BDTG50cm_05_05_23_noxyzlost_NoVeto.weights.xml (there is  a version with the Veto but not better)
     genpruned   = cms.InputTag('prunedGenParticles'),
     genpacked   = cms.InputTag('packedGenParticles'),
     vertices    = cms.InputTag('offlineSlimmedPrimaryVertices'),
@@ -224,15 +240,11 @@ weightFileMVA = cms.untracked.string( "BDTG_SIG50vsBKGtt_filter_NOveto_19varLOST
 process.p = cms.Path(process.FlyingTop)
 # getattr(process,'slimmedJets').addTagInfos = cms.bool(True)
 ########## output of ntuple
-#$$
-# process.TFileService = cms.Service("TFileService", fileName = cms.string("Ntuple.root") )
-process.TFileService = cms.Service("TFileService", fileName = cms.string("Ntuple_TT_NewBDTOutput_test.root") )
+
+process.TFileService = cms.Service("TFileService", fileName = cms.string("Ntuple_50_test.root") )
 # process.TFileService = cms.Service("TFileService", fileName = cms.string("UDD_bgctau50_smu275_snu225.root") )
 # process.TFileService = cms.Service("TFileService", fileName = cms.string("TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8_10k_NOdrSigCut.root") )
-#$$
-# Ntuple_50cm_TTNI_Treader_input.root
-# Ntuple_50cm_Neu_Treader_input.root
-#$$ 
+
 process.options.numberOfThreads=cms.untracked.uint32(4)
 
 # #Have logErrorHarvester wait for the same EDProducers to finish as those providing data for the OutputModule
