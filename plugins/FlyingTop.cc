@@ -169,6 +169,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     void clearVariables();
 
     std::string weightFile_;
+    std::string weightFileVtx_;
     std::string weightFileLost_;
     edm::EDGetTokenT<edm::View<reco::GenParticle> > prunedGenToken_;
     edm::EDGetTokenT<edm::View<pat::PackedGenParticle> > packedGenToken_;
@@ -246,6 +247,19 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     float TecHit;
     float isLost;
     TMVA::Reader *reader = new TMVA::Reader( "!Color:Silent" );
+
+    float mva_V_nTrks;
+    float mva_V_chi;
+    float mva_V_step;
+    float mva_V_r;
+    float mva_V_z;
+    float mva_V_MTW;
+    float mva_V_Mass;
+    float mva_V_dist;
+    // float mva_V_ntrk10;
+    // float mva_V_ntrk20;
+    TMVA::Reader *readerVtx = new TMVA::Reader( "!Color:Silent" );
+
     int index[1000];
     double MVAval[1000];
 
@@ -715,6 +729,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector< float > tree_Hemi_Vtx_xError;
     std::vector< float > tree_Hemi_Vtx_yError;
     std::vector< float > tree_Hemi_Vtx_zError;
+    std::vector< float > tree_Hemi_Vtx_eta;
     std::vector< float > tree_Hemi_Vtx_Vtx_dr;
     std::vector< float > tree_Hemi_Vtx_Vtx_dz;
     std::vector< float > tree_Hemi_Vtx_Vtx_dd;
@@ -723,12 +738,14 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector< float > tree_Hemi_Vtx_trackWeight;
     std::vector< float > tree_Hemi_Vtx_MeantrackWeight;
     std::vector< float > tree_Hemi_Vtx_Mass;
+    std::vector< float > tree_Hemi_Vtx_MVAval;
 
     std::vector< float > tree_Hemi_Vtx_track_DCA_x;
     std::vector< float > tree_Hemi_Vtx_track_DCA_y;
     std::vector< float > tree_Hemi_Vtx_track_DCA_z;
     std::vector< float > tree_Hemi_Vtx_track_DCA_r;
     std::vector< float > tree_Hemi_Vtx_track_DCA_d;
+    std::vector< float > tree_Hemi_Vtx_track_MeanDCA_d;
 
     std::vector< float > tree_Hemi_Vtx_TVtx_dx;
     std::vector< float > tree_Hemi_Vtx_TVtx_dy;
@@ -1217,7 +1234,7 @@ typedef ROOT::Math::SVector<double, 3> SVector3;
 FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
 
     weightFile_( iConfig.getUntrackedParameter<std::string>("weightFileMVA") ),   
-
+    weightFileVtx_( iConfig.getUntrackedParameter<std::string>("weightFileMVA_VTX") ),  
     prunedGenToken_(consumes<edm::View<reco::GenParticle> >(     iConfig.getParameter<edm::InputTag>("genpruned"))),
     packedGenToken_(consumes<edm::View<pat::PackedGenParticle> >(iConfig.getParameter<edm::InputTag>("genpacked"))),
     vertexToken_(   consumes<reco::VertexCollection>(            iConfig.getParameter<edm::InputTag>("vertices"))),
@@ -1665,6 +1682,7 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_Hemi_Vtx_xError",&tree_Hemi_Vtx_xError);
     smalltree->Branch("tree_Hemi_Vtx_yError",&tree_Hemi_Vtx_yError);
     smalltree->Branch("tree_Hemi_Vtx_zError",&tree_Hemi_Vtx_zError);
+    smalltree->Branch("tree_Hemi_Vtx_eta",   &tree_Hemi_Vtx_eta);
     smalltree->Branch("tree_Hemi_Vtx_Vtx_dr",&tree_Hemi_Vtx_Vtx_dr);
     smalltree->Branch("tree_Hemi_Vtx_Vtx_dz",&tree_Hemi_Vtx_Vtx_dz);
     smalltree->Branch("tree_Hemi_Vtx_Vtx_dd",&tree_Hemi_Vtx_Vtx_dd);
@@ -1677,7 +1695,9 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_Hemi_Vtx_track_DCA_z",&tree_Hemi_Vtx_track_DCA_z);
     smalltree->Branch("tree_Hemi_Vtx_track_DCA_r",&tree_Hemi_Vtx_track_DCA_r);
     smalltree->Branch("tree_Hemi_Vtx_track_DCA_d",&tree_Hemi_Vtx_track_DCA_d);
+    smalltree->Branch("tree_Hemi_Vtx_track_MeanDCA_d",&tree_Hemi_Vtx_track_MeanDCA_d);
     smalltree->Branch("tree_Hemi_Vtx_Mass", &tree_Hemi_Vtx_Mass);
+    smalltree->Branch("tree_Hemi_Vtx_MVAval", &tree_Hemi_Vtx_MVAval);
     smalltree->Branch("tree_Hemi_Vtx_TVtx_dx",&tree_Hemi_Vtx_TVtx_dx);
     smalltree->Branch("tree_Hemi_Vtx_TVtx_dy",&tree_Hemi_Vtx_TVtx_dy);
     smalltree->Branch("tree_Hemi_Vtx_TVtx_dz",&tree_Hemi_Vtx_TVtx_dz);
@@ -2128,7 +2148,7 @@ smalltree->Branch("HLT_PFHT800_PFMET75_PFMHT75_IDTight_v",&HLT_PFHT800_PFMET75_P
 //----------------------------------------
 // - BDT Input Variables -----------------
 //----------------------------------------
-
+//-------------Tracks---------------------
 //$$
     //add the variables from my BDT (Paul)
     // reader->AddVariable( "mva_track_firstHit_x", &firsthit_X); /*!*/
@@ -2160,6 +2180,20 @@ smalltree->Branch("HLT_PFHT800_PFMET75_PFMHT75_IDTight_v",&HLT_PFHT800_PFMET75_P
     // reader->AddVariable(" mva_nValTECHHit", &TecHit);
 
     reader->BookMVA( "BDTG", weightFile_ ); // root 6.14/09, care compatiblity of versions for tmva
+
+    //-------------Vertex---------------------
+    readerVtx->AddVariable( "mva_Vtx_nTrks",     &mva_V_nTrks);
+    readerVtx->AddVariable( "mva_Vtx_NChi2",     &mva_V_chi);
+    readerVtx->AddVariable( "mva_Vtx_step",     &mva_V_step);
+    // readerVtx->AddVariable( "mva_Vtx_r",     &mva_V_r);
+    // readerVtx->AddVariable( "mva_Vtx_z",     &mva_V_z);
+    readerVtx->AddVariable( "mva_Vtx_MTW",     &mva_V_MTW);
+    readerVtx->AddVariable( "mva_Vtx_Mass",     &mva_V_Mass);
+    // readerVtx->AddVariable( "mva_Vtx_dist",     &mva_V_dist);
+    // readerVtx->AddVariable( "mva_Vtx_ntrk10",     &mva_V_ntrk10);
+    // readerVtx->AddVariable( "mva_Vtx_ntrk20",     &mva_V_ntrk20);
+    readerVtx->BookMVA( "BDTG", weightFileVtx_ ); // root 6.14/09, care compatiblity of versions for tmva
+
 //$$
 }
 
@@ -3483,12 +3517,13 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
   int nmu = 0;
   float LT = 0;
    // float isoR3=0;
+    // bool triggered(const char* pathName) const { return triggerObjectMatchByPath(pathName, true, true) != nullptr; }
 
   for (const pat::Muon &mu : *muons)
   {
 
   if ( mu.pt() < 3. ) continue;
-  if ( abs(mu.eta()) > 2.4 ) continue;  // muon acceptance
+  if ( abs(mu.eta()) > 2.5 ) continue;  // muon acceptance
     tree_muon_pt.push_back(       mu.pt());
     LT += mu.pt();
     tree_muon_eta.push_back(      mu.eta());
@@ -3643,7 +3678,8 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
     if ( !tree_muon_isGlobal[mu] ) continue;
       mupt1  = tree_muon_pt[mu];
     if ( mupt1 < 10. ) continue; // Zmu filter
-    if ( abs(tree_muon_dxy[mu]) > 0.1 || abs(tree_muon_dz[mu]) > 0.2 ) continue; // muons closed to PV
+
+    if ( abs(tree_muon_dxy[mu]) > 0.1 || abs(tree_muon_dz[mu]) > 0.2 || (!tree_muon_trigger_dimu[mu] && tree_muon_trigger_isomu[mu]) ) continue; // muons closed to PV
       mueta1 = tree_muon_eta[mu];
       muphi1 = tree_muon_phi[mu];
       v1.SetPtEtaPhiM(mupt1,mueta1,muphi1,mu_mass);
@@ -3651,7 +3687,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
       {	    
       if ( !tree_muon_isGlobal[mu2] ) continue;
       if ( tree_muon_charge[mu] == tree_muon_charge[mu2] ) continue;
-      if ( abs(tree_muon_dxy[mu2]) > 0.1 || abs(tree_muon_dz[mu2]) > 0.2 ) continue;
+      if ( abs(tree_muon_dxy[mu2]) > 0.1 || abs(tree_muon_dz[mu2]) > 0.2 || (!tree_muon_trigger_dimu[mu] && tree_muon_trigger_isomu[mu])) continue;
         mupt2  = tree_muon_pt[mu2];
       if ( mupt2 < 10. ) continue;
       if ( mupt1 < 25. && mupt2 < 25. ) continue; // Zmu Filter
@@ -5770,6 +5806,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
         Vtx_chi = displacedVertex_Hemi1_mva.normalisedChiSquared();
 	      Vtx_step = 1;
         posError = displacedVertex_Hemi1_mva.positionError();
+        float DCA_VTX_Meand = 0;
         GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
               for (int p = 0; p < Vtx_ntk; p++)
                 {
@@ -5791,6 +5828,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
                       float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
                       float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
                       float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
+                      DCA_VTX_Meand+=DCA_VTX_d;
                       tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
                       tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
                       tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
@@ -5799,6 +5837,8 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
                     }
 
                 } 
+              DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
+              tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
       }
     }
       //----------------------------------------IAVF-----------------------------------------------//
@@ -5894,8 +5934,9 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
               Vtx_x = tempx;
               Vtx_y = tempy;
               Vtx_z = tempz;
-              Vtx_step = 10;
+              Vtx_step = 1;
               GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
+              float DCA_VTX_Meand = 0;
               for (int k = 0; k< Vtx_ntk; k++)
                 {
                   TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
@@ -5914,14 +5955,17 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
                       float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
                       float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
                       float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
+                      DCA_VTX_Meand+=DCA_VTX_d;
                       tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
                       tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
                       tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
                       tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
                       tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
+                      
                     }
                 }
-
+              DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
+              tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
               if (MeanWeight==0)//<=>only two tracks in the valid vertex
                   {
                     for(int i = 0; i<ntracks;i++)
@@ -5970,6 +6014,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
         Vtx_step = 2;
         GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
         posError = displacedVertex_step2_Hemi1.positionError();
+        float DCA_VTX_Meand = 0;
         for (int p = 0; p < Vtx_ntk; p++)
                 {
                   MeanWeight+=displacedVertex_step2_Hemi1.trackWeight(displacedTracks_step2_Hemi1[p]);
@@ -5990,6 +6035,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
                       float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
                       float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
                       float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
+                      DCA_VTX_Meand+=DCA_VTX_d;
                       tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
                       tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
                       tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
@@ -5997,6 +6043,8 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
                       tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
                     }
                 }
+              DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
+              tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
       }
     }
 
@@ -6081,6 +6129,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
               Vtx_z = tempz;
               Vtx_step = 3;
                GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
+               float DCA_VTX_Meand = 0;
               for (int k = 0; k< Vtx_ntk; k++)
                 {
                   TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
@@ -6099,6 +6148,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
                       float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
                       float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
                       float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
+                      DCA_VTX_Meand+=DCA_VTX_d;
                       tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
                       tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
                       tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
@@ -6106,6 +6156,8 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
                       tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
                     }
                 }
+              DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
+              tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
               if (MeanWeight==0)//<=>only two tracks in the valid vertex
                   {
                     for(int i = 0; i<ntracks;i++)
@@ -6124,12 +6176,11 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
         if ( success ) break;
       }
       //--------------------ENDOF IAVF--------------------------//
-      MeanWeight = tempMeanWeight;
     }
     
     float Vtx_chi1 = Vtx_chi;
-    int nVtx = 0;
-    if (abs(Vtx_chi)<10 && Vtx_ntk>1){nVtx++;}
+
+
     tree_Hemi.push_back(1);
     tree_Hemi_njet.push_back(njet1);
     tree_Hemi_eta.push_back(axis1_eta);
@@ -6150,6 +6201,10 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
     tree_Hemi_Vtx_xError.push_back(posError.cxx());
     tree_Hemi_Vtx_yError.push_back(posError.cyy());
     tree_Hemi_Vtx_zError.push_back(posError.czz());
+    float theta_Vtx = tan(sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y)/abs(Vtx_z)) ;
+    float eta_Vtx = -TMath::Log(tan(theta_Vtx/2));
+    if (Vtx_z<0){eta_Vtx = -eta_Vtx;}
+    tree_Hemi_Vtx_eta.push_back(eta_Vtx);
     recX = Vtx_x - tree_PV_x;
     recY = Vtx_y - tree_PV_y;
     recZ = Vtx_z - tree_PV_z;
@@ -6224,45 +6279,59 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
     float temp_pz = 0 ;
     float temp_e = 0 ;
 // ROOT::Math::PxPyPzEVector
-
+    TLorentzVector Total4Vector1(0,0,0,0);
       //--------------- B-tagging-----------------------//
     if(Vtx_step==1)
       {
-        for (unsigned int i = 0 ; i < TrackInfo_Hemi1_mva.size(); i++)
+        for (unsigned int i = 0 ; i < displacedTracks_Hemi1_mva.size(); i++)
           {
             if(TrackInfo_Hemi1_mva[i].first > TightWP || TrackInfo_Hemi1_mva[i].first > MediumWP )
               {
                 BtagGood_Hemi1 += 1;
               }
-              temp_px += TrackInfo_Hemi1_mva[i].second.Px();
-              temp_py += TrackInfo_Hemi1_mva[i].second.Py();
-              temp_pz += TrackInfo_Hemi1_mva[i].second.Pz();
-              temp_e  += TrackInfo_Hemi1_mva[i].second.E();
+              temp_px = TrackInfo_Hemi1_mva[i].second.Px();
+              temp_py = TrackInfo_Hemi1_mva[i].second.Py();
+              temp_pz = TrackInfo_Hemi1_mva[i].second.Pz();
+              temp_e  = TrackInfo_Hemi1_mva[i].second.E();
+              TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
+              Total4Vector1 +=TLorentzTrack;
           }
       }
     else if (Vtx_step == 2 || Vtx_step==3)
       {
-        for (unsigned int i = 0 ; i < TrackInfo_step2_Hemi1.size(); i++)
+        for (unsigned int i = 0 ; i < displacedTracks_step2_Hemi1.size(); i++)
           {
             if(TrackInfo_step2_Hemi1[i].first > TightWP || TrackInfo_step2_Hemi1[i].first > MediumWP )
               {
                 BtagGood_Hemi1 += 100;
               }
-              temp_px += TrackInfo_step2_Hemi1[i].second.Px();
-              temp_py += TrackInfo_step2_Hemi1[i].second.Py();
-              temp_pz += TrackInfo_step2_Hemi1[i].second.Pz();
-              temp_e  += TrackInfo_step2_Hemi1[i].second.E();
+              temp_px = TrackInfo_step2_Hemi1[i].second.Px();
+              temp_py = TrackInfo_step2_Hemi1[i].second.Py();
+              temp_pz = TrackInfo_step2_Hemi1[i].second.Pz();
+              temp_e  = TrackInfo_step2_Hemi1[i].second.E();
+              TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
+              Total4Vector1 += TLorentzTrack;
           }
       }
 
     tree_Hemi_Vtx_BTag.push_back(BtagGood_Hemi1);
       // -------------------- End  of  B-Tagging --------------------//
-    TLorentzVector InvMass1(temp_px,temp_py,temp_pz,temp_e); // ROOT::Math::PxPyPzEVector for later version of root (later than 6.14 at least)
-    tree_Hemi_Vtx_Mass.push_back(sqrt(InvMass1.Mag2()));
+    // ROOT::Math::PxPyPzEVector for later version of root (later than 6.14 at least)
+    tree_Hemi_Vtx_Mass.push_back(sqrt(Total4Vector1.Mag2()));
 
     // -------------------- End Of Invariant Mass ------------------------//
-    
-
+    mva_V_nTrks  =  Vtx_ntk;
+    mva_V_chi    =  Vtx_chi;
+    mva_V_step   =  Vtx_step;
+    // mva_V_r  =   sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y);
+    // mva_V_z  =    Vtx_z);
+    mva_V_MTW    =  MeanWeight;
+    mva_V_Mass   =  sqrt(Total4Vector1.Mag2());
+    // mva_V_dist  = recD;
+    double Vtx_bdtVal = -10;
+    Vtx_bdtVal = readerVtx->EvaluateMVA("BDTG");// values at -999
+   // default value = -10 (no -10 observed and -999 comes from EvaluateMVA)
+    tree_Hemi_Vtx_MVAval.push_back(Vtx_bdtVal);
     //--------------------------------------------------------------------------------------------//
     //--------------------------- SECOND HEMISPHERE WITH MVA -------------------------------------//
     //--------------------------------------------------------------------------------------------//
@@ -6300,6 +6369,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
         posError = displacedVertex_Hemi2_mva.positionError();
         GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
         MeanWeight = 0;
+        float DCA_VTX_Meand = 0;
         for (int p =0; p<Vtx_ntk; p++)
                 {
                   MeanWeight+=displacedVertex_Hemi2_mva.trackWeight(displacedTracks_Hemi2_mva[p]);
@@ -6319,6 +6389,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
                       float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
                       float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
                       float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
+                      DCA_VTX_Meand+=DCA_VTX_d;
                       tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
                       tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
                       tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
@@ -6326,6 +6397,8 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
                       tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
                     }
                 }
+              DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
+              tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
       }       
     }    
 
@@ -6399,8 +6472,9 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
                     Vtx_x = tempx;
                     Vtx_y = tempy;
                     Vtx_z = tempz;
-                    Vtx_step = 11;
+                    Vtx_step = 1;
                     GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
+                    float DCA_VTX_Meand = 0;
                     for (int k = 0; k< Vtx_ntk; k++)
                       {
                         TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
@@ -6418,6 +6492,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
                             float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
                             float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
                             float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
+                            DCA_VTX_Meand+=DCA_VTX_d;
                             tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
                             tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
                             tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
@@ -6432,6 +6507,8 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
                             MeanWeight+=TV.trackWeight(vTT[i]);
                           }
                       }
+                    DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
+                    tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
                   }
                 else
                   { // If not valid : we build a new seed
@@ -6470,6 +6547,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
         posError = displacedVertex_step2_Hemi2.positionError();
         GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
         MeanWeight = 0;
+        float DCA_VTX_Meand = 0;
         for (int p =0; p<Vtx_ntk; p++)
                 {
                   MeanWeight+=displacedVertex_step2_Hemi2.trackWeight(displacedTracks_step2_Hemi2[p]);
@@ -6490,6 +6568,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
                       float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
                       float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
                       float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
+                      DCA_VTX_Meand+=DCA_VTX_d;
                       tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
                       tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
                       tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
@@ -6497,6 +6576,8 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
                       tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
                     }
                 }
+              DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
+              tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
       }
     }
 
@@ -6572,6 +6653,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
                     Vtx_z = tempz;
                     Vtx_step = 3;
                     GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
+                    float DCA_VTX_Meand = 0;
                     for (int k = 0; k< Vtx_ntk; k++)
                       {
                         TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
@@ -6589,6 +6671,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
                             float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
                             float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
                             float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
+                            DCA_VTX_Meand+=DCA_VTX_d;
                             tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
                             tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
                             tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
@@ -6603,6 +6686,8 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
                             MeanWeight+=TV.trackWeight(vTT[i]);
                           }
                       }
+                    DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
+                    tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
                   }
                 else
                   { // If not valid : we build a new seed
@@ -6637,6 +6722,10 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
     tree_Hemi_Vtx_xError.push_back(posError.cxx());
     tree_Hemi_Vtx_yError.push_back(posError.cyy());
     tree_Hemi_Vtx_zError.push_back(posError.czz());
+    theta_Vtx = tan(sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y)/abs(Vtx_z)) ;
+    eta_Vtx = -TMath::Log(tan(theta_Vtx/2));
+    if (Vtx_z<0){eta_Vtx = -eta_Vtx;}
+    tree_Hemi_Vtx_eta.push_back(eta_Vtx);
     recX = Vtx_x - tree_PV_x;
     recY = Vtx_y - tree_PV_y;
     recZ = Vtx_z - tree_PV_z;
@@ -6677,10 +6766,12 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
     temp_py = 0;
     temp_pz = 0 ;
     temp_e = 0 ;
+TLorentzVector Total4Vector2(0,0,0,0);
+
 
     if(Vtx_step==1)
       {
-        for (unsigned int i = 0 ; i < TrackInfo_Hemi2_mva.size(); i++)
+        for (unsigned int i = 0 ; i < displacedTracks_Hemi2_mva.size(); i++)
           {
             if(TrackInfo_Hemi2_mva[i].first > TightWP || TrackInfo_Hemi2_mva[i].first > MediumWP )
               {
@@ -6690,13 +6781,15 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
             temp_py += TrackInfo_Hemi2_mva[i].second.Py();
             temp_pz += TrackInfo_Hemi2_mva[i].second.Pz();
             temp_e  += TrackInfo_Hemi2_mva[i].second.E();
+            TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
+            Total4Vector2 +=TLorentzTrack;
           }
 
       }
 
     else if (Vtx_step == 2 || Vtx_step==3)
       {
-        for (unsigned int i = 0 ; i < TrackInfo_step2_Hemi2.size(); i++)
+        for (unsigned int i = 0 ; i < displacedTracks_step2_Hemi2.size(); i++)
           {
             if(TrackInfo_step2_Hemi2[i].first > TightWP || TrackInfo_step2_Hemi2[i].first > MediumWP )
               {
@@ -6706,13 +6799,26 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
             temp_py += TrackInfo_step2_Hemi2[i].second.Py();
             temp_pz += TrackInfo_step2_Hemi2[i].second.Pz();
             temp_e  += TrackInfo_step2_Hemi2[i].second.E();
+            TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
+            Total4Vector2 +=TLorentzTrack;
           }
       } 
     tree_Hemi_Vtx_BTag.push_back(BtagGood_Hemi2 );
-    TLorentzVector InvMass2(temp_px,temp_py,temp_pz,temp_e);
-    tree_Hemi_Vtx_Mass.push_back(sqrt(InvMass2.Mag2()));
+    tree_Hemi_Vtx_Mass.push_back(sqrt(Total4Vector2.Mag2()));
 
+    mva_V_nTrks  =  Vtx_ntk;
+    mva_V_chi    =  Vtx_chi;
+    mva_V_step   =  Vtx_step;
+    // mva_V_r  =   sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y);
+    // mva_V_z  =    Vtx_z);
+    mva_V_MTW    =  MeanWeight;
+    mva_V_Mass   =  sqrt(Total4Vector2.Mag2());
+    // mva_V_dist  = recD;
 
+    Vtx_bdtVal = -10;
+    Vtx_bdtVal = readerVtx->EvaluateMVA("BDTG");
+    tree_Hemi_Vtx_MVAval.push_back(Vtx_bdtVal);
+   // default value = -10 (no -10 observed and -999 comes from EvaluateMVA)
 
     // -------------------------------------------//
   
@@ -7288,6 +7394,7 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_Hemi_Vtx_xError.clear();
     tree_Hemi_Vtx_yError.clear();
     tree_Hemi_Vtx_zError.clear();
+    tree_Hemi_Vtx_eta.clear();
     tree_Hemi_Vtx_Vtx_dr.clear();
     tree_Hemi_Vtx_Vtx_dz.clear();
     tree_Hemi_Vtx_Vtx_dd.clear();
@@ -7299,8 +7406,10 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_Hemi_Vtx_track_DCA_z.clear();
     tree_Hemi_Vtx_track_DCA_r.clear();
     tree_Hemi_Vtx_track_DCA_d.clear();
+    tree_Hemi_Vtx_track_MeanDCA_d.clear();
     tree_Hemi_Vtx_BTag.clear();
     tree_Hemi_Vtx_Mass.clear();
+    tree_Hemi_Vtx_MVAval.clear();
     tree_Hemi_Vtx_TVtx_dx.clear();
     tree_Hemi_Vtx_TVtx_dy.clear();
     tree_Hemi_Vtx_TVtx_dz.clear();
