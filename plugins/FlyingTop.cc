@@ -3679,7 +3679,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
       mupt1  = tree_muon_pt[mu];
     if ( mupt1 < 10. ) continue; // Zmu filter
 
-    if ( abs(tree_muon_dxy[mu]) > 0.1 || abs(tree_muon_dz[mu]) > 0.2 || (!tree_muon_trigger_dimu[mu] && tree_muon_trigger_isomu[mu]) || !tree_muon_isTight[mu] ) continue; // muons closed to PV
+    if ( abs(tree_muon_dxy[mu]) > 0.1 || abs(tree_muon_dz[mu]) > 0.2 || (!tree_muon_trigger_dimu[mu] && !tree_muon_trigger_isomu[mu]) || !tree_muon_isTight[mu] ) continue; // muons closed to PV
       mueta1 = tree_muon_eta[mu];
       muphi1 = tree_muon_phi[mu];
       v1.SetPtEtaPhiM(mupt1,mueta1,muphi1,mu_mass);
@@ -3687,7 +3687,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
       {	    
       if ( !tree_muon_isGlobal[mu2] ) continue;
       if ( tree_muon_charge[mu] == tree_muon_charge[mu2] ) continue;
-      if ( abs(tree_muon_dxy[mu2]) > 0.1 || abs(tree_muon_dz[mu2]) > 0.2 || (!tree_muon_trigger_dimu[mu2] && tree_muon_trigger_isomu[mu2]) || !tree_muon_isTight[mu2] ) continue;
+      if ( abs(tree_muon_dxy[mu2]) > 0.1 || abs(tree_muon_dz[mu2]) > 0.2 || (!tree_muon_trigger_dimu[mu2] && !tree_muon_trigger_isomu[mu2]) || !tree_muon_isTight[mu2] ) continue;
         mupt2  = tree_muon_pt[mu2];
       if ( mupt2 < 10. ) continue;
       if ( mupt1 < 25. && mupt2 < 25. ) continue; // Zmu Filter
