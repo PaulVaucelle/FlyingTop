@@ -195,7 +195,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     
     edm::ESHandle<MagneticField> bField;
     
-    edm::ParameterSet kvfPSet;
+    // edm::ParameterSet kvfPSet;
     //trig
     edm::EDGetTokenT<edm::TriggerResults> triggerResultsToken_;
     //trig
@@ -216,7 +216,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     int  tree_NbrOfZCand;
     bool tree_Filter;
     int  tree_nTracks, tree_nLostTracks; 
-    int  nBC = 0, tree_nFromC = 0, tree_nFromB = 0; 
+    int  tree_nFromC = 0, tree_nFromB = 0; 
     int nEvent;
     
     float LLP1_pt, LLP1_eta, LLP1_phi, LLP2_pt, LLP2_eta, LLP2_phi;
@@ -246,8 +246,10 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     float PixBarHit;
     float TecHit;
     float isLost;
+    //Track level BDT for displaced track selection
     TMVA::Reader *reader = new TMVA::Reader( "!Color:Silent" );
 
+    //Evt levelt BDT to select signal vertices
     float mva_V_nTrks;
     float mva_V_chi;
     float mva_V_step;
@@ -468,6 +470,8 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float> tree_jet_leadingMuon_dR;
     std::vector<float> tree_jet_leadingMuon2_dR;
     std::vector<float> tree_jet_jet_dR;
+    std::vector<float> tree_jet_jet_dPhi;
+    std::vector<float> tree_jet_jet_dEta;
     std::vector<float> tree_muon_jet_dRmin;
     std::vector<float> tree_muon_jet_dRmax;
     float tree_HT;
@@ -482,6 +486,9 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float> tree_electron_x;
     std::vector<float> tree_electron_y;
     std::vector<float> tree_electron_z;
+    std::vector<float> tree_electron_px;
+    std::vector<float> tree_electron_py;
+    std::vector<float> tree_electron_pz;
     std::vector<float> tree_electron_energy;
     std::vector< int > tree_electron_charge;
     std::vector<float> tree_electron_isoR4;
@@ -490,6 +497,8 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<bool>  tree_electron_IsTight;
     std::vector<bool>  tree_electron_trigger_Ele;
     std::vector<bool>  tree_electron_trigger_diEle;
+    std::vector<float> tree_electron_dxy;
+    std::vector<float> tree_electron_dz;
     
 
     //--------------------------------
@@ -503,6 +512,9 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float> tree_muon_x;
     std::vector<float> tree_muon_y;
     std::vector<float> tree_muon_z;
+    std::vector<float> tree_muon_px;
+    std::vector<float> tree_muon_py;
+    std::vector<float> tree_muon_pz;
     std::vector<float> tree_muon_energy;
     std::vector<float> tree_muon_dxy;
     std::vector<float> tree_muon_dxyError;
@@ -522,7 +534,8 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float> tree_muon_leadingpt;
     std::vector<float> tree_muon_leadingpt2;
     std::vector<float> tree_muon_muon_dR;
-
+    std::vector<float> tree_muon_muon_dPhi;
+    std::vector<float> tree_muon_muon_dEta;
     //-----------------------
     // per track
     //-----------------------
@@ -619,6 +632,11 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector< float > tree_genParticle_x;
     std::vector< float > tree_genParticle_y;
     std::vector< float > tree_genParticle_z;
+    std::vector< float > tree_genParticle_px;
+    std::vector< float > tree_genParticle_py;
+    std::vector< float > tree_genParticle_pz;
+    std::vector< float > tree_genParticle_energy;
+    std::vector< bool >  tree_genParticle_isPromptFinalState;
     std::vector< int >   tree_genParticle_statusCode;
     std::vector< int >   tree_genParticle_mother_pdgId;
     std::vector< int >   tree_genParticle_LLP;
@@ -655,6 +673,11 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector< float > tree_genAxis_dRneuneu;
     std::vector< float > tree_genAxis_dPhineuneu;
     std::vector< float > tree_genAxis_dEtaneuneu;
+    std::vector< float > tree_GenAxes_Mass;
+    std::vector< float > tree_GenAxis_Neu_dRmin;
+    std::vector< float > tree_GenAxis_Neu_dRmax;
+    std::vector< float > tree_GenAxis_RecoAxis_dRmin;
+    std::vector< float > tree_GenAxis_RecoAxis_dRmax;
 
     std::vector< float > tree_genFromC_pt;
     std::vector< float > tree_genFromC_eta;
@@ -725,11 +748,12 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector< float > tree_LLP12_dR;
     std::vector< float > tree_LLP12_deta;
     std::vector< float > tree_LLP12_dphi;
-    
+    std::vector< float > tree_LLP_Mass;
     //-----------------------
     // - Vertices information
     //-----------------------
     std::vector< int >   tree_Hemi;
+    std::vector< float > tree_Hemi_Mass;
     std::vector< int >   tree_Hemi_njet;
     std::vector< float > tree_Hemi_eta;
     std::vector< float > tree_Hemi_phi;
@@ -1460,6 +1484,8 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_jet_leadingMuon_dR",&tree_jet_leadingMuon_dR);
     smalltree->Branch("tree_jet_leadingMuon2_dR",&tree_jet_leadingMuon2_dR);
     smalltree->Branch("tree_jet_jet_dR",&tree_jet_jet_dR);
+    smalltree->Branch("tree_jet_jet_dPhi",&tree_jet_jet_dPhi);
+    smalltree->Branch("tree_jet_jet_dEta",&tree_jet_jet_dEta);
     smalltree->Branch("tree_muon_jet_dRmin",&tree_muon_jet_dRmin);
     smalltree->Branch("tree_muon_jet_dRmax",&tree_muon_jet_dRmax);
     smalltree->Branch("tree_HT"  ,          &tree_HT);
@@ -1472,14 +1498,19 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_electron_x"  ,    &tree_electron_x);
     smalltree->Branch("tree_electron_y" ,     &tree_electron_y);
     smalltree->Branch("tree_electron_z" ,     &tree_electron_z);
+    smalltree->Branch("tree_electron_px",     &tree_electron_px);
+    smalltree->Branch("tree_electron_py",     &tree_electron_py);
+    smalltree->Branch("tree_electron_pz",     &tree_electron_pz);
     smalltree->Branch("tree_electron_energy", &tree_electron_energy);
     smalltree->Branch("tree_electron_charge", &tree_electron_charge);
-    smalltree->Branch("tree_electron_isoR4",&tree_electron_isoR4);
+    smalltree->Branch("tree_electron_isoR4",  &tree_electron_isoR4);
     smalltree->Branch("tree_electron_IsLoose",&tree_electron_IsLoose);
     smalltree->Branch("tree_electron_IsMedium",&tree_electron_IsMedium);
     smalltree->Branch("tree_electron_IsTight",&tree_electron_IsTight);
     smalltree->Branch("tree_electron_trigger_Ele",&tree_electron_trigger_Ele);
     smalltree->Branch("tree_electron_trigger_diEle",&tree_electron_trigger_diEle);
+    smalltree->Branch("tree_electron_dxy",    &tree_electron_dxy);
+    smalltree->Branch("tree_electron_dz",     &tree_electron_dz);
 
     smalltree->Branch("tree_ST",&tree_ST);
     // muons info
@@ -1490,6 +1521,9 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_muon_x"  ,        &tree_muon_x);
     smalltree->Branch("tree_muon_y" ,         &tree_muon_y);
     smalltree->Branch("tree_muon_z" ,         &tree_muon_z);
+    smalltree->Branch("tree_muon_px"  ,       &tree_muon_px);
+    smalltree->Branch("tree_muon_py" ,        &tree_muon_py);
+    smalltree->Branch("tree_muon_pz" ,        &tree_muon_pz);   
     smalltree->Branch("tree_muon_energy",     &tree_muon_energy);
     smalltree->Branch("tree_muon_dxy",        &tree_muon_dxy);
     smalltree->Branch("tree_muon_dxyError",   &tree_muon_dxyError);
@@ -1509,7 +1543,8 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_muon_leadingpt",&tree_muon_leadingpt);
     smalltree->Branch("tree_muon_leadingpt2",&tree_muon_leadingpt2);
     smalltree->Branch("tree_muon_muon_dR",&tree_muon_muon_dR);
-
+    smalltree->Branch("tree_muon_muon_dPhi",&tree_muon_muon_dPhi);
+    smalltree->Branch("tree_muon_muon_dEta",&tree_muon_muon_dEta);
     // track
     smalltree->Branch("tree_nTracks",            &tree_nTracks, "tree_nTracks/I"); 
     smalltree->Branch("tree_nLostTracks",        &tree_nLostTracks, "tree_nLostTracks/I"); 
@@ -1603,6 +1638,12 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_genParticle_x"  ,	        &tree_genParticle_x);
     smalltree->Branch("tree_genParticle_y" ,	        &tree_genParticle_y);
     smalltree->Branch("tree_genParticle_z" ,	        &tree_genParticle_z);
+    smalltree->Branch("tree_genParticle_px",          &tree_genParticle_px);
+    smalltree->Branch("tree_genParticle_py",          &tree_genParticle_py);
+    smalltree->Branch("tree_genParticle_pz",          &tree_genParticle_pz);
+    smalltree->Branch("tree_genParticle_energy",      &tree_genParticle_energy);
+    smalltree->Branch("tree_genParticle_isPromptFinalState",         &tree_genParticle_isPromptFinalState);
+
     smalltree->Branch("tree_genParticle_statusCode",    &tree_genParticle_statusCode);
     smalltree->Branch("tree_genParticle_mother_pdgId" , &tree_genParticle_mother_pdgId);
     smalltree->Branch("tree_genParticle_LLP" ,          &tree_genParticle_LLP);
@@ -1639,6 +1680,11 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_genAxis_dRneuneu",       &tree_genAxis_dRneuneu);
     smalltree->Branch("tree_genAxis_dPhineuneu",     &tree_genAxis_dPhineuneu);
     smalltree->Branch("tree_genAxis_dEtaneuneu",     &tree_genAxis_dEtaneuneu);
+    smalltree->Branch("tree_GenAxes_Mass",           &tree_GenAxes_Mass);
+    smalltree->Branch("tree_GenAxis_Neu_dRmin",      &tree_GenAxis_Neu_dRmin);
+    smalltree->Branch("tree_GenAxis_Neu_dRmax",      &tree_GenAxis_Neu_dRmax);
+    smalltree->Branch("tree_GenAxis_RecoAxis_dRmin", &tree_GenAxis_RecoAxis_dRmin);
+    smalltree->Branch("tree_GenAxis_RecoAxis_dRmax", &tree_GenAxis_RecoAxis_dRmax);
 
     smalltree->Branch("tree_nFromC",                 &tree_nFromC,  "tree_nFromC/I");
     smalltree->Branch("tree_genFromC_pt"  ,          &tree_genFromC_pt);
@@ -1699,8 +1745,10 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_LLP12_dR",      &tree_LLP12_dR);
     smalltree->Branch("tree_LLP12_deta",    &tree_LLP12_deta);
     smalltree->Branch("tree_LLP12_dphi",    &tree_LLP12_dphi);
+    smalltree->Branch("tree_LLP_Mass",      &tree_LLP_Mass);
 
     smalltree->Branch("tree_Hemi",       &tree_Hemi);
+    smalltree->Branch("tree_Hemi_Mass",  &tree_Hemi_Mass);
     smalltree->Branch("tree_Hemi_njet",  &tree_Hemi_njet);
     smalltree->Branch("tree_Hemi_eta",   &tree_Hemi_eta);
     smalltree->Branch("tree_Hemi_phi",   &tree_Hemi_phi);
@@ -2363,8 +2411,8 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
 
   std::vector<std::string> TriggerCheck;
-  std::vector<std::string> VTrigger;
-  std::vector<bool> PassTrigger;
+  // std::vector<std::string> VTrigger;
+  // std::vector<bool> PassTrigger;
 
   // ######################
   const edm::Handle<edm::TriggerResults> triggerH = iEvent.getHandle(triggerResultsToken_);
@@ -2853,53 +2901,6 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
 //************************************************************************************************************************//
 }
 
-//   tree_trigger_size.push_back(TriggerCheck.size()); // has to be the same for each evnet!!
-
-//---Test Patate----//
-
-//------Test One plot for One trigger (For one file only)
-// TFile* pFile = new TFile("triggerTest.root","recreate");
-// TRandom3 rand3;
-// TEfficiency* EffvsObs2;
-// TDirectory* drt2 = new TDirectory();
-// EffvsObs2 = new TEfficiency("Eff2","Efficiency2;patate2;#epsilon",20,0,10);
-// EffvsObs2->SetDirectory(drt2);
-// bool bPassed;
-// double PATATE;
-// for (int i = 0 ; i <10000 ; i++)
-//   {
-//     PATATE = rand3.Uniform(10);//variable
-//     bPassed = rand3.Rndm() < TMath::Gaus(PATATE,5,4);//triggerH->accept(0)//trigger boolean
-//     EffvsObs2->TEfficiency::Fill(bPassed,PATATE);
-//   }
-
-//trig
-
-//------Test One plot for each trigger
-// TEfficiency** EffvsObs3;
-// TDirectory* drt3 = new TDirectory();
-
-// for (unsigned int j=0;j< triggerH->size();j++)
-//   {
-//     EffvsObs3[j] = new TEfficiency("Eff3","Efficiency3;MET;#epsilon",20,0,10);//crash
-//     EffvsObs3[j]->SetDirectory(drt3);
-//     for (int i = 0 ; i <1000 ; i++)
-//       {
-//         PATATE = rand3.Uniform(10);//variable
-//         bPassed = rand3.Rndm() < TMath::Gaus(PATATE,5,4);//triggerH->accept(0)//trigger boolean
-//         EffvsObs3[j]->TEfficiency::Fill(bPassed,PATATE);//triggerH->accept(j)
-//       }
-//       EffvsObs3[j]->Write();
-//   }
-
-//         for (unsigned int i=0;i<tree_passesTriggerName.size();i++)
-//             {
-//               if (strstr(tree_passesTriggerName[i].c_str(),"HLT_Mu15_v"))
-//                 {
-//                   test->Fill(tk_pt,triggerH->accept(i));
-//                 }
-//             }
-
 
   //////////////////////////////////
   //////////////////////////////////
@@ -2932,8 +2933,6 @@ if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->a
   }
 
   tree_nPV = primaryVertex->size();
-  std::vector<reco::Track> PVertextracks;
-  std::vector<reco::Track> PVtracks;
   if ( !primaryVertex->empty() ) {
     tree_PV_x     = (*primaryVertex)[0].x(); // l'index 0 donne le PV!
     tree_PV_y     = (*primaryVertex)[0].y();
@@ -3124,7 +3123,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
 
   int nLLP = 0;
   int nllp = 0;
-  nBC = 0; 
+  // nBC = 0; !
   tree_nFromC = 0; 
   tree_nFromB = 0;
   
@@ -3140,6 +3139,17 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
   for (int k=0; k<2; k++) {
     neu[k] = -1;
   }
+
+    int nGenjet = 0, nGenjet1 = 0, nGenjet2 = 0;
+    bool isGenjet[99], isGenjet1[99], isGenjet2[99];//the "real" size is given by the final value of jetidx since non-valid jets are replaced
+    TLorentzVector Genvaxis1, Genvaxis2, Genvjet[99];
+    TLorentzVector GenVaxis1, GenVaxis2, GenVjet[99];
+    TLorentzVector GenV1, GenV2, GenV;
+    TLorentzVector Genv1, Genv2, Genv;
+    float GenPtMin = 20;   // (GeV) minimum jet pt is optimum
+    float GenEtaMax = 10; // no cut on eta is optimum
+    int Genjetidx = 0; // : May be in the loop/ not sure it changes anything
+
 
   if ( !runOnData_ ) {
   
@@ -3362,6 +3372,11 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
       tree_genParticle_x.push_back(	    genIt.vx());
       tree_genParticle_y.push_back(	    genIt.vy());
       tree_genParticle_z.push_back(	    genIt.vz());
+      tree_genParticle_px.push_back(	    genIt.px());
+      tree_genParticle_py.push_back(	    genIt.py());
+      tree_genParticle_pz.push_back(	    genIt.pz());
+      tree_genParticle_energy.push_back(	    genIt.energy());
+      tree_genParticle_isPromptFinalState.push_back(   genIt.isPromptFinalState());
       tree_genParticle_statusCode.push_back(genIt.status());
       tree_genParticle_mother_pdgId.push_back( mom ? mom->pdgId() :  -10 );
       tree_genParticle_LLP.push_back(fromLLP);
@@ -3528,17 +3543,186 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
       tree_ngenPackPart++;
     }
 
+
+
+    //////////////////////
     // gen jets
+    //////////////////////
+
     for (auto const & genJet : *genJets)
     {
-    if ( genJet.pt() < 20. ) continue;
+    if ( genJet.pt() < GenPtMin ) continue;
       tree_genJet_pt.push_back(genJet.pt());
       tree_genJet_eta.push_back(genJet.eta());
       tree_genJet_phi.push_back(genJet.phi());
       tree_genJet_mass.push_back(genJet.mass());
       tree_genJet_energy.push_back(genJet.energy());
-    }
+
+      float Genjet_pt  = genJet.pt();
+      float Genjet_eta = genJet.eta();
+      float Genjet_phi = genJet.phi();
+      float Genjet_px = genJet.px();
+      float Genjet_py = genJet.py();
+      float Genjet_pz = genJet.pz();
+      float Genjet_e = genJet.energy();
+
+      isGenjet[Genjetidx]  = false;
+      isGenjet1[Genjetidx] = false; // first neutralino jets
+      isGenjet2[Genjetidx] = false; // second neutralino jets
+      Genv.SetPtEtaPhiM( Genjet_pt, Genjet_eta, Genjet_phi, 0. ); //set the axis
+      GenV.SetPxPyPzE(Genjet_px,Genjet_py,Genjet_pz,Genjet_e);
+      if ( Genjet_pt < GenPtMin ) continue;
+      if ( abs(Genjet_eta) > GenEtaMax ) continue;
+
+    //----------------------------------------//
+    //-----------GenEvent Axes----------------//
+    //----------------------------------------//
+
+      nGenjet++;
+      isGenjet[Genjetidx] = true;
+      Genvjet[Genjetidx] = Genv; // Only jet data (with  possible muons being removed)
+      GenVjet[Genjetidx] = GenV;
+      if ( nGenjet1 == 0 && Genjet_pt > GenPtMin && abs(Genjet_eta) < GenEtaMax && Genjetidx==0 )
+      {
+        nGenjet1 = 1;
+        isGenjet1[Genjetidx] = true;
+        Genvaxis1 = Genv;
+        GenVaxis1 = GenV;
+      }
+      
+
+      float GendR1 = 10., GendR2 = 10.;
+      float GendRcut_hemis  = 1.5; // subjective choice default is 1.5
+
+      if ( !isGenjet[Genjetidx] ) continue;
+      float jet_eta = Genvjet[Genjetidx].Eta();
+      float jet_phi = Genvjet[Genjetidx].Phi();
+      if ( nGenjet1 > 0 ) GendR1 = Deltar( jet_eta, jet_phi, Genvaxis1.Eta(), Genvaxis1.Phi() );
+      if ( nGenjet2 > 0 ) GendR2 = Deltar( jet_eta, jet_phi, Genvaxis2.Eta(), Genvaxis2.Phi() );
+
+            // axis 1  <---------------------
+      if ( nGenjet1 > 0 && !isGenjet2[Genjetidx]  && GendR1 < GendRcut_hemis) {
+        nGenjet1++;
+        Genvaxis1 += Genvjet[Genjetidx];
+        GenVaxis1 += GenVjet[Genjetidx];
+        isGenjet1[Genjetidx] = true;
+      }
+            // axis 2  ---------->
+      if ( nGenjet2 == 0 && !isGenjet1[Genjetidx] ) {
+        nGenjet2 = 1;
+        Genvaxis2 = Genvjet[Genjetidx];
+        GenVaxis2 += GenVjet[Genjetidx];
+      }
+            // axis 2  --------------------->
+      else if ( nGenjet2 > 0 && !isGenjet1[Genjetidx] && !isGenjet2[Genjetidx] && GendR2 < GendRcut_hemis) {//
+        nGenjet2++;
+        Genvaxis2 += Genvjet[Genjetidx];
+        GenVaxis2 += GenVjet[Genjetidx];
+        isGenjet2[Genjetidx] = true;
+      }
+      Genjetidx++;
+      // loop over genmuons and remove the contribution of the prompt muosn to the axes building procedure 
+
+      float deltaGenR1 = 1000.;
+      float deltaGenR2 = 1000.;
+
+      int nGenMuon = 0;
+      for (unsigned int k = 0 ; k < tree_genParticle_pdgId.size() ; k++) //loop over genMuons
+        {
+          if (abs(tree_genParticle_pdgId[k])!=13) continue;//pruned collection may be should check also with the packed colelction
+          //feels like there are sometimes two gen muons that are ony one?? close to having the same pt eta and phi (deltaQuantity  ~ 0.001) => continue
+          if ( !tree_genParticle_isPromptFinalState[k] ) continue;
+          if ( tree_genParticle_pt[k] < 25) continue;
+          nGenMuon++;
+          deltaGenR1 = Deltar( Genvaxis1.Eta(), Genvaxis1.Phi(), tree_genParticle_eta[k], tree_genParticle_phi[k] );
+          deltaGenR2 = Deltar( Genvaxis2.Eta(), Genvaxis2.Phi(), tree_genParticle_eta[k], tree_genParticle_phi[k] );
+          if ( deltaGenR1 < 0.4)
+            {
+              Genv1.SetPtEtaPhiM( tree_genParticle_pt[k],tree_genParticle_eta[k], tree_genParticle_phi[k], 0 );
+              
+              Genvaxis1 -= Genv1; // v TLorentzFactor being just above, defined by jet data
+              GenV1.SetPxPyPzE(tree_genParticle_px[k],tree_genParticle_py[k],tree_genParticle_pz[k],tree_genParticle_energy[k]);
+              GenVaxis1 -= GenV1;
+            }
+          if ( deltaGenR2 < 0.4 )
+            {
+              Genv2.SetPtEtaPhiM( tree_genParticle_pt[k],tree_genParticle_eta[k], tree_genParticle_phi[k], 0 );
+              GenV2.SetPxPyPzE(tree_genParticle_px[k],tree_genParticle_py[k],tree_genParticle_pz[k],tree_genParticle_energy[k]);
+              Genvaxis2 -= Genv2;
+              GenVaxis2 -= GenV2;
+            }
+        } // end of loop over gen muons
+    }// end loo pover gen jets
+//     ///////////////////////////////
+//     // Invariant Mass of GenAxes 
+//     ///////////////////////////////
     
+    //The computation of the invariant mass does not look good when using only the tracks
+    //So, we try to do it with the jets and the possible letpon coming out of the neutralino
+        float temp_px1 = GenVaxis1.Px();
+        float temp_py1 = GenVaxis1.Py();
+        float temp_pz1 = GenVaxis1.Pz();
+        float temp_e1  = GenVaxis1.E();
+        float temp_px2 = GenVaxis2.Px();
+        float temp_py2 = GenVaxis2.Py();
+        float temp_pz2 = GenVaxis2.Pz();
+        float temp_e2  = GenVaxis2.E();
+
+    //... then, add the lepton contribution
+
+
+    for (unsigned int i = 0 ; i<tree_genParticle_pdgId.size() ; i++)
+      {
+        if (abs(tree_genParticle_pdgId[i])!=13) continue;
+        if ( tree_genParticle_isPromptFinalState[i] ) continue;//||  !tree_muon_isTight[mu]
+        // Avoid prompt leptons
+        float GendRAxis1muon = Deltar( Genvaxis1.Eta(), Genvaxis1.Phi(), tree_genParticle_eta[i], tree_genParticle_phi[i] );
+        float GendRAxis2muon = Deltar( Genvaxis2.Eta(), Genvaxis2.Phi(), tree_genParticle_eta[i], tree_genParticle_phi[i] );
+        if (GendRAxis1muon<1.5  )
+          {
+            temp_px1 += tree_genParticle_px[i];
+            temp_py1 += tree_genParticle_py[i];
+            temp_pz1 += tree_genParticle_pz[i];
+            temp_e1  += tree_genParticle_energy[i];
+          }
+        if(GendRAxis2muon<1.5)
+          {
+            temp_px2 += tree_genParticle_px[i];
+            temp_py2 += tree_genParticle_py[i];
+            temp_pz2 += tree_genParticle_pz[i];
+            temp_e2  += tree_genParticle_energy[i];
+          }
+      }
+
+    for(unsigned int i = 0 ; i <tree_genParticle_pdgId.size() ; i++)
+      {
+        if (abs(tree_genParticle_pdgId[i])!=11) continue;
+        if(!tree_genParticle_isPromptFinalState[i]) continue; //tree_electron_IsTight
+        // Avoid prompt leptons
+        float GendRAxis1electron = Deltar( Genvaxis1.Eta(), Genvaxis1.Phi(), tree_genParticle_eta[i], tree_genParticle_phi[i] );
+        float GendRAxis2electron = Deltar( Genvaxis2.Eta(), Genvaxis2.Phi(), tree_genParticle_eta[i], tree_genParticle_phi[i] );
+        if (GendRAxis1electron<1.5  )
+          {
+            temp_px1 += tree_genParticle_px[i];
+            temp_py1 += tree_genParticle_py[i];
+            temp_pz1 += tree_genParticle_pz[i];
+            temp_e1  += tree_genParticle_energy[i];
+          }
+        if(GendRAxis2electron<1.5)
+          {
+            temp_px2 += tree_genParticle_px[i];
+            temp_py2 += tree_genParticle_py[i];
+            temp_pz2 += tree_genParticle_pz[i];
+            temp_e2  += tree_genParticle_energy[i];
+          }
+      }
+    TLorentzVector TLorentzGenAxis1(temp_px1,temp_py1,temp_pz1,temp_e1);
+    TLorentzVector TLorentzGenAxis2(temp_px2,temp_py2,temp_pz2,temp_e2);
+    tree_GenAxes_Mass.push_back(sqrt(TLorentzGenAxis1.Mag2()));
+    // std::cout<<"Mass GenAxis 1 : "<<sqrt(TLorentzGenAxis1.Mag2())<<std::endl;
+    tree_GenAxes_Mass.push_back(sqrt(TLorentzGenAxis2.Mag2()));
+    // std::cout<<"Mass GenAxis 2 : "<<sqrt(TLorentzGenAxis2.Mag2()) <<std::endl;
+
   } // endif simulation
 
 
@@ -3581,6 +3765,9 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
     tree_muon_x.push_back(        mu.vx());
     tree_muon_y.push_back(        mu.vy());
     tree_muon_z.push_back(        mu.vz());
+    tree_muon_px.push_back(       mu.px());
+    tree_muon_py.push_back(       mu.py());
+    tree_muon_pz.push_back(       mu.pz());
     tree_muon_energy.push_back(   mu.energy());
     tree_muon_dxy.push_back(	  mu.muonBestTrack()->dxy(PV.position()));
     tree_muon_dxyError.push_back( mu.muonBestTrack()->dxyError());
@@ -3613,25 +3800,9 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
           }
           genMuons++;
           if(IsMatched) break;
-
       }
-        // isoR3 = mu.trackIso();//the summed track pt in a cone of deltaR<0.3
-    //     /// Overload of pat::Lepton::trackIso(); returns the value of
-    // /// the summed Et of all recHits in the ecal in a cone of
-    // /// deltaR<0.3
-    // float ecalIso() const { return isolationR03().emEt; }
-    // /// Overload of pat::Lepton::trackIso(); returns the value of
-    // /// the summed Et of all caloTowers in the hcal in a cone of
-    // /// deltaR<0.4
-    // float hcalIso() const { return isolationR03().hadEt; }
-    // /// Overload of pat::Lepton::trackIso(); returns the sum of
-    // /// ecalIso() and hcalIso
-    // float caloIso() const { return ecalIso() + hcalIso(); }
-    // std::cout<<"Muon isolation : "<<isoR3<<std::endl;
-    // std::cout<<"tree_muon_pt : "<< mu.pt()<<std::endl;
-    
   }
-    // std::cout<<"size reco muon and gen muon "<<nmu<<" and "<<genMuons<<std::endl;
+
     if(nmu>=1)
       {
         tree_muon_leadingpt.push_back(tree_muon_pt[0]);
@@ -3640,12 +3811,16 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
       {
         tree_muon_leadingpt2.push_back(tree_muon_pt[1]);
         tree_muon_muon_dR.push_back(Deltar( tree_muon_eta[0], tree_muon_phi[0], tree_muon_eta[1], tree_muon_phi[1]));
+        tree_muon_muon_dPhi.push_back(abs(Deltaphi(tree_muon_phi[0],tree_muon_phi[1])));
+        tree_muon_muon_dEta.push_back(abs( tree_muon_eta[0]-tree_muon_eta[1]));
       }
     if( nmu==0){tree_muon_leadingpt.push_back(0);}
     if( nmu<=1)
     {
       tree_muon_leadingpt2.push_back(0);
       tree_muon_muon_dR.push_back(0);
+      tree_muon_muon_dPhi.push_back(0);
+      tree_muon_muon_dEta.push_back(0);
     }
   float ST = 0;
   ST+=LT;
@@ -3668,7 +3843,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
     indjet++;
     if ( jet.pt() < jet_pt_min ) continue;
     if ( indjet==0) {tree_jet_leadingpt.push_back(jet.pt());}
-    if ( indjet==0) {tree_jet_leadingpt2.push_back(jet.pt());}
+    if ( indjet==1) {tree_jet_leadingpt2.push_back(jet.pt());}
     tree_jet_E.push_back(jet.energy());
     tree_jet_pt.push_back(jet.pt());
     tree_jet_eta.push_back(jet.eta());
@@ -3686,9 +3861,6 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
     tree_jet_btag_DeepCSV.push_back(DeepCSV);
     tree_jet_btag_DeepJet.push_back(DeepJet);
     // WorkingPoints : https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation102X
-    // std::cout<<" DeepCSV : "<<DeepCSV<<std::endl;
-    // std::cout<<" DeepJet : "<<DeepJet<<std::endl;
-    //---------end of -btaginfos
 
     tree_njet++;
     if ( abs(jet.eta()) < 2.4 ) {HT_val += jet.pt();} // used in HT filter !
@@ -3709,7 +3881,15 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
   if(tree_njet>=2)
       {
         tree_jet_jet_dR.push_back(Deltar(tree_jet_eta[0],tree_jet_phi[0],tree_jet_eta[1],tree_jet_phi[1]));
+        tree_jet_jet_dPhi.push_back(abs(Deltaphi(tree_jet_phi[0],tree_jet_phi[1])));
+        tree_jet_jet_dEta.push_back(abs(tree_jet_eta[0]-tree_jet_eta[1]));
       }
+  else  
+    { 
+        tree_jet_jet_dR.push_back(0);
+        tree_jet_jet_dPhi.push_back(0);
+        tree_jet_jet_dEta.push_back(0);
+    }
   tree_HT = HT_val;
   // ST+=HT_val;
   float dRmuon1_jet_min = 0;
@@ -3768,15 +3948,14 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
     tree_electron_x.push_back(      el.vx());
     tree_electron_y.push_back(      el.vy());
     tree_electron_z.push_back(      el.vz());
+    tree_electron_px.push_back(      el.px());
+    tree_electron_py.push_back(      el.py());
+    tree_electron_pz.push_back(      el.pz());
     tree_electron_energy.push_back( el.energy());
     tree_electron_charge.push_back(el.charge());
     tree_electron_isoR4.push_back(el.trackIso());//returns the value of the summed track pt in a cone of deltaR<0.4
-    //     float ecalIso() const { return dr04EcalRecHitSumEt(); }
-    // /// Overload of pat::Lepton::hcalIso(); returns the value of the summed Et of all caloTowers in the hcal in a cone of deltaR<0.4
-    // float hcalIso() const { return dr04HcalTowerSumEt(); }
-    // /// Overload of pat::Lepton::caloIso(); returns the sum of ecalIso() and hcalIso
-    // float caloIso() const { return ecalIso() + hcalIso(); }
-    // std::cout<<"Electron isolation : "<<Eiso<<std::endl;
+    tree_electron_dxy.push_back(el.gsfTrack()->dxy(PV.position()));
+    tree_electron_dz.push_back(el.gsfTrack()->dz(PV.position()));
 
   // https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun2#Working_points_for_94X_and_later
   // https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideCategoryBasedElectronID
@@ -3785,13 +3964,12 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
     tree_electron_IsLoose.push_back(el.electronID("cutBasedElectronID-Fall17-94X-V2-loose"));//for 2018
     tree_electron_IsMedium.push_back(el.electronID("cutBasedElectronID-Fall17-94X-V2-medium"));//for 2018
     tree_electron_IsTight.push_back(el.electronID("cutBasedElectronID-Fall17-94X-V2-tight"));//for 2018
-
+    nEl++;
     // tree_electron_trigger_Ele.push_back(el.triggered("HLT_Ele27_WPTight_Gsf_v*"));
     // tree_electron_trigger_diEle.push_back(el.triggered("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v*"));
     if (el.gsfTrack()->dxy(PV.position())>0.05 || el.gsfTrack()->dz(PV.position())>0.1) continue;
-    nEl++;
     
-
+    if (showlog){std::cout<<"prmpt electron"<<std::endl;}
 //       	barrel 	endcap
 // d0, cm 	0.05 	0.10
 // dz, cm 	0.10 	0.20 
@@ -3924,18 +4102,11 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
           }
       }
 
-
-    // from /PhysicsTools/PatAlgos/plugins/PATIsolatedTrackProducer.cc
-    // and
-    // from /DQM/TrackingMonitor/src/PackedCandidateTrackValidator.cc
-
-
-
     //---------------------------------------------------------------------------------//
     //----------------------- V0 Producer adapted in MiniAOD---------------------------//
     //---------------------------------------------------------------------------------//
 
-    // - Be careful => tree_V0_xxx comes from the colelctino of CMSSW
+    // - Be careful => tree_V0_xxx comes from the collection of CMSSW
     // the following is the V0Producer code adapted in MiniAOD that will be also used to
     // reconstruct secondary interactiosn (photon conversions an dnuclear intractions) with slight modification
     // Basically, only cuts and the badtkhit have been changed from the V0Producer code.
@@ -5125,7 +5296,7 @@ else
       const HitPattern hp = tk_HitPattern;
       uint16_t firsthit = hp.getHitPattern(HitPattern::HitCategory::TRACK_HITS,0);
 //$$
-//     Approximation for the lostTrack since the hitpattern information is not available (only 1160, tracking POG knows about it)      
+//     Approximation for the lostTrack since the hitpattern information is not available (only 1160, tracking POG knows about it but do not seem to care)      
       if ( ipc >= pc->size() ) {
         if ( abs(tk_eta) < 1. ) firsthit = 1184; // PIXBL4 in barrel
         else                    firsthit = 1296; // PIXFD2 in forward
@@ -5265,7 +5436,7 @@ else
 
         float dSign = 1.;
         if ( xFirst*track_sim_x+yFirst*track_sim_y+zFirst*track_sim_z < 0. ) dSign = -1.;
-	dFirstGenMin = TMath::Sqrt(dFirstGenMin)*dSign;
+	      dFirstGenMin = TMath::Sqrt(dFirstGenMin)*dSign;
         if ( track_sim_LLP == 1 ) {
           track_sim_LLP_r = TMath::Sqrt( LLP1_x*LLP1_x + LLP1_y*LLP1_y );
           track_sim_LLP_z = abs(LLP1_z);
@@ -5350,6 +5521,8 @@ else
     float btag1[99]={0};
     float btag2[99]={0};
     TLorentzVector vaxis1, vaxis2, vjet[99];
+    TLorentzVector Vaxis1, Vaxis2, Vjet[99];
+    TLorentzVector V1, V2, V;
     float PtMin = 20;   // (GeV) minimum jet pt is optimum
     float EtaMax = 10; // no cut on eta is optimum
     int jetidx = 0; // : May be in the loop/ not sure it changes anything
@@ -5358,6 +5531,10 @@ else
       float jet_pt  = jet.pt();
       float jet_eta = jet.eta();
       float jet_phi = jet.phi();
+      float jet_px = jet.px();
+      float jet_py = jet.py();
+      float jet_pz = jet.pz();
+      float jet_e = jet.energy();
       // std::cout<<"tree_jet_pt : "<< jet.pt()<<std::endl;
       float DeepFlavourb = jet.bDiscriminator("pfDeepFlavourJetTags:probb");
       float DeepFlavourbb = jet.bDiscriminator("pfDeepFlavourJetTags:probbb");
@@ -5372,7 +5549,7 @@ else
       isjet1[jetidx] = false; // first neutralino jets
       isjet2[jetidx] = false; // second neutralino jets
       v.SetPtEtaPhiM( jet_pt, jet_eta, jet_phi, 0. ); //set the axis
-
+      V.SetPxPyPzE(jet_px,jet_py,jet_pz,jet_e);
       if ( jet_pt < PtMin ) continue;
       if ( abs(jet_eta) > EtaMax ) continue;
       
@@ -5385,26 +5562,37 @@ else
         if ( deltaR1 < 0.4 )
         { //if muon is inside, we remove the muons infomation from the jet
           v1.SetPtEtaPhiM( tree_muon_pt[imu1], tree_muon_eta[imu1], tree_muon_phi[imu1], 0 );
+          V1.SetPxPyPzE(tree_muon_px[imu1],tree_muon_py[imu1],tree_muon_pz[imu1],tree_muon_energy[imu1]);
           v -= v1; // v TLorentzFactor being just above, defined by jet data
+          V-= V1;
         }
         if ( deltaR2 < 0.4 )
         {
           v2.SetPtEtaPhiM( tree_muon_pt[imu2], tree_muon_eta[imu2], tree_muon_phi[imu2], 0 );
+          V2.SetPxPyPzE(tree_muon_px[imu2],tree_muon_py[imu2],tree_muon_pz[imu2],tree_muon_energy[imu2]);
           v -= v2;
+          V-= V2;
         }
         jet_pt  = v.Pt(); //Update jet data by removing the muons information (muons that could be in the jet)
         jet_eta = v.Eta(); //+ we do not want muons data to build the two axis since they come from the PV except the one that come from a top decay
         jet_phi = v.Phi();
+        jet_px = V.Px();
+        jet_pz = V.Py();
+        jet_py = V.Pz();
+        jet_e  = V.E();
+
       }
       
       njet++;
       isjet[jetidx] = true;
       vjet[jetidx] = v; // Only jet data (with  possible muons being removed)
+      Vjet[jetidx] = V;
       if ( njet1 == 0 && jet_pt > PtMin && abs(jet_eta) < EtaMax )
       {
         njet1 = 1;
         isjet1[jetidx] = true;
         vaxis1 = v;
+        Vaxis1 = V;
         btag1[jetidx] = btag[jetidx];
       }
       jetidx++;
@@ -5434,6 +5622,7 @@ else
       if ( njet1 > 0 && !isjet2[i]  && dR1 < dRcut_hemis) {
         njet1++;
         vaxis1 += vjet[i];
+        Vaxis1 += Vjet[i];
         isjet1[i] = true;
         btag1[i]=btag[i];
         if (btag1[i]>0.7264 && ActivateBtagLog) {std::cout<<"Tight b jet ID"<<std::endl;}
@@ -5444,6 +5633,7 @@ else
       if ( njet2 == 0 && !isjet1[i] ) {
         njet2 = 1;
         vaxis2 = vjet[i];
+        Vaxis2 += Vjet[i];
         isjet2[i] = true;
         btag2[i]=btag[i];
         if (btag2[i]>0.7264 && ActivateBtagLog) {std::cout<<"Tight b jet ID"<<std::endl;}
@@ -5451,6 +5641,7 @@ else
       else if ( njet2 > 0 && !isjet1[i] && !isjet2[i] && dR2 < dRcut_hemis) {//
         njet2++;
         vaxis2 += vjet[i];
+        Vaxis2 += Vjet[i];
         isjet2[i] = true;
         btag2[i]=btag[i];//njet2 insteag of i would also make sense, here there are voids when one of the other conditions above is filled
         if (btag2[i]>0.7264 && ActivateBtagLog) {std::cout<<"Tight b jet ID"<<std::endl;}
@@ -5462,6 +5653,77 @@ else
 //     vaxis1 = vneu[0];
 //     vaxis2 = vneu[1];
 //$$
+
+
+    ///////////////////////////////
+    // Invariant Mass of Axes 
+    ///////////////////////////////
+    
+    //The computation of the invariant mass does not look good when using only the tracks
+    //So, we try to do it with the jets and the possible letpon coming out of the neutralino
+        float temp_px1 = Vaxis1.Px();
+        float temp_py1 = Vaxis1.Py();
+        float temp_pz1 = Vaxis1.Pz();
+        float temp_e1  = Vaxis1.E();
+        float temp_px2 = Vaxis2.Px();
+        float temp_py2 = Vaxis2.Py();
+        float temp_pz2 = Vaxis2.Pz();
+        float temp_e2  = Vaxis2.E();
+
+    //... then, add the lepton contribution
+
+
+    for (int i = 0 ; i<nmu ; i++)
+      {
+        // if ( !tree_muon_isGlobal[mu] ) continue;
+        if ( abs(tree_muon_dxy[i]) < 0.1 || abs(tree_muon_dz[i]) < 0.2 ) continue;//||  !tree_muon_isTight[mu]
+        // Avoid prompt leptons
+        float dRAxis1muon = Deltar( vaxis1.Eta(), vaxis1.Phi(), tree_muon_eta[i], tree_muon_phi[i] );
+        float dRAxis2muon = Deltar( vaxis2.Eta(), vaxis2.Phi(), tree_muon_eta[i], tree_muon_phi[i] );
+        if (dRAxis1muon<1.5  )
+          {
+            temp_px1 += tree_muon_px[i];
+            temp_py1 += tree_muon_py[i];
+            temp_pz1 += tree_muon_pz[i];
+            temp_e1  += tree_muon_energy[i];
+          }
+        if(dRAxis2muon<1.5)
+          {
+            temp_px2 += tree_muon_px[i];
+            temp_py2 += tree_muon_py[i];
+            temp_pz2 += tree_muon_pz[i];
+            temp_e2  += tree_muon_energy[i];
+          }
+      }
+
+    for(int i = 0 ; i <nEl ; i++)
+      {
+        if(abs(tree_electron_dxy[i])< 0.05|| abs(tree_electron_dz[i])<0.1) continue; //tree_electron_IsTight
+        // Avoid prompt leptons
+        float dRAxis1electron = Deltar( vaxis1.Eta(), vaxis1.Phi(), tree_electron_eta[i], tree_electron_phi[i] );
+        float dRAxis2electron = Deltar( vaxis2.Eta(), vaxis2.Phi(), tree_electron_eta[i], tree_electron_phi[i] );
+        if (dRAxis1electron<1.5  )
+          {
+            temp_px1 += tree_electron_px[i];
+            temp_py1 += tree_electron_py[i];
+            temp_pz1 += tree_electron_pz[i];
+            temp_e1  += tree_electron_energy[i];
+          }
+        if(dRAxis2electron<1.5)
+          {
+            temp_px2 += tree_electron_px[i];
+            temp_py2 += tree_electron_py[i];
+            temp_pz2 += tree_electron_pz[i];
+            temp_e2  += tree_electron_energy[i];
+          }
+      }
+    TLorentzVector TLorentzAxis1(temp_px1,temp_py1,temp_pz1,temp_e1);
+    TLorentzVector TLorentzAxis2(temp_px2,temp_py2,temp_pz2,temp_e2);
+    tree_Hemi_Mass.push_back(sqrt(TLorentzAxis1.Mag2()));
+    // std::cout<<"Mass Axis 1 : "<<sqrt(TLorentzAxis1.Mag2())<<std::endl;
+    tree_Hemi_Mass.push_back(sqrt(TLorentzAxis2.Mag2()));
+    // std::cout<<"Mass Axis 2 : "<<sqrt(TLorentzAxis2.Mag2()) <<std::endl;
+
 
     ///////////////////////////////
     // compare with neutralino axis
@@ -5499,6 +5761,55 @@ else
         // cout << " axis1_phi " << axis1_phi << " and axis2_phi" << axis2_phi << endl;
         // cout << " axis1_dR " << axis1_dR << " and axis2_dR" << axis2_dR << endl;
         // cout << " dR_axis12 " << dR_axis12 << endl;
+
+    ///////////////////////////////////////////////////////
+    // Compare between the gen enutralino and the reco axis from gen jets and with the reco axis with reco jets
+    ///////////////////////////////////////////////////////
+    
+
+    float dRGenAxisNeuMin = -1000;
+    float dRGenAxisNeuMax = -1000;
+    dRGenAxisNeuMin = Deltar(Gen_neu1_eta,Gen_neu1_phi,Genvaxis1.Eta(),Genvaxis1.Phi() );
+    dRGenAxisNeuMax = Deltar(Gen_neu1_eta,Gen_neu1_phi,Genvaxis2.Eta(),Genvaxis2.Phi() );
+    if(dRGenAxisNeuMin > dRGenAxisNeuMax )
+      {
+        dRGenAxisNeuMin = Deltar(Gen_neu1_eta,Gen_neu1_phi,Genvaxis2.Eta(),Genvaxis2.Phi() );
+        dRGenAxisNeuMax = Deltar(Gen_neu1_eta,Gen_neu1_phi,Genvaxis1.Eta(),Genvaxis1.Phi() );
+      }
+    tree_GenAxis_Neu_dRmin.push_back(dRGenAxisNeuMin);
+    tree_GenAxis_Neu_dRmax.push_back(dRGenAxisNeuMax);
+
+    dRGenAxisNeuMin = Deltar(Gen_neu2_eta,Gen_neu2_phi,Genvaxis2.Eta(),Genvaxis2.Phi());
+    dRGenAxisNeuMax = Deltar(Gen_neu2_eta,Gen_neu2_phi,Genvaxis1.Eta(),Genvaxis1.Phi());
+    if(dRGenAxisNeuMin > dRGenAxisNeuMax )
+      {
+        dRGenAxisNeuMin = Deltar(Gen_neu2_eta,Gen_neu2_phi,Genvaxis1.Eta(),Genvaxis1.Phi());
+        dRGenAxisNeuMax = Deltar(Gen_neu2_eta,Gen_neu2_phi,Genvaxis2.Eta(),Genvaxis2.Phi() );
+      }
+    tree_GenAxis_Neu_dRmin.push_back(dRGenAxisNeuMin);
+    tree_GenAxis_Neu_dRmax.push_back(dRGenAxisNeuMax);
+
+    //-------------------------:/
+    float dRGenAxisRecoAxisMin = Deltar(vaxis1.Eta(),vaxis1.Phi(),Genvaxis1.Eta(),Genvaxis1.Phi() );
+    float dRGenAxisRecoAxisMax = Deltar(vaxis1.Eta(),vaxis1.Phi(),Genvaxis2.Eta(),Genvaxis2.Phi() );
+    if(dRGenAxisRecoAxisMin > dRGenAxisRecoAxisMax )
+      {
+        dRGenAxisRecoAxisMin = Deltar(vaxis1.Eta(),vaxis1.Phi(),Genvaxis2.Eta(),Genvaxis2.Phi() );
+        dRGenAxisRecoAxisMax = Deltar(vaxis1.Eta(),vaxis1.Phi(),Genvaxis1.Eta(),Genvaxis1.Phi() );
+      }
+    tree_GenAxis_RecoAxis_dRmin.push_back(dRGenAxisRecoAxisMin);
+    tree_GenAxis_RecoAxis_dRmax.push_back(dRGenAxisRecoAxisMax);
+
+
+    dRGenAxisRecoAxisMin = Deltar(vaxis2.Eta(),vaxis2.Phi(),Genvaxis2.Eta(),Genvaxis2.Phi());
+    dRGenAxisRecoAxisMax = Deltar(vaxis2.Eta(),vaxis2.Phi(),Genvaxis1.Eta(),Genvaxis1.Phi());
+    if(dRGenAxisRecoAxisMin > dRGenAxisRecoAxisMax )
+      {
+        dRGenAxisRecoAxisMin = Deltar(vaxis2.Eta(),vaxis2.Phi(),Genvaxis1.Eta(),Genvaxis1.Phi());
+        dRGenAxisRecoAxisMax = Deltar(vaxis2.Eta(),vaxis2.Phi(),Genvaxis2.Eta(),Genvaxis2.Phi());
+      }
+    tree_GenAxis_RecoAxis_dRmin.push_back(dRGenAxisRecoAxisMin);
+    tree_GenAxis_RecoAxis_dRmax.push_back(dRGenAxisRecoAxisMax);
 
 
     ///////////////////////////////////////////////////////
@@ -5623,8 +5934,6 @@ else
         if ( isFromLLP == 1 ) LLP1_nTrks++;
         if ( isFromLLP == 2 ) LLP2_nTrks++;
 
-        // bdtval = reader->EvaluateMVA( "BDTG" ); //default value = -10 (no -10 observed and -999 comes from EvaluateMVA)
-        // std::cout<<"tk pt : "<<pt<<" tk _eta : "<<eta<<" tk_phi :"<<phi<<" bdt_val :"<<bdtval<<std::endl;
         if ( tracks_axis == 1 ) {
           nTrks_axis1++;
           if ( isFromLLP == iLLPrec1 ) nTrks_axis1_sig++;
@@ -5682,6 +5991,9 @@ else
     vector<reco::TransientTrack> displacedTracks_Hemi1_mva_TW, displacedTracks_Hemi2_mva_TW; // Tracks selected wrt the hemisphere
     vector<reco::TransientTrack> displacedTracks_step2_Hemi1, displacedTracks_step2_Hemi2;
     
+    vector<TLorentzVector> TrackInfo_llp1_mva;
+    vector<TLorentzVector> TrackInfo_llp2_mva;
+
     vector<std::pair<float, TLorentzVector > > TrackInfo_Hemi1_mva;
     vector<std::pair<float, TLorentzVector > > TrackInfo_Hemi2_mva;
     vector<std::pair<float, TLorentzVector > > TrackInfo_step2_Hemi1;
@@ -5742,12 +6054,24 @@ else
       int tracks_axis = tree_track_Hemi[counter_track];
       double bdtval   = tree_track_MVAval[counter_track];
       TLorentzVector vTrack(tree_track_px[counter_track],tree_track_py[counter_track],tree_track_pz[counter_track],tree_track_energy[counter_track]);
-      
+
+
+
       if ( bdtval > bdtcut ) {
         if ( isFromLLP == 1 )
-          displacedTracks_llp1_mva.push_back(theTransientTrackBuilder->build(&tk));
+          {
+            displacedTracks_llp1_mva.push_back(theTransientTrackBuilder->build(&tk));
+            TLorentzVector SignalvTrack(tree_track_px[counter_track],tree_track_py[counter_track],tree_track_pz[counter_track],tree_track_energy[counter_track]);
+            TrackInfo_llp1_mva.push_back(SignalvTrack);
+          }
+         
+
         if ( isFromLLP == 2 )
-          displacedTracks_llp2_mva.push_back(theTransientTrackBuilder->build(&tk));
+          {
+            displacedTracks_llp2_mva.push_back(theTransientTrackBuilder->build(&tk));
+            TLorentzVector SignalvTrack(tree_track_px[counter_track],tree_track_py[counter_track],tree_track_pz[counter_track],tree_track_energy[counter_track]);
+            TrackInfo_llp2_mva.push_back(SignalvTrack);
+          }
 
         if ( tracks_axis == 1 )
           {
@@ -5821,7 +6145,7 @@ else
     Vtx_y = -100.;
     Vtx_z = -100.;
     Vtx_chi = -10.;
-    
+    TLorentzVector Total4Vector1(0,0,0,0);
     if ( Vtx_ntk > 1 )
     {
       TransientVertex displacedVertex_llp1_mva = theFitter_vertex_llp1_mva.vertex(displacedTracks_llp1_mva); // fitted vertex
@@ -5833,9 +6157,27 @@ else
         Vtx_y = displacedVertex_llp1_mva.position().y();
         Vtx_z = displacedVertex_llp1_mva.position().z();
         Vtx_chi = displacedVertex_llp1_mva.normalisedChiSquared();
+        float temp_px = 0;
+        float temp_py = 0;
+        float temp_pz = 0 ;
+        float temp_e = 0 ;
+
+        //--------------- B-tagging-----------------------//
+            for (unsigned int i =  0 ; i < displacedTracks_llp1_mva.size(); i++)
+              {
+                temp_px = TrackInfo_llp1_mva[i].Px();
+                temp_py = TrackInfo_llp1_mva[i].Py();
+                temp_pz = TrackInfo_llp1_mva[i].Pz();
+                temp_e  = TrackInfo_llp1_mva[i].E();
+                TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
+                Total4Vector1 +=TLorentzTrack;
+              }
+
+
+    // std::cout<<"invaraint mass of LLP1 with LorentzVector : "<<sqrt(Total4Vector1.Mag2())<<std::endl;
       }
     }
-
+    tree_LLP_Mass.push_back(sqrt(Total4Vector1.Mag2()));
     tree_LLP.push_back(1);
     tree_LLP_pt.push_back(   LLP1_pt);
     tree_LLP_eta.push_back(  LLP1_eta);
@@ -5888,7 +6230,7 @@ else
     Vtx_y = -100.;
     Vtx_z = -100.;
     Vtx_chi = -10.;
-    
+    Total4Vector1.SetPxPyPzE(0,0,0,0);
     if ( Vtx_ntk > 1 )
     {
       TransientVertex displacedVertex_llp2_mva = theFitter_vertex_llp2_mva.vertex(displacedTracks_llp2_mva); // fitted vertex
@@ -5899,9 +6241,33 @@ else
         Vtx_y = displacedVertex_llp2_mva.position().y();
         Vtx_z = displacedVertex_llp2_mva.position().z();
         Vtx_chi = displacedVertex_llp2_mva.normalisedChiSquared();
+
+        float temp_px = 0;
+        float temp_py = 0;
+        float temp_pz = 0 ;
+        float temp_e = 0 ;
+
+        
+        //--------------- B-tagging-----------------------//
+            for (unsigned int i =  0 ; i < displacedTracks_llp2_mva.size(); i++)
+              {
+                temp_px = TrackInfo_llp2_mva[i].Px();
+                temp_py = TrackInfo_llp2_mva[i].Py();
+                temp_pz = TrackInfo_llp2_mva[i].Pz();
+                temp_e  = TrackInfo_llp2_mva[i].E();
+                TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
+                Total4Vector1 +=TLorentzTrack;
+              }
+
+
+        // std::cout<<"invaraint mass of LLP2 with LorentzVector : "<<sqrt(Total4Vector1.Mag2())<<std::endl;
       }
+
+
     }
 
+    
+    tree_LLP_Mass.push_back(sqrt(Total4Vector1.Mag2()));
     tree_LLP.push_back(2);
     tree_LLP_pt.push_back(   LLP2_pt);
     tree_LLP_eta.push_back(  LLP2_eta);
@@ -5965,7 +6331,7 @@ else
     float MeanWeight =0;
     TransientVertex displacedVertex_Hemi1_mva;
     TransientVertex displacedVertex_Hemi1_mva_TW;
-
+    float DCA_VTX_Meand = 0;
 	
     if ( Vtx_ntk > 1 && ActivateStep1)
     {
@@ -5978,7 +6344,7 @@ else
         Vtx_chi = displacedVertex_Hemi1_mva.normalisedChiSquared();
 	      Vtx_step = 1;
         posError = displacedVertex_Hemi1_mva.positionError();
-        float DCA_VTX_Meand = 0;
+        
         GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
               for (int p = 0; p < Vtx_ntk; p++)
                 {
@@ -6010,7 +6376,7 @@ else
 
                 } 
               DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-              tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
+              // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
       }
     }
       //----------------------------------------IAVF-----------------------------------------------//
@@ -6042,12 +6408,13 @@ else
     float tempy = -100.;
     float tempz = -100.;
     bool badVtx = false;
-
+    
     float tempMeanWeight=0;
     if ( (Vtx_chi < 0. || Vtx_chi > 10.) && ActivateStep1IAVF ) badVtx = true;
     if ( badVtx && IterAVF && Vtx_ntk > 1 ) //IterAVF est redondant avec AcitvateStep3
     {
       MeanWeight=0;
+      DCA_VTX_Meand = 0;
       bool success = false;
       std::vector<TransientTrack> vTT;
       tempchi2 = -10.;
@@ -6137,7 +6504,7 @@ else
                     }
                 }
               DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-              tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
+              // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
               if (MeanWeight==0)//<=>only two tracks in the valid vertex
                   {
                     for(int i = 0; i<ntracks;i++)
@@ -6186,7 +6553,7 @@ else
         Vtx_step = 3;
         GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
         posError = displacedVertex_step2_Hemi1.positionError();
-        float DCA_VTX_Meand = 0;
+        DCA_VTX_Meand = 0;
         for (int p = 0; p < Vtx_ntk; p++)
                 {
                   MeanWeight+=displacedVertex_step2_Hemi1.trackWeight(displacedTracks_step2_Hemi1[p]);
@@ -6216,19 +6583,13 @@ else
                     }
                 }
               DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-              tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
+              // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
       }
     }
 
 
-
     // step 3
-    // int ntracks    = -2;
-    // float tempchi2 = -10.;
-    // float tempx = -100.;
-    // float tempy = -100.;
-    // float tempz = -100.;
-    // float tempMeanWeight=0;
+
     ntracks    = -2;
     tempchi2 = -10.;
     tempx = -100.;
@@ -6244,7 +6605,7 @@ else
       std::vector<TransientTrack> vTT;
       tempchi2 = -10.;
       tempMeanWeight=0;
-
+      DCA_VTX_Meand = 0;
       for ( int p = 1; p < Vtx_ntk; p++ )
       {
         for  ( int k = 0; k < p; k++ ) // take pairs of tracks of highest BDT value
@@ -6301,9 +6662,14 @@ else
               Vtx_z = tempz;
               Vtx_step = 4;
                GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
-               float DCA_VTX_Meand = 0;
+              //  float DCA_VTX_Meand = 0;
+              // float totalpx = 0 ;
+              // float totalpy = 0 ;
+              // float totalpz = 0 ;
+              // float totale = 0 ;
               for (int k = 0; k< Vtx_ntk; k++)
                 {
+                  // totale+= totale +
                   TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
                   if (DCA_Vtx.isValid()) //Be careful, all tracks are considered when looking at the DCA,
                   //but one should look of the wieghts of the track at the same time
@@ -6329,7 +6695,6 @@ else
                     }
                 }
               DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-              tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
               if (MeanWeight==0)//<=>only two tracks in the valid vertex
                   {
                     for(int i = 0; i<ntracks;i++)
@@ -6383,6 +6748,7 @@ else
     recD = TMath::Sqrt(recX*recX + recY*recY + recZ*recZ);
     tree_Hemi_Vtx_dist.push_back( recD );
     tree_Hemi_Vtx_MeantrackWeight.push_back(MeanWeight);
+    tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
     int nVertex = 0;
     float posx1 = Vtx_x;
     float posy1 = Vtx_y;
@@ -6450,41 +6816,50 @@ else
     float temp_py = 0;
     float temp_pz = 0 ;
     float temp_e = 0 ;
+
 // ROOT::Math::PxPyPzEVector
     TLorentzVector Total4Vector1(0,0,0,0);
       //--------------- B-tagging-----------------------//
     if(Vtx_step==1 || Vtx_step==2)
       {
-        for (unsigned int i = 0 ; i < displacedTracks_Hemi1_mva.size(); i++)
+        if(Vtx_chi>0 && Vtx_chi<10)
           {
-            if(TrackInfo_Hemi1_mva[i].first > TightWP || TrackInfo_Hemi1_mva[i].first > MediumWP )
+            for (unsigned int i = 0 ; i < displacedTracks_Hemi1_mva.size(); i++)
               {
-                BtagGood_Hemi1 += 1;
+                temp_px = TrackInfo_Hemi1_mva[i].second.Px();
+                temp_py = TrackInfo_Hemi1_mva[i].second.Py();
+                temp_pz = TrackInfo_Hemi1_mva[i].second.Pz();
+                temp_e  = TrackInfo_Hemi1_mva[i].second.E();
+                TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
+                Total4Vector1 +=TLorentzTrack;
+              if(TrackInfo_Hemi1_mva[i].first > TightWP || TrackInfo_Hemi1_mva[i].first > MediumWP )
+                {
+                  BtagGood_Hemi1 += 1;
+                }
+
               }
-              temp_px = TrackInfo_Hemi1_mva[i].second.Px();
-              temp_py = TrackInfo_Hemi1_mva[i].second.Py();
-              temp_pz = TrackInfo_Hemi1_mva[i].second.Pz();
-              temp_e  = TrackInfo_Hemi1_mva[i].second.E();
-              TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
-              Total4Vector1 +=TLorentzTrack;
           }
+
       }
+
     else if (Vtx_step == 3 || Vtx_step==4)
       {
         for (unsigned int i = 0 ; i < displacedTracks_step2_Hemi1.size(); i++)
           {
-            if(TrackInfo_step2_Hemi1[i].first > TightWP || TrackInfo_step2_Hemi1[i].first > MediumWP )
-              {
-                BtagGood_Hemi1 += 100;
-              }
               temp_px = TrackInfo_step2_Hemi1[i].second.Px();
               temp_py = TrackInfo_step2_Hemi1[i].second.Py();
               temp_pz = TrackInfo_step2_Hemi1[i].second.Pz();
               temp_e  = TrackInfo_step2_Hemi1[i].second.E();
               TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
               Total4Vector1 += TLorentzTrack;
+            if(TrackInfo_step2_Hemi1[i].first > TightWP || TrackInfo_step2_Hemi1[i].first > MediumWP )
+              {
+                BtagGood_Hemi1 += 100;
+              }
+
           }
       }
+    // std::cout<<"invaraint mass of Vertex1 with LorentzVector : "<<sqrt(Total4Vector1.Mag2())<<std::endl;
 
     tree_Hemi_Vtx_BTag.push_back(BtagGood_Hemi1);
       // -------------------- End  of  B-Tagging --------------------//
@@ -6524,6 +6899,7 @@ else
     Vtx_chi = -10.;
     Vtx_step = 0;
     MeanWeight = 0;
+    DCA_VTX_Meand = 0;
     TransientVertex displacedVertex_Hemi2_mva;
     TransientVertex displacedVertex_Hemi2_mva_TW;
 
@@ -6550,6 +6926,7 @@ else
                   if (DCA_Vtx.isValid()) //Be careful, all tracks are considered when looking at the DCA,
                   //but one should look of the wieghts of the track at the same time
                     {// The positions are given in the Global frame
+                   
                       float pca_Vtx_x = DCA_Vtx.position().x();
                       float pca_Vtx_y = DCA_Vtx.position().y();
                       float pca_Vtx_z = DCA_Vtx.position().z(); 
@@ -6570,7 +6947,7 @@ else
                     }
                 }
               DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-              tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
+              // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
       }       
     }    
 
@@ -6587,6 +6964,7 @@ else
       {
         MeanWeight=0;
         tempMeanWeight=0;
+        DCA_VTX_Meand = 0;
         bool success = false;
         std::vector<TransientTrack> vTT;
         tempchi2 = -10.;
@@ -6680,7 +7058,7 @@ else
                           }
                       }
                     DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-                    tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
+                    // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
                   }
                 else
                   { // If not valid : we build a new seed
@@ -6719,7 +7097,7 @@ else
         posError = displacedVertex_step2_Hemi2.positionError();
         GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
         MeanWeight = 0;
-        float DCA_VTX_Meand = 0;
+        DCA_VTX_Meand = 0;
         for (int p =0; p<Vtx_ntk; p++)
                 {
                   MeanWeight+=displacedVertex_step2_Hemi2.trackWeight(displacedTracks_step2_Hemi2[p]);
@@ -6749,7 +7127,7 @@ else
                     }
                 }
               DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-              tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
+              // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
       }
     }
 
@@ -6769,6 +7147,7 @@ else
         bool success = false;
         std::vector<TransientTrack> vTT;
         tempchi2 = -10.;
+        DCA_VTX_Meand = 0;
         for ( int p = 1; p < Vtx_ntk; p++ )
           {
             for  ( int k = 0; k < p; k++ ) // take pairs of tracks of highest BDT value
@@ -6825,7 +7204,7 @@ else
                     Vtx_z = tempz;
                     Vtx_step = 4;
                     GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
-                    float DCA_VTX_Meand = 0;
+                    DCA_VTX_Meand = 0;
                     for (int k = 0; k< Vtx_ntk; k++)
                       {
                         TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
@@ -6859,7 +7238,7 @@ else
                           }
                       }
                     DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-                    tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
+                    // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
                   }
                 else
                   { // If not valid : we build a new seed
@@ -6904,6 +7283,7 @@ else
     recD = TMath::Sqrt(recX*recX + recY*recY + recZ*recZ);
     tree_Hemi_Vtx_dist.push_back( recD );
     tree_Hemi_Vtx_MeantrackWeight.push_back(MeanWeight);
+    tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
     float posx2 = Vtx_x;
     float posy2 = Vtx_y;
     float posz2 = Vtx_z;
@@ -7335,6 +7715,8 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_jet_leadingMuon_dR.clear();
     tree_jet_leadingMuon2_dR.clear();
     tree_jet_jet_dR.clear();
+    tree_jet_jet_dPhi.clear();
+    tree_jet_jet_dEta.clear();
     tree_muon_jet_dRmin.clear();
     tree_muon_jet_dRmax.clear();
     
@@ -7344,6 +7726,9 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_electron_x.clear();
     tree_electron_y.clear();
     tree_electron_z.clear();
+    tree_electron_px.clear();
+    tree_electron_py.clear();
+    tree_electron_pz.clear();
     tree_electron_energy.clear();
     tree_electron_charge.clear();
     tree_electron_isoR4.clear();
@@ -7352,6 +7737,8 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_electron_IsTight.clear();
     tree_electron_trigger_Ele.clear();
     tree_electron_trigger_diEle.clear();
+    tree_electron_dxy.clear();
+    tree_electron_dz.clear();
 
     tree_ST.clear();
     tree_muon_pt.clear();
@@ -7360,6 +7747,9 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_muon_x.clear();
     tree_muon_y.clear();
     tree_muon_z.clear();
+    tree_muon_px.clear();
+    tree_muon_py.clear();
+    tree_muon_pz.clear();
     tree_muon_energy.clear();
     tree_muon_dxy.clear();
     tree_muon_dxyError.clear();
@@ -7379,6 +7769,8 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_muon_leadingpt.clear();
     tree_muon_leadingpt2.clear();
     tree_muon_muon_dR.clear();
+    tree_muon_muon_dPhi.clear();
+    tree_muon_muon_dEta.clear();
 //     tree_passesTrkPtr.clear();
 
     tree_track_ipc.clear();
@@ -7462,6 +7854,12 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_genParticle_x.clear();
     tree_genParticle_y.clear();
     tree_genParticle_z.clear();
+    tree_genParticle_px.clear();
+    tree_genParticle_py.clear();
+    tree_genParticle_pz.clear();
+    tree_genParticle_energy.clear();
+    tree_genParticle_isPromptFinalState.clear();
+
     tree_genParticle_statusCode.clear();
     tree_genParticle_mother_pdgId.clear();
     tree_genParticle_LLP.clear();
@@ -7497,6 +7895,11 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_genAxis_dRneuneu.clear();
     tree_genAxis_dPhineuneu.clear();
     tree_genAxis_dEtaneuneu.clear();
+    tree_GenAxes_Mass.clear();
+    tree_GenAxis_Neu_dRmin.clear();
+    tree_GenAxis_Neu_dRmax.clear();
+    tree_GenAxis_RecoAxis_dRmin.clear();
+    tree_GenAxis_RecoAxis_dRmax.clear();
 
     tree_genFromC_pt.clear();
     tree_genFromC_eta.clear();
@@ -7554,8 +7957,10 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_LLP12_dR.clear();
     tree_LLP12_deta.clear();
     tree_LLP12_dphi.clear();
+    tree_LLP_Mass.clear();
 
     tree_Hemi.clear();
+    tree_Hemi_Mass.clear();
     tree_Hemi_njet.clear();
     tree_Hemi_eta.clear();
     tree_Hemi_phi.clear();
