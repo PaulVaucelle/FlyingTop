@@ -257,9 +257,11 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     float mva_V_z;
     float mva_V_MTW;
     float mva_V_Mass;
+    float mva_H_Mass;
     float mva_V_dist;
-    // float mva_V_ntrk10;
-    // float mva_V_ntrk20;
+    float mva_V_MeanDCA;
+    float mva_V_ntrk10;
+    float mva_V_ntrk20;
     TMVA::Reader *readerVtx = new TMVA::Reader( "!Color:Silent" );
 
     int index[10000];
@@ -2283,10 +2285,14 @@ smalltree->Branch("HLT_PFHT800_PFMET75_PFMHT75_IDTight_v",&HLT_PFHT800_PFMET75_P
     // readerVtx->AddVariable( "mva_Vtx_z",     &mva_V_z);
     readerVtx->AddVariable( "mva_Vtx_MTW",     &mva_V_MTW);
     readerVtx->AddVariable( "mva_Vtx_Mass",     &mva_V_Mass);
+    readerVtx->AddVariable("mva_Hemi_Mass",&mva_H_Mass);
     // readerVtx->AddVariable( "mva_Vtx_dist",     &mva_V_dist);
-    // readerVtx->AddVariable( "mva_Vtx_ntrk10",     &mva_V_ntrk10);
-    // readerVtx->AddVariable( "mva_Vtx_ntrk20",     &mva_V_ntrk20);
+    readerVtx->AddVariable( "mva_Vtx_ntrk10",     &mva_V_ntrk10);
+    readerVtx->AddVariable( "mva_Vtx_ntrk20",     &mva_V_ntrk20);
+    readerVtx->AddVariable(" mva_Vtx_MeanDCA",&mva_V_MeanDCA);
     readerVtx->BookMVA( "BDTG", weightFileVtx_ ); // root 6.14/09, care compatiblity of versions for tmva
+
+
 
 //$$
 }
@@ -3844,6 +3850,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
     if ( jet.pt() < jet_pt_min ) continue;
     if ( indjet==0) {tree_jet_leadingpt.push_back(jet.pt());}
     if ( indjet==1) {tree_jet_leadingpt2.push_back(jet.pt());}
+
     tree_jet_E.push_back(jet.energy());
     tree_jet_pt.push_back(jet.pt());
     tree_jet_eta.push_back(jet.eta());
@@ -3883,12 +3890,14 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
         tree_jet_jet_dR.push_back(Deltar(tree_jet_eta[0],tree_jet_phi[0],tree_jet_eta[1],tree_jet_phi[1]));
         tree_jet_jet_dPhi.push_back(abs(Deltaphi(tree_jet_phi[0],tree_jet_phi[1])));
         tree_jet_jet_dEta.push_back(abs(tree_jet_eta[0]-tree_jet_eta[1]));
+        tree_jet_leadingpt2.push_back(tree_jet_pt[1]);
       }
   else  
     { 
         tree_jet_jet_dR.push_back(0);
         tree_jet_jet_dPhi.push_back(0);
         tree_jet_jet_dEta.push_back(0);
+        tree_jet_leadingpt2.push_back(tree_jet_pt[0]);
     }
   tree_HT = HT_val;
   // ST+=HT_val;
@@ -6867,18 +6876,18 @@ else
     tree_Hemi_Vtx_Mass.push_back(sqrt(Total4Vector1.Mag2()));
 
     // -------------------- End Of Invariant Mass ------------------------//
-    mva_V_nTrks  =  Vtx_ntk;
-    mva_V_chi    =  Vtx_chi;
-    mva_V_step   =  Vtx_step;
-    // mva_V_r  =   sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y);
-    // mva_V_z  =    Vtx_z);
-    mva_V_MTW    =  MeanWeight;
-    mva_V_Mass   =  sqrt(Total4Vector1.Mag2());
-    // mva_V_dist  = recD;
-    double Vtx_bdtVal = -10;
-    Vtx_bdtVal = readerVtx->EvaluateMVA("BDTG");// values at -999
-   // default value = -10 (no -10 observed and -999 comes from EvaluateMVA)
-    tree_Hemi_Vtx_MVAval.push_back(Vtx_bdtVal);
+
+    float Vtx1_ntk = Vtx_ntk;
+    float Vtx1_chi = Vtx_chi;
+    float Vtx1_step = Vtx_step;
+    float Vtx1_r = sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y);
+    float Vtx1_z = Vtx_z;
+    float Vtx1_MTW = MeanWeight;
+    float Vtx1_Mass = sqrt(Total4Vector1.Mag2());
+    float H1_Mass = sqrt(TLorentzAxis1.Mag2());
+    float Vtx1_dist = recD;
+
+    float Vtx1_MeanDCA = DCA_VTX_Meand;
     //--------------------------------------------------------------------------------------------//
     //--------------------------- SECOND HEMISPHERE WITH MVA -------------------------------------//
     //--------------------------------------------------------------------------------------------//
@@ -7358,19 +7367,21 @@ TLorentzVector Total4Vector2(0,0,0,0);
     tree_Hemi_Vtx_BTag.push_back(BtagGood_Hemi2 );
     tree_Hemi_Vtx_Mass.push_back(sqrt(Total4Vector2.Mag2()));
 
-    mva_V_nTrks  =  Vtx_ntk;
-    mva_V_chi    =  Vtx_chi;
-    mva_V_step   =  Vtx_step;
-    // mva_V_r  =   sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y);
-    // mva_V_z  =    Vtx_z);
-    mva_V_MTW    =  MeanWeight;
-    mva_V_Mass   =  sqrt(Total4Vector2.Mag2());
-    // mva_V_dist  = recD;
 
-    Vtx_bdtVal = -10;
-    Vtx_bdtVal = readerVtx->EvaluateMVA("BDTG");
-    tree_Hemi_Vtx_MVAval.push_back(Vtx_bdtVal);
-   // default value = -10 (no -10 observed and -999 comes from EvaluateMVA)
+//------------------------------------------------//
+    float Vtx2_ntk = Vtx_ntk;
+    float Vtx2_chi = Vtx_chi;
+    float Vtx2_step = Vtx_step;
+    float Vtx2_r = sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y);
+    float Vtx2_z = Vtx_z;
+    float Vtx2_MTW = MeanWeight;
+    float Vtx2_Mass = sqrt(Total4Vector2.Mag2());
+    float H2_Mass = sqrt(TLorentzAxis2.Mag2());
+    float Vtx2_dist = recD;
+    float Vtx2_MeanDCA = DCA_VTX_Meand;
+
+   
+
 
     // -------------------------------------------//
   
@@ -7444,6 +7455,8 @@ TLorentzVector Total4Vector2(0,0,0,0);
     tree_Hemi_dR12.push_back(dR_axis12);
     tree_Hemi_dR12.push_back(dR_axis12);
 
+
+//------------Duplicate for each hemisphere-----------//
     // some informations for tracks in their hemisphere
     int ntrk10_vtx_hemi1 = 0., ntrk10_vtx_hemi2 = 0.;
     int ntrk20_vtx_hemi1 = 0., ntrk20_vtx_hemi2 = 0.;
@@ -7490,7 +7503,8 @@ TLorentzVector Total4Vector2(0,0,0,0);
     tree_Hemi_Vtx_ntrk10.push_back(ntrk10_vtx_hemi2);
     tree_Hemi_Vtx_ntrk20.push_back(ntrk20_vtx_hemi1);
     tree_Hemi_Vtx_ntrk20.push_back(ntrk20_vtx_hemi2);
-
+ // ---------------------------------------------------//
+  
    if (ActivateBtag)
     {
       bool LooseAxesStatus = false ;
@@ -7534,13 +7548,63 @@ TLorentzVector Total4Vector2(0,0,0,0);
             }
 
         }
+        // tree_Hemi_LooseBTag_axes.push_back(LooseAxesStatus);
         tree_Hemi_LooseBTag_axes.push_back(LooseAxesStatus);
-        tree_Hemi_LooseBTag_axes.push_back(LooseAxesStatus);
+        // tree_Hemi_MediumBTag_axes.push_back(MediumAxesStatus);
         tree_Hemi_MediumBTag_axes.push_back(MediumAxesStatus);
-        tree_Hemi_MediumBTag_axes.push_back(MediumAxesStatus);
-        tree_Hemi_TightBTag_axes.push_back(TightAxesStatus);
+        // tree_Hemi_TightBTag_axes.push_back(TightAxesStatus);
         tree_Hemi_TightBTag_axes.push_back(TightAxesStatus);
     }
+
+    //////////////////////////////////////////
+    ////// Vertex Selection ----------------//
+    //////////////////////////////////////////
+
+        //--------------VTX1-------------------//
+    float Vtx1_ntrk10 = ntrk10_vtx_hemi1 ;
+    float Vtx1_ntrk20 = ntrk20_vtx_hemi1;
+    mva_V_nTrks  =  Vtx1_ntk;
+    mva_V_chi    =  Vtx1_chi;
+    mva_V_step   =  Vtx1_step;
+    // mva_V_r  =   Vtx1_r;
+    // mva_V_z  =    Vtx1_z;
+    mva_V_MTW    =  Vtx1_MTW;
+    mva_V_Mass   =  Vtx1_Mass;
+    mva_H_Mass   =  H1_Mass;
+
+    mva_V_ntrk10 = Vtx1_ntrk10;
+    mva_V_ntrk20 = Vtx1_ntrk20;
+    mva_V_MeanDCA = Vtx1_MeanDCA;
+    // mva_V_dist  = Vtx1_dist;
+    double Vtx1_bdtVal = -10;
+    Vtx1_bdtVal = readerVtx->EvaluateMVA("BDTG");// values at -999
+   // default value = -10 (no -10 observed and -999 comes from EvaluateMVA)
+    tree_Hemi_Vtx_MVAval.push_back(Vtx1_bdtVal);
+
+        //--------------VTX2-------------------//
+    float Vtx2_ntrk10 = ntrk10_vtx_hemi2 ;
+    float Vtx2_ntrk20 = ntrk20_vtx_hemi2;
+    
+    mva_V_nTrks  =  Vtx2_ntk;
+    mva_V_chi    =  Vtx2_chi;
+    mva_V_step   =  Vtx2_step;
+    // mva_V_r  =   Vtx2_r;
+    // mva_V_z  =    Vtx2_z;
+    mva_V_MTW    =  Vtx2_MTW;
+    mva_V_Mass   =  Vtx2_Mass;
+    mva_H_Mass   =  H2_Mass;
+
+    mva_V_ntrk10 = Vtx2_ntrk10;
+    mva_V_ntrk20 = Vtx2_ntrk20;
+    mva_V_MeanDCA = Vtx2_MeanDCA;
+    // mva_V_dist  = Vtx1_dist;
+    double Vtx2_bdtVal = -10;
+    Vtx2_bdtVal = readerVtx->EvaluateMVA("BDTG");// values at -999
+   // default value = -10 (no -10 observed and -999 comes from EvaluateMVA)
+    tree_Hemi_Vtx_MVAval.push_back(Vtx2_bdtVal);
+
+
+
   } // endif Filter
 
   smalltree->Fill();
