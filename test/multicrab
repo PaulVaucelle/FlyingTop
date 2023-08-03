@@ -5,6 +5,10 @@ This is a small script that does the equivalent of multicrab.
 import os
 from optparse import OptionParser
 
+
+from datetime import date
+
+
 import CRABClient
 from CRABAPI.RawCommand import crabCommand
 from CRABClient.ClientExceptions import ClientException
@@ -60,7 +64,8 @@ def main():
 
     # The submit command needs special treatment.
     if options.crabCmd == 'submit':
-
+        today = date.today()
+        d1 = today.strftime("%d_%m_%Y")
         #--------------------------------------------------------
         # This is the base config:
         #--------------------------------------------------------
@@ -68,18 +73,18 @@ def main():
         config = config()
 
         config.General.requestName = None
-        config.General.workArea = 'test'
+        config.General.workArea = d1
 
         config.JobType.pluginName = 'Analysis'
         config.JobType.psetName = 'flyingtop.py'
-        config.JobType.inputFiles = ['BDTG_SIG50vsBKGtt_filter_veto_15var.xml','BDTG_VtxSel_SIG50vsBKGtt.xml']
+        config.JobType.inputFiles = ['BDTG_SIG50vsBKGtt_filter_veto_15var.xml','BDTG_VtxSel_SIG50vsBKGtt.xml','BDTG_VtxSel_SIG50vsBKGtt_step1.xml']
 
 
         config.Data.inputDataset = None
         config.Data.splitting = 'FileBased'
         config.Data.unitsPerJob = 20
         config.Data.totalUnits = 20
-        # config.Data.outLFNDirBase = '/store/user/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC'
+        config.Data.outLFNDirBase = '/store/user/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC'
         config.Data.outputDatasetTag = 'MC'
 
         config.Site.storageSite = 'T2_FR_IPHC' # Choose your site. 
@@ -88,13 +93,23 @@ def main():
         # Will submit one task for each of these input datasets.
         inputDatasets = [
                          '/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v2/MINIAODSIM',
+                         '/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v1/MINIAODSIM',
+                         '/ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v1/MINIAODSIM',
+                         '/ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v1/MINIAODSIM',
+                         '/DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v1/MINIAODSIM',
+                         '/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v2/MINIAODSIM',
+                         '/WWTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v2/MINIAODSIM',
+                         '/WWTo2L2Nu_MLL_200To600_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v1/MINIAODSIM',
+                         '/WWTo2L2Nu_MLL_600To1200_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v3/MINIAODSIM',
+                         '/WZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v2/MINIAODSIM',
+                         '/ZZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v2/MINIAODSIM'
                         ]
 
         for inDS in inputDatasets:
             # inDS is of the form /A/B/C. Since B is unique for each inDS, use this in the CRAB request name.
             config.General.requestName = inDS.split('/')[1]
             config.Data.inputDataset = inDS
-            config.Data.outputDatasetTag = '%s_%s' % (config.General.workArea, config.General.requestName)
+            config.Data.outputDatasetTag = '%s_%s' % (d1, config.General.requestName)
             # Submit.
             try:
                 print "Submitting for input dataset %s" % (inDS)
@@ -178,4 +193,4 @@ if __name__ == '__main__':
 # config.Data.inputDataset = '/DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v1/MINIAODSIM'
 # config.Data.inputDataset = '/DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v1/MINIAODSIM'
 # config.Data.inputDataset = '/DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v1/MINIAODSIM'
-# config.Data.inputDataset = '/DYJetsToLL_M-50_
+# config.Data.inputDataset = '/DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v1/MINIAODSIM'
