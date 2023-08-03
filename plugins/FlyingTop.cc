@@ -420,6 +420,8 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float>     tree_SecInt_dca;
     std::vector<bool>      tree_SecInt_selec;
     std::vector<int>       tree_SecInt_layer;
+    std::vector<int>       tree_SecInt_ntrk10;
+    std::vector<int>       tree_SecInt_ntrk20;
     std::vector<int>       tree_SecInt_LLP;
     std::vector<float>     tree_SecInt_LLP_dr;
     std::vector<float>     tree_SecInt_LLP_dz;
@@ -1425,6 +1427,8 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_SecInt_dca",        &tree_SecInt_dca);
     smalltree->Branch("tree_SecInt_selec",      &tree_SecInt_selec);
     smalltree->Branch("tree_SecInt_layer",      &tree_SecInt_layer);
+    smalltree->Branch("tree_SecInt_ntrk10",     &tree_SecInt_ntrk10);
+    smalltree->Branch("tree_SecInt_ntrk20",     &tree_SecInt_ntrk20);
     smalltree->Branch("tree_SecInt_LLP",        &tree_SecInt_LLP);
     smalltree->Branch("tree_SecInt_LLP_dr",     &tree_SecInt_LLP_dr);
     smalltree->Branch("tree_SecInt_LLP_dz",     &tree_SecInt_LLP_dz);
@@ -1557,7 +1561,7 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_muon_muon_dEta",&tree_muon_muon_dEta);
 
     // track
-    smalltree->Branch("tree_TRACK_SIZE", &tree_TRACK_SIZE, "tree_TRACK_SIZE/I")
+    smalltree->Branch("tree_TRACK_SIZE", &tree_TRACK_SIZE, "tree_TRACK_SIZE/I");
     smalltree->Branch("tree_nTracks",            &tree_nTracks, "tree_nTracks/I"); 
     smalltree->Branch("tree_nLostTracks",        &tree_nLostTracks, "tree_nLostTracks/I"); 
 //     smalltree->Branch("tree_passesTrkPtr",       &tree_passesTrkPtr);
@@ -4212,7 +4216,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
         TRACK_SIZE = TRACK_SIZE+lostpc->size();
       }
     tree_TRACK_SIZE = TRACK_SIZE;
-    
+
     for (unsigned int ipc = 0; ipc < TRACK_SIZE; ipc++) { // loop on all packedPFCandidates + lostTrackss
       pat::PackedCandidateRef pcref = MINIgeneralTracks[ipc];
       const reco::Track *trackPcPtr = pcref->bestTrack();
@@ -4722,13 +4726,15 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
     //---------------------------------------------------------------//
     //----------------------- Secondary Interactions ----------------//
     //---------------------------------------------------------------//
-
+int SecInt_ntrk10 = 0;
+int SecInt_ntrk20 = 0;
 //-------------------------------- loop over tracks and vertex good charged track pairs
     for (unsigned int trd1 = 0; trd1 < theTrackRefs.size()-1; ++trd1) 
     {
 //$$
     if ( idxMGT[trd1].first ) continue;
 //$$
+
       int iq1 = theTrackRefs[trd1].charge();
       for (unsigned int trd2 = trd1+1; trd2 < theTrackRefs.size(); ++trd2) 
       {
@@ -4853,6 +4859,40 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
           float vz  = TrackRef.vz();
           
           std::pair<int,GloballyPositioned<float>::PositionType> FHPosition = PHP->Main(firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
+
+          //Check track first hit density here => There are too many SecInt reconstructed in Signal MC
+          for (unsigned int trd = 0; trd < theTrackRefs.size(); ++trd)
+            {
+              const HitPattern hp2 = theTrackRefs[trd].hitPattern();
+              uint16_t firsthit2 = hp2.getHitPattern(HitPattern::HitCategory::TRACK_HITS,0);     
+              //---Creating State to propagate from  TT---//
+              reco::TransientTrack TTrack2 = theTransientTrackBuilder->build(theTrackRefs[trd]);
+              GlobalPoint vert2 (theTrackRefs[trd].vx(),theTrackRefs[trd].vy(),theTrackRefs[trd].vz()); // Point where the propagation will start (Reference Point)
+              const TrajectoryStateOnSurface Surtraj2 = TTrack.stateOnSurface(vert2); // TSOS of this point
+              const MagneticField* B2 = TTrack2.field(); // 3.8T
+              AnalyticalPropagator* Prop = new AnalyticalPropagator(B2);
+              Basic3DVector<float> P3D22(theTrackRefs[trd].vx(),theTrackRefs[trd].vy(),theTrackRefs[trd].vz()); // global frame
+              Basic3DVector<float> B3DV2(theTrackRefs[trd].px(),theTrackRefs[trd].py(),theTrackRefs[trd].pz()); // global frame 
+              float Eta2 = theTrackRefs[trd].eta();
+              float Phi2 = theTrackRefs[trd].phi();
+              float vz2  = theTrackRefs[trd].vz();
+          
+              std::pair<int,GloballyPositioned<float>::PositionType> FHPosition2 = PHP->Main(firsthit2,Prop,Surtraj2,Eta2,Phi2,vz2,P3D22,B3DV2);
+              if (sqrt((FHPosition2.second.x()-FHPosition.second.x())*(FHPosition2.second.x()-FHPosition.second.x())
+                        +(FHPosition2.second.y()-FHPosition.second.y())*(FHPosition2.second.y()-FHPosition.second.y())
+                        +(FHPosition2.second.z()-FHPosition.second.z())*(FHPosition2.second.z()-FHPosition.second.z())  )<10)
+                          {
+                            SecInt_ntrk10++;
+                          }
+              else if (sqrt((FHPosition2.second.x()-FHPosition.second.x())*(FHPosition2.second.x()-FHPosition.second.x())
+                        +(FHPosition2.second.y()-FHPosition.second.y())*(FHPosition2.second.y()-FHPosition.second.y())
+                        +(FHPosition2.second.z()-FHPosition.second.z())*(FHPosition2.second.z()-FHPosition.second.z())  )<20)
+                          {
+                            SecInt_ntrk20++;
+                          }
+            }
+          tree_SecInt_ntrk10.push_back(SecInt_ntrk10);
+          tree_SecInt_ntrk20.push_back(SecInt_ntrk20);
           float xF = FHPosition.second.x() - PV.x();
           float yF = FHPosition.second.y() - PV.y();
 	  float rF = TMath::Sqrt( xF*xF + yF*yF );
@@ -7875,6 +7915,8 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_SecInt_dca.clear();
     tree_SecInt_selec.clear();
     tree_SecInt_layer.clear();
+    tree_SecInt_ntrk10.clear();
+    tree_SecInt_ntrk20.clear();
     tree_SecInt_LLP.clear();
     tree_SecInt_LLP_dr.clear();
     tree_SecInt_LLP_dz.clear();
