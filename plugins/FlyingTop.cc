@@ -216,7 +216,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     int runNumber, eventNumber, lumiBlock;
     int  tree_NbrOfZCand;
     bool tree_Filter;
-    int  tree_nTracks, tree_nLostTracks; 
+    int  tree_nTracks, tree_nLostTracks, tree_TRACK_SIZE; 
     int  tree_nFromC = 0, tree_nFromB = 0; 
     int nEvent;
     
@@ -1557,6 +1557,7 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_muon_muon_dEta",&tree_muon_muon_dEta);
 
     // track
+    smalltree->Branch("tree_TRACK_SIZE", &tree_TRACK_SIZE, "tree_TRACK_SIZE/I")
     smalltree->Branch("tree_nTracks",            &tree_nTracks, "tree_nTracks/I"); 
     smalltree->Branch("tree_nLostTracks",        &tree_nLostTracks, "tree_nLostTracks/I"); 
 //     smalltree->Branch("tree_passesTrkPtr",       &tree_passesTrkPtr);
@@ -4015,7 +4016,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
     if ( mupt1 < 10. ) continue; // Zmu filter
 
     // if ( abs(tree_muon_dxy[mu]) > 0.1 || abs(tree_muon_dz[mu]) > 0.2 || (!tree_muon_trigger_dimu[mu] && !tree_muon_trigger_isomu[mu]) || !tree_muon_isLoose[mu] ) continue; // muons closed to PV
-        if ( abs(tree_muon_dxy[mu]) > 0.1 || abs(tree_muon_dz[mu]) > 0.2 ||  !tree_muon_isTight[mu] ) continue; // muons closed to PV
+        if ( abs(tree_muon_dxy[mu]) > 0.1 || abs(tree_muon_dz[mu]) > 0.2 ||  !tree_muon_isLoose[mu] ) continue; // muons closed to PV
       mueta1 = tree_muon_eta[mu];
       muphi1 = tree_muon_phi[mu];
       v1.SetPtEtaPhiM(mupt1,mueta1,muphi1,mu_mass);
@@ -4024,7 +4025,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
       if ( !tree_muon_isGlobal[mu2] ) continue;
       if ( tree_muon_charge[mu] == tree_muon_charge[mu2] ) continue;
       // // if ( (tree_muon_trigger_isomu[mu] && (abs(tree_muon_dxy[mu2]) > 0.1 || abs(tree_muon_dz[mu2]) > 0.2 || !tree_muon_isLoose[mu2]))  || (abs(tree_muon_dxy[mu2]) > 0.1 || abs(tree_muon_dz[mu2]) > 0.2 || (!tree_muon_trigger_dimu[mu2] && tree_muon_trigger_dimu[mu] ) || !tree_muon_isLoose[mu2]) ) continue;
-      if ( ( (abs(tree_muon_dxy[mu2]) > 0.1 || abs(tree_muon_dz[mu2]) > 0.2 || !tree_muon_isTight[mu2])) ) continue;
+      if ( ( (abs(tree_muon_dxy[mu2]) > 0.1 || abs(tree_muon_dz[mu2]) > 0.2 || !tree_muon_isLoose[mu2])) ) continue;
         mupt2  = tree_muon_pt[mu2];
       if ( mupt2 < 10. ) continue;
       if ( mupt1 < 25. && mupt2 < 25. ) continue; // Zmu Filter
@@ -4059,6 +4060,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
   tree_Filter = false;
   tree_nTracks = 0;
   tree_nLostTracks = 0;
+  tree_TRACK_SIZE = 0;
   tree_nSecInt = 0;
   tree_nV0_reco = 0;
 
@@ -4209,7 +4211,8 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
       {
         TRACK_SIZE = TRACK_SIZE+lostpc->size();
       }
-
+    tree_TRACK_SIZE = TRACK_SIZE;
+    
     for (unsigned int ipc = 0; ipc < TRACK_SIZE; ipc++) { // loop on all packedPFCandidates + lostTrackss
       pat::PackedCandidateRef pcref = MINIgeneralTracks[ipc];
       const reco::Track *trackPcPtr = pcref->bestTrack();
