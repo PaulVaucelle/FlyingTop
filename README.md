@@ -113,7 +113,9 @@ cmsRun flyingtop.py (to run locally)
 # To run jobs :
 
 ./multicrab --crabCmd submit (edti to choose the samples)
+
 ./multicrab --crabCmd status --workArea ./<work_directory>   (work directory is the date of the launching of the jobs DD_MM_YYYY)
+
 ./multicrab --crabCmd getoutput --workArea ./<work_directory> --crabCmdOpts --checksum=no  (to retrieve the root files)
 
 
