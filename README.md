@@ -89,7 +89,9 @@ scramv1 b -j6
 cd /opt/sbg/cms/<insert uiX_dataY>/<insert name>/CMSSW_10_6_20_FLY/src
 
 export V0_CMS_SW_DIR=/cvmfs/cms.cern.ch
+
 source /cvmfs/cms.cern.ch/cmsset_default.sh
+
 export SCRAM_ARCH=slc7_amd64_gcc700
 
 eval `scramv1 runtime -sh`
