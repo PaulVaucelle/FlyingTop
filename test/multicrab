@@ -77,8 +77,9 @@ def main():
 
         config.JobType.pluginName = 'Analysis'
         config.JobType.psetName = 'flyingtop.py'
-        config.JobType.inputFiles = ['BDTG_SIG50vsBKGtt_filter_veto_15var.xml','BDTG_VtxSel_SIG50vsBKGtt.xml','BDTG_VtxSel_SIG50vsBKGtt_step1.xml']
-
+        config.JobType.inputFiles = ['BDTG_SIG50vsBKGtt_filter_veto_15var.xml','BDTG_EvtsSel_SIG50vsAll.xml','BDTG_VtxSel_SIG50vsBKGtt.xml','BDTG_VtxSel_SIG50vsBKGtt_step1.xml']
+        config.JobType.maxMemoryMB = 2500
+        # config.JobType.numCores = 4
 
         config.Data.inputDataset = None
         config.Data.splitting = 'FileBased'
