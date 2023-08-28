@@ -37,6 +37,7 @@ public :
    Float_t         tree_PV_ez;
    Float_t         tree_PV_NChi2;
    Int_t           tree_PV_ndf;
+   vector<float>   *tree_Evts_MVAval;
    vector<int>     *tree_allPV_i;
    vector<float>   *tree_allPV_x;
    vector<float>   *tree_allPV_y;
@@ -498,6 +499,7 @@ public :
    TBranch        *b_tree_PV_ez;   //!
    TBranch        *b_tree_PV_NChi2;   //!
    TBranch        *b_tree_PV_ndf;   //!
+   TBranch        *b_tree_Evts_MVAval;
    TBranch        *b_tree_allPV_i;   //!
    TBranch        *b_tree_allPV_x;   //!
    TBranch        *b_tree_allPV_y;   //!
@@ -956,7 +958,7 @@ public :
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     Init(TTree *tree);
    // virtual void     Loop();
-   virtual void     Loop(TString sample);
+   virtual void     Loop(TString sample, bool Signal);
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
 
@@ -1461,6 +1463,7 @@ void TreeReader::Init(TTree *tree)
    fChain->SetBranchAddress("tree_PV_ez", &tree_PV_ez, &b_tree_PV_ez);
    fChain->SetBranchAddress("tree_PV_NChi2", &tree_PV_NChi2, &b_tree_PV_NChi2);
    fChain->SetBranchAddress("tree_PV_ndf", &tree_PV_ndf, &b_tree_PV_ndf);
+   fChain->SetBranchAddress("tree_Evts_MVAval",&tree_Evts_MVAval, &b_tree_Evts_MVAval);
    fChain->SetBranchAddress("tree_allPV_i", &tree_allPV_i, &b_tree_allPV_i);
    fChain->SetBranchAddress("tree_allPV_x", &tree_allPV_x, &b_tree_allPV_x);
    fChain->SetBranchAddress("tree_allPV_y", &tree_allPV_y, &b_tree_allPV_y);
