@@ -7886,12 +7886,13 @@ TLorentzVector Total4Vector2(0,0,0,0);
     //////////////////////////////////////////
     ////// Vertex Selection ----------------//
     //////////////////////////////////////////
-
+float Vtx1_ntrk10 =0;
+float Vtx1_ntrk20 =0;
         //--------------VTX1-------------------//
         if (Vtx1_chi>0 && Vtx1_chi<10)
           {
-            float Vtx1_ntrk10 = ntrk10_vtx_hemi1 ;
-            float Vtx1_ntrk20 = ntrk20_vtx_hemi1;
+            Vtx1_ntrk10 = ntrk10_vtx_hemi1 ;
+            Vtx1_ntrk20 = ntrk20_vtx_hemi1;
             mva_V_nTrks  =  Vtx1_ntk;
             mva_V_chi    =  Vtx1_chi;
             mva_V_step   =  Vtx1_step;
@@ -7933,12 +7934,13 @@ TLorentzVector Total4Vector2(0,0,0,0);
       tree_Hemi_Vtx_MVAval_Step1.push_back(Vtx1_bdtVal_Step1);
     }
 
-
+float Vtx2_ntrk10=0;
+float Vtx2_ntrk20=0;
         //--------------VTX2-------------------//
         if (Vtx2_chi>0 && Vtx2_chi<10)
           {
-            float Vtx2_ntrk10 = ntrk10_vtx_hemi2 ;
-            float Vtx2_ntrk20 = ntrk20_vtx_hemi2;
+            Vtx2_ntrk10 = ntrk10_vtx_hemi2 ;
+            Vtx2_ntrk20 = ntrk20_vtx_hemi2;
 
             mva_V_nTrks  =  Vtx2_ntk;
             mva_V_chi    =  Vtx2_chi;
