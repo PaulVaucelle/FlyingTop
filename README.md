@@ -114,15 +114,25 @@ cmsRun flyingtop.py (to run locally)
  
 # To run jobs :
 
-./multicrab --crabCmd submit (edti to choose the samples)
+./multicrab --crabCmd submit  (edit to choose the samples)
 
 ./multicrab --crabCmd status --workArea ./<work_directory>   (work directory is the date of the launching of the jobs DD_MM_YYYY)
 
 ./multicrab --crabCmd getoutput --workArea ./<work_directory> --crabCmdOpts --checksum=no  (to retrieve the root files)
 
+# To run TreeReader.C (current version gives efficiencies for the different selections and the reconstruction of vertices + a txt file to summarize it)
 
+###You have to create an outputroot directory in the test directory if not already done
 
+root
 
+.L TreeReader.C+
+
+### If the message "creating library " appears
+
+.L runTreeReader.C
+
+### Else (it somehow happens) copy paste the macro in the root terminal :)
 
 
 
