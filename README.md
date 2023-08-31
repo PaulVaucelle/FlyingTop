@@ -128,11 +128,11 @@ root
 
 .L TreeReader.C+
 
-### If the message "creating library " appears
+### If the message "creating library " appears, you can try :
 
 .L runTreeReader.C
 
-### Else (it somehow happens) copy paste the macro in the root terminal :)
+### Else (it somehow happens that the command above crashes) copy paste the macro in the root terminal :)
 
 
 
