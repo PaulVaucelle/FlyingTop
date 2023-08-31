@@ -2422,7 +2422,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   using namespace reco;
   using namespace pat;
   
-  bool runOnData_ = false;
+  bool runOnData_ = true;
 
   // Pruned particles are the one containing "important" stuff
   Handle<edm::View<reco::GenParticle> > pruned;
@@ -3874,6 +3874,10 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
     muonpt=mu.pt();
     nmu++;
     // Matching to gen muons
+    if(!runOnData_)
+      {
+
+      
     bool IsMatched = false;
     for (unsigned int k = 0 ; k < tree_genParticle_pdgId.size() ; k++)
       {
@@ -3890,6 +3894,7 @@ if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
           genMuons++;
           if(IsMatched) break;
       }
+  }
   }
 
     if(nmu>=1)
@@ -5957,12 +5962,12 @@ else
       const HitPattern hp = tk_HitPattern;
       uint16_t firsthit = hp.getHitPattern(HitPattern::HitCategory::TRACK_HITS,0);
 //$$
-//     Approximation for the lostTrack since the hitpattern information is not available (only 1160, tracking POG knows about it but do not seem to care)      
-      if ( ipc >= pc->size() ) {
-        if ( abs(tk_eta) < 1. ) firsthit = 1184; // PIXBL4 in barrel
-        else                    firsthit = 1296; // PIXFD2 in forward
-      }      
-//$$
+// //     Approximation for the lostTrack since the hitpattern information is not available (only 1160, tracking POG knows about it but do not seem to care)      
+//       if ( ipc >= pc->size() ) {
+//         if ( abs(tk_eta) < 1. ) firsthit = 1184; // PIXBL4 in barrel
+//         else                    firsthit = 1296; // PIXFD2 in forward
+//       }      
+// //$$
       tree_track_firstHit.push_back(firsthit);
 
       //---Creating State to propagate from  TT---//
@@ -6173,1816 +6178,1831 @@ else
         }
     } // end loop on all track candidates
 
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
 
-    ///////////////////////////////////////////////////////
-    //-----------------------------------------------------
-    // selection of displaced tracks
-    //-----------------------------------------------------
-    ///////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------
 
-    int jet; /*!*/
+//-------------------------------------------------------------------------------------------
 
-    int nTrks_axis1 = 0;
-    int nTrks_axis1_sig=0, nTrks_axis1_bad=0;
-    int nTrks_axis2 = 0;
-    int nTrks_axis2_sig=0, nTrks_axis2_bad=0;
-    int nTrks_axis1_sig_mva=0, nTrks_axis1_bad_mva=0;
-    int nTrks_axis2_sig_mva=0, nTrks_axis2_bad_mva=0;
+//-------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------
+
+
+//     ///////////////////////////////////////////////////////
+//     //-----------------------------------------------------
+//     // selection of displaced tracks
+//     //-----------------------------------------------------
+//     ///////////////////////////////////////////////////////
+
+//     int jet; /*!*/
+
+//     int nTrks_axis1 = 0;
+//     int nTrks_axis1_sig=0, nTrks_axis1_bad=0;
+//     int nTrks_axis2 = 0;
+//     int nTrks_axis2_sig=0, nTrks_axis2_bad=0;
+//     int nTrks_axis1_sig_mva=0, nTrks_axis1_bad_mva=0;
+//     int nTrks_axis2_sig_mva=0, nTrks_axis2_bad_mva=0;
     
-    LLP1_nTrks = 0;
-    LLP2_nTrks = 0;
+//     LLP1_nTrks = 0;
+//     LLP2_nTrks = 0;
 
-//$$
-//     double _pt = -0.33; (0.22)   // for TMVAClassification_BDTG50cm_TT_WTrigger.weights.xml BDTMiniaod
-//     double bdtcut = -0.35; (0.7241)   // for TMVAClassification_BDTG50cm_TT.weights.xml BDTMiniaod
-//     double bdtcut = -0.0401; // for TMVAbgctau50withnhits.xml BDToldrecoavecalgo
-//     double bdtcut = -0.0815; // for TMVAClassification_BDTG50sansalgo.weights.xml BDToldreco
-//     double bdtcut =  0.0327; // for TMVAClassification_BDTG50cm_NewSignal.weights.xml BDTreco
-//     double bdtcut = -0.1456; // for TMVAClassification_BDTG50cm_HighPurity.weights.xml BDTrecohp
-//     double bdtcut = -0.1083; // for TMVAClassification_BDTG_FromBC.weights.xml from BDTminipf
-//     double bdtcut = -0.0067; // for TMVAClassification_BDTG50cm_sansntrk10_avecHP.weights.xml BDTrecohpsansntrk10
-//     double bdtcut = -10.; // no BDT cut
-//     double bdtcut = 0.1624; // for TMVAClassification_BDTG50cm_wVeto.weights.xml
-// TMVAClassification_BDTG50cm_V0Veto.weights.xml"),  # BDTMiniAOD //-0.0090
-// TMVAClassification_BDTG50cm_V0_YcVeto.weights.xml,  # BDTMiniAOD //0.0372
-// TMVAClassification_BDTG50cm_NoVeto.weights.xml,  # BDTMiniAOD ///0.1270
-//$$
-    double bdtcut = 0.85;        // ttbar ~ 1E-3
-    double bdtcut_step2 = 0.0;   // ttbar ~ 1E-2
-//$$
+// //$$
+// //     double _pt = -0.33; (0.22)   // for TMVAClassification_BDTG50cm_TT_WTrigger.weights.xml BDTMiniaod
+// //     double bdtcut = -0.35; (0.7241)   // for TMVAClassification_BDTG50cm_TT.weights.xml BDTMiniaod
+// //     double bdtcut = -0.0401; // for TMVAbgctau50withnhits.xml BDToldrecoavecalgo
+// //     double bdtcut = -0.0815; // for TMVAClassification_BDTG50sansalgo.weights.xml BDToldreco
+// //     double bdtcut =  0.0327; // for TMVAClassification_BDTG50cm_NewSignal.weights.xml BDTreco
+// //     double bdtcut = -0.1456; // for TMVAClassification_BDTG50cm_HighPurity.weights.xml BDTrecohp
+// //     double bdtcut = -0.1083; // for TMVAClassification_BDTG_FromBC.weights.xml from BDTminipf
+// //     double bdtcut = -0.0067; // for TMVAClassification_BDTG50cm_sansntrk10_avecHP.weights.xml BDTrecohpsansntrk10
+// //     double bdtcut = -10.; // no BDT cut
+// //     double bdtcut = 0.1624; // for TMVAClassification_BDTG50cm_wVeto.weights.xml
+// // TMVAClassification_BDTG50cm_V0Veto.weights.xml"),  # BDTMiniAOD //-0.0090
+// // TMVAClassification_BDTG50cm_V0_YcVeto.weights.xml,  # BDTMiniAOD //0.0372
+// // TMVAClassification_BDTG50cm_NoVeto.weights.xml,  # BDTMiniAOD ///0.1270
+// //$$
+//     double bdtcut = 0.85;        // ttbar ~ 1E-3
+//     double bdtcut_step2 = 0.0;   // ttbar ~ 1E-2
+// //$$
 
-    //---------------------------//
+//     //---------------------------//
 
-    for (int counter_track = 0; counter_track < tree_nTracks; counter_track++) 
-    {
-      firsthit_X = tree_track_firstHit_x[counter_track];
-      firsthit_Y = tree_track_firstHit_y[counter_track];
-      firsthit_Z = tree_track_firstHit_z[counter_track];
-      pt         = tree_track_pt[counter_track];
-      eta        = tree_track_eta[counter_track];
-      phi	 = tree_track_phi[counter_track];
-      NChi	 = tree_track_NChi2[counter_track];
-      nhits	 = tree_track_nHit[counter_track];
-      dxy	 = abs(tree_track_dxy[counter_track]);
-      dz	 = abs(tree_track_dz[counter_track]);
-      drSig	 = tree_track_drSig[counter_track];
-      dzSig      = tree_track_dzSig[counter_track];
+//     for (int counter_track = 0; counter_track < tree_nTracks; counter_track++) 
+//     {
+//       firsthit_X = tree_track_firstHit_x[counter_track];
+//       firsthit_Y = tree_track_firstHit_y[counter_track];
+//       firsthit_Z = tree_track_firstHit_z[counter_track];
+//       pt         = tree_track_pt[counter_track];
+//       eta        = tree_track_eta[counter_track];
+//       phi	 = tree_track_phi[counter_track];
+//       NChi	 = tree_track_NChi2[counter_track];
+//       nhits	 = tree_track_nHit[counter_track];
+//       dxy	 = abs(tree_track_dxy[counter_track]);
+//       dz	 = abs(tree_track_dz[counter_track]);
+//       drSig	 = tree_track_drSig[counter_track];
+//       dzSig      = tree_track_dzSig[counter_track];
 
-      dzTopu     = tree_track_dzTOpu[counter_track];
-      dzSigTopu  = tree_track_dzSigTOpu[counter_track];
-      TibHit     = tree_track_nHitTIB[counter_track] ;
-      TobHit     = tree_track_nHitTOB[counter_track] ;
-      PixBarHit  = tree_track_nHitPXB[counter_track];
-      TecHit     = tree_track_nHitTEC[counter_track];
-      // algo	    = tree_track_algo[counter_track];
+//       dzTopu     = tree_track_dzTOpu[counter_track];
+//       dzSigTopu  = tree_track_dzSigTOpu[counter_track];
+//       TibHit     = tree_track_nHitTIB[counter_track] ;
+//       TobHit     = tree_track_nHitTOB[counter_track] ;
+//       PixBarHit  = tree_track_nHitPXB[counter_track];
+//       TecHit     = tree_track_nHitTEC[counter_track];
+//       // algo	    = tree_track_algo[counter_track];
 
-      ntrk10 = 0, ntrk20 = 0, ntrk30 = 0, ntrk40 = 0;
-      isLost     = tree_track_lost[counter_track];
-      float ntrk10_lost = 0, ntrk20_lost = 0, ntrk30_lost = 0, ntrk40_lost = 0;
-      isinjet = 0.;
-      double bdtval = -10.;
-      dR = -1.;
-      int tracks_axis = 0; // flag to check which axis is the closest from the track
+//       ntrk10 = 0, ntrk20 = 0, ntrk30 = 0, ntrk40 = 0;
+//       isLost     = tree_track_lost[counter_track];
+//       float ntrk10_lost = 0, ntrk20_lost = 0, ntrk30_lost = 0, ntrk40_lost = 0;
+//       isinjet = 0.;
+//       double bdtval = -10.;
+//       dR = -1.;
+//       int tracks_axis = 0; // flag to check which axis is the closest from the track
 
-      jet = tree_track_iJet[counter_track];
-      if ( jet >= 0 ) isinjet = 1.; /*!*/
+//       jet = tree_track_iJet[counter_track];
+//       if ( jet >= 0 ) isinjet = 1.; /*!*/
 
-      int isFromLLP = tree_track_sim_LLP[counter_track];
+//       int isFromLLP = tree_track_sim_LLP[counter_track];
 
-      // check the dR between the tracks and the second axis (without any selection on the tracks)
-      dR1  = Deltar( eta, phi, axis1_eta, axis1_phi ); // axis1_phi and axis1_eta for the first axis
-      dR2  = Deltar( eta, phi, axis2_eta, axis2_phi );
-      tracks_axis = 1;
-      dR = dR1;
-      dRmax = dR2;
-      if ( dR2 < dR1 ) { // a restriction could be added on the value of dR to assign the value Tracks_axis  (avoid some background???)
-        tracks_axis = 2;
-        dR = dR2;
-        dRmax = dR1;
-      }
+//       // check the dR between the tracks and the second axis (without any selection on the tracks)
+//       dR1  = Deltar( eta, phi, axis1_eta, axis1_phi ); // axis1_phi and axis1_eta for the first axis
+//       dR2  = Deltar( eta, phi, axis2_eta, axis2_phi );
+//       tracks_axis = 1;
+//       dR = dR1;
+//       dRmax = dR2;
+//       if ( dR2 < dR1 ) { // a restriction could be added on the value of dR to assign the value Tracks_axis  (avoid some background???)
+//         tracks_axis = 2;
+//         dR = dR2;
+//         dRmax = dR1;
+//       }
 
-      //Computation of the distances needed for the BDT
-      for (int counter_othertrack = 0; counter_othertrack < tree_nTracks; counter_othertrack++) 
-      {
-      if ( counter_othertrack == counter_track ) continue;
-        float x2 = tree_track_firstHit_x[counter_othertrack];
-        float y2 = tree_track_firstHit_y[counter_othertrack];
-        float z2 = tree_track_firstHit_z[counter_othertrack];
-        float dist = TMath::Sqrt( (firsthit_X-x2)*(firsthit_X-x2) + (firsthit_Y-y2)*(firsthit_Y-y2) + (firsthit_Z-z2)*(firsthit_Z-z2) ); // pour chaque reconstruite, on regarde les autres tracks
-        if ( dist < 10. ) ntrk10++; 
-        if ( dist < 20. ) ntrk20++;
-        if ( dist < 30. ) ntrk30++;
-        if ( dist < 40. ) ntrk40++;
-	if ( tree_track_lost[counter_track] && tree_track_lost[counter_othertrack] ) {
-          if ( dist < 10. ) ntrk10_lost++; 
-          if ( dist < 20. ) ntrk20_lost++;
-          if ( dist < 30. ) ntrk30_lost++;
-          if ( dist < 40. ) ntrk40_lost++;
-	}
-      }  // end Loop on other Tracks
-      if ( tree_track_lost[counter_track] ) {
-        ntrk10 = ntrk10_lost;
-        ntrk20 = ntrk20_lost;
-        ntrk30 = ntrk30_lost;
-        ntrk40 = ntrk40_lost;
-      }
+//       //Computation of the distances needed for the BDT
+//       for (int counter_othertrack = 0; counter_othertrack < tree_nTracks; counter_othertrack++) 
+//       {
+//       if ( counter_othertrack == counter_track ) continue;
+//         float x2 = tree_track_firstHit_x[counter_othertrack];
+//         float y2 = tree_track_firstHit_y[counter_othertrack];
+//         float z2 = tree_track_firstHit_z[counter_othertrack];
+//         float dist = TMath::Sqrt( (firsthit_X-x2)*(firsthit_X-x2) + (firsthit_Y-y2)*(firsthit_Y-y2) + (firsthit_Z-z2)*(firsthit_Z-z2) ); // pour chaque reconstruite, on regarde les autres tracks
+//         if ( dist < 10. ) ntrk10++; 
+//         if ( dist < 20. ) ntrk20++;
+//         if ( dist < 30. ) ntrk30++;
+//         if ( dist < 40. ) ntrk40++;
+// 	if ( tree_track_lost[counter_track] && tree_track_lost[counter_othertrack] ) {
+//           if ( dist < 10. ) ntrk10_lost++; 
+//           if ( dist < 20. ) ntrk20_lost++;
+//           if ( dist < 30. ) ntrk30_lost++;
+//           if ( dist < 40. ) ntrk40_lost++;
+// 	}
+//       }  // end Loop on other Tracks
+//       if ( tree_track_lost[counter_track] ) {
+//         ntrk10 = ntrk10_lost;
+//         ntrk20 = ntrk20_lost;
+//         ntrk30 = ntrk30_lost;
+//         ntrk40 = ntrk40_lost;
+//       }
 
-      // - Apply BDT -------------------
-      bdtval = reader->EvaluateMVA( "BDTG" ); // default value = -10 (no -10 observed and -999 comes from EvaluateMVA)
-      // std::cout<<"tk pt : "<<pt<<" tk _eta : "<<eta<<" tk_phi :"<<phi<<" bdt_val :"<<bdtval<<std::endl;
+//       // - Apply BDT -------------------
+//       bdtval = reader->EvaluateMVA( "BDTG" ); // default value = -10 (no -10 observed and -999 comes from EvaluateMVA)
+//       // std::cout<<"tk pt : "<<pt<<" tk _eta : "<<eta<<" tk_phi :"<<phi<<" bdt_val :"<<bdtval<<std::endl;
 
-      if ( dR < dRcut_tracks ) 
-      {
-        if ( isFromLLP == 1 ) LLP1_nTrks++;
-        if ( isFromLLP == 2 ) LLP2_nTrks++;
+//       if ( dR < dRcut_tracks ) 
+//       {
+//         if ( isFromLLP == 1 ) LLP1_nTrks++;
+//         if ( isFromLLP == 2 ) LLP2_nTrks++;
 
-        if ( tracks_axis == 1 ) {
-          nTrks_axis1++;
-          if ( isFromLLP == iLLPrec1 ) nTrks_axis1_sig++;
-          else if ( isFromLLP >= 1 )   nTrks_axis1_bad++;
-          if ( bdtval > bdtcut ) {
-            if ( isFromLLP == iLLPrec1 ) nTrks_axis1_sig_mva++;
-            else if ( isFromLLP >= 1 )   nTrks_axis1_bad_mva++;
-          }
-        }
-        if ( tracks_axis == 2 ) {
-          nTrks_axis2++;
-          if ( isFromLLP == iLLPrec2 ) nTrks_axis2_sig++;
-          else if ( isFromLLP >= 1 )   nTrks_axis2_bad++;
-          if ( bdtval > bdtcut ) {
-            if ( isFromLLP == iLLPrec2 ) nTrks_axis2_sig_mva++;
-            else if ( isFromLLP >= 1 )   nTrks_axis2_bad_mva++;
-          }
-        }
-      }
+//         if ( tracks_axis == 1 ) {
+//           nTrks_axis1++;
+//           if ( isFromLLP == iLLPrec1 ) nTrks_axis1_sig++;
+//           else if ( isFromLLP >= 1 )   nTrks_axis1_bad++;
+//           if ( bdtval > bdtcut ) {
+//             if ( isFromLLP == iLLPrec1 ) nTrks_axis1_sig_mva++;
+//             else if ( isFromLLP >= 1 )   nTrks_axis1_bad_mva++;
+//           }
+//         }
+//         if ( tracks_axis == 2 ) {
+//           nTrks_axis2++;
+//           if ( isFromLLP == iLLPrec2 ) nTrks_axis2_sig++;
+//           else if ( isFromLLP >= 1 )   nTrks_axis2_bad++;
+//           if ( bdtval > bdtcut ) {
+//             if ( isFromLLP == iLLPrec2 ) nTrks_axis2_sig_mva++;
+//             else if ( isFromLLP >= 1 )   nTrks_axis2_bad_mva++;
+//           }
+//         }
+//       }
      
-      tree_track_ntrk10.push_back(ntrk10);
-      tree_track_ntrk20.push_back(ntrk20);
-      tree_track_ntrk30.push_back(ntrk30);
-      tree_track_ntrk40.push_back(ntrk40);
-      tree_track_MVAval.push_back(bdtval);
+//       tree_track_ntrk10.push_back(ntrk10);
+//       tree_track_ntrk20.push_back(ntrk20);
+//       tree_track_ntrk30.push_back(ntrk30);
+//       tree_track_ntrk40.push_back(ntrk40);
+//       tree_track_MVAval.push_back(bdtval);
       
-      tree_track_Hemi_dR.push_back(dR);
-      tree_track_Hemi_dRmax.push_back(dRmax);
-      tree_track_Hemi.push_back(tracks_axis);
-      if      ( tracks_axis == 1 ) tree_track_Hemi_LLP.push_back(iLLPrec1);
-      else if ( tracks_axis == 2 ) tree_track_Hemi_LLP.push_back(iLLPrec2);
-      else		tree_track_Hemi_LLP.push_back(0);
+//       tree_track_Hemi_dR.push_back(dR);
+//       tree_track_Hemi_dRmax.push_back(dRmax);
+//       tree_track_Hemi.push_back(tracks_axis);
+//       if      ( tracks_axis == 1 ) tree_track_Hemi_LLP.push_back(iLLPrec1);
+//       else if ( tracks_axis == 2 ) tree_track_Hemi_LLP.push_back(iLLPrec2);
+//       else		tree_track_Hemi_LLP.push_back(0);
       
-    } //End loop on all the tracks
+//     } //End loop on all the tracks
     
 
-    /////////////////////////////////////////
-    // Sort tracks by decreasing BDT value //
-    /////////////////////////////////////////
+//     /////////////////////////////////////////
+//     // Sort tracks by decreasing BDT value //
+//     /////////////////////////////////////////
 
-    for (int counter_track = 0; counter_track < tree_nTracks; counter_track++)
-      MVAval[counter_track] = tree_track_MVAval[counter_track];
-    if ( tree_nTracks < 10000 ) {
-      TMath::Sort(tree_nTracks, MVAval, index);
-    }
-    else cout << " !!!!!! ERROR tree_nTracks " << tree_nTracks << " ERROR !!!!!! " << endl;
+//     for (int counter_track = 0; counter_track < tree_nTracks; counter_track++)
+//       MVAval[counter_track] = tree_track_MVAval[counter_track];
+//     if ( tree_nTracks < 10000 ) {
+//       TMath::Sort(tree_nTracks, MVAval, index);
+//     }
+//     else cout << " !!!!!! ERROR tree_nTracks " << tree_nTracks << " ERROR !!!!!! " << endl;
 
 
-    ///////////////////////////////
-    // Fill the transient tracks //
-    ///////////////////////////////
+//     ///////////////////////////////
+//     // Fill the transient tracks //
+//     ///////////////////////////////
 
-    vector<reco::TransientTrack> displacedTracks_llp1_mva, displacedTracks_llp2_mva; // Control Tracks
-    vector<reco::TransientTrack> displacedTracks_Hemi1_mva, displacedTracks_Hemi2_mva; // Tracks selected wrt the hemisphere
-    vector<reco::TransientTrack> displacedTracks_Hemi1_mva_TW, displacedTracks_Hemi2_mva_TW; // Tracks selected wrt the hemisphere
-    vector<reco::TransientTrack> displacedTracks_step2_Hemi1, displacedTracks_step2_Hemi2;
+//     vector<reco::TransientTrack> displacedTracks_llp1_mva, displacedTracks_llp2_mva; // Control Tracks
+//     vector<reco::TransientTrack> displacedTracks_Hemi1_mva, displacedTracks_Hemi2_mva; // Tracks selected wrt the hemisphere
+//     vector<reco::TransientTrack> displacedTracks_Hemi1_mva_TW, displacedTracks_Hemi2_mva_TW; // Tracks selected wrt the hemisphere
+//     vector<reco::TransientTrack> displacedTracks_step2_Hemi1, displacedTracks_step2_Hemi2;
     
-    vector<TLorentzVector> TrackInfo_llp1_mva;
-    vector<TLorentzVector> TrackInfo_llp2_mva;
+//     vector<TLorentzVector> TrackInfo_llp1_mva;
+//     vector<TLorentzVector> TrackInfo_llp2_mva;
 
-    vector<std::pair<float, TLorentzVector > > TrackInfo_Hemi1_mva;
-    vector<std::pair<float, TLorentzVector > > TrackInfo_Hemi2_mva;
-    vector<std::pair<float, TLorentzVector > > TrackInfo_step2_Hemi1;
-    vector<std::pair<float, TLorentzVector > > TrackInfo_step2_Hemi2;
+//     vector<std::pair<float, TLorentzVector > > TrackInfo_Hemi1_mva;
+//     vector<std::pair<float, TLorentzVector > > TrackInfo_Hemi2_mva;
+//     vector<std::pair<float, TLorentzVector > > TrackInfo_step2_Hemi1;
+//     vector<std::pair<float, TLorentzVector > > TrackInfo_step2_Hemi2;
 
-    for (int k = 0; k < tree_nTracks; k++)
-    {
-      int counter_track = index[k];
-      unsigned int ipc = tree_track_ipc[counter_track];
-      pat::PackedCandidateRef pcref = MINIgeneralTracks[ipc];
-      const reco::Track *trackPcPtr = pcref->bestTrack();
-      reco::Track tk;
+//     for (int k = 0; k < tree_nTracks; k++)
+//     {
+//       int counter_track = index[k];
+//       unsigned int ipc = tree_track_ipc[counter_track];
+//       pat::PackedCandidateRef pcref = MINIgeneralTracks[ipc];
+//       const reco::Track *trackPcPtr = pcref->bestTrack();
+//       reco::Track tk;
 
-      //PseudoDefTrack forces the covariance matrix to be positive definite. Can be negative in MINIAod with bestTrack/pseudoTrack methods
-      //Correction defined by the BPH group => retrieve our effiency with this
-      //-----------------------------------------------------
-      const reco::Track& tk_temp = *trackPcPtr;//const ..;reco::Track
-      reco::TrackBase::CovarianceMatrix m_ = tk_temp.covariance(); //math::Error<5>::type
-      double det=0;
-      //Covariance Matrix Correction//
-      bool notPosDef = (!(m_).Sub<AlgebraicSymMatrix22>(0, 0).Det(det) || det < 0) ||
-                   (!(m_).Sub<AlgebraicSymMatrix33>(0, 0).Det(det) || det < 0) ||
-                   (!(m_).Sub<AlgebraicSymMatrix44>(0, 0).Det(det) || det < 0) || (!(m_).Det(det) || det < 0);
-      if ( notPosDef && NewCovMat ) {//flag to allow for covariance matrix corrections
-        reco::TrackBase::CovarianceMatrix m(m_);
-        // if not positive-definite, alter values to allow for pos-def
-        TMatrixDSym eigenCov(5);
-        for (int i = 0; i < 5; i++) {
-          for (int j = 0; j < 5; j++) {
-            if (std::isnan((m)(i, j)) || std::isinf((m)(i, j)))
-              eigenCov(i, j) = 1e-6;
-            else
-              eigenCov(i, j) = (m)(i, j);
-          }
-        }
-        TVectorD eigenValues(5);
-        eigenCov.EigenVectors(eigenValues);
-        double minEigenValue = eigenValues.Min();
-        double delta = 1e-6;
-        if (minEigenValue < 0) {
-          for (int i = 0; i < 5; i++)
-            m(i, i) += delta - minEigenValue;
-        }
-        // make a track object with pos def covariance matrix  
-        tk = reco::Track(tk_temp.normalizedChi2() * tk_temp.ndof(),tk_temp.ndof(),tk_temp.TrackBase::referencePoint(),tk_temp.momentum(),tk_temp.charge(),m,reco::TrackBase::undefAlgorithm,reco::TrackBase::loose);
-        // for(int i = 0 ; i<4 ;i++ )
-        //   {
-        //     for(int j = 0 ; j<4 ;j++ )
-        //	 {
-        //	     std::cout<<" Apres Covcor m["<<i<<"]["<<j<<"] <<m[i][j]<<std::endl;
-        //	 }
-        //   }
-      //-------------------end covariance matrix correction-----------//
-      }
-      else tk = *trackPcPtr;
+//       //PseudoDefTrack forces the covariance matrix to be positive definite. Can be negative in MINIAod with bestTrack/pseudoTrack methods
+//       //Correction defined by the BPH group => retrieve our effiency with this
+//       //-----------------------------------------------------
+//       const reco::Track& tk_temp = *trackPcPtr;//const ..;reco::Track
+//       reco::TrackBase::CovarianceMatrix m_ = tk_temp.covariance(); //math::Error<5>::type
+//       double det=0;
+//       //Covariance Matrix Correction//
+//       bool notPosDef = (!(m_).Sub<AlgebraicSymMatrix22>(0, 0).Det(det) || det < 0) ||
+//                    (!(m_).Sub<AlgebraicSymMatrix33>(0, 0).Det(det) || det < 0) ||
+//                    (!(m_).Sub<AlgebraicSymMatrix44>(0, 0).Det(det) || det < 0) || (!(m_).Det(det) || det < 0);
+//       if ( notPosDef && NewCovMat ) {//flag to allow for covariance matrix corrections
+//         reco::TrackBase::CovarianceMatrix m(m_);
+//         // if not positive-definite, alter values to allow for pos-def
+//         TMatrixDSym eigenCov(5);
+//         for (int i = 0; i < 5; i++) {
+//           for (int j = 0; j < 5; j++) {
+//             if (std::isnan((m)(i, j)) || std::isinf((m)(i, j)))
+//               eigenCov(i, j) = 1e-6;
+//             else
+//               eigenCov(i, j) = (m)(i, j);
+//           }
+//         }
+//         TVectorD eigenValues(5);
+//         eigenCov.EigenVectors(eigenValues);
+//         double minEigenValue = eigenValues.Min();
+//         double delta = 1e-6;
+//         if (minEigenValue < 0) {
+//           for (int i = 0; i < 5; i++)
+//             m(i, i) += delta - minEigenValue;
+//         }
+//         // make a track object with pos def covariance matrix  
+//         tk = reco::Track(tk_temp.normalizedChi2() * tk_temp.ndof(),tk_temp.ndof(),tk_temp.TrackBase::referencePoint(),tk_temp.momentum(),tk_temp.charge(),m,reco::TrackBase::undefAlgorithm,reco::TrackBase::loose);
+//         // for(int i = 0 ; i<4 ;i++ )
+//         //   {
+//         //     for(int j = 0 ; j<4 ;j++ )
+//         //	 {
+//         //	     std::cout<<" Apres Covcor m["<<i<<"]["<<j<<"] <<m[i][j]<<std::endl;
+//         //	 }
+//         //   }
+//       //-------------------end covariance matrix correction-----------//
+//       }
+//       else tk = *trackPcPtr;
 
-      int isFromLLP   = tree_track_sim_LLP[counter_track];
-      int tracks_axis = tree_track_Hemi[counter_track];
-      float track_p = sqrt(tree_track_px[counter_track]*tree_track_px[counter_track]+tree_track_py[counter_track]*tree_track_py[counter_track]+tree_track_pz[counter_track]*tree_track_pz[counter_track]);
-      float track_e = tree_track_energy[counter_track];
-      double bdtval   = tree_track_MVAval[counter_track];
-      if ((tree_track_energy[counter_track]*tree_track_energy[counter_track]-track_p*track_p)<0)
-        {
-          track_e = sqrt(track_p*track_p+0.01946);//pi0 mass
-        }
-      TLorentzVector vTrack(tree_track_px[counter_track],tree_track_py[counter_track],tree_track_pz[counter_track],track_e);
+//       int isFromLLP   = tree_track_sim_LLP[counter_track];
+//       int tracks_axis = tree_track_Hemi[counter_track];
+//       float track_p = sqrt(tree_track_px[counter_track]*tree_track_px[counter_track]+tree_track_py[counter_track]*tree_track_py[counter_track]+tree_track_pz[counter_track]*tree_track_pz[counter_track]);
+//       float track_e = tree_track_energy[counter_track];
+//       double bdtval   = tree_track_MVAval[counter_track];
+//       if ((tree_track_energy[counter_track]*tree_track_energy[counter_track]-track_p*track_p)<0)
+//         {
+//           track_e = sqrt(track_p*track_p+0.01946);//pi0 mass
+//         }
+//       TLorentzVector vTrack(tree_track_px[counter_track],tree_track_py[counter_track],tree_track_pz[counter_track],track_e);
 
 
 
-      if ( bdtval > bdtcut ) {//tight wp
-        if ( isFromLLP == 1 )
-          {
-            displacedTracks_llp1_mva.push_back(theTransientTrackBuilder->build(&tk));
-            TLorentzVector SignalvTrack(tree_track_px[counter_track],tree_track_py[counter_track],tree_track_pz[counter_track],track_e);
-            TrackInfo_llp1_mva.push_back(SignalvTrack);
-          }
+//       if ( bdtval > bdtcut ) {//tight wp
+//         if ( isFromLLP == 1 )
+//           {
+//             displacedTracks_llp1_mva.push_back(theTransientTrackBuilder->build(&tk));
+//             TLorentzVector SignalvTrack(tree_track_px[counter_track],tree_track_py[counter_track],tree_track_pz[counter_track],track_e);
+//             TrackInfo_llp1_mva.push_back(SignalvTrack);
+//           }
          
 
-        if ( isFromLLP == 2 )
-          {
-            displacedTracks_llp2_mva.push_back(theTransientTrackBuilder->build(&tk));
-            TLorentzVector SignalvTrack(tree_track_px[counter_track],tree_track_py[counter_track],tree_track_pz[counter_track],track_e);
-            TrackInfo_llp2_mva.push_back(SignalvTrack);
-          }
+//         if ( isFromLLP == 2 )
+//           {
+//             displacedTracks_llp2_mva.push_back(theTransientTrackBuilder->build(&tk));
+//             TLorentzVector SignalvTrack(tree_track_px[counter_track],tree_track_py[counter_track],tree_track_pz[counter_track],track_e);
+//             TrackInfo_llp2_mva.push_back(SignalvTrack);
+//           }
 
-        if ( tracks_axis == 1 )
-          {
-            displacedTracks_Hemi1_mva.push_back(theTransientTrackBuilder->build(&tk));
-            TrackInfo_Hemi1_mva.push_back(make_pair(tree_track_btag[counter_track],vTrack));
+//         if ( tracks_axis == 1 )
+//           {
+//             displacedTracks_Hemi1_mva.push_back(theTransientTrackBuilder->build(&tk));
+//             TrackInfo_Hemi1_mva.push_back(make_pair(tree_track_btag[counter_track],vTrack));
             
-          }
-        if ( tracks_axis == 2 )
-          {
-            displacedTracks_Hemi2_mva.push_back(theTransientTrackBuilder->build(&tk));
-            TrackInfo_Hemi2_mva.push_back(make_pair(tree_track_btag[counter_track],vTrack));
-          }
-      }
+//           }
+//         if ( tracks_axis == 2 )
+//           {
+//             displacedTracks_Hemi2_mva.push_back(theTransientTrackBuilder->build(&tk));
+//             TrackInfo_Hemi2_mva.push_back(make_pair(tree_track_btag[counter_track],vTrack));
+//           }
+//       }
 
-      if ( bdtval > bdtcut_step2 ) {//loose wp
-        if ( tracks_axis == 1 )
-          {
-            displacedTracks_step2_Hemi1.push_back(theTransientTrackBuilder->build(&tk));
-            TrackInfo_step2_Hemi1.push_back(make_pair(tree_track_btag[counter_track],vTrack));
-          }    
-        if ( tracks_axis == 2 )
-          {
-            displacedTracks_step2_Hemi2.push_back(theTransientTrackBuilder->build(&tk));
-            TrackInfo_step2_Hemi2.push_back(make_pair(tree_track_btag[counter_track],vTrack));
-          } 
-      }
-    }  // end loop on tracks
+//       if ( bdtval > bdtcut_step2 ) {//loose wp
+//         if ( tracks_axis == 1 )
+//           {
+//             displacedTracks_step2_Hemi1.push_back(theTransientTrackBuilder->build(&tk));
+//             TrackInfo_step2_Hemi1.push_back(make_pair(tree_track_btag[counter_track],vTrack));
+//           }    
+//         if ( tracks_axis == 2 )
+//           {
+//             displacedTracks_step2_Hemi2.push_back(theTransientTrackBuilder->build(&tk));
+//             TrackInfo_step2_Hemi2.push_back(make_pair(tree_track_btag[counter_track],vTrack));
+//           } 
+//       }
+//     }  // end loop on tracks
   
-    // cout << " displaced tracks LLP1 " << LLP1_nTrks << " and with mva" << displacedTracks_llp1_mva.size() << endl;
-    // cout << " displaced tracks LLP2 " << LLP2_nTrks << " and with mva" << displacedTracks_llp2_mva.size() << endl;
-    // cout << " displaced tracks Hemi1 " << nTrks_axis1 << " and with mva" << displacedTracks_Hemi1_mva.size() << endl;
-    // cout << " displaced tracks Hemi2 " << nTrks_axis2 << " and with mva" << displacedTracks_Hemi2_mva.size() << endl;
+//     // cout << " displaced tracks LLP1 " << LLP1_nTrks << " and with mva" << displacedTracks_llp1_mva.size() << endl;
+//     // cout << " displaced tracks LLP2 " << LLP2_nTrks << " and with mva" << displacedTracks_llp2_mva.size() << endl;
+//     // cout << " displaced tracks Hemi1 " << nTrks_axis1 << " and with mva" << displacedTracks_Hemi1_mva.size() << endl;
+//     // cout << " displaced tracks Hemi2 " << nTrks_axis2 << " and with mva" << displacedTracks_Hemi2_mva.size() << endl;
 
 
-    ///////////////////////////////////////////////////////
-    //-----------------------------------------------------
-    // Vertex fitting 
-    //-----------------------------------------------------
-    ///////////////////////////////////////////////////////
+//     ///////////////////////////////////////////////////////
+//     //-----------------------------------------------------
+//     // Vertex fitting 
+//     //-----------------------------------------------------
+//     ///////////////////////////////////////////////////////
 
-    int   Vtx_ntk = 0, Vtx_step = 0;
-    float Vtx_x = 0., Vtx_y = 0., Vtx_z= 0., Vtx_chi = -10.;
-    float recX, recY, recZ, dSV, recD;
+//     int   Vtx_ntk = 0, Vtx_step = 0;
+//     float Vtx_x = 0., Vtx_y = 0., Vtx_z= 0., Vtx_chi = -10.;
+//     float recX, recY, recZ, dSV, recD;
 
-//$$
-    // parameters for the Adaptive Vertex Fitter (AVF)
-    double maxshift        = 0.0001;
-    unsigned int maxstep   = 30;
-    double maxlpshift      = 0.1;
-    double weightThreshold = 0.001;
-    double sigmacut        = 3.;
-    double Tini            = 256.;
-    double ratio           = 0.25;
-//$$
- if (!runOnData_)
-  {
+// //$$
+//     // parameters for the Adaptive Vertex Fitter (AVF)
+//     double maxshift        = 0.0001;
+//     unsigned int maxstep   = 30;
+//     double maxlpshift      = 0.1;
+//     double weightThreshold = 0.001;
+//     double sigmacut        = 3.;
+//     double Tini            = 256.;
+//     double ratio           = 0.25;
+// //$$
+//  if (!runOnData_)
+//   {
 
   
-  if ( tree_nLLP > 0 ) {
-//------------------------------- FIRST LLP WITH MVA ----------------------------------//
+//   if ( tree_nLLP > 0 ) {
+// //------------------------------- FIRST LLP WITH MVA ----------------------------------//
 
-    static AdaptiveVertexFitter 
-    theFitter_vertex_llp1_mva(
-                 GeometricAnnealing ( sigmacut, Tini, ratio ), 
-                 DefaultLinearizationPointFinder(),
-                 KalmanVertexUpdator<5>(), 
-                 KalmanVertexTrackCompatibilityEstimator<5>(), 
-                 KalmanVertexSmoother() );
-    theFitter_vertex_llp1_mva.setParameters ( maxshift, maxlpshift, maxstep, weightThreshold );
+//     static AdaptiveVertexFitter 
+//     theFitter_vertex_llp1_mva(
+//                  GeometricAnnealing ( sigmacut, Tini, ratio ), 
+//                  DefaultLinearizationPointFinder(),
+//                  KalmanVertexUpdator<5>(), 
+//                  KalmanVertexTrackCompatibilityEstimator<5>(), 
+//                  KalmanVertexSmoother() );
+//     theFitter_vertex_llp1_mva.setParameters ( maxshift, maxlpshift, maxstep, weightThreshold );
     
-    Vtx_ntk = displacedTracks_llp1_mva.size();
-    Vtx_x = -100.;
-    Vtx_y = -100.;
-    Vtx_z = -100.;
-    Vtx_chi = -10.;
-    TLorentzVector Total4Vector1(0,0,0,0);
-    if ( Vtx_ntk > 1 )
-    {
-      TransientVertex displacedVertex_llp1_mva = theFitter_vertex_llp1_mva.vertex(displacedTracks_llp1_mva); // fitted vertex
-      // std::cout<< "displacedVertex_llp1_mva is built" << std::endl;
-      if ( displacedVertex_llp1_mva.isValid() ) // NotValid if the max number of steps has been exceded or the fitted position is out of tracker bounds.
-      {
-        Vtx_ntk = displacedTracks_llp1_mva.size();
-        Vtx_x = displacedVertex_llp1_mva.position().x();
-        Vtx_y = displacedVertex_llp1_mva.position().y();
-        Vtx_z = displacedVertex_llp1_mva.position().z();
-        Vtx_chi = displacedVertex_llp1_mva.normalisedChiSquared();
-        float temp_px = 0;
-        float temp_py = 0;
-        float temp_pz = 0 ;
-        float temp_e = 0 ;
+//     Vtx_ntk = displacedTracks_llp1_mva.size();
+//     Vtx_x = -100.;
+//     Vtx_y = -100.;
+//     Vtx_z = -100.;
+//     Vtx_chi = -10.;
+//     TLorentzVector Total4Vector1(0,0,0,0);
+//     if ( Vtx_ntk > 1 )
+//     {
+//       TransientVertex displacedVertex_llp1_mva = theFitter_vertex_llp1_mva.vertex(displacedTracks_llp1_mva); // fitted vertex
+//       // std::cout<< "displacedVertex_llp1_mva is built" << std::endl;
+//       if ( displacedVertex_llp1_mva.isValid() ) // NotValid if the max number of steps has been exceded or the fitted position is out of tracker bounds.
+//       {
+//         Vtx_ntk = displacedTracks_llp1_mva.size();
+//         Vtx_x = displacedVertex_llp1_mva.position().x();
+//         Vtx_y = displacedVertex_llp1_mva.position().y();
+//         Vtx_z = displacedVertex_llp1_mva.position().z();
+//         Vtx_chi = displacedVertex_llp1_mva.normalisedChiSquared();
+//         float temp_px = 0;
+//         float temp_py = 0;
+//         float temp_pz = 0 ;
+//         float temp_e = 0 ;
 
-        //--------------- B-tagging-----------------------//
-            for (unsigned int i =  0 ; i < displacedTracks_llp1_mva.size(); i++)
-              {
-                temp_px = TrackInfo_llp1_mva[i].Px();
-                temp_py = TrackInfo_llp1_mva[i].Py();
-                temp_pz = TrackInfo_llp1_mva[i].Pz();
-                temp_e  = TrackInfo_llp1_mva[i].E();
-                TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
-                Total4Vector1 +=TLorentzTrack;
-              }
+//         //--------------- B-tagging-----------------------//
+//             for (unsigned int i =  0 ; i < displacedTracks_llp1_mva.size(); i++)
+//               {
+//                 temp_px = TrackInfo_llp1_mva[i].Px();
+//                 temp_py = TrackInfo_llp1_mva[i].Py();
+//                 temp_pz = TrackInfo_llp1_mva[i].Pz();
+//                 temp_e  = TrackInfo_llp1_mva[i].E();
+//                 TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
+//                 Total4Vector1 +=TLorentzTrack;
+//               }
 
-    // std::cout<<"invaraint mass of LLP1 with LorentzVector : "<<sqrt(Total4Vector1.Mag2())<<std::endl;
-      }
-    }
-    tree_LLP_Mass.push_back(sqrt(Total4Vector1.Mag2()));
-    tree_LLP.push_back(1);
-    tree_LLP_pt.push_back(   LLP1_pt);
-    tree_LLP_eta.push_back(  LLP1_eta);
-    tree_LLP_phi.push_back(  LLP1_phi);
-    tree_LLP_x.push_back(    LLP1_x);
-    tree_LLP_y.push_back(    LLP1_y);
-    tree_LLP_z.push_back(    LLP1_z);
-    tree_LLP_r.push_back(sqrt(LLP1_x*LLP1_x+LLP1_y*LLP1_y));
-    tree_LLP_dist.push_back( LLP1_dist);
-    tree_LLP_nTrks.push_back(LLP1_nTrks);
-    tree_LLP_Vtx_nTrks.push_back(Vtx_ntk);
-    tree_LLP_Vtx_NChi2.push_back(Vtx_chi);
-    tree_LLP_Vtx_dx.push_back(Vtx_x - LLP1_x);
-    tree_LLP_Vtx_dy.push_back(Vtx_y - LLP1_y);
-    tree_LLP_Vtx_dz.push_back(Vtx_z - LLP1_z);
+//     // std::cout<<"invaraint mass of LLP1 with LorentzVector : "<<sqrt(Total4Vector1.Mag2())<<std::endl;
+//       }
+//     }
+//     tree_LLP_Mass.push_back(sqrt(Total4Vector1.Mag2()));
+//     tree_LLP.push_back(1);
+//     tree_LLP_pt.push_back(   LLP1_pt);
+//     tree_LLP_eta.push_back(  LLP1_eta);
+//     tree_LLP_phi.push_back(  LLP1_phi);
+//     tree_LLP_x.push_back(    LLP1_x);
+//     tree_LLP_y.push_back(    LLP1_y);
+//     tree_LLP_z.push_back(    LLP1_z);
+//     tree_LLP_r.push_back(sqrt(LLP1_x*LLP1_x+LLP1_y*LLP1_y));
+//     tree_LLP_dist.push_back( LLP1_dist);
+//     tree_LLP_nTrks.push_back(LLP1_nTrks);
+//     tree_LLP_Vtx_nTrks.push_back(Vtx_ntk);
+//     tree_LLP_Vtx_NChi2.push_back(Vtx_chi);
+//     tree_LLP_Vtx_dx.push_back(Vtx_x - LLP1_x);
+//     tree_LLP_Vtx_dy.push_back(Vtx_y - LLP1_y);
+//     tree_LLP_Vtx_dz.push_back(Vtx_z - LLP1_z);
 
-    dSV = (Vtx_x - LLP1_x)*(Vtx_x - LLP1_x) + (Vtx_y - LLP1_y)*(Vtx_y - LLP1_y) + (Vtx_z - LLP1_z)*(Vtx_z - LLP1_z);
-    recX = Vtx_x - tree_PV_x;
-    recY = Vtx_y - tree_PV_y;
-    recZ = Vtx_z - tree_PV_z;
-    recD = TMath::Sqrt(recX*recX + recY*recY + recZ*recZ);
-    tree_LLP_Vtx_dist.push_back( recD );
-    tree_LLP_Vtx_dd.push_back( TMath::Sqrt(dSV)/LLP1_dist );
+//     dSV = (Vtx_x - LLP1_x)*(Vtx_x - LLP1_x) + (Vtx_y - LLP1_y)*(Vtx_y - LLP1_y) + (Vtx_z - LLP1_z)*(Vtx_z - LLP1_z);
+//     recX = Vtx_x - tree_PV_x;
+//     recY = Vtx_y - tree_PV_y;
+//     recZ = Vtx_z - tree_PV_z;
+//     recD = TMath::Sqrt(recX*recX + recY*recY + recZ*recZ);
+//     tree_LLP_Vtx_dist.push_back( recD );
+//     tree_LLP_Vtx_dd.push_back( TMath::Sqrt(dSV)/LLP1_dist );
     
-//&&&&&
-// //     bool dump = false;
-// //     if ( Vtx_chi < 0 && LLP1_nTrks > 1 ) dump = true;
-//     cout << endl;
-//     cout << endl;
-//     cout << " &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& " << endl;
-//     cout << " run event " << runNumber << " " << eventNumber << endl;
-//     cout << " LLP " << 1 << " pt eta phi " << LLP1_pt << " " << LLP1_eta << " " << LLP1_phi << " x y z " << LLP1_x << " " << LLP1_y << " " << LLP1_z << " nTrks " << LLP1_nTrks << endl;
-//     cout << "	  Vtx Chi2 " << Vtx_chi << " dx dy dz " << Vtx_x - LLP1_x << " " << Vtx_y - LLP1_y  << " " << Vtx_z - LLP1_z << " nTrks " << Vtx_ntk << endl;
-//&&&&&
-
-
-    //-------------------------- SECOND LLP WITH MVA -------------------------------------//
-
-    static AdaptiveVertexFitter 
-    theFitter_vertex_llp2_mva(
-                 GeometricAnnealing ( sigmacut, Tini, ratio ), 
-                 DefaultLinearizationPointFinder(),
-                 KalmanVertexUpdator<5>(), 
-                 KalmanVertexTrackCompatibilityEstimator<5>(), 
-                 KalmanVertexSmoother() );
-    theFitter_vertex_llp2_mva.setParameters ( maxshift, maxlpshift, maxstep, weightThreshold );
-    
-    Vtx_ntk = displacedTracks_llp2_mva.size();
-    Vtx_x = -100.;
-    Vtx_y = -100.;
-    Vtx_z = -100.;
-    Vtx_chi = -10.;
-    Total4Vector1.SetPxPyPzE(0,0,0,0);
-    if ( Vtx_ntk > 1 )
-    {
-      TransientVertex displacedVertex_llp2_mva = theFitter_vertex_llp2_mva.vertex(displacedTracks_llp2_mva); // fitted vertex
-      
-      if ( displacedVertex_llp2_mva.isValid() ) // NotValid if the max number of steps has been exceded or the fitted position is out of tracker bounds.
-      {
-        Vtx_x = displacedVertex_llp2_mva.position().x();
-        Vtx_y = displacedVertex_llp2_mva.position().y();
-        Vtx_z = displacedVertex_llp2_mva.position().z();
-        Vtx_chi = displacedVertex_llp2_mva.normalisedChiSquared();
-
-        float temp_px = 0;
-        float temp_py = 0;
-        float temp_pz = 0 ;
-        float temp_e = 0 ;
-        
-        //--------------- B-tagging-----------------------//
-            for (unsigned int i =  0 ; i < displacedTracks_llp2_mva.size(); i++)
-              {
-                temp_px = TrackInfo_llp2_mva[i].Px();
-                temp_py = TrackInfo_llp2_mva[i].Py();
-                temp_pz = TrackInfo_llp2_mva[i].Pz();
-                temp_e  = TrackInfo_llp2_mva[i].E();
-                TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
-                Total4Vector1 +=TLorentzTrack;
-              }
-
-
-        // std::cout<<"invaraint mass of LLP2 with LorentzVector : "<<sqrt(Total4Vector1.Mag2())<<std::endl;
-      }
-
-    }
-    
-    tree_LLP_Mass.push_back(sqrt(Total4Vector1.Mag2()));
-    tree_LLP.push_back(2);
-    tree_LLP_pt.push_back(   LLP2_pt);
-    tree_LLP_eta.push_back(  LLP2_eta);
-    tree_LLP_phi.push_back(  LLP2_phi);
-    tree_LLP_x.push_back(    LLP2_x);
-    tree_LLP_y.push_back(    LLP2_y);
-    tree_LLP_z.push_back(    LLP2_z);
-    tree_LLP_dist.push_back( LLP2_dist);
-    tree_LLP_r.push_back(sqrt(LLP2_x*LLP2_x+LLP2_y*LLP2_y));
-    tree_LLP_nTrks.push_back(LLP2_nTrks);
-    tree_LLP_Vtx_nTrks.push_back(Vtx_ntk);
-    tree_LLP_Vtx_NChi2.push_back(Vtx_chi);
-    tree_LLP_Vtx_dx.push_back(Vtx_x - LLP2_x);
-    tree_LLP_Vtx_dy.push_back(Vtx_y - LLP2_y);
-    tree_LLP_Vtx_dz.push_back(Vtx_z - LLP2_z);
-
-    dSV = (Vtx_x - LLP2_x)*(Vtx_x - LLP2_x) + (Vtx_y - LLP2_y)*(Vtx_y - LLP2_y) + (Vtx_z - LLP2_z)*(Vtx_z - LLP2_z);
-    recX = Vtx_x - tree_PV_x;
-    recY = Vtx_y - tree_PV_y;
-    recZ = Vtx_z - tree_PV_z;
-    recD = TMath::Sqrt(recX*recX + recY*recY + recZ*recZ);
-    tree_LLP_Vtx_dist.push_back( recD );
-    tree_LLP_Vtx_dd.push_back( TMath::Sqrt(dSV)/LLP2_dist );
-    
-    float dR_LLP12   = Deltar(LLP1_eta, LLP1_phi, LLP2_eta, LLP2_phi);
-    float deta_LLP12 = abs(LLP1_eta - LLP2_eta);
-    float dphi_LLP12 = abs(Deltaphi(LLP1_phi, LLP2_phi));
-    tree_LLP12_dR.push_back(   dR_LLP12);
-    tree_LLP12_deta.push_back( deta_LLP12);
-    tree_LLP12_dphi.push_back( dphi_LLP12);
-
-//&&&&&
-// //     if ( Vtx_chi < 0 && LLP2_nTrks > 1 ) dump = true;
-//     cout << endl;
-//     cout << " LLP " << 2 << " pt eta phi " << LLP2_pt << " " << LLP2_eta << " " << LLP2_phi << " x y z " << LLP2_x << " " << LLP2_y << " " << LLP2_z << " nTrks " << LLP2_nTrks << endl;
-//     cout << "	  Vtx Chi2 " << Vtx_chi << " dx dy dz " << Vtx_x - LLP2_x << " " << Vtx_y - LLP2_y  << " " << Vtx_z - LLP2_z << " nTrks " << Vtx_ntk << endl;
-//     cout << " &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& " << endl;
+// //&&&&&
+// // //     bool dump = false;
+// // //     if ( Vtx_chi < 0 && LLP1_nTrks > 1 ) dump = true;
 // //     cout << endl;
-//&&&&&
-  }
-  } // !runonData
+// //     cout << endl;
+// //     cout << " &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& " << endl;
+// //     cout << " run event " << runNumber << " " << eventNumber << endl;
+// //     cout << " LLP " << 1 << " pt eta phi " << LLP1_pt << " " << LLP1_eta << " " << LLP1_phi << " x y z " << LLP1_x << " " << LLP1_y << " " << LLP1_z << " nTrks " << LLP1_nTrks << endl;
+// //     cout << "	  Vtx Chi2 " << Vtx_chi << " dx dy dz " << Vtx_x - LLP1_x << " " << Vtx_y - LLP1_y  << " " << Vtx_z - LLP1_z << " nTrks " << Vtx_ntk << endl;
+// //&&&&&
 
-      //-----------------------------------Vertexing-----------------------------------------------//
-      //                               4 steps Vertexing                                           //
-      // These 4 steps can be divided into 2 => (1,2) & (3,4)                                      //
-      //        (1,2) : Corresponds to the Tight WP  of the Track level  BDT                       //
-      //        (3,4) : Corresponds to the Loose WP of the Track level  BDT 
-      //     => 1 & 3 are using the classic Adaptive Vertex Fitter (AVF) to build the vertices     //
-      //     => 2 & 4 are using the Iterative Adaptive Vertex Fitter (IAVF)to build the vertices   //
-      //          => Description of the IAVF at step 2                                             //
-      //Process : Takes a collection of displaced track (from the BDT) as an input, then           //
-      //          a vertex is built using the AVF or the IAVF if needed. No vertex can be obtained //
-      //          out of these 4 steps                                                             //
-      //                                                                                           //
-      //Reconstruction Criteria : We require the vertex to have a chi2 per D.O.F between 0 and 10  //                                                                    //
-      //                          and to be matched to a generated vertex when looking at signal MC//
-      //                                                                                           //
-      //-------------------------------------------------------------------------------------------//
-     
-    //--------------------------- FIRST HEMISPHERE WITH MVA -------------------------------------//
 
-    static AdaptiveVertexFitter 
-    theFitter_Vertex_Hemi1_mva(
-                 GeometricAnnealing ( sigmacut, Tini, ratio ), 
-                 DefaultLinearizationPointFinder(),
-                 KalmanVertexUpdator<5>(), 
-                 KalmanVertexTrackCompatibilityEstimator<5>(), 
-                 KalmanVertexSmoother() );
-    theFitter_Vertex_Hemi1_mva.setParameters ( maxshift, maxlpshift, maxstep, weightThreshold );
+//     //-------------------------- SECOND LLP WITH MVA -------------------------------------//
+
+//     static AdaptiveVertexFitter 
+//     theFitter_vertex_llp2_mva(
+//                  GeometricAnnealing ( sigmacut, Tini, ratio ), 
+//                  DefaultLinearizationPointFinder(),
+//                  KalmanVertexUpdator<5>(), 
+//                  KalmanVertexTrackCompatibilityEstimator<5>(), 
+//                  KalmanVertexSmoother() );
+//     theFitter_vertex_llp2_mva.setParameters ( maxshift, maxlpshift, maxstep, weightThreshold );
     
-    Vtx_ntk = displacedTracks_Hemi1_mva.size();
-    Vtx_x = -100.;
-    Vtx_y = -100.;
-    Vtx_z = -100.;
-    Vtx_chi = -10.;
-    Vtx_step = 0;
-    GlobalError posError;
-    float MeanWeight =0;
-    TransientVertex displacedVertex_Hemi1_mva;
-    TransientVertex displacedVertex_Hemi1_mva_TW;
-    float DCA_VTX_Meand = 0;
-	
-    if ( Vtx_ntk > 1 && ActivateStep1)
-    {
-      displacedVertex_Hemi1_mva = theFitter_Vertex_Hemi1_mva.vertex(displacedTracks_Hemi1_mva); // fitted vertex
-      if ( displacedVertex_Hemi1_mva.isValid() ) // NotValid if the max number of steps has been exceded or the fitted position is out of tracker bounds.
-      { 
-        Vtx_x = displacedVertex_Hemi1_mva.position().x();
-        Vtx_y = displacedVertex_Hemi1_mva.position().y();
-        Vtx_z = displacedVertex_Hemi1_mva.position().z();
-        Vtx_chi = displacedVertex_Hemi1_mva.normalisedChiSquared();
-	      Vtx_step = 1;
-        posError = displacedVertex_Hemi1_mva.positionError();
+//     Vtx_ntk = displacedTracks_llp2_mva.size();
+//     Vtx_x = -100.;
+//     Vtx_y = -100.;
+//     Vtx_z = -100.;
+//     Vtx_chi = -10.;
+//     Total4Vector1.SetPxPyPzE(0,0,0,0);
+//     if ( Vtx_ntk > 1 )
+//     {
+//       TransientVertex displacedVertex_llp2_mva = theFitter_vertex_llp2_mva.vertex(displacedTracks_llp2_mva); // fitted vertex
+      
+//       if ( displacedVertex_llp2_mva.isValid() ) // NotValid if the max number of steps has been exceded or the fitted position is out of tracker bounds.
+//       {
+//         Vtx_x = displacedVertex_llp2_mva.position().x();
+//         Vtx_y = displacedVertex_llp2_mva.position().y();
+//         Vtx_z = displacedVertex_llp2_mva.position().z();
+//         Vtx_chi = displacedVertex_llp2_mva.normalisedChiSquared();
+
+//         float temp_px = 0;
+//         float temp_py = 0;
+//         float temp_pz = 0 ;
+//         float temp_e = 0 ;
         
-        GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
-              for (int p = 0; p < Vtx_ntk; p++)
-                {
-                   MeanWeight+=displacedVertex_Hemi1_mva.trackWeight(displacedTracks_Hemi1_mva[p]);
-                  tree_Hemi_Vtx_trackWeight.push_back(displacedVertex_Hemi1_mva.trackWeight(displacedTracks_Hemi1_mva[p]));
-                  TrajectoryStateClosestToPoint DCA_Vtx = displacedTracks_Hemi1_mva[p].trajectoryStateClosestToPoint(RECOvtxPos);
-                  if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
-                  //but one should look at the wieghts of the track at the same time i.e : wieght close to 0 means the track was not important for the reco of the vtx
-                    {// The positions are given in the Global frame
-                      float pca_Vtx_x = DCA_Vtx.position().x();
-                      float pca_Vtx_y = DCA_Vtx.position().y();
-                      float pca_Vtx_z = DCA_Vtx.position().z();
-                      // to check 
-                      float refPoint_x = DCA_Vtx.referencePoint().x();
-                      float refPoint_y = DCA_Vtx.referencePoint().y();
-                      float refPoint_z = DCA_Vtx.referencePoint().z();
-                      float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
-                      float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
-                      float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
-                      float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
-                      float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
-                      DCA_VTX_Meand+=DCA_VTX_d;
-                      tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
-                      tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
-                      tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
-                      tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
-                      tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
-                    }
-                } 
-              DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-              // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
-      }
-    }
-      //----------------------------------------IAVF-----------------------------------------------//
-      //                           Iterative Adaptive Vertex Fitter                                //
-      //Input : Collections od displaced Tracks ordered by decreasing values of BDT => to have the //
-      //        the best tracks at the beginning of the collection                                 //
-      //                                                                                           //
-      //Process : Within the collection of tracks, look for the first good seed made of 2 tracks,  //
-      //          (good seed : vertex valid with a chi2 within a certain range (LowerLimit and     //
-      //          UpperLimit)). From this seed, tracks are added one by one, and a vertex is built //
-      //          at each step. The vertex is either valid or not. If valid in a certain range of  //
-      //          Chi2, we keep going until there are no more tracks left                          //
-      //                                                                                           //
-      //Degrees of freedom: -LowerLimit (Chi2 restriction)                                         //
-      //                    -UpperLimit (Chi2 restriction)                                         //
-      //                    -BDtValue (Restriction on the BDT value of the tracks that formed  //
-      //                     the vertex)                                                           //
-      //                                                                                           //
-      //Why? : Address the drop in efficiency due to MiniAOD datatier, turns out it improves the   //
-      //       basic AVF implementation (even in RECO/AOD)                                         //
-      //                                                                                           //
-      //PS: Maximum efficiency is reached for MiniAOD when using the covariance matrix correction  //
-      //-------------------------------------------------------------------------------------------//
+//         //--------------- B-tagging-----------------------//
+//             for (unsigned int i =  0 ; i < displacedTracks_llp2_mva.size(); i++)
+//               {
+//                 temp_px = TrackInfo_llp2_mva[i].Px();
+//                 temp_py = TrackInfo_llp2_mva[i].Py();
+//                 temp_pz = TrackInfo_llp2_mva[i].Pz();
+//                 temp_e  = TrackInfo_llp2_mva[i].E();
+//                 TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
+//                 Total4Vector1 +=TLorentzTrack;
+//               }
 
-    // step 2 : IAVF if you want to assign the IAVF to the Step1 => ActivateStep1IAVF => true
-    int ntracks    = -2;
-    float tempchi2 = -10.;
-    float tempx = -100.;
-    float tempy = -100.;
-    float tempz = -100.;
-    bool badVtx = false;
+
+//         // std::cout<<"invaraint mass of LLP2 with LorentzVector : "<<sqrt(Total4Vector1.Mag2())<<std::endl;
+//       }
+
+//     }
     
-    float tempMeanWeight=0;
-    if ( (Vtx_chi < 0. || Vtx_chi > 10.) && ActivateStep1IAVF ) badVtx = true;
-    if ( badVtx && IterAVF && Vtx_ntk > 1 ) //IterAVF est redondant avec AcitvateStep3
-    {
-      MeanWeight=0;
-      DCA_VTX_Meand = 0;
-      bool success = false;
-      std::vector<TransientTrack> vTT;
-      tempchi2 = -10.;
-      tempMeanWeight=0;
-      for ( int p = 1; p < Vtx_ntk; p++ )
-      {
-        for  ( int k = 0; k < p; k++ ) // take pairs of tracks of highest BDT value
-        {
-          vTT.push_back(displacedTracks_Hemi1_mva[p]);
-          vTT.push_back(displacedTracks_Hemi1_mva[k]);
-          ntracks = 2;
-          TransientVertex TV = theFitter_Vertex_Hemi1_mva.vertex(vTT); // We take the first "good-looking" seed to start
-          if ( TV.isValid() && TV.normalisedChiSquared()>0 && TV.normalisedChiSquared()<10 ) 
-            {
-	            tempchi2 = TV.normalisedChiSquared();
-	            tempx = TV.position().x();
-	            tempy = TV.position().y();
-	            tempz = TV.position().z();
-              posError = TV.positionError();
-	            success = true; 
-              for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                {
-                  if (m == k || m == p) continue;
-                  ntracks++;
-                  tempMeanWeight=0;
-                  vTT.push_back(displacedTracks_Hemi1_mva[m]);
-                  TransientVertex updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
-                  if ( !updatedTV.isValid() ) 
-	                  {  
-	    	              vTT.pop_back();
-	    	              ntracks--;
-	    	              updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
-	    	              tempchi2 = updatedTV.normalisedChiSquared();
-	    	              tempx=updatedTV.position().x();
-	    	              tempy=updatedTV.position().y();
-        	            tempz=updatedTV.position().z();
-                      posError = updatedTV.positionError();
-	    	              continue;
-	                  } 
-                  if ( updatedTV.isValid() ) 
-	                  {
-                      tempchi2 = updatedTV.normalisedChiSquared();
-	    	              tempx=updatedTV.position().x();
-	    	              tempy=updatedTV.position().y();
-	    	              tempz=updatedTV.position().z();
-                      posError = updatedTV.positionError();
-                      for(int i = 0; i<ntracks;i++)
-                        {
-                          tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                          if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                        }
-	                  }
-                } // end loop on the other tracks
-              Vtx_ntk = ntracks;
-              Vtx_chi = tempchi2;
-              Vtx_x = tempx;
-              Vtx_y = tempy;
-              Vtx_z = tempz;
-              Vtx_step = 2;
-              GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
-              float DCA_VTX_Meand = 0;
-              for (int k = 0; k< Vtx_ntk; k++)
-                {
-                  TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
-                  if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
-                  //but one should look of the wieghts of the track at the same time
-                    {// The positions are given in the Global frame
-                      float pca_Vtx_x = DCA_Vtx.position().x();
-                      float pca_Vtx_y = DCA_Vtx.position().y();
-                      float pca_Vtx_z = DCA_Vtx.position().z();
-                      // to check 
-                      float refPoint_x = DCA_Vtx.referencePoint().x();
-                      float refPoint_y = DCA_Vtx.referencePoint().y();
-                      float refPoint_z = DCA_Vtx.referencePoint().z();
-                      float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
-                      float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
-                      float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
-                      float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
-                      float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
-                      DCA_VTX_Meand+=DCA_VTX_d;
-                      tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
-                      tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
-                      tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
-                      tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
-                      tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
+//     tree_LLP_Mass.push_back(sqrt(Total4Vector1.Mag2()));
+//     tree_LLP.push_back(2);
+//     tree_LLP_pt.push_back(   LLP2_pt);
+//     tree_LLP_eta.push_back(  LLP2_eta);
+//     tree_LLP_phi.push_back(  LLP2_phi);
+//     tree_LLP_x.push_back(    LLP2_x);
+//     tree_LLP_y.push_back(    LLP2_y);
+//     tree_LLP_z.push_back(    LLP2_z);
+//     tree_LLP_dist.push_back( LLP2_dist);
+//     tree_LLP_r.push_back(sqrt(LLP2_x*LLP2_x+LLP2_y*LLP2_y));
+//     tree_LLP_nTrks.push_back(LLP2_nTrks);
+//     tree_LLP_Vtx_nTrks.push_back(Vtx_ntk);
+//     tree_LLP_Vtx_NChi2.push_back(Vtx_chi);
+//     tree_LLP_Vtx_dx.push_back(Vtx_x - LLP2_x);
+//     tree_LLP_Vtx_dy.push_back(Vtx_y - LLP2_y);
+//     tree_LLP_Vtx_dz.push_back(Vtx_z - LLP2_z);
+
+//     dSV = (Vtx_x - LLP2_x)*(Vtx_x - LLP2_x) + (Vtx_y - LLP2_y)*(Vtx_y - LLP2_y) + (Vtx_z - LLP2_z)*(Vtx_z - LLP2_z);
+//     recX = Vtx_x - tree_PV_x;
+//     recY = Vtx_y - tree_PV_y;
+//     recZ = Vtx_z - tree_PV_z;
+//     recD = TMath::Sqrt(recX*recX + recY*recY + recZ*recZ);
+//     tree_LLP_Vtx_dist.push_back( recD );
+//     tree_LLP_Vtx_dd.push_back( TMath::Sqrt(dSV)/LLP2_dist );
+    
+//     float dR_LLP12   = Deltar(LLP1_eta, LLP1_phi, LLP2_eta, LLP2_phi);
+//     float deta_LLP12 = abs(LLP1_eta - LLP2_eta);
+//     float dphi_LLP12 = abs(Deltaphi(LLP1_phi, LLP2_phi));
+//     tree_LLP12_dR.push_back(   dR_LLP12);
+//     tree_LLP12_deta.push_back( deta_LLP12);
+//     tree_LLP12_dphi.push_back( dphi_LLP12);
+
+// //&&&&&
+// // //     if ( Vtx_chi < 0 && LLP2_nTrks > 1 ) dump = true;
+// //     cout << endl;
+// //     cout << " LLP " << 2 << " pt eta phi " << LLP2_pt << " " << LLP2_eta << " " << LLP2_phi << " x y z " << LLP2_x << " " << LLP2_y << " " << LLP2_z << " nTrks " << LLP2_nTrks << endl;
+// //     cout << "	  Vtx Chi2 " << Vtx_chi << " dx dy dz " << Vtx_x - LLP2_x << " " << Vtx_y - LLP2_y  << " " << Vtx_z - LLP2_z << " nTrks " << Vtx_ntk << endl;
+// //     cout << " &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& " << endl;
+// // //     cout << endl;
+// //&&&&&
+//   }
+//   } // !runonData
+
+//       //-----------------------------------Vertexing-----------------------------------------------//
+//       //                               4 steps Vertexing                                           //
+//       // These 4 steps can be divided into 2 => (1,2) & (3,4)                                      //
+//       //        (1,2) : Corresponds to the Tight WP  of the Track level  BDT                       //
+//       //        (3,4) : Corresponds to the Loose WP of the Track level  BDT 
+//       //     => 1 & 3 are using the classic Adaptive Vertex Fitter (AVF) to build the vertices     //
+//       //     => 2 & 4 are using the Iterative Adaptive Vertex Fitter (IAVF)to build the vertices   //
+//       //          => Description of the IAVF at step 2                                             //
+//       //Process : Takes a collection of displaced track (from the BDT) as an input, then           //
+//       //          a vertex is built using the AVF or the IAVF if needed. No vertex can be obtained //
+//       //          out of these 4 steps                                                             //
+//       //                                                                                           //
+//       //Reconstruction Criteria : We require the vertex to have a chi2 per D.O.F between 0 and 10  //                                                                    //
+//       //                          and to be matched to a generated vertex when looking at signal MC//
+//       //                                                                                           //
+//       //-------------------------------------------------------------------------------------------//
+     
+//     //--------------------------- FIRST HEMISPHERE WITH MVA -------------------------------------//
+
+//     static AdaptiveVertexFitter 
+//     theFitter_Vertex_Hemi1_mva(
+//                  GeometricAnnealing ( sigmacut, Tini, ratio ), 
+//                  DefaultLinearizationPointFinder(),
+//                  KalmanVertexUpdator<5>(), 
+//                  KalmanVertexTrackCompatibilityEstimator<5>(), 
+//                  KalmanVertexSmoother() );
+//     theFitter_Vertex_Hemi1_mva.setParameters ( maxshift, maxlpshift, maxstep, weightThreshold );
+    
+//     Vtx_ntk = displacedTracks_Hemi1_mva.size();
+//     Vtx_x = -100.;
+//     Vtx_y = -100.;
+//     Vtx_z = -100.;
+//     Vtx_chi = -10.;
+//     Vtx_step = 0;
+//     GlobalError posError;
+//     float MeanWeight =0;
+//     TransientVertex displacedVertex_Hemi1_mva;
+//     TransientVertex displacedVertex_Hemi1_mva_TW;
+//     float DCA_VTX_Meand = 0;
+	
+//     if ( Vtx_ntk > 1 && ActivateStep1)
+//     {
+//       displacedVertex_Hemi1_mva = theFitter_Vertex_Hemi1_mva.vertex(displacedTracks_Hemi1_mva); // fitted vertex
+//       if ( displacedVertex_Hemi1_mva.isValid() ) // NotValid if the max number of steps has been exceded or the fitted position is out of tracker bounds.
+//       { 
+//         Vtx_x = displacedVertex_Hemi1_mva.position().x();
+//         Vtx_y = displacedVertex_Hemi1_mva.position().y();
+//         Vtx_z = displacedVertex_Hemi1_mva.position().z();
+//         Vtx_chi = displacedVertex_Hemi1_mva.normalisedChiSquared();
+// 	      Vtx_step = 1;
+//         posError = displacedVertex_Hemi1_mva.positionError();
+        
+//         GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
+//               for (int p = 0; p < Vtx_ntk; p++)
+//                 {
+//                    MeanWeight+=displacedVertex_Hemi1_mva.trackWeight(displacedTracks_Hemi1_mva[p]);
+//                   tree_Hemi_Vtx_trackWeight.push_back(displacedVertex_Hemi1_mva.trackWeight(displacedTracks_Hemi1_mva[p]));
+//                   TrajectoryStateClosestToPoint DCA_Vtx = displacedTracks_Hemi1_mva[p].trajectoryStateClosestToPoint(RECOvtxPos);
+//                   if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
+//                   //but one should look at the wieghts of the track at the same time i.e : wieght close to 0 means the track was not important for the reco of the vtx
+//                     {// The positions are given in the Global frame
+//                       float pca_Vtx_x = DCA_Vtx.position().x();
+//                       float pca_Vtx_y = DCA_Vtx.position().y();
+//                       float pca_Vtx_z = DCA_Vtx.position().z();
+//                       // to check 
+//                       float refPoint_x = DCA_Vtx.referencePoint().x();
+//                       float refPoint_y = DCA_Vtx.referencePoint().y();
+//                       float refPoint_z = DCA_Vtx.referencePoint().z();
+//                       float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
+//                       float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
+//                       float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
+//                       float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
+//                       float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
+//                       DCA_VTX_Meand+=DCA_VTX_d;
+//                       tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
+//                       tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
+//                       tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
+//                       tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
+//                       tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
+//                     }
+//                 } 
+//               DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
+//               // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
+//       }
+//     }
+//       //----------------------------------------IAVF-----------------------------------------------//
+//       //                           Iterative Adaptive Vertex Fitter                                //
+//       //Input : Collections od displaced Tracks ordered by decreasing values of BDT => to have the //
+//       //        the best tracks at the beginning of the collection                                 //
+//       //                                                                                           //
+//       //Process : Within the collection of tracks, look for the first good seed made of 2 tracks,  //
+//       //          (good seed : vertex valid with a chi2 within a certain range (LowerLimit and     //
+//       //          UpperLimit)). From this seed, tracks are added one by one, and a vertex is built //
+//       //          at each step. The vertex is either valid or not. If valid in a certain range of  //
+//       //          Chi2, we keep going until there are no more tracks left                          //
+//       //                                                                                           //
+//       //Degrees of freedom: -LowerLimit (Chi2 restriction)                                         //
+//       //                    -UpperLimit (Chi2 restriction)                                         //
+//       //                    -BDtValue (Restriction on the BDT value of the tracks that formed  //
+//       //                     the vertex)                                                           //
+//       //                                                                                           //
+//       //Why? : Address the drop in efficiency due to MiniAOD datatier, turns out it improves the   //
+//       //       basic AVF implementation (even in RECO/AOD)                                         //
+//       //                                                                                           //
+//       //PS: Maximum efficiency is reached for MiniAOD when using the covariance matrix correction  //
+//       //-------------------------------------------------------------------------------------------//
+
+//     // step 2 : IAVF if you want to assign the IAVF to the Step1 => ActivateStep1IAVF => true
+//     int ntracks    = -2;
+//     float tempchi2 = -10.;
+//     float tempx = -100.;
+//     float tempy = -100.;
+//     float tempz = -100.;
+//     bool badVtx = false;
+    
+//     float tempMeanWeight=0;
+//     if ( (Vtx_chi < 0. || Vtx_chi > 10.) && ActivateStep1IAVF ) badVtx = true;
+//     if ( badVtx && IterAVF && Vtx_ntk > 1 ) //IterAVF est redondant avec AcitvateStep3
+//     {
+//       MeanWeight=0;
+//       DCA_VTX_Meand = 0;
+//       bool success = false;
+//       std::vector<TransientTrack> vTT;
+//       tempchi2 = -10.;
+//       tempMeanWeight=0;
+//       for ( int p = 1; p < Vtx_ntk; p++ )
+//       {
+//         for  ( int k = 0; k < p; k++ ) // take pairs of tracks of highest BDT value
+//         {
+//           vTT.push_back(displacedTracks_Hemi1_mva[p]);
+//           vTT.push_back(displacedTracks_Hemi1_mva[k]);
+//           ntracks = 2;
+//           TransientVertex TV = theFitter_Vertex_Hemi1_mva.vertex(vTT); // We take the first "good-looking" seed to start
+//           if ( TV.isValid() && TV.normalisedChiSquared()>0 && TV.normalisedChiSquared()<10 ) 
+//             {
+// 	            tempchi2 = TV.normalisedChiSquared();
+// 	            tempx = TV.position().x();
+// 	            tempy = TV.position().y();
+// 	            tempz = TV.position().z();
+//               posError = TV.positionError();
+// 	            success = true; 
+//               for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
+//                 {
+//                   if (m == k || m == p) continue;
+//                   ntracks++;
+//                   tempMeanWeight=0;
+//                   vTT.push_back(displacedTracks_Hemi1_mva[m]);
+//                   TransientVertex updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
+//                   if ( !updatedTV.isValid() ) 
+// 	                  {  
+// 	    	              vTT.pop_back();
+// 	    	              ntracks--;
+// 	    	              updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
+// 	    	              tempchi2 = updatedTV.normalisedChiSquared();
+// 	    	              tempx=updatedTV.position().x();
+// 	    	              tempy=updatedTV.position().y();
+//         	            tempz=updatedTV.position().z();
+//                       posError = updatedTV.positionError();
+// 	    	              continue;
+// 	                  } 
+//                   if ( updatedTV.isValid() ) 
+// 	                  {
+//                       tempchi2 = updatedTV.normalisedChiSquared();
+// 	    	              tempx=updatedTV.position().x();
+// 	    	              tempy=updatedTV.position().y();
+// 	    	              tempz=updatedTV.position().z();
+//                       posError = updatedTV.positionError();
+//                       for(int i = 0; i<ntracks;i++)
+//                         {
+//                           tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
+//                           if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
+//                         }
+// 	                  }
+//                 } // end loop on the other tracks
+//               Vtx_ntk = ntracks;
+//               Vtx_chi = tempchi2;
+//               Vtx_x = tempx;
+//               Vtx_y = tempy;
+//               Vtx_z = tempz;
+//               Vtx_step = 2;
+//               GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
+//               float DCA_VTX_Meand = 0;
+//               for (int k = 0; k< Vtx_ntk; k++)
+//                 {
+//                   TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
+//                   if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
+//                   //but one should look of the wieghts of the track at the same time
+//                     {// The positions are given in the Global frame
+//                       float pca_Vtx_x = DCA_Vtx.position().x();
+//                       float pca_Vtx_y = DCA_Vtx.position().y();
+//                       float pca_Vtx_z = DCA_Vtx.position().z();
+//                       // to check 
+//                       float refPoint_x = DCA_Vtx.referencePoint().x();
+//                       float refPoint_y = DCA_Vtx.referencePoint().y();
+//                       float refPoint_z = DCA_Vtx.referencePoint().z();
+//                       float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
+//                       float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
+//                       float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
+//                       float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
+//                       float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
+//                       DCA_VTX_Meand+=DCA_VTX_d;
+//                       tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
+//                       tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
+//                       tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
+//                       tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
+//                       tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
                       
-                    }
-                }
-              DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-              // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
-              if (MeanWeight==0)//<=>only two tracks in the valid vertex
-                  {
-                    for(int i = 0; i<ntracks;i++)
-                      {
-                        MeanWeight+=TV.trackWeight(vTT[i]);
-                      }
-                  }
-            }
-          else
-            { // If not valid : we build a new seed
-              ntracks = 0;
-              vTT.clear();
-            }
-          if ( success ) break;
-        }
-        if ( success ) break;
-      }
-      //--------------------ENDOF IAVF--------------------------//
-    }
+//                     }
+//                 }
+//               DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
+//               // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
+//               if (MeanWeight==0)//<=>only two tracks in the valid vertex
+//                   {
+//                     for(int i = 0; i<ntracks;i++)
+//                       {
+//                         MeanWeight+=TV.trackWeight(vTT[i]);
+//                       }
+//                   }
+//             }
+//           else
+//             { // If not valid : we build a new seed
+//               ntracks = 0;
+//               vTT.clear();
+//             }
+//           if ( success ) break;
+//         }
+//         if ( success ) break;
+//       }
+//       //--------------------ENDOF IAVF--------------------------//
+//     }
 
-    // step 3
-    TransientVertex displacedVertex_step2_Hemi1;
-    static AdaptiveVertexFitter theFitter_Vertex_step2_Hemi1(
-    	       GeometricAnnealing ( sigmacut, Tini, ratio ), 
-    	       DefaultLinearizationPointFinder(),
-    	       KalmanVertexUpdator<5>(), 
-    	       KalmanVertexTrackCompatibilityEstimator<5>(), 
-    	       KalmanVertexSmoother() );
-    theFitter_Vertex_step2_Hemi1.setParameters ( maxshift, maxlpshift, maxstep, weightThreshold );
-    // bool badVtx = false;
-    badVtx = false;
-    if ( (Vtx_chi < 0. || Vtx_chi > 10.) && ActivateStep2 ) badVtx = true;
-    if ( badVtx && displacedTracks_step2_Hemi1.size() > 1 ) {
-      Vtx_ntk = displacedTracks_step2_Hemi1.size();
-      Vtx_chi = -10.;
-      displacedVertex_step2_Hemi1 = theFitter_Vertex_step2_Hemi1.vertex(displacedTracks_step2_Hemi1);
-      if ( displacedVertex_step2_Hemi1.isValid() )
-      { 
-        MeanWeight =0;
-        Vtx_x	= displacedVertex_step2_Hemi1.position().x();
-        Vtx_y	= displacedVertex_step2_Hemi1.position().y();
-        Vtx_z	= displacedVertex_step2_Hemi1.position().z();
-        Vtx_chi = displacedVertex_step2_Hemi1.normalisedChiSquared();
-        Vtx_step = 3;
-        GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
-        posError = displacedVertex_step2_Hemi1.positionError();
-        DCA_VTX_Meand = 0;
-        for (int p = 0; p < Vtx_ntk; p++)
-                {
-                  MeanWeight+=displacedVertex_step2_Hemi1.trackWeight(displacedTracks_step2_Hemi1[p]);
-                  tree_Hemi_Vtx_trackWeight.push_back(displacedVertex_step2_Hemi1.trackWeight(displacedTracks_step2_Hemi1[p]));
-                  TrajectoryStateClosestToPoint DCA_Vtx = displacedTracks_step2_Hemi1[p].trajectoryStateClosestToPoint(RECOvtxPos);
-                  if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
-                  //but one should look of the wieghts of the track at the same time
-                    {// The positions are given in the Global frame
-                      float pca_Vtx_x = DCA_Vtx.position().x();
-                      float pca_Vtx_y = DCA_Vtx.position().y();
-                      float pca_Vtx_z = DCA_Vtx.position().z();
-                      // to check 
-                      float refPoint_x = DCA_Vtx.referencePoint().x();
-                      float refPoint_y = DCA_Vtx.referencePoint().y();
-                      float refPoint_z = DCA_Vtx.referencePoint().z();
-                      float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
-                      float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
-                      float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
-                      float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
-                      float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
-                      DCA_VTX_Meand+=DCA_VTX_d;
-                      tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
-                      tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
-                      tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
-                      tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
-                      tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
-                    }
-                }
-              DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-              // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
-      }
-    }
+//     // step 3
+//     TransientVertex displacedVertex_step2_Hemi1;
+//     static AdaptiveVertexFitter theFitter_Vertex_step2_Hemi1(
+//     	       GeometricAnnealing ( sigmacut, Tini, ratio ), 
+//     	       DefaultLinearizationPointFinder(),
+//     	       KalmanVertexUpdator<5>(), 
+//     	       KalmanVertexTrackCompatibilityEstimator<5>(), 
+//     	       KalmanVertexSmoother() );
+//     theFitter_Vertex_step2_Hemi1.setParameters ( maxshift, maxlpshift, maxstep, weightThreshold );
+//     // bool badVtx = false;
+//     badVtx = false;
+//     if ( (Vtx_chi < 0. || Vtx_chi > 10.) && ActivateStep2 ) badVtx = true;
+//     if ( badVtx && displacedTracks_step2_Hemi1.size() > 1 ) {
+//       Vtx_ntk = displacedTracks_step2_Hemi1.size();
+//       Vtx_chi = -10.;
+//       displacedVertex_step2_Hemi1 = theFitter_Vertex_step2_Hemi1.vertex(displacedTracks_step2_Hemi1);
+//       if ( displacedVertex_step2_Hemi1.isValid() )
+//       { 
+//         MeanWeight =0;
+//         Vtx_x	= displacedVertex_step2_Hemi1.position().x();
+//         Vtx_y	= displacedVertex_step2_Hemi1.position().y();
+//         Vtx_z	= displacedVertex_step2_Hemi1.position().z();
+//         Vtx_chi = displacedVertex_step2_Hemi1.normalisedChiSquared();
+//         Vtx_step = 3;
+//         GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
+//         posError = displacedVertex_step2_Hemi1.positionError();
+//         DCA_VTX_Meand = 0;
+//         for (int p = 0; p < Vtx_ntk; p++)
+//                 {
+//                   MeanWeight+=displacedVertex_step2_Hemi1.trackWeight(displacedTracks_step2_Hemi1[p]);
+//                   tree_Hemi_Vtx_trackWeight.push_back(displacedVertex_step2_Hemi1.trackWeight(displacedTracks_step2_Hemi1[p]));
+//                   TrajectoryStateClosestToPoint DCA_Vtx = displacedTracks_step2_Hemi1[p].trajectoryStateClosestToPoint(RECOvtxPos);
+//                   if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
+//                   //but one should look of the wieghts of the track at the same time
+//                     {// The positions are given in the Global frame
+//                       float pca_Vtx_x = DCA_Vtx.position().x();
+//                       float pca_Vtx_y = DCA_Vtx.position().y();
+//                       float pca_Vtx_z = DCA_Vtx.position().z();
+//                       // to check 
+//                       float refPoint_x = DCA_Vtx.referencePoint().x();
+//                       float refPoint_y = DCA_Vtx.referencePoint().y();
+//                       float refPoint_z = DCA_Vtx.referencePoint().z();
+//                       float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
+//                       float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
+//                       float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
+//                       float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
+//                       float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
+//                       DCA_VTX_Meand+=DCA_VTX_d;
+//                       tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
+//                       tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
+//                       tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
+//                       tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
+//                       tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
+//                     }
+//                 }
+//               DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
+//               // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
+//       }
+//     }
 
-    ntracks    = -2;
-    tempchi2 = -10.;
-    tempx = -100.;
-    tempy = -100.;
-    tempz = -100.;
-    badVtx = false;
+//     ntracks    = -2;
+//     tempchi2 = -10.;
+//     tempx = -100.;
+//     tempy = -100.;
+//     tempz = -100.;
+//     badVtx = false;
 
-    if ( (Vtx_chi < 0. || Vtx_chi > 10.) && ActivateStep3 ) badVtx = true;
-    if ( badVtx && IterAVF && Vtx_ntk > 1 ) //IterAVF est redondant avec AcitvateStep3
-    {
-      MeanWeight=0;
-      bool success = false;
-      std::vector<TransientTrack> vTT;
-      tempchi2 = -10.;
-      tempMeanWeight=0;
-      DCA_VTX_Meand = 0;
-      for ( int p = 1; p < Vtx_ntk; p++ )
-      {
-        for  ( int k = 0; k < p; k++ ) // take pairs of tracks of highest BDT value
-        {
-          vTT.push_back(displacedTracks_step2_Hemi1[p]);
-          vTT.push_back(displacedTracks_step2_Hemi1[k]);
-          ntracks = 2;
-          TransientVertex TV = theFitter_Vertex_step2_Hemi1.vertex(vTT); // We take the first "good-looking" seed to start
-          if ( TV.isValid() && TV.normalisedChiSquared()>0 && TV.normalisedChiSquared()<10 ) 
-            {
-	            tempchi2 = TV.normalisedChiSquared();
-	            tempx = TV.position().x();
-	            tempy = TV.position().y();
-	            tempz = TV.position().z();
-              posError = TV.positionError();
-	            success = true; 
-              for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                {
-                  if (m == k || m == p) continue;
-                  ntracks++;
-                  tempMeanWeight=0;
-                  vTT.push_back(displacedTracks_step2_Hemi1[m]);
-                  TransientVertex updatedTV = theFitter_Vertex_step2_Hemi1.vertex(vTT);
-                  if ( !updatedTV.isValid() ) 
-	                  {  
-	    	              vTT.pop_back();
-	    	              ntracks--;
-	    	              updatedTV = theFitter_Vertex_step2_Hemi1.vertex(vTT);
-	    	              tempchi2 = updatedTV.normalisedChiSquared();
-	    	              tempx=updatedTV.position().x();
-	    	              tempy=updatedTV.position().y();
-        	            tempz=updatedTV.position().z();
-                      posError = updatedTV.positionError();
-	    	              continue;
-	                  } 
-                  if ( updatedTV.isValid() ) 
-	                  {
-                      tempchi2 = updatedTV.normalisedChiSquared();
-	    	              tempx=updatedTV.position().x();
-	    	              tempy=updatedTV.position().y();
-	    	              tempz=updatedTV.position().z();
-                      posError = updatedTV.positionError();
-                      for(int i = 0; i<ntracks;i++)
-                        {
-                          tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                          if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                        }
-	                  }
-                } // end loop on the other tracks
-              Vtx_ntk = ntracks;
-              Vtx_chi = tempchi2;
-              Vtx_x = tempx;
-              Vtx_y = tempy;
-              Vtx_z = tempz;
-              Vtx_step = 4;
-               GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
-              //  float DCA_VTX_Meand = 0;
-              // float totalpx = 0 ;
-              // float totalpy = 0 ;
-              // float totalpz = 0 ;
-              // float totale = 0 ;
-              for (int k = 0; k< Vtx_ntk; k++)
-                {
-                  // totale+= totale +
-                  TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
-                  if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
-                  //but one should look of the wieghts of the track at the same time
-                    {// The positions are given in the Global frame
-                      float pca_Vtx_x = DCA_Vtx.position().x();
-                      float pca_Vtx_y = DCA_Vtx.position().y();
-                      float pca_Vtx_z = DCA_Vtx.position().z();
-                      // to check 
-                      float refPoint_x = DCA_Vtx.referencePoint().x();
-                      float refPoint_y = DCA_Vtx.referencePoint().y();
-                      float refPoint_z = DCA_Vtx.referencePoint().z();
-                      float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
-                      float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
-                      float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
-                      float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
-                      float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
-                      DCA_VTX_Meand+=DCA_VTX_d;
-                      tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
-                      tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
-                      tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
-                      tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
-                      tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
-                    }
-                }
-              DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-              if (MeanWeight==0)//<=>only two tracks in the valid vertex
-                  {
-                    for(int i = 0; i<ntracks;i++)
-                      {
-                        MeanWeight+=TV.trackWeight(vTT[i]);
-                      }
-                  }
-            }
-          else
-            { // If not valid : we build a new seed
-              ntracks = 0;
-              vTT.clear();
-            }
-          if ( success ) break;
-        }
-        if ( success ) break;
-      }
-      //--------------------END OF IAVF--------------------------//
-    }
+//     if ( (Vtx_chi < 0. || Vtx_chi > 10.) && ActivateStep3 ) badVtx = true;
+//     if ( badVtx && IterAVF && Vtx_ntk > 1 ) //IterAVF est redondant avec AcitvateStep3
+//     {
+//       MeanWeight=0;
+//       bool success = false;
+//       std::vector<TransientTrack> vTT;
+//       tempchi2 = -10.;
+//       tempMeanWeight=0;
+//       DCA_VTX_Meand = 0;
+//       for ( int p = 1; p < Vtx_ntk; p++ )
+//       {
+//         for  ( int k = 0; k < p; k++ ) // take pairs of tracks of highest BDT value
+//         {
+//           vTT.push_back(displacedTracks_step2_Hemi1[p]);
+//           vTT.push_back(displacedTracks_step2_Hemi1[k]);
+//           ntracks = 2;
+//           TransientVertex TV = theFitter_Vertex_step2_Hemi1.vertex(vTT); // We take the first "good-looking" seed to start
+//           if ( TV.isValid() && TV.normalisedChiSquared()>0 && TV.normalisedChiSquared()<10 ) 
+//             {
+// 	            tempchi2 = TV.normalisedChiSquared();
+// 	            tempx = TV.position().x();
+// 	            tempy = TV.position().y();
+// 	            tempz = TV.position().z();
+//               posError = TV.positionError();
+// 	            success = true; 
+//               for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
+//                 {
+//                   if (m == k || m == p) continue;
+//                   ntracks++;
+//                   tempMeanWeight=0;
+//                   vTT.push_back(displacedTracks_step2_Hemi1[m]);
+//                   TransientVertex updatedTV = theFitter_Vertex_step2_Hemi1.vertex(vTT);
+//                   if ( !updatedTV.isValid() ) 
+// 	                  {  
+// 	    	              vTT.pop_back();
+// 	    	              ntracks--;
+// 	    	              updatedTV = theFitter_Vertex_step2_Hemi1.vertex(vTT);
+// 	    	              tempchi2 = updatedTV.normalisedChiSquared();
+// 	    	              tempx=updatedTV.position().x();
+// 	    	              tempy=updatedTV.position().y();
+//         	            tempz=updatedTV.position().z();
+//                       posError = updatedTV.positionError();
+// 	    	              continue;
+// 	                  } 
+//                   if ( updatedTV.isValid() ) 
+// 	                  {
+//                       tempchi2 = updatedTV.normalisedChiSquared();
+// 	    	              tempx=updatedTV.position().x();
+// 	    	              tempy=updatedTV.position().y();
+// 	    	              tempz=updatedTV.position().z();
+//                       posError = updatedTV.positionError();
+//                       for(int i = 0; i<ntracks;i++)
+//                         {
+//                           tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
+//                           if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
+//                         }
+// 	                  }
+//                 } // end loop on the other tracks
+//               Vtx_ntk = ntracks;
+//               Vtx_chi = tempchi2;
+//               Vtx_x = tempx;
+//               Vtx_y = tempy;
+//               Vtx_z = tempz;
+//               Vtx_step = 4;
+//                GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
+//               //  float DCA_VTX_Meand = 0;
+//               // float totalpx = 0 ;
+//               // float totalpy = 0 ;
+//               // float totalpz = 0 ;
+//               // float totale = 0 ;
+//               for (int k = 0; k< Vtx_ntk; k++)
+//                 {
+//                   // totale+= totale +
+//                   TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
+//                   if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
+//                   //but one should look of the wieghts of the track at the same time
+//                     {// The positions are given in the Global frame
+//                       float pca_Vtx_x = DCA_Vtx.position().x();
+//                       float pca_Vtx_y = DCA_Vtx.position().y();
+//                       float pca_Vtx_z = DCA_Vtx.position().z();
+//                       // to check 
+//                       float refPoint_x = DCA_Vtx.referencePoint().x();
+//                       float refPoint_y = DCA_Vtx.referencePoint().y();
+//                       float refPoint_z = DCA_Vtx.referencePoint().z();
+//                       float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
+//                       float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
+//                       float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
+//                       float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
+//                       float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
+//                       DCA_VTX_Meand+=DCA_VTX_d;
+//                       tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
+//                       tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
+//                       tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
+//                       tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
+//                       tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
+//                     }
+//                 }
+//               DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
+//               if (MeanWeight==0)//<=>only two tracks in the valid vertex
+//                   {
+//                     for(int i = 0; i<ntracks;i++)
+//                       {
+//                         MeanWeight+=TV.trackWeight(vTT[i]);
+//                       }
+//                   }
+//             }
+//           else
+//             { // If not valid : we build a new seed
+//               ntracks = 0;
+//               vTT.clear();
+//             }
+//           if ( success ) break;
+//         }
+//         if ( success ) break;
+//       }
+//       //--------------------END OF IAVF--------------------------//
+//     }
     
-    float Vtx_chi1 = Vtx_chi;
-    tree_Hemi.push_back(1);
-    tree_Hemi_njet.push_back(njet1);
-    tree_Hemi_eta.push_back(axis1_eta);
-    tree_Hemi_phi.push_back(axis1_phi);
-    tree_Hemi_dR.push_back(axis1_dR);
-    tree_Hemi_nTrks.push_back(nTrks_axis1);
-    tree_Hemi_nTrks_sig.push_back(nTrks_axis1_sig);
-    tree_Hemi_nTrks_bad.push_back(nTrks_axis1_bad);
-    tree_Hemi_Vtx_step.push_back(Vtx_step);
-    tree_Hemi_Vtx_NChi2.push_back(Vtx_chi);
-    tree_Hemi_Vtx_nTrks.push_back(Vtx_ntk);
-    tree_Hemi_Vtx_nTrks_sig.push_back(nTrks_axis1_sig_mva);
-    tree_Hemi_Vtx_nTrks_bad.push_back(nTrks_axis1_bad_mva);
-    tree_Hemi_Vtx_x.push_back(Vtx_x);
-    tree_Hemi_Vtx_y.push_back(Vtx_y);
-    tree_Hemi_Vtx_r.push_back(sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y));
-    tree_Hemi_Vtx_z.push_back(Vtx_z);
-    tree_Hemi_Vtx_xError.push_back(posError.cxx());
-    tree_Hemi_Vtx_yError.push_back(posError.cyy());
-    tree_Hemi_Vtx_zError.push_back(posError.czz());
-    float theta_Vtx = tan(sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y)/abs(Vtx_z)) ;
-    float eta_Vtx = -TMath::Log(tan(theta_Vtx/2));
-    if (Vtx_z<0){eta_Vtx = -eta_Vtx;}
-    tree_Hemi_Vtx_eta.push_back(eta_Vtx);
-    recX = Vtx_x - tree_PV_x;
-    recY = Vtx_y - tree_PV_y;
-    recZ = Vtx_z - tree_PV_z;
-    recD = TMath::Sqrt(recX*recX + recY*recY + recZ*recZ);
-    tree_Hemi_Vtx_dist.push_back( recD );
-    tree_Hemi_Vtx_MeantrackWeight.push_back(MeanWeight);
-    tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
-    int nVertex = 0;
-    float posx1 = Vtx_x;
-    float posy1 = Vtx_y;
-    float posz1 = Vtx_z;
-    if ( Vtx_step>0 && Vtx_chi<10 && Vtx_chi>0 ){nVertex++;}
+//     float Vtx_chi1 = Vtx_chi;
+//     tree_Hemi.push_back(1);
+//     tree_Hemi_njet.push_back(njet1);
+//     tree_Hemi_eta.push_back(axis1_eta);
+//     tree_Hemi_phi.push_back(axis1_phi);
+//     tree_Hemi_dR.push_back(axis1_dR);
+//     tree_Hemi_nTrks.push_back(nTrks_axis1);
+//     tree_Hemi_nTrks_sig.push_back(nTrks_axis1_sig);
+//     tree_Hemi_nTrks_bad.push_back(nTrks_axis1_bad);
+//     tree_Hemi_Vtx_step.push_back(Vtx_step);
+//     tree_Hemi_Vtx_NChi2.push_back(Vtx_chi);
+//     tree_Hemi_Vtx_nTrks.push_back(Vtx_ntk);
+//     tree_Hemi_Vtx_nTrks_sig.push_back(nTrks_axis1_sig_mva);
+//     tree_Hemi_Vtx_nTrks_bad.push_back(nTrks_axis1_bad_mva);
+//     tree_Hemi_Vtx_x.push_back(Vtx_x);
+//     tree_Hemi_Vtx_y.push_back(Vtx_y);
+//     tree_Hemi_Vtx_r.push_back(sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y));
+//     tree_Hemi_Vtx_z.push_back(Vtx_z);
+//     tree_Hemi_Vtx_xError.push_back(posError.cxx());
+//     tree_Hemi_Vtx_yError.push_back(posError.cyy());
+//     tree_Hemi_Vtx_zError.push_back(posError.czz());
+//     float theta_Vtx = tan(sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y)/abs(Vtx_z)) ;
+//     float eta_Vtx = -TMath::Log(tan(theta_Vtx/2));
+//     if (Vtx_z<0){eta_Vtx = -eta_Vtx;}
+//     tree_Hemi_Vtx_eta.push_back(eta_Vtx);
+//     recX = Vtx_x - tree_PV_x;
+//     recY = Vtx_y - tree_PV_y;
+//     recZ = Vtx_z - tree_PV_z;
+//     recD = TMath::Sqrt(recX*recX + recY*recY + recZ*recZ);
+//     tree_Hemi_Vtx_dist.push_back( recD );
+//     tree_Hemi_Vtx_MeantrackWeight.push_back(MeanWeight);
+//     tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
+//     int nVertex = 0;
+//     float posx1 = Vtx_x;
+//     float posy1 = Vtx_y;
+//     float posz1 = Vtx_z;
+//     if ( Vtx_step>0 && Vtx_chi<10 && Vtx_chi>0 ){nVertex++;}
 
-    float ddok, ddbad;
-    float ping1 = 0;
+//     float ddok, ddbad;
+//     float ping1 = 0;
 
-  if (!runOnData_)
-    {
+//   if (!runOnData_)
+//     {
 
     
-  if ( tree_nLLP > 0 ) {
-    if ( iLLPrec1 == 1 ) {
-      tree_Hemi_LLP_pt.push_back( LLP1_pt);
-      tree_Hemi_LLP_eta.push_back(LLP1_eta);
-      tree_Hemi_LLP_phi.push_back(LLP1_phi);
-      tree_Hemi_LLP_x.push_back(LLP1_x);
-      tree_Hemi_LLP_y.push_back(LLP1_y);
-      tree_Hemi_LLP_z.push_back(LLP1_z);
-      tree_Hemi_LLP_dist.push_back(LLP1_dist);
-      tree_Hemi_Vtx_dx.push_back(Vtx_x - LLP1_x);
-      tree_Hemi_Vtx_dy.push_back(Vtx_y - LLP1_y);
-      tree_Hemi_Vtx_dz.push_back(Vtx_z - LLP1_z);
-      tree_Hemi_Vtx_dr.push_back(TMath::Sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y) - TMath::Sqrt(LLP1_x*LLP1_x+LLP1_y*LLP1_y));
+//   if ( tree_nLLP > 0 ) {
+//     if ( iLLPrec1 == 1 ) {
+//       tree_Hemi_LLP_pt.push_back( LLP1_pt);
+//       tree_Hemi_LLP_eta.push_back(LLP1_eta);
+//       tree_Hemi_LLP_phi.push_back(LLP1_phi);
+//       tree_Hemi_LLP_x.push_back(LLP1_x);
+//       tree_Hemi_LLP_y.push_back(LLP1_y);
+//       tree_Hemi_LLP_z.push_back(LLP1_z);
+//       tree_Hemi_LLP_dist.push_back(LLP1_dist);
+//       tree_Hemi_Vtx_dx.push_back(Vtx_x - LLP1_x);
+//       tree_Hemi_Vtx_dy.push_back(Vtx_y - LLP1_y);
+//       tree_Hemi_Vtx_dz.push_back(Vtx_z - LLP1_z);
+//       tree_Hemi_Vtx_dr.push_back(TMath::Sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y) - TMath::Sqrt(LLP1_x*LLP1_x+LLP1_y*LLP1_y));
 
-      dSV = (Vtx_x - LLP1_x)*(Vtx_x - LLP1_x) + (Vtx_y - LLP1_y)*(Vtx_y - LLP1_y) + (Vtx_z - LLP1_z)*(Vtx_z - LLP1_z);
-      ddok = TMath::Sqrt(dSV)/LLP1_dist;
-      tree_Hemi_Vtx_dd.push_back( ddok );
-      dSV = (Vtx_x - LLP2_x)*(Vtx_x - LLP2_x) + (Vtx_y - LLP2_y)*(Vtx_y - LLP2_y) + (Vtx_z - LLP2_z)*(Vtx_z - LLP2_z);
-      ddbad = TMath::Sqrt(dSV)/LLP2_dist;
-      tree_Hemi_Vtx_ddbad.push_back( ddbad );
-      if      ( Vtx_chi >= 0. && Vtx_chi < 10. && ddok  < 0.1 ) ping1 = 1;
-      else if ( Vtx_chi >= 0. && Vtx_chi < 10. && ddbad < 0.1 ) ping1 = 2;
-    }
-    else {
-      tree_Hemi_LLP_pt.push_back( LLP2_pt);
-      tree_Hemi_LLP_eta.push_back(LLP2_eta);
-      tree_Hemi_LLP_phi.push_back(LLP2_phi);
-      tree_Hemi_LLP_x.push_back(LLP2_x);
-      tree_Hemi_LLP_y.push_back(LLP2_y);
-      tree_Hemi_LLP_z.push_back(LLP2_z);
-      tree_Hemi_LLP_dist.push_back(LLP2_dist);
-      tree_Hemi_Vtx_dx.push_back(Vtx_x - LLP2_x);
-      tree_Hemi_Vtx_dy.push_back(Vtx_y - LLP2_y);
-      tree_Hemi_Vtx_dz.push_back(Vtx_z - LLP2_z);
-      tree_Hemi_Vtx_dr.push_back(TMath::Sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y) - TMath::Sqrt(LLP2_x*LLP2_x+LLP2_y*LLP2_y));
+//       dSV = (Vtx_x - LLP1_x)*(Vtx_x - LLP1_x) + (Vtx_y - LLP1_y)*(Vtx_y - LLP1_y) + (Vtx_z - LLP1_z)*(Vtx_z - LLP1_z);
+//       ddok = TMath::Sqrt(dSV)/LLP1_dist;
+//       tree_Hemi_Vtx_dd.push_back( ddok );
+//       dSV = (Vtx_x - LLP2_x)*(Vtx_x - LLP2_x) + (Vtx_y - LLP2_y)*(Vtx_y - LLP2_y) + (Vtx_z - LLP2_z)*(Vtx_z - LLP2_z);
+//       ddbad = TMath::Sqrt(dSV)/LLP2_dist;
+//       tree_Hemi_Vtx_ddbad.push_back( ddbad );
+//       if      ( Vtx_chi >= 0. && Vtx_chi < 10. && ddok  < 0.1 ) ping1 = 1;
+//       else if ( Vtx_chi >= 0. && Vtx_chi < 10. && ddbad < 0.1 ) ping1 = 2;
+//     }
+//     else {
+//       tree_Hemi_LLP_pt.push_back( LLP2_pt);
+//       tree_Hemi_LLP_eta.push_back(LLP2_eta);
+//       tree_Hemi_LLP_phi.push_back(LLP2_phi);
+//       tree_Hemi_LLP_x.push_back(LLP2_x);
+//       tree_Hemi_LLP_y.push_back(LLP2_y);
+//       tree_Hemi_LLP_z.push_back(LLP2_z);
+//       tree_Hemi_LLP_dist.push_back(LLP2_dist);
+//       tree_Hemi_Vtx_dx.push_back(Vtx_x - LLP2_x);
+//       tree_Hemi_Vtx_dy.push_back(Vtx_y - LLP2_y);
+//       tree_Hemi_Vtx_dz.push_back(Vtx_z - LLP2_z);
+//       tree_Hemi_Vtx_dr.push_back(TMath::Sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y) - TMath::Sqrt(LLP2_x*LLP2_x+LLP2_y*LLP2_y));
 
-      dSV = (Vtx_x - LLP2_x)*(Vtx_x - LLP2_x) + (Vtx_y - LLP2_y)*(Vtx_y - LLP2_y) + (Vtx_z - LLP2_z)*(Vtx_z - LLP2_z);
-      ddok = TMath::Sqrt(dSV)/LLP2_dist;
-      tree_Hemi_Vtx_dd.push_back( ddok );
-      dSV = (Vtx_x - LLP1_x)*(Vtx_x - LLP1_x) + (Vtx_y - LLP1_y)*(Vtx_y - LLP1_y) + (Vtx_z - LLP1_z)*(Vtx_z - LLP1_z);
-      ddbad = TMath::Sqrt(dSV)/LLP1_dist;
-      tree_Hemi_Vtx_ddbad.push_back( ddbad );
-      if      ( Vtx_chi >= 0. && Vtx_chi < 10. && ddok  < 0.1 ) ping1 = 2;
-      else if ( Vtx_chi >= 0. && Vtx_chi < 10. && ddbad < 0.1 ) ping1 = 1;
-    }
-    tree_Hemi_LLP.push_back(iLLPrec1);
-  }  
-    }     
-    // Vertex Analysis Step
-    // float LooseWP  = 0.0494;
-    // float MediumWP = 0.2770;
-    // float TightWP  = 0.7264;
-    int BtagGood_Hemi1 = 0; // Number of b-tagged hets over Medium WP in the Hemi1
-    float temp_px = 0;
-    float temp_py = 0;
-    float temp_pz = 0 ;
-    float temp_e = 0 ;
+//       dSV = (Vtx_x - LLP2_x)*(Vtx_x - LLP2_x) + (Vtx_y - LLP2_y)*(Vtx_y - LLP2_y) + (Vtx_z - LLP2_z)*(Vtx_z - LLP2_z);
+//       ddok = TMath::Sqrt(dSV)/LLP2_dist;
+//       tree_Hemi_Vtx_dd.push_back( ddok );
+//       dSV = (Vtx_x - LLP1_x)*(Vtx_x - LLP1_x) + (Vtx_y - LLP1_y)*(Vtx_y - LLP1_y) + (Vtx_z - LLP1_z)*(Vtx_z - LLP1_z);
+//       ddbad = TMath::Sqrt(dSV)/LLP1_dist;
+//       tree_Hemi_Vtx_ddbad.push_back( ddbad );
+//       if      ( Vtx_chi >= 0. && Vtx_chi < 10. && ddok  < 0.1 ) ping1 = 2;
+//       else if ( Vtx_chi >= 0. && Vtx_chi < 10. && ddbad < 0.1 ) ping1 = 1;
+//     }
+//     tree_Hemi_LLP.push_back(iLLPrec1);
+//   }  
+//     }     
+//     // Vertex Analysis Step
+//     // float LooseWP  = 0.0494;
+//     // float MediumWP = 0.2770;
+//     // float TightWP  = 0.7264;
+//     int BtagGood_Hemi1 = 0; // Number of b-tagged hets over Medium WP in the Hemi1
+//     float temp_px = 0;
+//     float temp_py = 0;
+//     float temp_pz = 0 ;
+//     float temp_e = 0 ;
 
-// ROOT::Math::PxPyPzEVector
-    TLorentzVector Total4Vector1(0,0,0,0);
-      //--------------- B-tagging-----------------------//
-    if(Vtx_step==1 || Vtx_step==2)
-      {
-        if(Vtx_chi>0 && Vtx_chi<10)
-          {
-            for (unsigned int i = 0 ; i < displacedTracks_Hemi1_mva.size(); i++)
-              {
-                temp_px = TrackInfo_Hemi1_mva[i].second.Px();
-                temp_py = TrackInfo_Hemi1_mva[i].second.Py();
-                temp_pz = TrackInfo_Hemi1_mva[i].second.Pz();
-                temp_e  = TrackInfo_Hemi1_mva[i].second.E();
-                TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
-                Total4Vector1 +=TLorentzTrack;
-              if(TrackInfo_Hemi1_mva[i].first > TightWP || TrackInfo_Hemi1_mva[i].first > MediumWP )
-                {
-                  BtagGood_Hemi1 += 1;
-                }
+// // ROOT::Math::PxPyPzEVector
+//     TLorentzVector Total4Vector1(0,0,0,0);
+//       //--------------- B-tagging-----------------------//
+//     if(Vtx_step==1 || Vtx_step==2)
+//       {
+//         if(Vtx_chi>0 && Vtx_chi<10)
+//           {
+//             for (unsigned int i = 0 ; i < displacedTracks_Hemi1_mva.size(); i++)
+//               {
+//                 temp_px = TrackInfo_Hemi1_mva[i].second.Px();
+//                 temp_py = TrackInfo_Hemi1_mva[i].second.Py();
+//                 temp_pz = TrackInfo_Hemi1_mva[i].second.Pz();
+//                 temp_e  = TrackInfo_Hemi1_mva[i].second.E();
+//                 TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
+//                 Total4Vector1 +=TLorentzTrack;
+//               if(TrackInfo_Hemi1_mva[i].first > TightWP || TrackInfo_Hemi1_mva[i].first > MediumWP )
+//                 {
+//                   BtagGood_Hemi1 += 1;
+//                 }
 
-              }
-          }
+//               }
+//           }
 
-      }
+//       }
 
-    else if (Vtx_step == 3 || Vtx_step==4)
-      {
-        for (unsigned int i = 0 ; i < displacedTracks_step2_Hemi1.size(); i++)
-          {
-              temp_px = TrackInfo_step2_Hemi1[i].second.Px();
-              temp_py = TrackInfo_step2_Hemi1[i].second.Py();
-              temp_pz = TrackInfo_step2_Hemi1[i].second.Pz();
-              temp_e  = TrackInfo_step2_Hemi1[i].second.E();
-              TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
-              Total4Vector1 += TLorentzTrack;
-            if(TrackInfo_step2_Hemi1[i].first > TightWP || TrackInfo_step2_Hemi1[i].first > MediumWP )
-              {
-                BtagGood_Hemi1 += 100;
-              }
+//     else if (Vtx_step == 3 || Vtx_step==4)
+//       {
+//         for (unsigned int i = 0 ; i < displacedTracks_step2_Hemi1.size(); i++)
+//           {
+//               temp_px = TrackInfo_step2_Hemi1[i].second.Px();
+//               temp_py = TrackInfo_step2_Hemi1[i].second.Py();
+//               temp_pz = TrackInfo_step2_Hemi1[i].second.Pz();
+//               temp_e  = TrackInfo_step2_Hemi1[i].second.E();
+//               TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
+//               Total4Vector1 += TLorentzTrack;
+//             if(TrackInfo_step2_Hemi1[i].first > TightWP || TrackInfo_step2_Hemi1[i].first > MediumWP )
+//               {
+//                 BtagGood_Hemi1 += 100;
+//               }
 
-          }
-      }
-    // std::cout<<"invaraint mass of Vertex1 with LorentzVector : "<<sqrt(Total4Vector1.Mag2())<<std::endl;
+//           }
+//       }
+//     // std::cout<<"invaraint mass of Vertex1 with LorentzVector : "<<sqrt(Total4Vector1.Mag2())<<std::endl;
 
-    tree_Hemi_Vtx_BTag.push_back(BtagGood_Hemi1);
-      // -------------------- End  of  B-Tagging --------------------//
-    // ROOT::Math::PxPyPzEVector for later version of root (later than 6.14 at least)
-    tree_Hemi_Vtx_Mass.push_back(sqrt(Total4Vector1.Mag2()));
+//     tree_Hemi_Vtx_BTag.push_back(BtagGood_Hemi1);
+//       // -------------------- End  of  B-Tagging --------------------//
+//     // ROOT::Math::PxPyPzEVector for later version of root (later than 6.14 at least)
+//     tree_Hemi_Vtx_Mass.push_back(sqrt(Total4Vector1.Mag2()));
 
-    // -------------------- End Of Invariant Mass ------------------------//
+//     // -------------------- End Of Invariant Mass ------------------------//
 
-    float Vtx1_ntk = Vtx_ntk;
-    float Vtx1_chi = Vtx_chi;
-    float Vtx1_step = Vtx_step;
-    float Vtx1_r = sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y);
-    float Vtx1_z = Vtx_z;
-    float Vtx1_MTW = MeanWeight;
-    float Vtx1_Mass = sqrt(Total4Vector1.Mag2());
-    float H1_Mass = sqrt(TLorentzAxis1.Mag2());
-    float Vtx1_dist = recD;
+//     float Vtx1_ntk = Vtx_ntk;
+//     float Vtx1_chi = Vtx_chi;
+//     float Vtx1_step = Vtx_step;
+//     float Vtx1_r = sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y);
+//     float Vtx1_z = Vtx_z;
+//     float Vtx1_MTW = MeanWeight;
+//     float Vtx1_Mass = sqrt(Total4Vector1.Mag2());
+//     float H1_Mass = sqrt(TLorentzAxis1.Mag2());
+//     float Vtx1_dist = recD;
 
-    float Vtx1_MeanDCA = DCA_VTX_Meand;
+//     float Vtx1_MeanDCA = DCA_VTX_Meand;
 
 
-    //--------------------------------------------------------------------------------------------//
-    //--------------------------- SECOND HEMISPHERE WITH MVA -------------------------------------//
-    //--------------------------------------------------------------------------------------------//
+//     //--------------------------------------------------------------------------------------------//
+//     //--------------------------- SECOND HEMISPHERE WITH MVA -------------------------------------//
+//     //--------------------------------------------------------------------------------------------//
 
-    static AdaptiveVertexFitter 
-    theFitter_Vertex_Hemi2_mva(
-                 GeometricAnnealing ( sigmacut, Tini, ratio ), 
-                 DefaultLinearizationPointFinder(),
-                 KalmanVertexUpdator<5>(), 
-                 KalmanVertexTrackCompatibilityEstimator<5>(), 
-                 KalmanVertexSmoother() );
-    theFitter_Vertex_Hemi2_mva.setParameters ( maxshift, maxlpshift, maxstep, weightThreshold );
+//     static AdaptiveVertexFitter 
+//     theFitter_Vertex_Hemi2_mva(
+//                  GeometricAnnealing ( sigmacut, Tini, ratio ), 
+//                  DefaultLinearizationPointFinder(),
+//                  KalmanVertexUpdator<5>(), 
+//                  KalmanVertexTrackCompatibilityEstimator<5>(), 
+//                  KalmanVertexSmoother() );
+//     theFitter_Vertex_Hemi2_mva.setParameters ( maxshift, maxlpshift, maxstep, weightThreshold );
 
-    Vtx_ntk = displacedTracks_Hemi2_mva.size();
-    Vtx_x = -100.;
-    Vtx_y = -100.;
-    Vtx_z = -100.;
-    Vtx_chi = -10.;
-    Vtx_step = 0;
-    MeanWeight = 0;
-    DCA_VTX_Meand = 0;
-    TransientVertex displacedVertex_Hemi2_mva;
-    TransientVertex displacedVertex_Hemi2_mva_TW;
+//     Vtx_ntk = displacedTracks_Hemi2_mva.size();
+//     Vtx_x = -100.;
+//     Vtx_y = -100.;
+//     Vtx_z = -100.;
+//     Vtx_chi = -10.;
+//     Vtx_step = 0;
+//     MeanWeight = 0;
+//     DCA_VTX_Meand = 0;
+//     TransientVertex displacedVertex_Hemi2_mva;
+//     TransientVertex displacedVertex_Hemi2_mva_TW;
 
-    if ( Vtx_ntk > 1 && ActivateStep1 )
-    {
-      displacedVertex_Hemi2_mva = theFitter_Vertex_Hemi2_mva.vertex(displacedTracks_Hemi2_mva); // fitted vertex
+//     if ( Vtx_ntk > 1 && ActivateStep1 )
+//     {
+//       displacedVertex_Hemi2_mva = theFitter_Vertex_Hemi2_mva.vertex(displacedTracks_Hemi2_mva); // fitted vertex
       
-      if ( displacedVertex_Hemi2_mva.isValid() ) // NotValid if the max number of steps has been exceded or the fitted position is out of tracker bounds.
-      {
-        Vtx_x = displacedVertex_Hemi2_mva.position().x();
-        Vtx_y = displacedVertex_Hemi2_mva.position().y();
-        Vtx_z = displacedVertex_Hemi2_mva.position().z();
-        Vtx_chi = displacedVertex_Hemi2_mva.normalisedChiSquared();
-	      Vtx_step = 1;
-        posError = displacedVertex_Hemi2_mva.positionError();
-        GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
-        MeanWeight = 0;
-        float DCA_VTX_Meand = 0;
-        for (int p =0; p<Vtx_ntk; p++)
-                {
-                  MeanWeight+=displacedVertex_Hemi2_mva.trackWeight(displacedTracks_Hemi2_mva[p]);
-                  tree_Hemi_Vtx_trackWeight.push_back(displacedVertex_Hemi2_mva.trackWeight(displacedTracks_Hemi2_mva[p]));
-                  TrajectoryStateClosestToPoint DCA_Vtx = displacedTracks_Hemi2_mva[p].trajectoryStateClosestToPoint(RECOvtxPos);
-                  if ( DCA_Vtx.isValid() )  // Be careful, all tracks are considered when looking at the DCA,
-                  //but one should look of the wieghts of the track at the same time
-                    {// The positions are given in the Global frame
+//       if ( displacedVertex_Hemi2_mva.isValid() ) // NotValid if the max number of steps has been exceded or the fitted position is out of tracker bounds.
+//       {
+//         Vtx_x = displacedVertex_Hemi2_mva.position().x();
+//         Vtx_y = displacedVertex_Hemi2_mva.position().y();
+//         Vtx_z = displacedVertex_Hemi2_mva.position().z();
+//         Vtx_chi = displacedVertex_Hemi2_mva.normalisedChiSquared();
+// 	      Vtx_step = 1;
+//         posError = displacedVertex_Hemi2_mva.positionError();
+//         GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
+//         MeanWeight = 0;
+//         float DCA_VTX_Meand = 0;
+//         for (int p =0; p<Vtx_ntk; p++)
+//                 {
+//                   MeanWeight+=displacedVertex_Hemi2_mva.trackWeight(displacedTracks_Hemi2_mva[p]);
+//                   tree_Hemi_Vtx_trackWeight.push_back(displacedVertex_Hemi2_mva.trackWeight(displacedTracks_Hemi2_mva[p]));
+//                   TrajectoryStateClosestToPoint DCA_Vtx = displacedTracks_Hemi2_mva[p].trajectoryStateClosestToPoint(RECOvtxPos);
+//                   if ( DCA_Vtx.isValid() )  // Be careful, all tracks are considered when looking at the DCA,
+//                   //but one should look of the wieghts of the track at the same time
+//                     {// The positions are given in the Global frame
                    
-                      float pca_Vtx_x = DCA_Vtx.position().x();
-                      float pca_Vtx_y = DCA_Vtx.position().y();
-                      float pca_Vtx_z = DCA_Vtx.position().z(); 
-                      float refPoint_x = DCA_Vtx.referencePoint().x();
-                      float refPoint_y = DCA_Vtx.referencePoint().y();
-                      float refPoint_z = DCA_Vtx.referencePoint().z();
-                      float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
-                      float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
-                      float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
-                      float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
-                      float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
-                      DCA_VTX_Meand+=DCA_VTX_d;
-                      tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
-                      tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
-                      tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
-                      tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
-                      tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
-                    }
-                }
-              DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-              // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
-      }       
-    }    
+//                       float pca_Vtx_x = DCA_Vtx.position().x();
+//                       float pca_Vtx_y = DCA_Vtx.position().y();
+//                       float pca_Vtx_z = DCA_Vtx.position().z(); 
+//                       float refPoint_x = DCA_Vtx.referencePoint().x();
+//                       float refPoint_y = DCA_Vtx.referencePoint().y();
+//                       float refPoint_z = DCA_Vtx.referencePoint().z();
+//                       float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
+//                       float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
+//                       float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
+//                       float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
+//                       float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
+//                       DCA_VTX_Meand+=DCA_VTX_d;
+//                       tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
+//                       tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
+//                       tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
+//                       tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
+//                       tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
+//                     }
+//                 }
+//               DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
+//               // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
+//       }       
+//     }    
 
-    // step 2 : IAVF same as Hemi1
-    ntracks   = -2;
-    tempchi2  = -10.;
-    tempx = -100.;
-    tempy = -100.;
-    tempz = -100.;
-    badVtx = false;
+//     // step 2 : IAVF same as Hemi1
+//     ntracks   = -2;
+//     tempchi2  = -10.;
+//     tempx = -100.;
+//     tempy = -100.;
+//     tempz = -100.;
+//     badVtx = false;
 
-    if ( (Vtx_chi < 0. || Vtx_chi > 10.) && ActivateStep1IAVF ) badVtx = true;
-    if ( badVtx && IterAVF && Vtx_ntk > 1 ) 
-      {
-        MeanWeight=0;
-        tempMeanWeight=0;
-        DCA_VTX_Meand = 0;
-        bool success = false;
-        std::vector<TransientTrack> vTT;
-        tempchi2 = -10.;
-        for ( int p = 1; p < Vtx_ntk; p++ )
-          {
-            for  ( int k = 0; k < p; k++ ) // take pairs of tracks of highest BDT value
-              {
-                vTT.push_back(displacedTracks_Hemi2_mva[p]);
-                vTT.push_back(displacedTracks_Hemi2_mva[k]);
-                ntracks = 2;
-                TransientVertex TV = theFitter_Vertex_Hemi2_mva.vertex(vTT); // We take the first "good-looking" seed to start
-                if ( TV.isValid() && TV.normalisedChiSquared()>0 && TV.normalisedChiSquared()<10 ) 
-                  {
-	                  tempchi2 = TV.normalisedChiSquared();
-	                  tempx = TV.position().x();
-	                  tempy = TV.position().y();
-	                  tempz = TV.position().z();
-                    posError =TV.positionError();
-                    success = true;
-                    for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                      {
-                        if (m == k || m == p) continue;
-                        ntracks++;
-                        tempMeanWeight =0;
-                        vTT.push_back(displacedTracks_Hemi2_mva[m]);
-                        TransientVertex updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
-                        if ( updatedTV.isValid() ) 
-                          {
-                            tempchi2 = updatedTV.normalisedChiSquared();
-                            tempx=updatedTV.position().x();
-	    	                    tempy=updatedTV.position().y();
-	    	                    tempz=updatedTV.position().z();
-                            posError =updatedTV.positionError();
-                            for(int i = 0; i<ntracks;i++)
-                              {
-                                tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                              }
-                          }
-                        if ( !updatedTV.isValid() ) 
-	                        {  
-	    	                    vTT.pop_back();
-	    	                    ntracks--;
-	    	                    updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
-	    	                    tempchi2 = updatedTV.normalisedChiSquared();
-	    	                    tempx=updatedTV.position().x();
-	    	                    tempy=updatedTV.position().y();
-        	                  tempz=updatedTV.position().z();
-                            posError =updatedTV.positionError();
-	    	                    continue;
-	                        } 
-                      } // end loop on the other tracks
-                    Vtx_ntk = ntracks;
-                    Vtx_chi = tempchi2;
-                    Vtx_x = tempx;
-                    Vtx_y = tempy;
-                    Vtx_z = tempz;
-                    Vtx_step = 2;
-                    GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
-                    float DCA_VTX_Meand = 0;
-                    for (int k = 0; k< Vtx_ntk; k++)
-                      {
-                        TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
-                        if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
-                        //but one should look of the wieghts of the track at the same time
-                          {// The positions are given in the Global frame
-                            float pca_Vtx_x = DCA_Vtx.position().x();
-                            float pca_Vtx_y = DCA_Vtx.position().y();
-                            float pca_Vtx_z = DCA_Vtx.position().z();
-                            float refPoint_x = DCA_Vtx.referencePoint().x();
-                            float refPoint_y = DCA_Vtx.referencePoint().y();
-                            float refPoint_z = DCA_Vtx.referencePoint().z();
-                            float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
-                            float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
-                            float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
-                            float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
-                            float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
-                            DCA_VTX_Meand+=DCA_VTX_d;
-                            tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
-                            tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
-                            tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
-                            tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
-                            tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
-                          }
-                      }
-                    if (MeanWeight==0)//<=>only two tracks in the valid vertex
-                      {
-                        for(int i = 0; i<ntracks;i++)
-                          {
-                            MeanWeight+=TV.trackWeight(vTT[i]);
-                          }
-                      }
-                    DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-                    // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
-                  }
-                else
-                  { // If not valid : we build a new seed
-                    ntracks = 0;
-                    vTT.clear();
-                  }
-                if ( success ) break;
-              }
-            if ( success ) break;
-          }
-      //--------------------END OF IAVF-------------------------//
-      }
+//     if ( (Vtx_chi < 0. || Vtx_chi > 10.) && ActivateStep1IAVF ) badVtx = true;
+//     if ( badVtx && IterAVF && Vtx_ntk > 1 ) 
+//       {
+//         MeanWeight=0;
+//         tempMeanWeight=0;
+//         DCA_VTX_Meand = 0;
+//         bool success = false;
+//         std::vector<TransientTrack> vTT;
+//         tempchi2 = -10.;
+//         for ( int p = 1; p < Vtx_ntk; p++ )
+//           {
+//             for  ( int k = 0; k < p; k++ ) // take pairs of tracks of highest BDT value
+//               {
+//                 vTT.push_back(displacedTracks_Hemi2_mva[p]);
+//                 vTT.push_back(displacedTracks_Hemi2_mva[k]);
+//                 ntracks = 2;
+//                 TransientVertex TV = theFitter_Vertex_Hemi2_mva.vertex(vTT); // We take the first "good-looking" seed to start
+//                 if ( TV.isValid() && TV.normalisedChiSquared()>0 && TV.normalisedChiSquared()<10 ) 
+//                   {
+// 	                  tempchi2 = TV.normalisedChiSquared();
+// 	                  tempx = TV.position().x();
+// 	                  tempy = TV.position().y();
+// 	                  tempz = TV.position().z();
+//                     posError =TV.positionError();
+//                     success = true;
+//                     for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
+//                       {
+//                         if (m == k || m == p) continue;
+//                         ntracks++;
+//                         tempMeanWeight =0;
+//                         vTT.push_back(displacedTracks_Hemi2_mva[m]);
+//                         TransientVertex updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
+//                         if ( updatedTV.isValid() ) 
+//                           {
+//                             tempchi2 = updatedTV.normalisedChiSquared();
+//                             tempx=updatedTV.position().x();
+// 	    	                    tempy=updatedTV.position().y();
+// 	    	                    tempz=updatedTV.position().z();
+//                             posError =updatedTV.positionError();
+//                             for(int i = 0; i<ntracks;i++)
+//                               {
+//                                 tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
+//                                 if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
+//                               }
+//                           }
+//                         if ( !updatedTV.isValid() ) 
+// 	                        {  
+// 	    	                    vTT.pop_back();
+// 	    	                    ntracks--;
+// 	    	                    updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
+// 	    	                    tempchi2 = updatedTV.normalisedChiSquared();
+// 	    	                    tempx=updatedTV.position().x();
+// 	    	                    tempy=updatedTV.position().y();
+//         	                  tempz=updatedTV.position().z();
+//                             posError =updatedTV.positionError();
+// 	    	                    continue;
+// 	                        } 
+//                       } // end loop on the other tracks
+//                     Vtx_ntk = ntracks;
+//                     Vtx_chi = tempchi2;
+//                     Vtx_x = tempx;
+//                     Vtx_y = tempy;
+//                     Vtx_z = tempz;
+//                     Vtx_step = 2;
+//                     GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
+//                     float DCA_VTX_Meand = 0;
+//                     for (int k = 0; k< Vtx_ntk; k++)
+//                       {
+//                         TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
+//                         if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
+//                         //but one should look of the wieghts of the track at the same time
+//                           {// The positions are given in the Global frame
+//                             float pca_Vtx_x = DCA_Vtx.position().x();
+//                             float pca_Vtx_y = DCA_Vtx.position().y();
+//                             float pca_Vtx_z = DCA_Vtx.position().z();
+//                             float refPoint_x = DCA_Vtx.referencePoint().x();
+//                             float refPoint_y = DCA_Vtx.referencePoint().y();
+//                             float refPoint_z = DCA_Vtx.referencePoint().z();
+//                             float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
+//                             float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
+//                             float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
+//                             float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
+//                             float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
+//                             DCA_VTX_Meand+=DCA_VTX_d;
+//                             tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
+//                             tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
+//                             tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
+//                             tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
+//                             tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
+//                           }
+//                       }
+//                     if (MeanWeight==0)//<=>only two tracks in the valid vertex
+//                       {
+//                         for(int i = 0; i<ntracks;i++)
+//                           {
+//                             MeanWeight+=TV.trackWeight(vTT[i]);
+//                           }
+//                       }
+//                     DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
+//                     // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
+//                   }
+//                 else
+//                   { // If not valid : we build a new seed
+//                     ntracks = 0;
+//                     vTT.clear();
+//                   }
+//                 if ( success ) break;
+//               }
+//             if ( success ) break;
+//           }
+//       //--------------------END OF IAVF-------------------------//
+//       }
     
 
-    TransientVertex displacedVertex_step2_Hemi2;
-    static AdaptiveVertexFitter theFitter_Vertex_step2_Hemi2(
-    	       GeometricAnnealing ( sigmacut, Tini, ratio ), 
-    	       DefaultLinearizationPointFinder(),
-    	       KalmanVertexUpdator<5>(), 
-    	       KalmanVertexTrackCompatibilityEstimator<5>(), 
-    	       KalmanVertexSmoother() );
-    theFitter_Vertex_step2_Hemi2.setParameters ( maxshift, maxlpshift, maxstep, weightThreshold );
-    badVtx = false;
-    if ( (Vtx_chi < 0. || Vtx_chi > 10.) && ActivateStep2 ) badVtx = true;
-    if ( badVtx && displacedTracks_step2_Hemi2.size() > 1 ) {
-      Vtx_ntk = displacedTracks_step2_Hemi2.size();
-      Vtx_chi = -10.;
-      displacedVertex_step2_Hemi2 = theFitter_Vertex_step2_Hemi2.vertex(displacedTracks_step2_Hemi2);
-      if ( displacedVertex_step2_Hemi2.isValid() )
-      { 
-        Vtx_x	= displacedVertex_step2_Hemi2.position().x();
-        Vtx_y	= displacedVertex_step2_Hemi2.position().y();
-        Vtx_z	= displacedVertex_step2_Hemi2.position().z();
-        Vtx_chi = displacedVertex_step2_Hemi2.normalisedChiSquared();
-        Vtx_step = 3;
-        posError = displacedVertex_step2_Hemi2.positionError();
-        GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
-        MeanWeight = 0;
-        DCA_VTX_Meand = 0;
-        for (int p =0; p<Vtx_ntk; p++)
-                {
-                  MeanWeight+=displacedVertex_step2_Hemi2.trackWeight(displacedTracks_step2_Hemi2[p]);
-                  tree_Hemi_Vtx_trackWeight.push_back(displacedVertex_step2_Hemi2.trackWeight(displacedTracks_step2_Hemi2[p]));
-                  TrajectoryStateClosestToPoint DCA_Vtx = displacedTracks_step2_Hemi2[p].trajectoryStateClosestToPoint(RECOvtxPos);
-                  if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
-                  //but one should look at the weights of the track at the same time
-                    {// The positions are given in the Global frame
-                      float pca_Vtx_x = DCA_Vtx.position().x();
-                      float pca_Vtx_y = DCA_Vtx.position().y();
-                      float pca_Vtx_z = DCA_Vtx.position().z();
-                      // to check 
-                      float refPoint_x = DCA_Vtx.referencePoint().x();
-                      float refPoint_y = DCA_Vtx.referencePoint().y();
-                      float refPoint_z = DCA_Vtx.referencePoint().z();
-                      float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
-                      float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
-                      float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
-                      float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
-                      float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
-                      DCA_VTX_Meand+=DCA_VTX_d;
-                      tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
-                      tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
-                      tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
-                      tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
-                      tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
-                    }
-                }
-              DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-              // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
-      }
-    }
+//     TransientVertex displacedVertex_step2_Hemi2;
+//     static AdaptiveVertexFitter theFitter_Vertex_step2_Hemi2(
+//     	       GeometricAnnealing ( sigmacut, Tini, ratio ), 
+//     	       DefaultLinearizationPointFinder(),
+//     	       KalmanVertexUpdator<5>(), 
+//     	       KalmanVertexTrackCompatibilityEstimator<5>(), 
+//     	       KalmanVertexSmoother() );
+//     theFitter_Vertex_step2_Hemi2.setParameters ( maxshift, maxlpshift, maxstep, weightThreshold );
+//     badVtx = false;
+//     if ( (Vtx_chi < 0. || Vtx_chi > 10.) && ActivateStep2 ) badVtx = true;
+//     if ( badVtx && displacedTracks_step2_Hemi2.size() > 1 ) {
+//       Vtx_ntk = displacedTracks_step2_Hemi2.size();
+//       Vtx_chi = -10.;
+//       displacedVertex_step2_Hemi2 = theFitter_Vertex_step2_Hemi2.vertex(displacedTracks_step2_Hemi2);
+//       if ( displacedVertex_step2_Hemi2.isValid() )
+//       { 
+//         Vtx_x	= displacedVertex_step2_Hemi2.position().x();
+//         Vtx_y	= displacedVertex_step2_Hemi2.position().y();
+//         Vtx_z	= displacedVertex_step2_Hemi2.position().z();
+//         Vtx_chi = displacedVertex_step2_Hemi2.normalisedChiSquared();
+//         Vtx_step = 3;
+//         posError = displacedVertex_step2_Hemi2.positionError();
+//         GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
+//         MeanWeight = 0;
+//         DCA_VTX_Meand = 0;
+//         for (int p =0; p<Vtx_ntk; p++)
+//                 {
+//                   MeanWeight+=displacedVertex_step2_Hemi2.trackWeight(displacedTracks_step2_Hemi2[p]);
+//                   tree_Hemi_Vtx_trackWeight.push_back(displacedVertex_step2_Hemi2.trackWeight(displacedTracks_step2_Hemi2[p]));
+//                   TrajectoryStateClosestToPoint DCA_Vtx = displacedTracks_step2_Hemi2[p].trajectoryStateClosestToPoint(RECOvtxPos);
+//                   if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
+//                   //but one should look at the weights of the track at the same time
+//                     {// The positions are given in the Global frame
+//                       float pca_Vtx_x = DCA_Vtx.position().x();
+//                       float pca_Vtx_y = DCA_Vtx.position().y();
+//                       float pca_Vtx_z = DCA_Vtx.position().z();
+//                       // to check 
+//                       float refPoint_x = DCA_Vtx.referencePoint().x();
+//                       float refPoint_y = DCA_Vtx.referencePoint().y();
+//                       float refPoint_z = DCA_Vtx.referencePoint().z();
+//                       float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
+//                       float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
+//                       float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
+//                       float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
+//                       float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
+//                       DCA_VTX_Meand+=DCA_VTX_d;
+//                       tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
+//                       tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
+//                       tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
+//                       tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
+//                       tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
+//                     }
+//                 }
+//               DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
+//               // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
+//       }
+//     }
 
-    // step 3
-    ntracks   = -2;
-    tempchi2  = -10.;
-    tempx = -100.;
-    tempy = -100.;
-    tempz = -100.;
-    badVtx = false;
+//     // step 3
+//     ntracks   = -2;
+//     tempchi2  = -10.;
+//     tempx = -100.;
+//     tempy = -100.;
+//     tempz = -100.;
+//     badVtx = false;
    
    
-    if ( (Vtx_chi < 0. || Vtx_chi > 10.) && ActivateStep3 ) badVtx = true;
-    if ( badVtx && IterAVF && Vtx_ntk > 1 ) 
-      {
-        MeanWeight=0;
-        bool success = false;
-        std::vector<TransientTrack> vTT;
-        tempchi2 = -10.;
-        DCA_VTX_Meand = 0;
-        for ( int p = 1; p < Vtx_ntk; p++ )
-          {
-            for  ( int k = 0; k < p; k++ ) // take pairs of tracks of highest BDT value
-              {
-                vTT.push_back(displacedTracks_step2_Hemi2[p]);
-                vTT.push_back(displacedTracks_step2_Hemi2[k]);
-                ntracks = 2;
-                TransientVertex TV = theFitter_Vertex_step2_Hemi2.vertex(vTT); // We take the first "good-looking" seed to start
-                if ( TV.isValid() && TV.normalisedChiSquared()>0 && TV.normalisedChiSquared()<10 ) 
-                  {
-	                  tempchi2 = TV.normalisedChiSquared();
-	                  tempx = TV.position().x();
-	                  tempy = TV.position().y();
-	                  tempz = TV.position().z();
-                    posError =TV.positionError();
-                    success = true;
-                    for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                      {
-                        if (m == k || m == p) continue;
-                        ntracks++;
-                        tempMeanWeight =0;
-                        vTT.push_back(displacedTracks_step2_Hemi2[m]);
-                        TransientVertex updatedTV = theFitter_Vertex_step2_Hemi2.vertex(vTT);
-                        if ( !updatedTV.isValid() ) 
-	                        {  
-	    	                    vTT.pop_back();
-	    	                    ntracks--;
-	    	                    updatedTV = theFitter_Vertex_step2_Hemi2.vertex(vTT);
-	    	                    tempchi2 = updatedTV.normalisedChiSquared();
-	    	                    tempx=updatedTV.position().x();
-	    	                    tempy=updatedTV.position().y();
-        	                  tempz=updatedTV.position().z();
-                            posError =updatedTV.positionError();
-	    	                    continue;
-	                        } 
-                        if ( updatedTV.isValid() ) 
-	                        {
-                            tempchi2 = updatedTV.normalisedChiSquared();
-	    	                    tempx=updatedTV.position().x();
-	    	                    tempy=updatedTV.position().y();
-	    	                    tempz=updatedTV.position().z();
-                            posError =updatedTV.positionError();
-                            for(int i = 0; i<ntracks;i++)
-                              {
-                                tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                              }
-	                        }
-                       } // end loop on the other tracks
-                    Vtx_ntk = ntracks;
-                    Vtx_chi = tempchi2;
-                    Vtx_x = tempx;
-                    Vtx_y = tempy;
-                    Vtx_z = tempz;
-                    Vtx_step = 4;
-                    GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
-                    DCA_VTX_Meand = 0;
-                    for (int k = 0; k< Vtx_ntk; k++)
-                      {
-                        TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
-                        if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
-                        //but one should look of the wieghts of the track at the same time
-                          {// The positions are given in the Global frame
-                            float pca_Vtx_x = DCA_Vtx.position().x();
-                            float pca_Vtx_y = DCA_Vtx.position().y();
-                            float pca_Vtx_z = DCA_Vtx.position().z();
-                            float refPoint_x = DCA_Vtx.referencePoint().x();
-                            float refPoint_y = DCA_Vtx.referencePoint().y();
-                            float refPoint_z = DCA_Vtx.referencePoint().z();
-                            float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
-                            float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
-                            float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
-                            float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
-                            float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
-                            DCA_VTX_Meand+=DCA_VTX_d;
-                            tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
-                            tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
-                            tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
-                            tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
-                            tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
-                          }
-                      }
-                    if (MeanWeight==0)//<=>only two tracks in the valid vertex
-                      {
-                        for(int i = 0; i<ntracks;i++)
-                          {
-                            MeanWeight+=TV.trackWeight(vTT[i]);
-                          }
-                      }
-                    DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-                    // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
-                  }
-                else
-                  { // If not valid : we build a new seed
-                    ntracks = 0;
-                    vTT.clear();
-                  }
-                if ( success ) break;
-              }
-            if ( success ) break;
-          }
-      //--------------------END OF IAVF-------------------------//
-      }
+//     if ( (Vtx_chi < 0. || Vtx_chi > 10.) && ActivateStep3 ) badVtx = true;
+//     if ( badVtx && IterAVF && Vtx_ntk > 1 ) 
+//       {
+//         MeanWeight=0;
+//         bool success = false;
+//         std::vector<TransientTrack> vTT;
+//         tempchi2 = -10.;
+//         DCA_VTX_Meand = 0;
+//         for ( int p = 1; p < Vtx_ntk; p++ )
+//           {
+//             for  ( int k = 0; k < p; k++ ) // take pairs of tracks of highest BDT value
+//               {
+//                 vTT.push_back(displacedTracks_step2_Hemi2[p]);
+//                 vTT.push_back(displacedTracks_step2_Hemi2[k]);
+//                 ntracks = 2;
+//                 TransientVertex TV = theFitter_Vertex_step2_Hemi2.vertex(vTT); // We take the first "good-looking" seed to start
+//                 if ( TV.isValid() && TV.normalisedChiSquared()>0 && TV.normalisedChiSquared()<10 ) 
+//                   {
+// 	                  tempchi2 = TV.normalisedChiSquared();
+// 	                  tempx = TV.position().x();
+// 	                  tempy = TV.position().y();
+// 	                  tempz = TV.position().z();
+//                     posError =TV.positionError();
+//                     success = true;
+//                     for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
+//                       {
+//                         if (m == k || m == p) continue;
+//                         ntracks++;
+//                         tempMeanWeight =0;
+//                         vTT.push_back(displacedTracks_step2_Hemi2[m]);
+//                         TransientVertex updatedTV = theFitter_Vertex_step2_Hemi2.vertex(vTT);
+//                         if ( !updatedTV.isValid() ) 
+// 	                        {  
+// 	    	                    vTT.pop_back();
+// 	    	                    ntracks--;
+// 	    	                    updatedTV = theFitter_Vertex_step2_Hemi2.vertex(vTT);
+// 	    	                    tempchi2 = updatedTV.normalisedChiSquared();
+// 	    	                    tempx=updatedTV.position().x();
+// 	    	                    tempy=updatedTV.position().y();
+//         	                  tempz=updatedTV.position().z();
+//                             posError =updatedTV.positionError();
+// 	    	                    continue;
+// 	                        } 
+//                         if ( updatedTV.isValid() ) 
+// 	                        {
+//                             tempchi2 = updatedTV.normalisedChiSquared();
+// 	    	                    tempx=updatedTV.position().x();
+// 	    	                    tempy=updatedTV.position().y();
+// 	    	                    tempz=updatedTV.position().z();
+//                             posError =updatedTV.positionError();
+//                             for(int i = 0; i<ntracks;i++)
+//                               {
+//                                 tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
+//                                 if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
+//                               }
+// 	                        }
+//                        } // end loop on the other tracks
+//                     Vtx_ntk = ntracks;
+//                     Vtx_chi = tempchi2;
+//                     Vtx_x = tempx;
+//                     Vtx_y = tempy;
+//                     Vtx_z = tempz;
+//                     Vtx_step = 4;
+//                     GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
+//                     DCA_VTX_Meand = 0;
+//                     for (int k = 0; k< Vtx_ntk; k++)
+//                       {
+//                         TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
+//                         if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
+//                         //but one should look of the wieghts of the track at the same time
+//                           {// The positions are given in the Global frame
+//                             float pca_Vtx_x = DCA_Vtx.position().x();
+//                             float pca_Vtx_y = DCA_Vtx.position().y();
+//                             float pca_Vtx_z = DCA_Vtx.position().z();
+//                             float refPoint_x = DCA_Vtx.referencePoint().x();
+//                             float refPoint_y = DCA_Vtx.referencePoint().y();
+//                             float refPoint_z = DCA_Vtx.referencePoint().z();
+//                             float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
+//                             float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
+//                             float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
+//                             float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
+//                             float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
+//                             DCA_VTX_Meand+=DCA_VTX_d;
+//                             tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
+//                             tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
+//                             tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
+//                             tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
+//                             tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
+//                           }
+//                       }
+//                     if (MeanWeight==0)//<=>only two tracks in the valid vertex
+//                       {
+//                         for(int i = 0; i<ntracks;i++)
+//                           {
+//                             MeanWeight+=TV.trackWeight(vTT[i]);
+//                           }
+//                       }
+//                     DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
+//                     // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
+//                   }
+//                 else
+//                   { // If not valid : we build a new seed
+//                     ntracks = 0;
+//                     vTT.clear();
+//                   }
+//                 if ( success ) break;
+//               }
+//             if ( success ) break;
+//           }
+//       //--------------------END OF IAVF-------------------------//
+//       }
     
-    float Vtx_chi2 = Vtx_chi;
-    tree_Hemi.push_back(2);
-    tree_Hemi_njet.push_back(njet2);
-    tree_Hemi_eta.push_back(axis2_eta);
-    tree_Hemi_phi.push_back(axis2_phi);
-    tree_Hemi_dR.push_back(axis2_dR);
-    tree_Hemi_nTrks.push_back(nTrks_axis2);
-    tree_Hemi_nTrks_sig.push_back(nTrks_axis2_sig);
-    tree_Hemi_nTrks_bad.push_back(nTrks_axis2_bad);
-    tree_Hemi_Vtx_step.push_back(Vtx_step);
-    tree_Hemi_Vtx_NChi2.push_back(Vtx_chi);
-    tree_Hemi_Vtx_nTrks.push_back(Vtx_ntk);
-    tree_Hemi_Vtx_nTrks_sig.push_back(nTrks_axis2_sig_mva);
-    tree_Hemi_Vtx_nTrks_bad.push_back(nTrks_axis2_bad_mva);
-    tree_Hemi_Vtx_x.push_back(Vtx_x);
-    tree_Hemi_Vtx_y.push_back(Vtx_y);
-    tree_Hemi_Vtx_r.push_back(sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y));
-    tree_Hemi_Vtx_z.push_back(Vtx_z);
-    tree_Hemi_Vtx_xError.push_back(posError.cxx());
-    tree_Hemi_Vtx_yError.push_back(posError.cyy());
-    tree_Hemi_Vtx_zError.push_back(posError.czz());
-    theta_Vtx = tan(sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y)/abs(Vtx_z)) ;
-    eta_Vtx = -TMath::Log(tan(theta_Vtx/2));
-    if (Vtx_z<0){eta_Vtx = -eta_Vtx;}
-    tree_Hemi_Vtx_eta.push_back(eta_Vtx);
-    recX = Vtx_x - tree_PV_x;
-    recY = Vtx_y - tree_PV_y;
-    recZ = Vtx_z - tree_PV_z;
-    recD = TMath::Sqrt(recX*recX + recY*recY + recZ*recZ);
-    tree_Hemi_Vtx_dist.push_back( recD );
-    tree_Hemi_Vtx_MeantrackWeight.push_back(MeanWeight);
-    tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
-    float posx2 = Vtx_x;
-    float posy2 = Vtx_y;
-    float posz2 = Vtx_z;
-    if(Vtx_step>0 && Vtx_chi<10 && Vtx_chi>0){nVertex++;}
+//     float Vtx_chi2 = Vtx_chi;
+//     tree_Hemi.push_back(2);
+//     tree_Hemi_njet.push_back(njet2);
+//     tree_Hemi_eta.push_back(axis2_eta);
+//     tree_Hemi_phi.push_back(axis2_phi);
+//     tree_Hemi_dR.push_back(axis2_dR);
+//     tree_Hemi_nTrks.push_back(nTrks_axis2);
+//     tree_Hemi_nTrks_sig.push_back(nTrks_axis2_sig);
+//     tree_Hemi_nTrks_bad.push_back(nTrks_axis2_bad);
+//     tree_Hemi_Vtx_step.push_back(Vtx_step);
+//     tree_Hemi_Vtx_NChi2.push_back(Vtx_chi);
+//     tree_Hemi_Vtx_nTrks.push_back(Vtx_ntk);
+//     tree_Hemi_Vtx_nTrks_sig.push_back(nTrks_axis2_sig_mva);
+//     tree_Hemi_Vtx_nTrks_bad.push_back(nTrks_axis2_bad_mva);
+//     tree_Hemi_Vtx_x.push_back(Vtx_x);
+//     tree_Hemi_Vtx_y.push_back(Vtx_y);
+//     tree_Hemi_Vtx_r.push_back(sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y));
+//     tree_Hemi_Vtx_z.push_back(Vtx_z);
+//     tree_Hemi_Vtx_xError.push_back(posError.cxx());
+//     tree_Hemi_Vtx_yError.push_back(posError.cyy());
+//     tree_Hemi_Vtx_zError.push_back(posError.czz());
+//     theta_Vtx = tan(sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y)/abs(Vtx_z)) ;
+//     eta_Vtx = -TMath::Log(tan(theta_Vtx/2));
+//     if (Vtx_z<0){eta_Vtx = -eta_Vtx;}
+//     tree_Hemi_Vtx_eta.push_back(eta_Vtx);
+//     recX = Vtx_x - tree_PV_x;
+//     recY = Vtx_y - tree_PV_y;
+//     recZ = Vtx_z - tree_PV_z;
+//     recD = TMath::Sqrt(recX*recX + recY*recY + recZ*recZ);
+//     tree_Hemi_Vtx_dist.push_back( recD );
+//     tree_Hemi_Vtx_MeantrackWeight.push_back(MeanWeight);
+//     tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
+//     float posx2 = Vtx_x;
+//     float posy2 = Vtx_y;
+//     float posz2 = Vtx_z;
+//     if(Vtx_step>0 && Vtx_chi<10 && Vtx_chi>0){nVertex++;}
 
-    float dr_2V = -10.;//quantities that should be lower for the backgrounds/ compared to signal
-    float dz_2V = -10.;
-    float dd_2V = -10.;
-    if(nVertex==2)
-      {
-        dr_2V = sqrt((posx2-posx1)*(posx2-posx1)+(posy2-posy1)*(posy2-posy1));
-        dz_2V = sqrt((posz2-posz1)*(posz2-posz1));
-        dd_2V = sqrt((posx2-posx1)*(posx2-posx1)+(posy2-posy1)*(posy2-posy1)+(posz2-posz1)*(posz2-posz1));
-      }
-    tree_Hemi_Vtx_nVtx.push_back(nVertex);
-    // tree_Hemi_Vtx_nVtx.push_back(nVertex);
-    tree_Hemi_Vtx_Vtx_dr.push_back(dr_2V);
-    tree_Hemi_Vtx_Vtx_dr.push_back(dr_2V);
-    tree_Hemi_Vtx_Vtx_dz.push_back(dz_2V);
-    tree_Hemi_Vtx_Vtx_dz.push_back(dz_2V);
-    tree_Hemi_Vtx_Vtx_dd.push_back(dd_2V);
-    tree_Hemi_Vtx_Vtx_dd.push_back(dd_2V);
+//     float dr_2V = -10.;//quantities that should be lower for the backgrounds/ compared to signal
+//     float dz_2V = -10.;
+//     float dd_2V = -10.;
+//     if(nVertex==2)
+//       {
+//         dr_2V = sqrt((posx2-posx1)*(posx2-posx1)+(posy2-posy1)*(posy2-posy1));
+//         dz_2V = sqrt((posz2-posz1)*(posz2-posz1));
+//         dd_2V = sqrt((posx2-posx1)*(posx2-posx1)+(posy2-posy1)*(posy2-posy1)+(posz2-posz1)*(posz2-posz1));
+//       }
+//     tree_Hemi_Vtx_nVtx.push_back(nVertex);
+//     // tree_Hemi_Vtx_nVtx.push_back(nVertex);
+//     tree_Hemi_Vtx_Vtx_dr.push_back(dr_2V);
+//     tree_Hemi_Vtx_Vtx_dr.push_back(dr_2V);
+//     tree_Hemi_Vtx_Vtx_dz.push_back(dz_2V);
+//     tree_Hemi_Vtx_Vtx_dz.push_back(dz_2V);
+//     tree_Hemi_Vtx_Vtx_dd.push_back(dd_2V);
+//     tree_Hemi_Vtx_Vtx_dd.push_back(dd_2V);
 
-    // Vertex Analysis Step
+//     // Vertex Analysis Step
 
-        // 0.7264 : Tight
-        // 0.2770 : Medium 
-        // 0.0494 : loose
-    // pass BtagGood_Hemi1 
-    int BtagGood_Hemi2 = 0 ;
-    temp_px = 0;
-    temp_py = 0;
-    temp_pz = 0 ;
-    temp_e = 0 ;
-TLorentzVector Total4Vector2(0,0,0,0);
-
-
-    if(Vtx_step==1 || Vtx_step==2)
-      {
-        for (unsigned int i = 0 ; i < displacedTracks_Hemi2_mva.size(); i++)
-          {
-            if(TrackInfo_Hemi2_mva[i].first > TightWP || TrackInfo_Hemi2_mva[i].first > MediumWP )
-              {
-                BtagGood_Hemi2 -= 1;
-              }
-            temp_px += TrackInfo_Hemi2_mva[i].second.Px();
-            temp_py += TrackInfo_Hemi2_mva[i].second.Py();
-            temp_pz += TrackInfo_Hemi2_mva[i].second.Pz();
-            temp_e  += TrackInfo_Hemi2_mva[i].second.E();
-            TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
-            Total4Vector2 +=TLorentzTrack;
-          }
-      }
-
-    else if (Vtx_step == 3 || Vtx_step==4)
-      {
-        for (unsigned int i = 0 ; i < displacedTracks_step2_Hemi2.size(); i++)
-          {
-            if(TrackInfo_step2_Hemi2[i].first > TightWP || TrackInfo_step2_Hemi2[i].first > MediumWP )
-              {
-                BtagGood_Hemi2 -= 100;
-              }
-            temp_px += TrackInfo_step2_Hemi2[i].second.Px();
-            temp_py += TrackInfo_step2_Hemi2[i].second.Py();
-            temp_pz += TrackInfo_step2_Hemi2[i].second.Pz();
-            temp_e  += TrackInfo_step2_Hemi2[i].second.E();
-            TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
-            Total4Vector2 +=TLorentzTrack;
-          }
-      } 
-    tree_Hemi_Vtx_BTag.push_back(BtagGood_Hemi2 );
-    tree_Hemi_Vtx_Mass.push_back(sqrt(Total4Vector2.Mag2()));
+//         // 0.7264 : Tight
+//         // 0.2770 : Medium 
+//         // 0.0494 : loose
+//     // pass BtagGood_Hemi1 
+//     int BtagGood_Hemi2 = 0 ;
+//     temp_px = 0;
+//     temp_py = 0;
+//     temp_pz = 0 ;
+//     temp_e = 0 ;
+// TLorentzVector Total4Vector2(0,0,0,0);
 
 
-//------------------------------------------------//
-    float Vtx2_ntk = Vtx_ntk;
-    float Vtx2_chi = Vtx_chi;
-    float Vtx2_step = Vtx_step;
-    float Vtx2_r = sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y);
-    float Vtx2_z = Vtx_z;
-    float Vtx2_MTW = MeanWeight;
-    float Vtx2_Mass = sqrt(Total4Vector2.Mag2());
-    float H2_Mass = sqrt(TLorentzAxis2.Mag2());
-    float Vtx2_dist = recD;
-    float Vtx2_MeanDCA = DCA_VTX_Meand;
+//     if(Vtx_step==1 || Vtx_step==2)
+//       {
+//         for (unsigned int i = 0 ; i < displacedTracks_Hemi2_mva.size(); i++)
+//           {
+//             if(TrackInfo_Hemi2_mva[i].first > TightWP || TrackInfo_Hemi2_mva[i].first > MediumWP )
+//               {
+//                 BtagGood_Hemi2 -= 1;
+//               }
+//             temp_px += TrackInfo_Hemi2_mva[i].second.Px();
+//             temp_py += TrackInfo_Hemi2_mva[i].second.Py();
+//             temp_pz += TrackInfo_Hemi2_mva[i].second.Pz();
+//             temp_e  += TrackInfo_Hemi2_mva[i].second.E();
+//             TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
+//             Total4Vector2 +=TLorentzTrack;
+//           }
+//       }
+
+//     else if (Vtx_step == 3 || Vtx_step==4)
+//       {
+//         for (unsigned int i = 0 ; i < displacedTracks_step2_Hemi2.size(); i++)
+//           {
+//             if(TrackInfo_step2_Hemi2[i].first > TightWP || TrackInfo_step2_Hemi2[i].first > MediumWP )
+//               {
+//                 BtagGood_Hemi2 -= 100;
+//               }
+//             temp_px += TrackInfo_step2_Hemi2[i].second.Px();
+//             temp_py += TrackInfo_step2_Hemi2[i].second.Py();
+//             temp_pz += TrackInfo_step2_Hemi2[i].second.Pz();
+//             temp_e  += TrackInfo_step2_Hemi2[i].second.E();
+//             TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
+//             Total4Vector2 +=TLorentzTrack;
+//           }
+//       } 
+//     tree_Hemi_Vtx_BTag.push_back(BtagGood_Hemi2 );
+//     tree_Hemi_Vtx_Mass.push_back(sqrt(Total4Vector2.Mag2()));
 
 
-    // -------------------------------------------//
+// //------------------------------------------------//
+//     float Vtx2_ntk = Vtx_ntk;
+//     float Vtx2_chi = Vtx_chi;
+//     float Vtx2_step = Vtx_step;
+//     float Vtx2_r = sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y);
+//     float Vtx2_z = Vtx_z;
+//     float Vtx2_MTW = MeanWeight;
+//     float Vtx2_Mass = sqrt(Total4Vector2.Mag2());
+//     float H2_Mass = sqrt(TLorentzAxis2.Mag2());
+//     float Vtx2_dist = recD;
+//     float Vtx2_MeanDCA = DCA_VTX_Meand;
+
+
+//     // -------------------------------------------//
   
-    float ping2 = 0;
-    bool ping_Hemi1 = false, ping_Hemi2 = false;
-      if (!runOnData_)
-        {
+//     float ping2 = 0;
+//     bool ping_Hemi1 = false, ping_Hemi2 = false;
+//       if (!runOnData_)
+//         {
 
-  if ( tree_nLLP > 0 ) {
-    if ( iLLPrec2 == 1 ) {
-      tree_Hemi_LLP_pt.push_back( LLP1_pt);
-      tree_Hemi_LLP_eta.push_back(LLP1_eta);
-      tree_Hemi_LLP_phi.push_back(LLP1_phi);
-      tree_Hemi_LLP_x.push_back(LLP1_x);
-      tree_Hemi_LLP_y.push_back(LLP1_y);
-      tree_Hemi_LLP_z.push_back(LLP1_z);
-      tree_Hemi_LLP_dist.push_back(LLP1_dist);
-      tree_Hemi_Vtx_dx.push_back(Vtx_x - LLP1_x);
-      tree_Hemi_Vtx_dy.push_back(Vtx_y - LLP1_y);
-      tree_Hemi_Vtx_dz.push_back(Vtx_z - LLP1_z);
-      tree_Hemi_Vtx_dr.push_back(TMath::Sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y) - TMath::Sqrt(LLP1_x*LLP1_x+LLP1_y*LLP1_y));
+//   if ( tree_nLLP > 0 ) {
+//     if ( iLLPrec2 == 1 ) {
+//       tree_Hemi_LLP_pt.push_back( LLP1_pt);
+//       tree_Hemi_LLP_eta.push_back(LLP1_eta);
+//       tree_Hemi_LLP_phi.push_back(LLP1_phi);
+//       tree_Hemi_LLP_x.push_back(LLP1_x);
+//       tree_Hemi_LLP_y.push_back(LLP1_y);
+//       tree_Hemi_LLP_z.push_back(LLP1_z);
+//       tree_Hemi_LLP_dist.push_back(LLP1_dist);
+//       tree_Hemi_Vtx_dx.push_back(Vtx_x - LLP1_x);
+//       tree_Hemi_Vtx_dy.push_back(Vtx_y - LLP1_y);
+//       tree_Hemi_Vtx_dz.push_back(Vtx_z - LLP1_z);
+//       tree_Hemi_Vtx_dr.push_back(TMath::Sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y) - TMath::Sqrt(LLP1_x*LLP1_x+LLP1_y*LLP1_y));
 
-      dSV = (Vtx_x - LLP1_x)*(Vtx_x - LLP1_x) + (Vtx_y - LLP1_y)*(Vtx_y - LLP1_y) + (Vtx_z - LLP1_z)*(Vtx_z - LLP1_z);
-      ddok = TMath::Sqrt(dSV)/LLP1_dist;
-      tree_Hemi_Vtx_dd.push_back( ddok );
-      dSV = (Vtx_x - LLP2_x)*(Vtx_x - LLP2_x) + (Vtx_y - LLP2_y)*(Vtx_y - LLP2_y) + (Vtx_z - LLP2_z)*(Vtx_z - LLP2_z);
-      ddbad = TMath::Sqrt(dSV)/LLP2_dist;
-      tree_Hemi_Vtx_ddbad.push_back( ddbad );
-      if      ( Vtx_chi >= 0. && Vtx_chi < 10. && ddok  < 0.1 ) ping2 = 1;
-      else if ( Vtx_chi >= 0. && Vtx_chi < 10. && ddbad < 0.1 ) ping2 = 2;
-    }
-    else {
-      tree_Hemi_LLP_pt.push_back( LLP2_pt);
-      tree_Hemi_LLP_eta.push_back(LLP2_eta);
-      tree_Hemi_LLP_phi.push_back(LLP2_phi);
-      tree_Hemi_LLP_x.push_back(LLP2_x);
-      tree_Hemi_LLP_y.push_back(LLP2_y);
-      tree_Hemi_LLP_z.push_back(LLP2_z);
-      tree_Hemi_LLP_dist.push_back(LLP2_dist);
-      tree_Hemi_Vtx_dx.push_back(Vtx_x - LLP2_x);
-      tree_Hemi_Vtx_dy.push_back(Vtx_y - LLP2_y);
-      tree_Hemi_Vtx_dz.push_back(Vtx_z - LLP2_z);
-      tree_Hemi_Vtx_dr.push_back(TMath::Sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y) - TMath::Sqrt(LLP2_x*LLP2_x+LLP2_y*LLP2_y));
+//       dSV = (Vtx_x - LLP1_x)*(Vtx_x - LLP1_x) + (Vtx_y - LLP1_y)*(Vtx_y - LLP1_y) + (Vtx_z - LLP1_z)*(Vtx_z - LLP1_z);
+//       ddok = TMath::Sqrt(dSV)/LLP1_dist;
+//       tree_Hemi_Vtx_dd.push_back( ddok );
+//       dSV = (Vtx_x - LLP2_x)*(Vtx_x - LLP2_x) + (Vtx_y - LLP2_y)*(Vtx_y - LLP2_y) + (Vtx_z - LLP2_z)*(Vtx_z - LLP2_z);
+//       ddbad = TMath::Sqrt(dSV)/LLP2_dist;
+//       tree_Hemi_Vtx_ddbad.push_back( ddbad );
+//       if      ( Vtx_chi >= 0. && Vtx_chi < 10. && ddok  < 0.1 ) ping2 = 1;
+//       else if ( Vtx_chi >= 0. && Vtx_chi < 10. && ddbad < 0.1 ) ping2 = 2;
+//     }
+//     else {
+//       tree_Hemi_LLP_pt.push_back( LLP2_pt);
+//       tree_Hemi_LLP_eta.push_back(LLP2_eta);
+//       tree_Hemi_LLP_phi.push_back(LLP2_phi);
+//       tree_Hemi_LLP_x.push_back(LLP2_x);
+//       tree_Hemi_LLP_y.push_back(LLP2_y);
+//       tree_Hemi_LLP_z.push_back(LLP2_z);
+//       tree_Hemi_LLP_dist.push_back(LLP2_dist);
+//       tree_Hemi_Vtx_dx.push_back(Vtx_x - LLP2_x);
+//       tree_Hemi_Vtx_dy.push_back(Vtx_y - LLP2_y);
+//       tree_Hemi_Vtx_dz.push_back(Vtx_z - LLP2_z);
+//       tree_Hemi_Vtx_dr.push_back(TMath::Sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y) - TMath::Sqrt(LLP2_x*LLP2_x+LLP2_y*LLP2_y));
 
-      dSV = (Vtx_x - LLP2_x)*(Vtx_x - LLP2_x) + (Vtx_y - LLP2_y)*(Vtx_y - LLP2_y) + (Vtx_z - LLP2_z)*(Vtx_z - LLP2_z);
-      ddok = TMath::Sqrt(dSV)/LLP2_dist;
-      tree_Hemi_Vtx_dd.push_back( ddok );
-      dSV = (Vtx_x - LLP1_x)*(Vtx_x - LLP1_x) + (Vtx_y - LLP1_y)*(Vtx_y - LLP1_y) + (Vtx_z - LLP1_z)*(Vtx_z - LLP1_z);
-      ddbad = TMath::Sqrt(dSV)/LLP1_dist;
-      tree_Hemi_Vtx_ddbad.push_back( ddbad );
-      if      ( Vtx_chi >= 0. && Vtx_chi < 10. && ddok  < 0.1 ) ping2 = 2;
-      else if ( Vtx_chi >= 0. && Vtx_chi < 10. && ddbad < 0.1 ) ping2 = 1;
-    }
-    tree_Hemi_LLP.push_back(iLLPrec2);
-    tree_Hemi_LLP_dR12.push_back(dRneuneu);
-    tree_Hemi_LLP_dR12.push_back(dRneuneu);
+//       dSV = (Vtx_x - LLP2_x)*(Vtx_x - LLP2_x) + (Vtx_y - LLP2_y)*(Vtx_y - LLP2_y) + (Vtx_z - LLP2_z)*(Vtx_z - LLP2_z);
+//       ddok = TMath::Sqrt(dSV)/LLP2_dist;
+//       tree_Hemi_Vtx_dd.push_back( ddok );
+//       dSV = (Vtx_x - LLP1_x)*(Vtx_x - LLP1_x) + (Vtx_y - LLP1_y)*(Vtx_y - LLP1_y) + (Vtx_z - LLP1_z)*(Vtx_z - LLP1_z);
+//       ddbad = TMath::Sqrt(dSV)/LLP1_dist;
+//       tree_Hemi_Vtx_ddbad.push_back( ddbad );
+//       if      ( Vtx_chi >= 0. && Vtx_chi < 10. && ddok  < 0.1 ) ping2 = 2;
+//       else if ( Vtx_chi >= 0. && Vtx_chi < 10. && ddbad < 0.1 ) ping2 = 1;
+//     }
+//     tree_Hemi_LLP.push_back(iLLPrec2);
+//     tree_Hemi_LLP_dR12.push_back(dRneuneu);
+//     tree_Hemi_LLP_dR12.push_back(dRneuneu);
 
-    if ( ping1 == iLLPrec1 ) ping_Hemi1 = true;
-    if ( ping2 == iLLPrec2 ) ping_Hemi2 = true;
-    if ( ping1 == iLLPrec2 && ping2 == iLLPrec1 ) {
-      ping_Hemi1 = true;
-      ping_Hemi2 = true;
-    }
-    if ( ping2 == 0 && ping1 == iLLPrec2 ) ping_Hemi1 = true;
-    if ( ping1 == 0 && ping2 == iLLPrec1 ) ping_Hemi2 = true;
-    tree_Hemi_LLP_ping.push_back( ping_Hemi1 );
-    tree_Hemi_LLP_ping.push_back( ping_Hemi2 );
-    int ping_event = 0;
-    if      ( ping_Hemi1 && ping_Hemi2 ) ping_event = 2;
-    else if ( ping_Hemi1 || ping_Hemi2 ) ping_event = 1;
-    tree_event_LLP_ping.push_back( ping_event );
-  }
-  else  {
-        tree_Hemi_LLP_ping.push_back( false );
-        tree_Hemi_LLP_ping.push_back( false );
-        }
+//     if ( ping1 == iLLPrec1 ) ping_Hemi1 = true;
+//     if ( ping2 == iLLPrec2 ) ping_Hemi2 = true;
+//     if ( ping1 == iLLPrec2 && ping2 == iLLPrec1 ) {
+//       ping_Hemi1 = true;
+//       ping_Hemi2 = true;
+//     }
+//     if ( ping2 == 0 && ping1 == iLLPrec2 ) ping_Hemi1 = true;
+//     if ( ping1 == 0 && ping2 == iLLPrec1 ) ping_Hemi2 = true;
+//     tree_Hemi_LLP_ping.push_back( ping_Hemi1 );
+//     tree_Hemi_LLP_ping.push_back( ping_Hemi2 );
+//     int ping_event = 0;
+//     if      ( ping_Hemi1 && ping_Hemi2 ) ping_event = 2;
+//     else if ( ping_Hemi1 || ping_Hemi2 ) ping_event = 1;
+//     tree_event_LLP_ping.push_back( ping_event );
+//   }
+//   else  {
+//         tree_Hemi_LLP_ping.push_back( false );
+//         tree_Hemi_LLP_ping.push_back( false );
+//         }
     
-    tree_Hemi_dR12.push_back(dR_axis12);
-    tree_Hemi_dR12.push_back(dR_axis12);
-        }
+//     tree_Hemi_dR12.push_back(dR_axis12);
+//     tree_Hemi_dR12.push_back(dR_axis12);
+//         }
 
-//------------Duplicate for each hemisphere-----------//
-    // some informations for tracks in their hemisphere
-    int ntrk10_vtx_hemi1 = 0., ntrk10_vtx_hemi2 = 0.;
-    int ntrk20_vtx_hemi1 = 0., ntrk20_vtx_hemi2 = 0.;
-    int NisjetH = 0;
-    for (int counter_track = 0; counter_track < tree_nTracks; counter_track++) 
-    {
-      int hemi      = tree_track_Hemi[counter_track];
-      double MVAval = tree_track_MVAval[counter_track];
-      bool ping = false;
+// //------------Duplicate for each hemisphere-----------//
+//     // some informations for tracks in their hemisphere
+//     int ntrk10_vtx_hemi1 = 0., ntrk10_vtx_hemi2 = 0.;
+//     int ntrk20_vtx_hemi1 = 0., ntrk20_vtx_hemi2 = 0.;
+//     int NisjetH = 0;
+//     for (int counter_track = 0; counter_track < tree_nTracks; counter_track++) 
+//     {
+//       int hemi      = tree_track_Hemi[counter_track];
+//       double MVAval = tree_track_MVAval[counter_track];
+//       bool ping = false;
       
-      Vtx_chi = -10.;
-      float dist = -100.;
-      if ( MVAval > bdtcut ) {
-        if      ( hemi == 1 ) Vtx_chi = Vtx_chi1;
-        else if ( hemi == 2 ) Vtx_chi = Vtx_chi2;
-        if ( hemi == 1 && ping_Hemi1 ) ping = true;
-        if ( hemi == 2 && ping_Hemi2 ) ping = true;
-        if ( Vtx_chi < 10. && Vtx_chi>0 ) {
-          bool isLostTrack = tree_track_lost[counter_track];
-          if (isLostTrack && RemoveLostTrackFromVtxSelec ) {continue;}
-          float x1 = tree_track_firstHit_x[counter_track] - tree_PV_x;
-          float y1 = tree_track_firstHit_y[counter_track] - tree_PV_y;
-          float z1 = tree_track_firstHit_z[counter_track] - tree_PV_z;
-          float vtx_x = tree_Hemi_Vtx_x[hemi-1] - tree_PV_x;
-          float vtx_y = tree_Hemi_Vtx_y[hemi-1] - tree_PV_y;
-          float vtx_z = tree_Hemi_Vtx_z[hemi-1] - tree_PV_z;
-          dist = TMath::Sqrt( (x1-vtx_x)*(x1-vtx_x) + (y1-vtx_y)*(y1-vtx_y) + (z1-vtx_z)*(z1-vtx_z) );
+//       Vtx_chi = -10.;
+//       float dist = -100.;
+//       if ( MVAval > bdtcut ) {
+//         if      ( hemi == 1 ) Vtx_chi = Vtx_chi1;
+//         else if ( hemi == 2 ) Vtx_chi = Vtx_chi2;
+//         if ( hemi == 1 && ping_Hemi1 ) ping = true;
+//         if ( hemi == 2 && ping_Hemi2 ) ping = true;
+//         if ( Vtx_chi < 10. && Vtx_chi>0 ) {
+//           bool isLostTrack = tree_track_lost[counter_track];
+//           if (isLostTrack && RemoveLostTrackFromVtxSelec ) {continue;}
+//           float x1 = tree_track_firstHit_x[counter_track] - tree_PV_x;
+//           float y1 = tree_track_firstHit_y[counter_track] - tree_PV_y;
+//           float z1 = tree_track_firstHit_z[counter_track] - tree_PV_z;
+//           float vtx_x = tree_Hemi_Vtx_x[hemi-1] - tree_PV_x;
+//           float vtx_y = tree_Hemi_Vtx_y[hemi-1] - tree_PV_y;
+//           float vtx_z = tree_Hemi_Vtx_z[hemi-1] - tree_PV_z;
+//           dist = TMath::Sqrt( (x1-vtx_x)*(x1-vtx_x) + (y1-vtx_y)*(y1-vtx_y) + (z1-vtx_z)*(z1-vtx_z) );
 
-      int ijet = tree_track_iJet[counter_track];
-      if ( ijet >= 0 ) NisjetH ++; /*!*/
-	  if ( x1*vtx_x + y1*vtx_y + z1*vtx_z < 0. ) dist = -dist;
-	  if ( dist > 0. && dist < 10. && hemi == 1 ) ntrk10_vtx_hemi1++;
-	  if ( dist > 0. && dist < 20. && hemi == 1 ) ntrk20_vtx_hemi1++;
-	  if ( dist > 0. && dist < 10. && hemi == 2 ) ntrk10_vtx_hemi2++;
-	  if ( dist > 0. && dist < 20. && hemi == 2 ) ntrk20_vtx_hemi2++;
-	}
-      }
-      tree_track_Hemi_mva_NChi2.push_back(Vtx_chi);
-      tree_track_Hemi_ping.push_back(ping);
-      tree_track_Hemi_dFirstVtx.push_back( dist );
+//       int ijet = tree_track_iJet[counter_track];
+//       if ( ijet >= 0 ) NisjetH ++; /*!*/
+// 	  if ( x1*vtx_x + y1*vtx_y + z1*vtx_z < 0. ) dist = -dist;
+// 	  if ( dist > 0. && dist < 10. && hemi == 1 ) ntrk10_vtx_hemi1++;
+// 	  if ( dist > 0. && dist < 20. && hemi == 1 ) ntrk20_vtx_hemi1++;
+// 	  if ( dist > 0. && dist < 10. && hemi == 2 ) ntrk10_vtx_hemi2++;
+// 	  if ( dist > 0. && dist < 20. && hemi == 2 ) ntrk20_vtx_hemi2++;
+// 	}
+//       }
+//       tree_track_Hemi_mva_NChi2.push_back(Vtx_chi);
+//       tree_track_Hemi_ping.push_back(ping);
+//       tree_track_Hemi_dFirstVtx.push_back( dist );
       
-    } // End loop on tracks
-    tree_track_Hemi_isjet.push_back(NisjetH);
-    tree_track_Hemi_isjet.push_back(NisjetH);
-    tree_Hemi_Vtx_ntrk10.push_back(ntrk10_vtx_hemi1);
-    tree_Hemi_Vtx_ntrk10.push_back(ntrk10_vtx_hemi2);
-    tree_Hemi_Vtx_ntrk20.push_back(ntrk20_vtx_hemi1);
-    tree_Hemi_Vtx_ntrk20.push_back(ntrk20_vtx_hemi2);
- // ---------------------------------------------------//
+//     } // End loop on tracks
+//     tree_track_Hemi_isjet.push_back(NisjetH);
+//     tree_track_Hemi_isjet.push_back(NisjetH);
+//     tree_Hemi_Vtx_ntrk10.push_back(ntrk10_vtx_hemi1);
+//     tree_Hemi_Vtx_ntrk10.push_back(ntrk10_vtx_hemi2);
+//     tree_Hemi_Vtx_ntrk20.push_back(ntrk20_vtx_hemi1);
+//     tree_Hemi_Vtx_ntrk20.push_back(ntrk20_vtx_hemi2);
+//  // ---------------------------------------------------//
 
 
-    //////////////////////////////////////////
-    ////// Vertex Selection ----------------//
-    //////////////////////////////////////////
-float Vtx1_ntrk10 =0;
-float Vtx1_ntrk20 =0;
-        //--------------VTX1-------------------//
-        if (Vtx1_chi>0 && Vtx1_chi<10)
-          {
-            Vtx1_ntrk10 = ntrk10_vtx_hemi1 ;
-            Vtx1_ntrk20 = ntrk20_vtx_hemi1;
-            mva_V_nTrks  =  Vtx1_ntk;
-            mva_V_chi    =  Vtx1_chi;
-            mva_V_step   =  Vtx1_step;
-            // mva_V_r  =   Vtx1_r;
-            // mva_V_z  =    Vtx1_z;
-            mva_V_MTW    =  Vtx1_MTW;
-            mva_V_Mass   =  Vtx1_Mass;
-            mva_H_Mass   =  H1_Mass;
+//     //////////////////////////////////////////
+//     ////// Vertex Selection ----------------//
+//     //////////////////////////////////////////
+// float Vtx1_ntrk10 =0;
+// float Vtx1_ntrk20 =0;
+//         //--------------VTX1-------------------//
+//         if (Vtx1_chi>0 && Vtx1_chi<10)
+//           {
+//             Vtx1_ntrk10 = ntrk10_vtx_hemi1 ;
+//             Vtx1_ntrk20 = ntrk20_vtx_hemi1;
+//             mva_V_nTrks  =  Vtx1_ntk;
+//             mva_V_chi    =  Vtx1_chi;
+//             mva_V_step   =  Vtx1_step;
+//             // mva_V_r  =   Vtx1_r;
+//             // mva_V_z  =    Vtx1_z;
+//             mva_V_MTW    =  Vtx1_MTW;
+//             mva_V_Mass   =  Vtx1_Mass;
+//             mva_H_Mass   =  H1_Mass;
 
-            mva_V_ntrk10 = Vtx1_ntrk10;
-            mva_V_ntrk20 = Vtx1_ntrk20;
-            mva_V_MeanDCA = Vtx1_MeanDCA;
-            // mva_V_dist  = Vtx1_dist;
-          }
-    double Vtx1_bdtVal = -10;
-    Vtx1_bdtVal = readerVtx->EvaluateMVA("BDTG");// values at -999 => thishappens if the Hemi_Mass and Hemi_Vtx_Mass are not definite
-   // default value = -10 (no -10 observed and -999 comes from EvaluateMVA)
-    tree_Hemi_Vtx_MVAval.push_back(Vtx1_bdtVal);
+//             mva_V_ntrk10 = Vtx1_ntrk10;
+//             mva_V_ntrk20 = Vtx1_ntrk20;
+//             mva_V_MeanDCA = Vtx1_MeanDCA;
+//             // mva_V_dist  = Vtx1_dist;
+//           }
+//     double Vtx1_bdtVal = -10;
+//     Vtx1_bdtVal = readerVtx->EvaluateMVA("BDTG");// values at -999 => thishappens if the Hemi_Mass and Hemi_Vtx_Mass are not definite
+//    // default value = -10 (no -10 observed and -999 comes from EvaluateMVA)
+//     tree_Hemi_Vtx_MVAval.push_back(Vtx1_bdtVal);
 
-      if ((Vtx1_step==1 || Vtx1_step==2) && Vtx1_chi>0 && Vtx1_chi<10)
-    {
-      Vtx1_ntrk10 = ntrk10_vtx_hemi2 ;
-      Vtx1_ntrk20 = ntrk20_vtx_hemi2;
+//       if ((Vtx1_step==1 || Vtx1_step==2) && Vtx1_chi>0 && Vtx1_chi<10)
+//     {
+//       Vtx1_ntrk10 = ntrk10_vtx_hemi2 ;
+//       Vtx1_ntrk20 = ntrk20_vtx_hemi2;
 
-      mva_V_nTrks  =  Vtx1_ntk;
-      mva_V_chi    =  Vtx1_chi;
-      mva_V_step   =  Vtx1_step;
-      // mva_V_r  =   Vtx1_r;
-      // mva_V_z  =    Vtx1_z;
-      mva_V_MTW    =  Vtx1_MTW;
-      mva_V_Mass   =  Vtx1_Mass;
-      mva_H_Mass   =  H1_Mass;
+//       mva_V_nTrks  =  Vtx1_ntk;
+//       mva_V_chi    =  Vtx1_chi;
+//       mva_V_step   =  Vtx1_step;
+//       // mva_V_r  =   Vtx1_r;
+//       // mva_V_z  =    Vtx1_z;
+//       mva_V_MTW    =  Vtx1_MTW;
+//       mva_V_Mass   =  Vtx1_Mass;
+//       mva_H_Mass   =  H1_Mass;
 
-      mva_V_ntrk10 = Vtx1_ntrk10;
-      mva_V_ntrk20 = Vtx1_ntrk20;
-      mva_V_MeanDCA = Vtx1_MeanDCA;
-      double Vtx1_bdtVal_Step1 = -10; 
-      Vtx1_bdtVal_Step1 = readerVtxStep1->EvaluateMVA("BDTG");
-      tree_Hemi_Vtx_MVAval_Step1.push_back(Vtx1_bdtVal_Step1);
-    }
+//       mva_V_ntrk10 = Vtx1_ntrk10;
+//       mva_V_ntrk20 = Vtx1_ntrk20;
+//       mva_V_MeanDCA = Vtx1_MeanDCA;
 
-float Vtx2_ntrk10=0;
-float Vtx2_ntrk20=0;
-        //--------------VTX2-------------------//
-        if (Vtx2_chi>0 && Vtx2_chi<10)
-          {
-            Vtx2_ntrk10 = ntrk10_vtx_hemi2 ;
-            Vtx2_ntrk20 = ntrk20_vtx_hemi2;
+//     }
+//       double Vtx1_bdtVal_Step1 = -10; 
+//       Vtx1_bdtVal_Step1 = readerVtxStep1->EvaluateMVA("BDTG");
+//       tree_Hemi_Vtx_MVAval_Step1.push_back(Vtx1_bdtVal_Step1);
+// float Vtx2_ntrk10=0;
+// float Vtx2_ntrk20=0;
+//         //--------------VTX2-------------------//
+//         if (Vtx2_chi>0 && Vtx2_chi<10)
+//           {
+//             Vtx2_ntrk10 = ntrk10_vtx_hemi2 ;
+//             Vtx2_ntrk20 = ntrk20_vtx_hemi2;
 
-            mva_V_nTrks  =  Vtx2_ntk;
-            mva_V_chi    =  Vtx2_chi;
-            mva_V_step   =  Vtx2_step;
-            // mva_V_r  =   Vtx2_r;
-            // mva_V_z  =    Vtx2_z;
-            mva_V_MTW    =  Vtx2_MTW;
-            mva_V_Mass   =  Vtx2_Mass;
-            mva_H_Mass   =  H2_Mass;
-            mva_V_ntrk10 = Vtx2_ntrk10;
-            mva_V_ntrk20 = Vtx2_ntrk20;
-            mva_V_MeanDCA = Vtx2_MeanDCA;
-            // mva_V_dist  = Vtx1_dist;
-          }
-    double Vtx2_bdtVal = -10;
-    Vtx2_bdtVal = readerVtx->EvaluateMVA("BDTG");// values at -999
-   // default value = -10 (no -10 observed and -999 comes from EvaluateMVA)
-    tree_Hemi_Vtx_MVAval.push_back(Vtx2_bdtVal);
+//             mva_V_nTrks  =  Vtx2_ntk;
+//             mva_V_chi    =  Vtx2_chi;
+//             mva_V_step   =  Vtx2_step;
+//             // mva_V_r  =   Vtx2_r;
+//             // mva_V_z  =    Vtx2_z;
+//             mva_V_MTW    =  Vtx2_MTW;
+//             mva_V_Mass   =  Vtx2_Mass;
+//             mva_H_Mass   =  H2_Mass;
+//             mva_V_ntrk10 = Vtx2_ntrk10;
+//             mva_V_ntrk20 = Vtx2_ntrk20;
+//             mva_V_MeanDCA = Vtx2_MeanDCA;
+//             // mva_V_dist  = Vtx1_dist;
+//           }
+//     double Vtx2_bdtVal = -10;
+//     Vtx2_bdtVal = readerVtx->EvaluateMVA("BDTG");// values at -999
+//    // default value = -10 (no -10 observed and -999 comes from EvaluateMVA)
+//     tree_Hemi_Vtx_MVAval.push_back(Vtx2_bdtVal);
 
-  if ((Vtx2_step==1 || Vtx2_step==2) && Vtx2_chi>0 && Vtx2_chi<10)
-    {
-      Vtx2_ntrk10 = ntrk10_vtx_hemi2 ;
-      Vtx2_ntrk20 = ntrk20_vtx_hemi2;
+//   if ((Vtx2_step==1 || Vtx2_step==2) && Vtx2_chi>0 && Vtx2_chi<10)
+//     {
+//       Vtx2_ntrk10 = ntrk10_vtx_hemi2 ;
+//       Vtx2_ntrk20 = ntrk20_vtx_hemi2;
 
-      mva_V_nTrks  =  Vtx2_ntk;
-      mva_V_chi    =  Vtx2_chi;
-      mva_V_step   =  Vtx2_step;
-      // mva_V_r  =   Vtx2_r;
-      // mva_V_z  =    Vtx2_z;
-      mva_V_MTW    =  Vtx2_MTW;
-      mva_V_Mass   =  Vtx2_Mass;
-      mva_H_Mass   =  H2_Mass;
+//       mva_V_nTrks  =  Vtx2_ntk;
+//       mva_V_chi    =  Vtx2_chi;
+//       mva_V_step   =  Vtx2_step;
+//       // mva_V_r  =   Vtx2_r;
+//       // mva_V_z  =    Vtx2_z;
+//       mva_V_MTW    =  Vtx2_MTW;
+//       mva_V_Mass   =  Vtx2_Mass;
+//       mva_H_Mass   =  H2_Mass;
 
-      mva_V_ntrk10 = Vtx2_ntrk10;
-      mva_V_ntrk20 = Vtx2_ntrk20;
-      mva_V_MeanDCA = Vtx2_MeanDCA;
-      double Vtx2_bdtVal_Step1 = -10; 
-      Vtx2_bdtVal_Step1 = readerVtxStep1->EvaluateMVA("BDTG");
-      tree_Hemi_Vtx_MVAval_Step1.push_back(Vtx2_bdtVal_Step1);
-    }
+//       mva_V_ntrk10 = Vtx2_ntrk10;
+//       mva_V_ntrk20 = Vtx2_ntrk20;
+//       mva_V_MeanDCA = Vtx2_MeanDCA;
 
+//     }
 
+//       double Vtx2_bdtVal_Step1 = -10; 
+//       Vtx2_bdtVal_Step1 = readerVtxStep1->EvaluateMVA("BDTG");
+//       tree_Hemi_Vtx_MVAval_Step1.push_back(Vtx2_bdtVal_Step1);
   } // endif Filter
 
 
