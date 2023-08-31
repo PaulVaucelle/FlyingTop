@@ -50,8 +50,8 @@ void TreeReader::Loop(TString sample, bool Signal)//void TreeReader::Loop(TStrin
    }
    // ----------- Parameters --------------------//
 
-   float TightWP = 0.85;
-   float LooseWP = 0.;
+   float TightWP = 0.85;// for tracks => everytime Tight is mentioned, it is a refrence to this value.
+   float LooseWP = 0.; // for tracks => same for loose
 
    // -------- List of variables ---------------//
 
@@ -70,9 +70,15 @@ void TreeReader::Loop(TString sample, bool Signal)//void TreeReader::Loop(TStrin
    float TotalnVertex = 0;
    float nEvts = 0;
    float nFilterEvt = 0;
+   float nSelecBDTVtx = 0;
+   float nSelecBDTVtxTight = 0;
 
    float nEvts_w2Vtx = 0;
    float nEvts_w2TightVtx = 0;
+   float nEvts_w2TightBDTVtx = 0;
+
+  float nEvts_w1TightVtx = 0 ;
+  float nEvts_w1TightBDTVtx = 0;
 // Evts selectipn BDT-------------------
 
 float MeanBDTcut = -1;
@@ -464,8 +470,8 @@ if (thesample == "DYJetsToLL_M50")
       //loop on Reco Vertices
       //*******************************
 
-
       int nTightVertex = 0;
+      float nSelecBDTVtxTight_evt = 0;
       for(unsigned int iVtx = 0; iVtx <tree_Hemi->size(); iVtx ++)
          {
             fillHisto("hData_Hemi_Vtx_NChi2","noSel",   thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);
@@ -501,6 +507,12 @@ if (thesample == "DYJetsToLL_M50")
                         fillHisto("hData_Hemi_Vtx_r","GoodRecoVtx",       thesample,tree_Hemi_Vtx_r->at(iVtx),1.);
                         fillHisto("hData_Hemi_Vtx_z","GoodRecoVtx",       thesample,tree_Hemi_Vtx_z->at(iVtx),1.);
                         fillHisto("hData_Hemi_Vtx_MVAval","GoodRecoVtx",  thesample,tree_Hemi_Vtx_MVAval->at(iVtx),1.);
+                        // if (tree_Hemi_Vtx_MVAval->size()!=tree_Hemi_Vtx_step->size())
+                        //   {std::cout<<"trere is an issue"<<std::endl;}
+                        if (tree_Hemi_Vtx_MVAval->at(iVtx)>0)
+                          {
+                            nSelecBDTVtx++;
+                          }
                         if (Signal)
                           {
                             if (tree_Hemi_LLP_ping->at(iVtx))
@@ -543,7 +555,12 @@ if (thesample == "DYJetsToLL_M50")
                               fillHisto("hData_Hemi_Vtx_z","GoodRecoVtx_TightWP",       thesample,tree_Hemi_Vtx_z->at(iVtx),1.);
                               fillHisto("hData_Hemi_Vtx_MVAval","GoodRecoVtx_TightWP",  thesample,tree_Hemi_Vtx_MVAval->at(iVtx),1.);
                               nTightVertex++;
-
+                              if (tree_Hemi_Vtx_MVAval_Step1->at(iVtx)>0)
+                                {
+                                  nSelecBDTVtxTight++;
+                                  nSelecBDTVtxTight_evt++;
+                                }
+                              
                               if (Signal)
                                 {
                                   if (tree_Hemi_LLP_ping->at(iVtx))
@@ -562,6 +579,7 @@ if (thesample == "DYJetsToLL_M50")
                               MeanDistanceTightWP +=  tree_Hemi_Vtx_dist->at(iVtx);              
                       
                            }
+                          
                      }// End Tight WP
 
                   // -------------- Loose WP ------------------------//
@@ -605,11 +623,14 @@ if (thesample == "DYJetsToLL_M50")
 
                      }//Loose WP
               }//RecoVtx
-    //           tree_Hemi_Vtx_MVAval.clear();
-    // tree_Hemi_Vtx_MVAval_Step1
+
+
          }//End Loop on Vertices
 
         if (nTightVertex==2){nEvts_w2TightVtx++;}
+        if (nTightVertex==1){nEvts_w1TightVtx++;}
+        if (nSelecBDTVtxTight_evt == 2){nEvts_w2TightBDTVtx++;}
+        if (nSelecBDTVtxTight_evt == 1){nEvts_w1TightBDTVtx++;}
          //---------------Vtx Selection Variables----------------//
   //------------------MWT CUT -------------------//
   for (int i =0 ;i<nSteps+1;i++)
@@ -1015,6 +1036,8 @@ for (int i = 0 ; i < nStep_MuonJetdRmin ; i++)
                      }
                }
          }
+
+
   for (int i =0 ;i<nSteps_BDT;i++)
     {
 
@@ -1026,7 +1049,7 @@ for (int i = 0 ; i < nStep_MuonJetdRmin ; i++)
             }
         }
     }
-
+// std::cout<<"debugB"<<std::endl;
       }// End of Tree_FIlter
    }// End Global Loop
 
@@ -1056,7 +1079,7 @@ for (int h = 0 ; h < nStep_10; h++)
 // std::cout<<"bug starts here 3"<<std::endl;
 for (int h = 0 ; h < nStep_dd; h++)
   {
-      fillHisto("Data_Vtx_Vtx_dd","NoSel",  thesample,VtxddCut+h*ddd ,nEvts_Vtx_dd[h]/nRecoVertex);
+      fillHisto("Data_Vtx_Vtx_dd","NoSel",  thesample,VtxddCut+h*ddd ,nEvts_Vtx_dd[h]/nEvts_w2Vtx);
       fillHisto("Data_Vtx_Vtx_dd","TightWP",  thesample,VtxddCut+h*ddd ,nEvts_Vtx_dd_step1[h]/nRecoVertexTightWP);
   }
 
@@ -1246,18 +1269,25 @@ for(int h =0 ; h < nStep_nJet;h++)
     fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,1,nFilterEvt*NormFactor);
     fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,2,nEvts*NormFactor);
     fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,3,nRecoVertex*NormFactor/2);
-    // fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,4,nRecoVertexLooseWP*NormFactor/2);
-    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,4,nRecoVertexTightWP*NormFactor/2);
-    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,5,nEvts_w2TightVtx*NormFactor);
-    
+    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,4,nSelecBDTVtx*NormFactor/2);
+    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,5,nRecoVertexTightWP*NormFactor/2);
+    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,6,nSelecBDTVtxTight*NormFactor/2);
+    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,7,nEvts_w2TightVtx*NormFactor);
+    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,8,nEvts_w2TightBDTVtx*NormFactor);
+    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,9,nEvts_w1TightVtx*NormFactor);
+    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,10,nEvts_w1TightBDTVtx*NormFactor);
 
     fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,0,nentries/nentries);
-    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,1,nFilterEvt*NormFactor);
+    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,1,nFilterEvt/nentries);
     fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,2,nEvts/nentries);
     fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,3,nRecoVertex/(2*nentries));
-    // fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,4,nRecoVertexLooseWP/(2*nentries));
-    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,4,nRecoVertexTightWP/(2*nentries));
-    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,5,nEvts_w2TightVtx/(nentries));
+    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,4,nSelecBDTVtx/(2*nentries));
+    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,5,nRecoVertexTightWP/(2*nentries));
+    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,6,nSelecBDTVtxTight/(2*nentries));
+    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,7,nEvts_w2TightVtx/(nentries));
+    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,8,nEvts_w2TightBDTVtx/nentries);
+    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,9,nEvts_w1TightVtx/nentries);
+    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,10,nEvts_w1TightBDTVtx/nentries);
 
    theoutputfile->Write();
    //deleteHisto();
@@ -1472,8 +1502,8 @@ void TreeReader::initializeHisto(TString sample, bool isfirstset){
 
     //----------Vtx Selection -------------//
 
-    addHisto("hData_Vtx_SelectionNXSNormalized","Step",                 sample.Data(),6,0,6);
-    addHisto("hData_Vtx_SelectionNNormalized","Step",                 sample.Data(),6,0,6);
+    addHisto("hData_Vtx_SelectionNXSNormalized","Step",                 sample.Data(),11,0,11);
+    addHisto("hData_Vtx_SelectionNNormalized","Step",                 sample.Data(),11,0,11);
 }
 
 
