@@ -120,6 +120,14 @@ cmsRun flyingtop.py (to run locally)
 
 ./multicrab --crabCmd getoutput --workArea ./<work_directory> --crabCmdOpts --checksum=no  (to retrieve the root files)
 
+# To merge the outputfiles, use the haddWithWeights.py macro:
+
+Please check the paths so that they correspond to your envrionment
+
+python haddWithWeights.py <work_directory>/
+
+Please do not forget the "/" after <work_directory>
+
 # To run TreeReader.C (current version gives efficiencies for the different selections and the reconstruction of vertices + a txt file to summarize it)
 
 ###You have to create an outputroot directory in the test directory if not already done
