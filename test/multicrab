@@ -85,7 +85,7 @@ def main():
         config.Data.splitting = 'FileBased'
         config.Data.unitsPerJob = 20
         config.Data.totalUnits = 20
-        config.Data.outLFNDirBase = '/store/user/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC'
+        config.Data.outLFNDirBase = '/store/user/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/MC'
         config.Data.outputDatasetTag = 'MC'
 
         config.Site.storageSite = 'T2_FR_IPHC' # Choose your site. 
