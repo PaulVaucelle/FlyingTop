@@ -16,18 +16,16 @@
 //----------------------------------------------------------------------------//
 
 The analysis code is available and can run on MiniAOD data tier.
-
-A Reco version is available @: https://github.com/Threshic/TrackingPerf
-
-Look for the _RECO file or "Version-05_10_2022-AVF (Pour présentation TPS)" of TrackingPerf.cc (in plugins) on the history version of the repo.
-
-For the _RECO file, there are two versions : 16/11/22 and 17/11/22. Both are quite the same, the first is more of a draft than the second one. You'd rather use the second one (Daniel).
-
 For people @IPHC that want access to the code:
 
 git clone https://github.com/Threshic/FlyingTop.git will only give these files and not the CMSSW env
 
-# Release 10_6_20_FLY : 
+Fro Run 2 Analyses, the release 10_6_30 is recommended. The analysis code is available for 10_6_20 (master branch)
+and 10_6_30 (10_6_30 branch)
+
+The following commands are for 10_6_20 but one can replace it by 10_6_30 as it is only installing the release.
+
+# Release 10_6_30_FLY : 
 
 ###
 ### create repository :
@@ -43,11 +41,11 @@ source /cvmfs/cms.cern.ch/crab3/crab.sh
 
 export SCRAM_ARCH=slc7_amd64_gcc700
 
-scramv1 p CMSSW CMSSW_10_6_20
+scramv1 p CMSSW CMSSW_10_6_30
 
-mv CMSSW_10_6_20 CMSSW_10_6_20_FLY
+mv CMSSW_10_6_30 CMSSW_10_6_30_FLY
 
-cd CMSSW_10_6_20_FLY
+cd CMSSW_10_6_30_FLY
 
 scramv1 b ProjectRename
 
@@ -57,20 +55,35 @@ eval  `scramv1 r -sh`
 
 git cms-init
 
- cp -r /opt/sbg/cms/ui2_data1/blochd/CMSSW_10_6_20_FLY_pourPaul/src/FlyingTop . (Daniel's version)
- 
- or
- 
-cp -r /opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop . (Paul's version)
-
-just for information for the very first time:
-
 mkdir FlyingTop
 cd FlyingTop
 mkedanlzr FlyingTop
-edit => FlyingTop/plugins/BuildFile.xml & // and add :
 
-use name="DataFormats/PatCandidates"/
+git clone https://github.com/PaulVaucelle/FlyingTop.git
+git checkout CMSSW_10_6_30
+
+----------------------------
+
+# packages to add :
+# Do these steps  in another CMSSW_10_6_30
+
+cd CMSSW_10_6_30_dumy/src
+
+git cms-addpkg RecoEgamma/EgammaTools
+
+git clone https://github.com/cms-egamma/EgammaPostRecoTools.git
+
+ mv EgammaPostRecoTools/python/EgammaPostRecoTools.py RecoEgamma/EgammaTools/python/.
+ 
+git clone -b ULSSfiles_correctScaleSysMC https://github.com/jainshilpi/EgammaAnalysis-ElectronTools.git 
+
+git cms-addpkg EgammaAnalysis/ElectronTools
+
+scram b -j 8
+
+# these packages are used in the flyingtop_MC(data).py files 
+
+# Electron p4 and Muon rochester corrections are directly applied in the code though different methods as well as for PileUp
 
 ###
 ### compilation :
@@ -86,7 +99,7 @@ scramv1 b -j6
 ### Execute :
 ###
 
-cd /opt/sbg/cms/<insert uiX_dataY>/<insert name>/CMSSW_10_6_20_FLY/src
+cd /opt/sbg/cms/<insert uiX_dataY>/<insert name>/CMSSW_10_6_30_FLY/src
 
 export V0_CMS_SW_DIR=/cvmfs/cms.cern.ch
 
@@ -106,7 +119,7 @@ voms-proxy-init -rfc -voms cms -valid 192:00
 
 cd FlyingTop/FlyingTop/test
 
-cmsRun flyingtop.py (to run locally)
+cmsRun flyingtop_MC.py or cmsRun flyingtop_data.py (specific to the branch 10_6_30)
   
  or (still working but not used, see next point "To run jobs")
   
@@ -130,7 +143,7 @@ Please do not forget the "/" after <work_directory>
 
 # To run TreeReader.C (current version gives efficiencies for the different selections and the reconstruction of vertices + a txt file to summarize it)
 
-###You have to create an outputroot directory in the test directory if not already done
+### You have to create an outputroot directory in the test directory if not already done
 
 root
 
