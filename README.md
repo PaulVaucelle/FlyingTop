@@ -15,17 +15,16 @@
 
 //----------------------------------------------------------------------------//
 
-The analysis code is available and can run on MiniAOD data tier.
-
-A Reco version is available @: https://github.com/Threshic/TrackingPerf
-
-Look for the _RECO file or "Version-05_10_2022-AVF (Pour présentation TPS)" of TrackingPerf.cc (in plugins) on the history version of the repo.
-
-For the _RECO file, there are two versions : 16/11/22 and 17/11/22. Both are quite the same, the first is more of a draft than the second one. You'd rather use the second one (Daniel).
+This LLP analysis code is available and can run on MiniAOD data tier.
 
 For people @IPHC that want access to the code:
 
 git clone https://github.com/Threshic/FlyingTop.git will only give these files and not the CMSSW env
+
+Fro Run 2 Analyses, the release 10_6_30 is recommended. The analysis code is available for 10_6_20 (master branch)
+and 10_6_30 (10_6_30 branch)
+
+The following commands are for 10_6_20 but one can replace it by 10_6_30 as it is only installing the release.
 
 # Release 10_6_20_FLY : 
 
@@ -57,13 +56,11 @@ eval  `scramv1 r -sh`
 
 git cms-init
 
- cp -r /opt/sbg/cms/ui2_data1/blochd/CMSSW_10_6_20_FLY_pourPaul/src/FlyingTop . (Daniel's version)
- 
- or
- 
-cp -r /opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop . (Paul's version)
+mkdir FlyingTop
 
-just for information for the very first time:
+git clone https://github.com/PaulVaucelle/FlyingTop.git
+
+# just for information for the very first time:
 
 mkdir FlyingTop
 cd FlyingTop
@@ -71,6 +68,7 @@ mkedanlzr FlyingTop
 edit => FlyingTop/plugins/BuildFile.xml & // and add :
 
 use name="DataFormats/PatCandidates"/
+
 
 ###
 ### compilation :
@@ -107,6 +105,8 @@ voms-proxy-init -rfc -voms cms -valid 192:00
 cd FlyingTop/FlyingTop/test
 
 cmsRun flyingtop.py (to run locally)
+
+cmsRun flyingtop_MC.py or cmsRun flyingtop_data.py (for 10_6_30)
   
  or (still working but not used, see next point "To run jobs")
   
