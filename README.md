@@ -57,17 +57,10 @@ eval  `scramv1 r -sh`
 git cms-init
 
 mkdir FlyingTop
-
-git clone https://github.com/PaulVaucelle/FlyingTop.git
-
-# just for information for the very first time:
-
-mkdir FlyingTop
 cd FlyingTop
 mkedanlzr FlyingTop
-edit => FlyingTop/plugins/BuildFile.xml & // and add :
 
-use name="DataFormats/PatCandidates"/
+git clone https://github.com/PaulVaucelle/FlyingTop.git
 
 
 ###
@@ -105,8 +98,6 @@ voms-proxy-init -rfc -voms cms -valid 192:00
 cd FlyingTop/FlyingTop/test
 
 cmsRun flyingtop.py (to run locally)
-
-cmsRun flyingtop_MC.py or cmsRun flyingtop_data.py (for 10_6_30)
   
  or (still working but not used, see next point "To run jobs")
   
