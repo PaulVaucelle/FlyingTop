@@ -216,6 +216,7 @@ public :
    vector<float>   *tree_muon_muon_dR;
    vector<float>   *tree_muon_muon_dPhi;
    vector<float>   *tree_muon_muon_dEta;
+   Int_t           tree_TRACK_SIZE;
    Int_t           tree_nTracks;
    Int_t           tree_nLostTracks;
    vector<unsigned int> *tree_track_ipc;
@@ -290,6 +291,8 @@ public :
    Float_t         tree_GenPVx;
    Float_t         tree_GenPVy;
    Float_t         tree_GenPVz;
+   Int_t           tree_smu_mass;
+   Int_t           tree_neu_mass;
    vector<float>   *tree_genParticle_pt;
    vector<float>   *tree_genParticle_eta;
    vector<float>   *tree_genParticle_phi;
@@ -307,6 +310,7 @@ public :
    vector<int>     *tree_genParticle_statusCode;
    vector<int>     *tree_genParticle_mother_pdgId;
    vector<int>     *tree_genParticle_LLP;
+   vector<float>   *tree_genParticle_ct0;
    Int_t           tree_ngenPackPart;
    vector<float>   *tree_genPackPart_pt;
    vector<float>   *tree_genPackPart_eta;
@@ -678,6 +682,7 @@ public :
    TBranch        *b_tree_muon_muon_dR;   //!
    TBranch        *b_tree_muon_muon_dPhi;   //!
    TBranch        *b_tree_muon_muon_dEta;   //!
+   TBranch        *b_tree_TRACK_SIZE;
    TBranch        *b_tree_nTracks;   //!
    TBranch        *b_tree_nLostTracks;   //!
    TBranch        *b_tree_track_ipc;   //!
@@ -752,6 +757,8 @@ public :
    TBranch        *b_tree_GenPVx;   //!
    TBranch        *b_tree_GenPVy;   //!
    TBranch        *b_tree_GenPVz;   //!
+   TBranch        *b_tree_smu_mass;
+   TBranch        *b_tree_neu_mass;
    TBranch        *b_tree_genParticle_pt;   //!
    TBranch        *b_tree_genParticle_eta;   //!
    TBranch        *b_tree_genParticle_phi;   //!
@@ -769,6 +776,7 @@ public :
    TBranch        *b_tree_genParticle_statusCode;   //!
    TBranch        *b_tree_genParticle_mother_pdgId;   //!
    TBranch        *b_tree_genParticle_LLP;   //!
+   TBranch        *b_tree_genParticle_ct0;
    TBranch        *b_tree_ngenPackPart;   //!
    TBranch        *b_tree_genPackPart_pt;   //!
    TBranch        *b_tree_genPackPart_eta;   //!
@@ -1299,6 +1307,7 @@ void TreeReader::Init(TTree *tree)
    tree_genParticle_statusCode = 0;
    tree_genParticle_mother_pdgId = 0;
    tree_genParticle_LLP = 0;
+   tree_genParticle_ct0 = 0;
    tree_genPackPart_pt = 0;
    tree_genPackPart_eta = 0;
    tree_genPackPart_phi = 0;
@@ -1642,6 +1651,7 @@ void TreeReader::Init(TTree *tree)
    fChain->SetBranchAddress("tree_muon_muon_dR", &tree_muon_muon_dR, &b_tree_muon_muon_dR);
    fChain->SetBranchAddress("tree_muon_muon_dPhi", &tree_muon_muon_dPhi, &b_tree_muon_muon_dPhi);
    fChain->SetBranchAddress("tree_muon_muon_dEta", &tree_muon_muon_dEta, &b_tree_muon_muon_dEta);
+   fChain->SetBranchAddress("tree_TRACK_SIZE",&tree_TRACK_SIZE,&b_tree_TRACK_SIZE);
    fChain->SetBranchAddress("tree_nTracks", &tree_nTracks, &b_tree_nTracks);
    fChain->SetBranchAddress("tree_nLostTracks", &tree_nLostTracks, &b_tree_nLostTracks);
    fChain->SetBranchAddress("tree_track_ipc", &tree_track_ipc, &b_tree_track_ipc);
@@ -1716,6 +1726,8 @@ void TreeReader::Init(TTree *tree)
    fChain->SetBranchAddress("tree_GenPVx", &tree_GenPVx, &b_tree_GenPVx);
    fChain->SetBranchAddress("tree_GenPVy", &tree_GenPVy, &b_tree_GenPVy);
    fChain->SetBranchAddress("tree_GenPVz", &tree_GenPVz, &b_tree_GenPVz);
+   fChain->SetBranchAddress("tree_smu_mass",&tree_smu_mass,&b_tree_smu_mass);
+   fChain->SetBranchAddress("tree_neu_mass",&tree_neu_mass,&b_tree_neu_mass);
    fChain->SetBranchAddress("tree_genParticle_pt", &tree_genParticle_pt, &b_tree_genParticle_pt);
    fChain->SetBranchAddress("tree_genParticle_eta", &tree_genParticle_eta, &b_tree_genParticle_eta);
    fChain->SetBranchAddress("tree_genParticle_phi", &tree_genParticle_phi, &b_tree_genParticle_phi);
@@ -1733,6 +1745,7 @@ void TreeReader::Init(TTree *tree)
    fChain->SetBranchAddress("tree_genParticle_statusCode", &tree_genParticle_statusCode, &b_tree_genParticle_statusCode);
    fChain->SetBranchAddress("tree_genParticle_mother_pdgId", &tree_genParticle_mother_pdgId, &b_tree_genParticle_mother_pdgId);
    fChain->SetBranchAddress("tree_genParticle_LLP", &tree_genParticle_LLP, &b_tree_genParticle_LLP);
+   fChain->SetBranchAddress("tree_genParticle_ct0", &tree_genParticle_ct0, &b_tree_genParticle_ct0);
    fChain->SetBranchAddress("tree_ngenPackPart", &tree_ngenPackPart, &b_tree_ngenPackPart);
    fChain->SetBranchAddress("tree_genPackPart_pt", &tree_genPackPart_pt, &b_tree_genPackPart_pt);
    fChain->SetBranchAddress("tree_genPackPart_eta", &tree_genPackPart_eta, &b_tree_genPackPart_eta);
