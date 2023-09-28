@@ -77,7 +77,7 @@ def main():
 
         config.JobType.pluginName = 'Analysis'
         config.JobType.psetName = 'flyingtop.py'
-        config.JobType.inputFiles = ['BDTG_SIG50vsBKGtt_filter_veto_15var.xml','BDTG_EvtsSel_SIG50vsAll.xml','BDTG_VtxSel_SIG50vsBKGtt.xml','BDTG_VtxSel_SIG50vsBKGtt_step1.xml']
+        config.JobType.inputFiles = ['BDTG_SIG50vsBKGtt_filter_veto_15var.xml','BDTG_EvtsSel_SIG50vsAll.xml','BDTG_VtxSel_SIG50vsAll.xml','BDTG_VtxSel_SIG50vsAll_Tight.xml']
         config.JobType.maxMemoryMB = 2500
         # config.JobType.numCores = 4
 
@@ -85,11 +85,18 @@ def main():
         config.Data.splitting = 'FileBased'
         config.Data.unitsPerJob = 20
         config.Data.totalUnits = 20
-        config.Data.outLFNDirBase = '/store/user/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/MC'
+        config.Data.outLFNDirBase = '/store/user/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC'
         config.Data.outputDatasetTag = 'MC'
-
+        config.Data.inputDBS = 'global' #for signal : phys03 // for bkg :  global 
+        config.Data.ignoreLocality = False
         config.Site.storageSite = 'T2_FR_IPHC' # Choose your site. 
+
+        config.General.transferOutputs = True
+
+        
+
         #--------------------------------------------------------
+        
 
         # Will submit one task for each of these input datasets.
         inputDatasets = [
@@ -103,11 +110,44 @@ def main():
                          '/WWTo2L2Nu_MLL_200To600_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v1/MINIAODSIM',
                          '/WWTo2L2Nu_MLL_600To1200_TuneCP5_13TeV-powheg-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v3/MINIAODSIM',
                          '/WZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v2/MINIAODSIM',
-                         '/ZZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v2/MINIAODSIM'
-                        ]
+                         '/ZZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v2/MINIAODSIM',
+                        '/ttWJetsToLNu_5f_EWK_TuneCP5_13TeV_amcatnlo-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v2/MINIAODSIM',
+			            '/TTZToLL_5f_TuneCP5_13TeV-madgraphMLM-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v2/MINIAODSIM',
+			            '/TTToHadronic_TuneCP5CR1_13TeV-powheg-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v2/MINIAODSIM',
+			            '/TTWW_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18MiniAODv2-106X_upgrade2018_realistic_v16_L1v1-v1/MINIAODSIM'
+
+                        # '/UDD_2018_LO_smu200_neu180_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER'
+                        # '/UDD_2018_LO_smu250_neu200_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # # '/UDD_2018_LO_smu300_neu180_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu300_neu180_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu300_neu250_lamE-2_ctau01/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu300_neu250_lamE-2_ctau03/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu300_neu250_lamE-2_ctau10/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu300_neu250_lamE-2_ctau100/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu300_neu250_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu300_neu250_lamE-2_ctau30/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu300_neu250_lamE-2_ctaup1/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu300_neu250_lamE-2_ctaup3/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu300_neu280_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu400_neu180_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu400_neu200_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu400_neu250_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu400_neu300_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu400_neu350_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu400_neu380_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu500_neu180_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu500_neu200_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu500_neu250_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu500_neu300_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu500_neu350_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu500_neu400_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu500_neu450_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER',
+                        # '/UDD_2018_LO_smu500_neu480_lamE-2_ctau20/blochd-step4-a2e45195ead716c497c8ed50793157ff/USER'
+			]
 
         for inDS in inputDatasets:
             # inDS is of the form /A/B/C. Since B is unique for each inDS, use this in the CRAB request name.
+            config.Data.publication = False
             config.General.requestName = inDS.split('/')[1]
             config.Data.inputDataset = inDS
             config.Data.outputDatasetTag = '%s_%s' % (d1, config.General.requestName)
