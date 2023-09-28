@@ -3,15 +3,20 @@
   std::vector<TString > systlist;
   systlist.push_back("");
 
+  TTree* treeLO_smu200to500_ctau20=0;
+  TreeReader * tree_LO_smu200to500_ctau20 = new TreeReader(treeLO_smu200to500_ctau20, "LO_smu200to500_ctau20", systlist);
+  tree_LO_smu200to500_ctau20->Loop("LO_smu200to500_ctau20",true);
+  delete tree_LO_smu200to500_ctau20;
+  
   TTree* tree70=0;
   TreeReader * tree_70_test = new TreeReader(tree70, "70_test", systlist);
   tree_70_test->Loop("70_test",true);
   delete tree_70_test;
 
   TTree* tree50=0;
-  TreeReader * tree_50_test = new TreeReader(tree50, "50_test", systlist);
+  TreeReader * tree_50_test = new TreeReader(tree50, "50_test", systlist);//Ntuple_
   tree_50_test->Loop("50_test",true);
-  delete tree_50_test;
+  delete tree_50_test; 
 
   TTree* tree30=0;
   TreeReader * tree_30_test = new TreeReader(tree30, "30_test", systlist);
@@ -25,150 +30,6 @@
 
 
 
-  //   TTree* treesmu200_neu180_lamE_2_ctau20=0;
-  // TreeReader * tree_smu200_neu180_lamE_2_ctau20 = new TreeReader(treesmu200_neu180_lamE_2_ctau20, "smu200_neu180_lamE_2_ctau20", systlist);
-  // tree_smu200_neu180_lamE_2_ctau20->Loop("smu200_neu180_lamE_2_ctau20",true);
-  // delete tree_smu200_neu180_lamE_2_ctau20;
-
-  //   TTree* treesmu250_neu200_lamE_2_ctau20=0;
-  // TreeReader * tree_smu250_neu200_lamE_2_ctau20 = new TreeReader(treesmu250_neu200_lamE_2_ctau20, "smu250_neu200_lamE_2_ctau20", systlist);
-  // tree_smu250_neu200_lamE_2_ctau20->Loop("smu250_neu200_lamE_2_ctau20",true);
-  // delete tree_smu250_neu200_lamE_2_ctau20;
-
-  //   TTree* treesmu300_neu180_lamE_2_ctau20=0;
-  // TreeReader * tree_smu300_neu180_lamE_2_ctau20 = new TreeReader(treesmu300_neu180_lamE_2_ctau20, "smu300_neu180_lamE_2_ctau20", systlist);
-  // tree_smu300_neu180_lamE_2_ctau20->Loop("smu300_neu180_lamE_2_ctau20",true);
-  // delete tree_smu300_neu180_lamE_2_ctau20;
-
-  //   TTree* treesmu300_neu200_lamE_2_ctau20=0;
-  // TreeReader * tree_smu300_neu200_lamE_2_ctau20 = new TreeReader(treesmu300_neu200_lamE_2_ctau20, "smu300_neu200_lamE_2_ctau20", systlist);
-  // tree_smu300_neu200_lamE_2_ctau20->Loop("smu300_neu200_lamE_2_ctau20",true);
-  // delete tree_smu300_neu200_lamE_2_ctau20;
-
-  //   TTree* treesmu300_neu250_lamE_2_ctau01=0;
-  // TreeReader * tree_smu300_neu250_lamE_2_ctau01 = new TreeReader(treesmu300_neu250_lamE_2_ctau01, "smu300_neu250_lamE_2_ctau01", systlist);
-  // tree_smu300_neu250_lamE_2_ctau01->Loop("smu300_neu250_lamE_2_ctau01",true);
-  // delete tree_smu300_neu250_lamE_2_ctau01;
-
-  //   TTree* treesmu300_neu250_lamE_2_ctau03=0;
-  // TreeReader * tree_smu300_neu250_lamE_2_ctau03 = new TreeReader(treesmu300_neu250_lamE_2_ctau03, "smu300_neu250_lamE_2_ctau03", systlist);
-  // tree_smu300_neu250_lamE_2_ctau03->Loop("smu300_neu250_lamE_2_ctau03",true);
-  // delete tree_smu300_neu250_lamE_2_ctau03;
-
-
-
-  //   TTree* treeNtuple_smu300_neu250_lamE_2_ctau10=0;
-  // TreeReader * tree_Ntuple_smu300_neu250_lamE_2_ctau10 = new TreeReader(treeNtuple_smu300_neu250_lamE_2_ctau10, "smu300_neu250_lamE_2_ctau10", systlist);
-  // tree_Ntuple_smu300_neu250_lamE_2_ctau10->Loop("smu300_neu250_lamE_2_ctau10",true);
-  // delete tree_Ntuple_smu300_neu250_lamE_2_ctau10;
-
-  // TTree* treesmu300_neu250_lamE_2_ctau100=0;
-  // TreeReader * tree_smu300_neu250_lamE_2_ctau100 = new TreeReader(treesmu300_neu250_lamE_2_ctau100, "smu300_neu250_lamE_2_ctau100", systlist);
-  // tree_smu300_neu250_lamE_2_ctau100->Loop("smu300_neu250_lamE_2_ctau100",true);
-  // delete tree_smu300_neu250_lamE_2_ctau100;
-
-  //   TTree* treesmu300_neu250_lamE_2_ctau20=0;
-  // TreeReader * tree_smu300_neu250_lamE_2_ctau20 = new TreeReader(treesmu300_neu250_lamE_2_ctau20, "smu300_neu250_lamE_2_ctau20", systlist);
-  // tree_smu300_neu250_lamE_2_ctau20->Loop("smu300_neu250_lamE_2_ctau20",true);
-  // delete tree_smu300_neu250_lamE_2_ctau20;
-
-  //   TTree* treesmu300_neu250_lamE_2_ctau30=0;
-  // TreeReader * tree_smu300_neu250_lamE_2_ctau30 = new TreeReader(treesmu300_neu250_lamE_2_ctau30, "smu300_neu250_lamE_2_ctau30", systlist);
-  // tree_smu300_neu250_lamE_2_ctau30->Loop("smu300_neu250_lamE_2_ctau30",true);
-  // delete tree_smu300_neu250_lamE_2_ctau30;
-
-  //   TTree* treesmu300_neu250_lamE_2_ctaup1=0;
-  // TreeReader * tree_smu300_neu250_lamE_2_ctaup1 = new TreeReader(treesmu300_neu250_lamE_2_ctaup1, "smu300_neu250_lamE_2_ctaup1", systlist);
-  // tree_smu300_neu250_lamE_2_ctaup1->Loop("smu300_neu250_lamE_2_ctaup1",true);
-  // delete tree_smu300_neu250_lamE_2_ctaup1;
-
-  //   TTree* treesmu300_neu250_lamE_2_ctaup3=0;
-  // TreeReader * tree_smu300_neu250_lamE_2_ctaup3 = new TreeReader(treesmu300_neu250_lamE_2_ctaup3, "smu300_neu250_lamE_2_ctaup3", systlist);
-  // tree_smu300_neu250_lamE_2_ctaup3->Loop("smu300_neu250_lamE_2_ctaup3",true);
-  // delete tree_smu300_neu250_lamE_2_ctaup3;
-
-  //   TTree* treesmu300_neu280_lamE_2_ctau20=0;
-  // TreeReader * tree_smu300_neu280_lamE_2_ctau20 = new TreeReader(treesmu300_neu280_lamE_2_ctau20, "smu300_neu280_lamE_2_ctau20", systlist);
-  // tree_smu300_neu280_lamE_2_ctau20->Loop("smu300_neu280_lamE_2_ctau20",true);
-  // delete tree_smu300_neu280_lamE_2_ctau20;
-
-
-  //   TTree* treesmu400_neu180_lamE_2_ctau20=0;
-  // TreeReader * tree_smu400_neu180_lamE_2_ctau20 = new TreeReader(treesmu400_neu180_lamE_2_ctau20, "smu400_neu180_lamE_2_ctau20", systlist);
-  // tree_smu400_neu180_lamE_2_ctau20->Loop("smu400_neu180_lamE_2_ctau20",true);
-  // delete tree_smu400_neu180_lamE_2_ctau20;
-
-  //   TTree* treesmu400_neu200_lamE_2_ctau20=0;
-  // TreeReader * tree_smu400_neu200_lamE_2_ctau20 = new TreeReader(treesmu400_neu200_lamE_2_ctau20, "smu400_neu200_lamE_2_ctau20", systlist);
-  // tree_smu400_neu200_lamE_2_ctau20->Loop("smu400_neu200_lamE_2_ctau20",true);
-  // delete tree_smu400_neu200_lamE_2_ctau20;
-
-
-  //   TTree* treesmu400_neu250_lamE_2_ctau20=0;
-  // TreeReader * tree_smu400_neu250_lamE_2_ctau20 = new TreeReader(treesmu400_neu250_lamE_2_ctau20, "smu400_neu250_lamE_2_ctau20", systlist);
-  // tree_smu400_neu250_lamE_2_ctau20->Loop("smu400_neu250_lamE_2_ctau20",true);
-  // delete tree_smu400_neu250_lamE_2_ctau20;
-
-  //   TTree* treesmu400_neu300_lamE_2_ctau20=0;
-  // TreeReader * tree_smu400_neu300_lamE_2_ctau20 = new TreeReader(treesmu400_neu300_lamE_2_ctau20, "smu400_neu300_lamE_2_ctau20", systlist);
-  // tree_smu400_neu300_lamE_2_ctau20->Loop("smu400_neu300_lamE_2_ctau20",true);
-  // delete tree_smu400_neu300_lamE_2_ctau20;
-
-  //   TTree* treesmu400_neu350_lamE_2_ctau20=0;
-  // TreeReader * tree_smu400_neu350_lamE_2_ctau20 = new TreeReader(treesmu400_neu350_lamE_2_ctau20, "smu400_neu350_lamE_2_ctau20", systlist);
-  // tree_smu400_neu350_lamE_2_ctau20->Loop("smu400_neu350_lamE_2_ctau20",true);
-  // delete tree_smu400_neu350_lamE_2_ctau20;
-
-
-  //   TTree* treesmu400_neu380_lamE_2_ctau20=0;
-  // TreeReader * tree_smu400_neu380_lamE_2_ctau20 = new TreeReader(treesmu400_neu380_lamE_2_ctau20, "smu400_neu380_lamE_2_ctau20", systlist);
-  // tree_smu400_neu380_lamE_2_ctau20->Loop("smu400_neu380_lamE_2_ctau20",true);
-  // delete tree_smu400_neu380_lamE_2_ctau20;
-
-  //   TTree* treesmu500_neu180_lamE_2_ctau20=0;
-  // TreeReader * tree_smu500_neu180_lamE_2_ctau20 = new TreeReader(treesmu500_neu180_lamE_2_ctau20, "smu500_neu180_lamE_2_ctau20", systlist);
-  // tree_smu500_neu180_lamE_2_ctau20->Loop("smu500_neu180_lamE_2_ctau20",true);
-  // delete tree_smu500_neu180_lamE_2_ctau20;
-
-  //   TTree* treesmu500_neu200_lamE_2_ctau20=0;
-  // TreeReader * tree_smu500_neu200_lamE_2_ctau20 = new TreeReader(treesmu500_neu200_lamE_2_ctau20, "smu500_neu200_lamE_2_ctau20", systlist);
-  // tree_smu500_neu200_lamE_2_ctau20->Loop("smu500_neu200_lamE_2_ctau20",true);
-  // delete tree_smu500_neu200_lamE_2_ctau20;
-
-  //   TTree* treesmu500_neu250_lamE_2_ctau20=0;
-  // TreeReader * tree_smu500_neu250_lamE_2_ctau20 = new TreeReader(treesmu500_neu250_lamE_2_ctau20, "smu500_neu250_lamE_2_ctau20", systlist);
-  // tree_smu500_neu250_lamE_2_ctau20->Loop("smu500_neu250_lamE_2_ctau20",true);
-  // delete tree_smu500_neu250_lamE_2_ctau20;
-
-  //   TTree* treesmu500_neu300_lamE_2_ctau20=0;
-  // TreeReader * tree_smu500_neu300_lamE_2_ctau20 = new TreeReader(treesmu500_neu300_lamE_2_ctau20, "smu500_neu300_lamE_2_ctau20", systlist);
-  // tree_smu500_neu300_lamE_2_ctau20->Loop("smu500_neu300_lamE_2_ctau20",true);
-  // delete tree_smu500_neu300_lamE_2_ctau20;
-
-  //   TTree* treesmu500_neu350_lamE_2_ctau20=0;
-  // TreeReader * tree_smu500_neu350_lamE_2_ctau20 = new TreeReader(treesmu500_neu350_lamE_2_ctau20, "smu500_neu350_lamE_2_ctau20", systlist);
-  // tree_smu500_neu350_lamE_2_ctau20->Loop("smu500_neu350_lamE_2_ctau20",true);
-  // delete tree_smu500_neu350_lamE_2_ctau20;
-
-  //   TTree* treesmu500_neu400_lamE_2_ctau20=0;
-  // TreeReader * tree_smu500_neu400_lamE_2_ctau20 = new TreeReader(treesmu500_neu400_lamE_2_ctau20, "smu500_neu400_lamE_2_ctau20", systlist);
-  // tree_smu500_neu400_lamE_2_ctau20->Loop("smu500_neu400_lamE_2_ctau20",true);
-  // delete tree_smu500_neu400_lamE_2_ctau20;
-
-  //   TTree* treesmu500_neu450_lamE_2_ctau20=0;
-  // TreeReader * tree_smu500_neu450_lamE_2_ctau20 = new TreeReader(treesmu500_neu450_lamE_2_ctau20, "smu500_neu450_lamE_2_ctau20", systlist);
-  // tree_smu500_neu450_lamE_2_ctau20->Loop("smu500_neu450_lamE_2_ctau20",true);
-  // delete tree_smu500_neu450_lamE_2_ctau20;
-
-  //   TTree* treesmu500_neu480_lamE_2_ctau20=0;
-  // TreeReader * tree_smu500_neu480_lamE_2_ctau20 = new TreeReader(treesmu500_neu480_lamE_2_ctau20, "smu500_neu480_lamE_2_ctau20", systlist);
-  // tree_smu500_neu480_lamE_2_ctau20->Loop("smu500_neu480_lamE_2_ctau20",true);
-  // delete tree_smu500_neu480_lamE_2_ctau20;
-  
-    TTree* treeBKG=0;
-  TreeReader * tree_BKG = new TreeReader(treeBKG, "BKG", systlist);
-  tree_BKG->Loop("BKG", false);
-  delete tree_BKG;
 
   TTree* treeWZTo2Q2L_mllmin4p0=0;
   TreeReader * tree_WZTo2Q2L_mllmin4p0 = new TreeReader(treeWZTo2Q2L_mllmin4p0, "WZTo2Q2L_mllmin4p0", systlist);
@@ -225,5 +86,175 @@
   TreeReader * tree_TTTo2L2Nu = new TreeReader(treeTTTo2L2Nu, "TTTo2L2Nu", systlist);
   tree_TTTo2L2Nu->Loop("TTTo2L2Nu", false);
   delete tree_TTTo2L2Nu;
+
+
+  TTree* treeTTToHadronic=0;   
+  TreeReader * tree_TTToHadronic = new TreeReader(treeTTTo2L2Nu, "TTToHadronic", systlist);
+  tree_TTToHadronic->Loop("TTToHadronic", false);
+  delete tree_TTToHadronic;
+
+  TTree* treeTTZToLL_5f=0;
+  TreeReader * tree_TTZToLL_5f = new TreeReader(treeTTZToLL_5f, "TTZToLL_5f", systlist);
+  tree_TTZToLL_5f->Loop("TTZToLL_5f", false);
+  delete tree_TTZToLL_5f;
+
+    TTree* treettWJetsToLNu_5f_EWK=0;
+  TreeReader * tree_ttWJetsToLNu_5f_EWK = new TreeReader(treettWJetsToLNu_5f_EWK, "ttWJetsToLNu_5f_EWK", systlist);
+  tree_ttWJetsToLNu_5f_EWK->Loop("ttWJetsToLNu_5f_EWK", false);
+  delete tree_ttWJetsToLNu_5f_EWK;
+
+      TTree* treeTTWW=0;
+  TreeReader * tree_TTWW = new TreeReader(treeTTWW, "TTWW", systlist);
+  tree_TTWW->Loop("TTWW", false);
+  delete tree_TTWW;
+
+
+
+    TTree* treesmu200_neu180_lamE_2_ctau20=0;
+  TreeReader * tree_smu200_neu180_lamE_2_ctau20 = new TreeReader(treesmu200_neu180_lamE_2_ctau20, "smu200_neu180_lamE_2_ctau20", systlist);
+  tree_smu200_neu180_lamE_2_ctau20->Loop("smu200_neu180_lamE_2_ctau20",true);
+  delete tree_smu200_neu180_lamE_2_ctau20;
+
+    TTree* treesmu250_neu200_lamE_2_ctau20=0;
+  TreeReader * tree_smu250_neu200_lamE_2_ctau20 = new TreeReader(treesmu250_neu200_lamE_2_ctau20, "smu250_neu200_lamE_2_ctau20", systlist);
+  tree_smu250_neu200_lamE_2_ctau20->Loop("smu250_neu200_lamE_2_ctau20",true);
+  delete tree_smu250_neu200_lamE_2_ctau20;
+
+    TTree* treesmu300_neu180_lamE_2_ctau20=0;
+  TreeReader * tree_smu300_neu180_lamE_2_ctau20 = new TreeReader(treesmu300_neu180_lamE_2_ctau20, "smu300_neu180_lamE_2_ctau20", systlist);
+  tree_smu300_neu180_lamE_2_ctau20->Loop("smu300_neu180_lamE_2_ctau20",true);
+  delete tree_smu300_neu180_lamE_2_ctau20;
+
+    TTree* treesmu300_neu200_lamE_2_ctau20=0;
+  TreeReader * tree_smu300_neu200_lamE_2_ctau20 = new TreeReader(treesmu300_neu200_lamE_2_ctau20, "smu300_neu200_lamE_2_ctau20", systlist);
+  tree_smu300_neu200_lamE_2_ctau20->Loop("smu300_neu200_lamE_2_ctau20",true);
+  delete tree_smu300_neu200_lamE_2_ctau20;
+
+    TTree* treesmu300_neu250_lamE_2_ctau01=0;
+  TreeReader * tree_smu300_neu250_lamE_2_ctau01 = new TreeReader(treesmu300_neu250_lamE_2_ctau01, "smu300_neu250_lamE_2_ctau01", systlist);
+  tree_smu300_neu250_lamE_2_ctau01->Loop("smu300_neu250_lamE_2_ctau01",true);
+  delete tree_smu300_neu250_lamE_2_ctau01;
+
+    TTree* treesmu300_neu250_lamE_2_ctau03=0;
+  TreeReader * tree_smu300_neu250_lamE_2_ctau03 = new TreeReader(treesmu300_neu250_lamE_2_ctau03, "smu300_neu250_lamE_2_ctau03", systlist);
+  tree_smu300_neu250_lamE_2_ctau03->Loop("smu300_neu250_lamE_2_ctau03",true);
+  delete tree_smu300_neu250_lamE_2_ctau03;
+
+
+
+    TTree* treeNtuple_smu300_neu250_lamE_2_ctau10=0;
+  TreeReader * tree_Ntuple_smu300_neu250_lamE_2_ctau10 = new TreeReader(treeNtuple_smu300_neu250_lamE_2_ctau10, "smu300_neu250_lamE_2_ctau10", systlist);
+  tree_Ntuple_smu300_neu250_lamE_2_ctau10->Loop("smu300_neu250_lamE_2_ctau10",true);
+  delete tree_Ntuple_smu300_neu250_lamE_2_ctau10;
+
+  TTree* treesmu300_neu250_lamE_2_ctau100=0;
+  TreeReader * tree_smu300_neu250_lamE_2_ctau100 = new TreeReader(treesmu300_neu250_lamE_2_ctau100, "smu300_neu250_lamE_2_ctau100", systlist);
+  tree_smu300_neu250_lamE_2_ctau100->Loop("smu300_neu250_lamE_2_ctau100",true);
+  delete tree_smu300_neu250_lamE_2_ctau100;
+
+    TTree* treesmu300_neu250_lamE_2_ctau20=0;
+  TreeReader * tree_smu300_neu250_lamE_2_ctau20 = new TreeReader(treesmu300_neu250_lamE_2_ctau20, "smu300_neu250_lamE_2_ctau20", systlist);
+  tree_smu300_neu250_lamE_2_ctau20->Loop("smu300_neu250_lamE_2_ctau20",true);
+  delete tree_smu300_neu250_lamE_2_ctau20;
+
+    TTree* treesmu300_neu250_lamE_2_ctau30=0;
+  TreeReader * tree_smu300_neu250_lamE_2_ctau30 = new TreeReader(treesmu300_neu250_lamE_2_ctau30, "smu300_neu250_lamE_2_ctau30", systlist);
+  tree_smu300_neu250_lamE_2_ctau30->Loop("smu300_neu250_lamE_2_ctau30",true);
+  delete tree_smu300_neu250_lamE_2_ctau30;
+
+    TTree* treesmu300_neu250_lamE_2_ctaup1=0;
+  TreeReader * tree_smu300_neu250_lamE_2_ctaup1 = new TreeReader(treesmu300_neu250_lamE_2_ctaup1, "smu300_neu250_lamE_2_ctaup1", systlist);
+  tree_smu300_neu250_lamE_2_ctaup1->Loop("smu300_neu250_lamE_2_ctaup1",true);
+  delete tree_smu300_neu250_lamE_2_ctaup1;
+
+    TTree* treesmu300_neu250_lamE_2_ctaup3=0;
+  TreeReader * tree_smu300_neu250_lamE_2_ctaup3 = new TreeReader(treesmu300_neu250_lamE_2_ctaup3, "smu300_neu250_lamE_2_ctaup3", systlist);
+  tree_smu300_neu250_lamE_2_ctaup3->Loop("smu300_neu250_lamE_2_ctaup3",true);
+  delete tree_smu300_neu250_lamE_2_ctaup3;
+
+    TTree* treesmu300_neu280_lamE_2_ctau20=0;
+  TreeReader * tree_smu300_neu280_lamE_2_ctau20 = new TreeReader(treesmu300_neu280_lamE_2_ctau20, "smu300_neu280_lamE_2_ctau20", systlist);
+  tree_smu300_neu280_lamE_2_ctau20->Loop("smu300_neu280_lamE_2_ctau20",true);
+  delete tree_smu300_neu280_lamE_2_ctau20;
+
+
+    TTree* treesmu400_neu180_lamE_2_ctau20=0;
+  TreeReader * tree_smu400_neu180_lamE_2_ctau20 = new TreeReader(treesmu400_neu180_lamE_2_ctau20, "smu400_neu180_lamE_2_ctau20", systlist);
+  tree_smu400_neu180_lamE_2_ctau20->Loop("smu400_neu180_lamE_2_ctau20",true);
+  delete tree_smu400_neu180_lamE_2_ctau20;
+
+    TTree* treesmu400_neu200_lamE_2_ctau20=0;
+  TreeReader * tree_smu400_neu200_lamE_2_ctau20 = new TreeReader(treesmu400_neu200_lamE_2_ctau20, "smu400_neu200_lamE_2_ctau20", systlist);
+  tree_smu400_neu200_lamE_2_ctau20->Loop("smu400_neu200_lamE_2_ctau20",true);
+  delete tree_smu400_neu200_lamE_2_ctau20;
+
+
+    TTree* treesmu400_neu250_lamE_2_ctau20=0;
+  TreeReader * tree_smu400_neu250_lamE_2_ctau20 = new TreeReader(treesmu400_neu250_lamE_2_ctau20, "smu400_neu250_lamE_2_ctau20", systlist);
+  tree_smu400_neu250_lamE_2_ctau20->Loop("smu400_neu250_lamE_2_ctau20",true);
+  delete tree_smu400_neu250_lamE_2_ctau20;
+
+    TTree* treesmu400_neu300_lamE_2_ctau20=0;
+  TreeReader * tree_smu400_neu300_lamE_2_ctau20 = new TreeReader(treesmu400_neu300_lamE_2_ctau20, "smu400_neu300_lamE_2_ctau20", systlist);
+  tree_smu400_neu300_lamE_2_ctau20->Loop("smu400_neu300_lamE_2_ctau20",true);
+  delete tree_smu400_neu300_lamE_2_ctau20;
+
+    TTree* treesmu400_neu350_lamE_2_ctau20=0;
+  TreeReader * tree_smu400_neu350_lamE_2_ctau20 = new TreeReader(treesmu400_neu350_lamE_2_ctau20, "smu400_neu350_lamE_2_ctau20", systlist);
+  tree_smu400_neu350_lamE_2_ctau20->Loop("smu400_neu350_lamE_2_ctau20",true);
+  delete tree_smu400_neu350_lamE_2_ctau20;
+
+
+    TTree* treesmu400_neu380_lamE_2_ctau20=0;
+  TreeReader * tree_smu400_neu380_lamE_2_ctau20 = new TreeReader(treesmu400_neu380_lamE_2_ctau20, "smu400_neu380_lamE_2_ctau20", systlist);
+  tree_smu400_neu380_lamE_2_ctau20->Loop("smu400_neu380_lamE_2_ctau20",true);
+  delete tree_smu400_neu380_lamE_2_ctau20;
+
+    TTree* treesmu500_neu180_lamE_2_ctau20=0;
+  TreeReader * tree_smu500_neu180_lamE_2_ctau20 = new TreeReader(treesmu500_neu180_lamE_2_ctau20, "smu500_neu180_lamE_2_ctau20", systlist);
+  tree_smu500_neu180_lamE_2_ctau20->Loop("smu500_neu180_lamE_2_ctau20",true);
+  delete tree_smu500_neu180_lamE_2_ctau20;
+
+    TTree* treesmu500_neu200_lamE_2_ctau20=0;
+  TreeReader * tree_smu500_neu200_lamE_2_ctau20 = new TreeReader(treesmu500_neu200_lamE_2_ctau20, "smu500_neu200_lamE_2_ctau20", systlist);
+  tree_smu500_neu200_lamE_2_ctau20->Loop("smu500_neu200_lamE_2_ctau20",true);
+  delete tree_smu500_neu200_lamE_2_ctau20;
+
+    TTree* treesmu500_neu250_lamE_2_ctau20=0;
+  TreeReader * tree_smu500_neu250_lamE_2_ctau20 = new TreeReader(treesmu500_neu250_lamE_2_ctau20, "smu500_neu250_lamE_2_ctau20", systlist);
+  tree_smu500_neu250_lamE_2_ctau20->Loop("smu500_neu250_lamE_2_ctau20",true);
+  delete tree_smu500_neu250_lamE_2_ctau20;
+
+    TTree* treesmu500_neu300_lamE_2_ctau20=0;
+  TreeReader * tree_smu500_neu300_lamE_2_ctau20 = new TreeReader(treesmu500_neu300_lamE_2_ctau20, "smu500_neu300_lamE_2_ctau20", systlist);
+  tree_smu500_neu300_lamE_2_ctau20->Loop("smu500_neu300_lamE_2_ctau20",true);
+  delete tree_smu500_neu300_lamE_2_ctau20;
+
+    TTree* treesmu500_neu350_lamE_2_ctau20=0;
+  TreeReader * tree_smu500_neu350_lamE_2_ctau20 = new TreeReader(treesmu500_neu350_lamE_2_ctau20, "smu500_neu350_lamE_2_ctau20", systlist);
+  tree_smu500_neu350_lamE_2_ctau20->Loop("smu500_neu350_lamE_2_ctau20",true);
+  delete tree_smu500_neu350_lamE_2_ctau20;
+
+    TTree* treesmu500_neu400_lamE_2_ctau20=0;
+  TreeReader * tree_smu500_neu400_lamE_2_ctau20 = new TreeReader(treesmu500_neu400_lamE_2_ctau20, "smu500_neu400_lamE_2_ctau20", systlist);
+  tree_smu500_neu400_lamE_2_ctau20->Loop("smu500_neu400_lamE_2_ctau20",true);
+  delete tree_smu500_neu400_lamE_2_ctau20;
+
+    TTree* treesmu500_neu450_lamE_2_ctau20=0;
+  TreeReader * tree_smu500_neu450_lamE_2_ctau20 = new TreeReader(treesmu500_neu450_lamE_2_ctau20, "smu500_neu450_lamE_2_ctau20", systlist);
+  tree_smu500_neu450_lamE_2_ctau20->Loop("smu500_neu450_lamE_2_ctau20",true);
+  delete tree_smu500_neu450_lamE_2_ctau20;
+
+    TTree* treesmu500_neu480_lamE_2_ctau20=0;
+  TreeReader * tree_smu500_neu480_lamE_2_ctau20 = new TreeReader(treesmu500_neu480_lamE_2_ctau20, "smu500_neu480_lamE_2_ctau20", systlist);
+  tree_smu500_neu480_lamE_2_ctau20->Loop("smu500_neu480_lamE_2_ctau20",true);
+  delete tree_smu500_neu480_lamE_2_ctau20;
+
+
+  
+  //   TTree* treeBKG=0;
+  // TreeReader * tree_BKG = new TreeReader(treeBKG, "BKG", systlist);
+  // tree_BKG->Loop("BKG", false);
+  // delete tree_BKG;
 
 }
