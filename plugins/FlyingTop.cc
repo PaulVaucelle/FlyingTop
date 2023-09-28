@@ -8110,7 +8110,7 @@ else
     recD = TMath::Sqrt(recX*recX + recY*recY + recZ*recZ);
     tree_Hemi_Vtx_dist.push_back( recD );
     tree_Hemi_Vtx_MeantrackWeight.push_back(MeanWeight);
-    std::cout<<" DCA_VTX_Meand1 "<< DCA_VTX_Meand<<std::endl;
+    // std::cout<<" DCA_VTX_Meand1 "<< DCA_VTX_Meand<<std::endl;
     tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
     int nVertex = 0;
     float posx1 = Vtx_x;
@@ -9428,7 +9428,7 @@ if (showlog){std::cout<<"success Hemi2 step 2 : "<<success<<std::endl;}
     recD = TMath::Sqrt(recX*recX + recY*recY + recZ*recZ);
     tree_Hemi_Vtx_dist.push_back( recD );
     tree_Hemi_Vtx_MeantrackWeight.push_back(MeanWeight);
-    std::cout<<" DCA_VTX_Meand2 "<< DCA_VTX_Meand<<std::endl;
+    // std::cout<<" DCA_VTX_Meand2 "<< DCA_VTX_Meand<<std::endl;
     tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
     float posx2 = Vtx_x;
     float posy2 = Vtx_y;
