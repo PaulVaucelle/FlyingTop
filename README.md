@@ -83,6 +83,9 @@ git cms-addpkg RecoJets/JetProducers
 
 scram b -j 8
 
+More details are available at : https://twiki.cern.ch/twiki/bin/view/CMS/EgammaUL2016To2018 and https://twiki.cern.ch/twiki/bin/view/CMS/PileupJetIDUL#Recommendations_for_2018_UL_data if needed
+ 
+
 # these packages are used in the flyingtop_MC(data).py files 
 
 # Electron p4 and Muon rochester corrections are directly applied in the code through different methods as well as for PileUp
