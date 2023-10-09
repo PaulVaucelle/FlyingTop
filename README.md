@@ -65,9 +65,9 @@ git checkout CMSSW_10_6_30
 ----------------------------
 
 # packages to add :
-# Do these steps  in another CMSSW_10_6_30
+# Do these steps  in CMSSW_10_6_30/src
 
-cd CMSSW_10_6_30_dumy/src
+cd CMSSW_10_6_30/src
 
 git cms-addpkg RecoEgamma/EgammaTools
 
@@ -79,11 +79,13 @@ git clone -b ULSSfiles_correctScaleSysMC https://github.com/jainshilpi/EgammaAna
 
 git cms-addpkg EgammaAnalysis/ElectronTools
 
+git cms-addpkg RecoJets/JetProducers
+
 scram b -j 8
 
 # these packages are used in the flyingtop_MC(data).py files 
 
-# Electron p4 and Muon rochester corrections are directly applied in the code though different methods as well as for PileUp
+# Electron p4 and Muon rochester corrections are directly applied in the code through different methods as well as for PileUp
 
 ###
 ### compilation :
