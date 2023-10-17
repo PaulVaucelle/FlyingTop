@@ -36,8 +36,8 @@ else:
 ## 102X_dataRun2_Sep2018Rereco_v1 => /MuonEG/Run2018B-17Sep2018-v1/MINIAOD                                                                                                                
 # FlyingTopAnalyzer                                                                                          
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(200) )
+# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
 
 process.GoodVertexFilter = cms.EDFilter("VertexSelector",
                                         src = cms.InputTag("offlineSlimmedPrimaryVertices"),
@@ -49,7 +49,7 @@ process.GoodVertexFilter = cms.EDFilter("VertexSelector",
 # Input source
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-                                #'/store/mc/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/2430000/03B96C60-30E8-A449-BF9B-7D4BF8E11222.root'
+                                # '/store/mc/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/2430000/03B96C60-30E8-A449-BF9B-7D4BF8E11222.root'
                                 #'/store/data/Run2018D/SingleMuon/MINIAOD/22Jan2019-v2/110000/03549C1A-345E-8244-9D47-19752B13FAC8.root'
                                 #'/store/data/Run2018B/MuonEG/MINIAOD/17Sep2018-v1/00000/1044E92E-2236-7547-A380-E4E28961E076.root'
                                 #'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/564C53A2-0646-A24D-B580-AEBF43B22A7B.root'
@@ -183,6 +183,255 @@ process.source = cms.Source("PoolSource",
     # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/F4EABEBA-0405-254F-BBF9-5B8B6B727973.root',
     # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/F8DA96F9-7958-AB44-87AF-914D435896CA.root',
     # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/FB2A28D0-3315-EE42-A78D-DC38DA4B4B2E.root'
+                           
+                           
+#                            'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu480_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu480_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu480_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu480_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu480_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu480_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu480_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu480_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu480_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu480_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root',
+
+
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu450_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu450_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu450_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu450_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu450_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu450_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu450_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu450_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu450_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu450_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root',
+
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu400_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu400_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu400_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu400_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu400_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu400_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu400_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu400_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu400_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu400_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root',
+
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root',
+
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root',
+
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root',
+
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root',
+
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu500_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root',
+
+# # #######################################################smu400 ctau20########################################################################
+
+
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu380_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu380_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu380_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu380_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu380_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu380_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu380_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu380_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu380_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu380_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root',
+
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu350_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root',
+
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu300_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root',
+
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root',
+
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root',
+
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu400_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root',
+
+
+# ##########################"smu300 ctau 20 ##############################"
+
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu280_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu280_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu280_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu280_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu280_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu280_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu280_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu280_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu280_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu280_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root',
+
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root',
+
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root',
+
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root',
+
+# ###################smu250 ctau20
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu250_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu250_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu250_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu250_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu250_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu250_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu250_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu250_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu250_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu250_neu200_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root',
+
+
+# # #################smu 200 ctau20
+
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu200_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu200_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu200_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu200_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu200_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu200_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu200_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu200_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu200_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu200_neu180_lamE-2_ctau20/MINIAODSIM_v16_L1v1_10.root'
+
+                           
+                           #new 1 jet
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu250_ctau240/231011_072813/0000/MINIAODSIM_v16_L1v1_1.root',          
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu250_ctau240/231011_072813/0000/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu250_ctau240/231011_072813/0000/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu250_ctau240/231011_072813/0000/MINIAODSIM_v16_L1v1_4.root',                           
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu250_ctau240/231011_072813/0000/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu250_ctau240/231011_072813/0000/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu250_ctau240/231011_072813/0000/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu250_ctau240/231011_072813/0000/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu250_ctau240/231011_072813/0000/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu250_ctau240/231011_072813/0000/MINIAODSIM_v16_L1v1_10.root',
+
+
+
+                           
                             )
 )
 
@@ -246,25 +495,14 @@ process.pileupJetIdUpdated = process.pileupJetId.clone(
 
 process.options = cms.untracked.PSet( )
 process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
-#$$
-                                isMC =cms.bool(IsMC),
-                                   weightFileMVA = cms.untracked.string( "BDTG_SIG50vsBKGtt_filter_veto_15var.xml"),#track selection
 
-# BDTG_SIG50vsBKGtt_filter_veto_15var.xml => Daniel => version sans Yc Veto bug
-
-#the following BDT contain the YC bug + BDt input variables bug
-#(Paul) : Latest Version Running with xyzlost : TMVAClassification_BDTG50cm_04_05_23_NoVeto.weights.xml
-#(Daniel) : Latest Version Running with xyzlost : BDTG_SIG50vsBKGtt_filter_NOveto_19varLOST.xml
-# (Daniel) Latest version Running witout xyzlost : BDTG_SIG50vsBKGtt_filter_veto_15var.xml : 
-#(Paul)   : Latest Version Running without xyzlost : TMVAClassification_BDTG50cm_05_05_23_noxyzlost_NoVeto.weights.xml (there is  a version with the Veto but not better)
-                                   
-                                   #runOnData =cms.bool(True), 
-                                   
-                                       weightFileMVA_EVTS = cms.untracked.string("BDTG_EvtsSel_SIG50vsAll.xml"),#evts selection
-                                   weightFileMVA_VTX = cms.untracked.string("BDTG_VtxSel_SIG50vsBKGtt.xml"),#vtx selection
-                                   weightFileMVA_VTX_step1 = cms.untracked.string("BDTG_VtxSel_SIG50vsBKGtt_step1.xml"),#vtx selection
-                                       genEventInfoInput        = cms.InputTag("generator"),
-    LHEEventProductInput     = cms.InputTag("source"),
+                                    isMC =cms.bool(IsMC),
+                                   weightFileMVA = cms.untracked.string( "TMVAClassification_BDTG_TRKSEL_.weights.xml"),#track selection
+                                   weightFileMVA_EVTS = cms.untracked.string("TMVAClassification_BDTG_EVTSEL_.weights.xml"),#evts selection
+                                   weightFileMVA_VTX = cms.untracked.string("TMVAClassification_BDTG_VTXSEL_.weights.xml"),#vtx selection
+                                   weightFileMVA_VTX_step1 = cms.untracked.string("TMVAClassification_BDTG_VTXSel_TIGHTWP.weights.xml"),#vtx selection
+                                   genEventInfoInput        = cms.InputTag("generator"),
+                                   LHEEventProductInput     = cms.InputTag("externalLHEProducer"),#source or externalLHEProducer
                                    genpruned   = cms.InputTag('prunedGenParticles'),
                                    genpacked   = cms.InputTag('packedGenParticles'),
                                    vertices    = cms.InputTag('offlineSlimmedPrimaryVertices'),
@@ -278,10 +516,9 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
                                    Kshorts     = cms.InputTag("slimmedKshortVertices"),#recoVertexCompositePtrCandidates_slimmedKshortVertices__PAT
                                    Lambda      = cms.InputTag("slimmedLambdaVertices"),#recoVertexCompositePtrCandidates_slimmedLambdaVertices__PAT
                                    beamSpot    = cms.untracked.InputTag('offlineBeamSpot'),
-                                   #    kcvFitter_ =  KinematicConstrainedVertexFitter(),
-                                   puCollection = cms.InputTag("slimmedAddPileupInfo")
-                                   # SV = cms.InputTag("slimmedSecondaryVertices")
-                               )
+                                   puCollection = cms.InputTag("slimmedAddPileupInfo"),
+                                   rhoCollection = cms.InputTag("fixedGridRhoFastjetAll")
+                                )
 
 #process.tsk = cms.Task()
 #for mod in process.producers_().itervalues():
@@ -298,6 +535,7 @@ process.p = cms.Path(process.GoodVertexFilter* process.prefiringweight* process.
 ########## output of ntuple
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("Ntuple_50_test.root") )
+# Ntuple_LO_smu200to500_ctau20
 # process.TFileService = cms.Service("TFileService", fileName = cms.string("UDD_bgctau50_smu275_snu225.root") )
 # process.TFileService = cms.Service("TFileService", fileName = cms.string("TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8_10k_NOdrSigCut.root") )
 
