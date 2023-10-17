@@ -1,11 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 from Configuration.Eras.Era_Run2_2018_cff import Run2_2018
 process = cms.Process("FlyingTop",Run2_2018)
-#$$
-# from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
-#$$
-# import of standard configurations
-#$$
+
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
@@ -16,10 +12,6 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 
 #$$
 process.load("Geometry.CaloEventSetup.CaloTowerConstituents_cfi")
-#$$
-# setupEgammaPostRecoSeq(process,era='2018-Prompt')
-# process.p=cms.Path(process.egammaPostRecoSeq)
-#$$
 
 IsMC=True
 
@@ -49,6 +41,8 @@ process.GoodVertexFilter = cms.EDFilter("VertexSelector",
 # Input source
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
+                                #  '/store/mc/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/2430000/03B96C60-30E8-A449-BF9B-7D4BF8E11222.root'
+
                                 # '/store/mc/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/2430000/03B96C60-30E8-A449-BF9B-7D4BF8E11222.root'
                                 #'/store/data/Run2018D/SingleMuon/MINIAOD/22Jan2019-v2/110000/03549C1A-345E-8244-9D47-19752B13FAC8.root'
                                 #'/store/data/Run2018B/MuonEG/MINIAOD/17Sep2018-v1/00000/1044E92E-2236-7547-A380-E4E28961E076.root'
@@ -70,16 +64,16 @@ process.source = cms.Source("PoolSource",
 #        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_10.root'
 
                                 # # 50cm---------------------------------------------------
-                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_1.root',
-                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_2.root',
-                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_3.root',
-                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_4.root',
-                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_5.root',
-                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_6.root',
-                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_7.root',
-                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_8.root',
-                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_9.root',
-                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_10.root'
+                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_1.root',
+                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_2.root',
+                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_3.root',
+                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_4.root',
+                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_5.root',
+                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_6.root',
+                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_7.root',
+                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_8.root',
+                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_9.root',
+                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_10.root'
 
 # # #30cm-------------------------
 #         'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_1.root',
@@ -112,9 +106,9 @@ process.source = cms.Source("PoolSource",
     # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/564C53A2-0646-A24D-B580-AEBF43B22A7B.root',
     # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/6C51F452-445D-7547-B585-BDA1278294AE.root',
 
-    # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/0023597E-6F49-214D-A518-CC9330A404BD.root',
-    # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/00B564A1-86ED-2C45-8159-5FE8CA552C71.root',
-    # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/041BD979-6754-BC42-8A91-8698F5744F27.root',
+    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/0023597E-6F49-214D-A518-CC9330A404BD.root',
+    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/00B564A1-86ED-2C45-8159-5FE8CA552C71.root',
+    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/041BD979-6754-BC42-8A91-8698F5744F27.root',
     # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/0938183D-C346-BE42-AD41-EAAB4DD5F61C.root',
     # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/11E8D8AA-5485-2B43-937C-2137A3A95624.root',
     # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/1207B318-4CEB-AF41-B68C-2BD3598339F0.root',
@@ -451,16 +445,88 @@ setupEgammaPostRecoSeq(process,
 #from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
 #setupEgammaPostRecoSeq(process,era='2018-UL')  
 
-from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
-updateJetCollection(
-    process,
-    jetSource = cms.InputTag('slimmedJets'),
-    jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
-#$$$$    btagDiscriminators = ['pfDeepCSVJetTags:probb','pfDeepCSVJetTags:probc','pfDeepCSVJetTags:probudsg','pfDeepCSVJetTags:probbb','pfDeepFlavourJetTags:probb'], ## to add discriminators
-    btagDiscriminators = ['pfDeepCSVJetTags:probb','pfDeepCSVJetTags:probbb',
-                          'pfDeepFlavourJetTags:probb','pfDeepFlavourJetTags:probbb','pfDeepFlavourJetTags:problepb'], ## to add discriminators
-    btagPrefix = 'TEST'
+# from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
+# updateJetCollection(
+#     process,
+#     jetSource = cms.InputTag('slimmedJets'),
+#     jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
+# #$$$$    btagDiscriminators = ['pfDeepCSVJetTags:probb','pfDeepCSVJetTags:probc','pfDeepCSVJetTags:probudsg','pfDeepCSVJetTags:probbb','pfDeepFlavourJetTags:probb'], ## to add discriminators
+#     btagDiscriminators = ['pfDeepCSVJetTags:probb','pfDeepCSVJetTags:probbb',
+#                           'pfDeepFlavourJetTags:probb','pfDeepFlavourJetTags:probbb','pfDeepFlavourJetTags:problepb'], ## to add discriminators
+#     btagPrefix = 'TEST'
+# )
+
+##########################################################
+#
+# Setup AK4 jets to be used for analysis
+#
+##########################################################
+#
+# Setup JEC factors
+#
+from PhysicsTools.PatAlgos.recoLayer0.jetCorrFactors_cfi import *
+process.jetCorrFactors = patJetCorrFactors.clone(src='slimmedJets',
+    levels = cms.vstring('L1FastJet',
+        'L2Relative',
+        'L3Absolute',
+        'L2L3Residual'),
+    primaryVertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
 )
+#
+# This module will take the JEC factors and update them on slimmedJets
+#
+from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cfi import *
+process.updatedJets = updatedPatJets.clone(
+    addBTagInfo=False,
+    jetSource='slimmedJets',
+    jetCorrFactorsSource=cms.VInputTag(cms.InputTag("jetCorrFactors") ),
+)
+#
+#  Module to calculate JetID for "Tight" working point
+#
+process.tightJetId = cms.EDProducer("PatJetIDValueMapProducer",
+    filterParams=cms.PSet(
+        version = cms.string('RUN2ULCHS'), #NOTE: Use "RUN2UL16CHS" for UL2016 eras
+        quality = cms.string('TIGHT'),
+    ),
+    src = cms.InputTag("updatedJets")
+)
+
+process.tightLepVetoJetId = cms.EDProducer("PatJetIDValueMapProducer",
+  filterParams=cms.PSet(
+    version = cms.string('RUN2ULCHS'), #NOTE: Use "RUN2UL16CHS" for UL2016 eras^M
+    quality = cms.string('TIGHTLEPVETO'),
+  ),
+  src = cms.InputTag("updatedJets")
+)
+#
+# Module to calculate Pileup Jet ID
+#
+from RecoJets.JetProducers.PileupJetID_cfi import _chsalgos_106X_UL18
+process.load("RecoJets.JetProducers.PileupJetID_cfi")
+process.pileupJetIdUpdated = process.pileupJetId.clone(
+    jets=cms.InputTag("updatedJets"),# JEC corrected jets
+    inputIsCorrected=True,
+    applyJec=False,
+    vertexes=cms.InputTag("offlineSlimmedPrimaryVertices"),
+    algos = cms.VPSet(_chsalgos_106X_UL18),
+)
+#
+# Embed the Jet ID and Pileup Jet ID variables in the jets.
+#
+process.updatedJetsWithUserData = cms.EDProducer("PATJetUserDataEmbedder",
+    src = cms.InputTag("updatedJets"),
+    userFloats = cms.PSet(
+        puIdDisc = cms.InputTag('pileupJetIdUpdated:fullDiscriminant'),
+    ),
+    userInts = cms.PSet(
+        puId = cms.InputTag('pileupJetIdUpdated:fullId'),
+        tightId = cms.InputTag("tightJetId"),
+        tightLepVetoId = cms.InputTag("tightLepVetoJetId"),
+    ),
+)
+
+
 
 from PhysicsTools.PatUtils.l1PrefiringWeightProducer_cfi import l1PrefiringWeightProducer
 process.prefiringweight = l1PrefiringWeightProducer.clone(
@@ -472,26 +538,6 @@ process.prefiringweight = l1PrefiringWeightProducer.clone(
     PrefiringRateSystematicUnctyECAL = cms.double(0.2),
     PrefiringRateSystematicUnctyMuon = cms.double(0.2)
 )
-
-
-#process.load("RecoJets.JetProducers.PileupJetID_cfi")
-
-
-
-from RecoJets.JetProducers.PileupJetID_cfi import _chsalgos_106X_UL18
-process.load("RecoJets.JetProducers.PileupJetID_cfi")
-process.pileupJetIdUpdated = process.pileupJetId.clone( 
-    jets=cms.InputTag("slimmedJets"),# JEC corrected jets
-#    jets=cms.InputTag("updatedPatJetsTransientCorrectedNewDFTraining"),
-    inputIsCorrected=True,
-    applyJec=False,
-    vertexes=cms.InputTag("offlineSlimmedPrimaryVertices"),
-    algos = cms.VPSet(_chsalgos_106X_UL18),
-)
-
-#print process.pileupJetId.dumpConfig()
-
-#process.updatedPatJetsTransientCorrectedNewDFTraining.addTagInfos=cms.bool(True)
 
 process.options = cms.untracked.PSet( )
 process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
@@ -507,7 +553,7 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
                                    genpacked   = cms.InputTag('packedGenParticles'),
                                    vertices    = cms.InputTag('offlineSlimmedPrimaryVertices'),
                                    mets        = cms.InputTag("slimmedMETs"),
-                                   jets        = cms.InputTag("slimmedJets"),
+                                   jets        = cms.InputTag("updatedJetsWithUserData"),
                                    genjets     = cms.InputTag("slimmedGenJets"),
                                    electrons   = cms.InputTag("slimmedElectrons"),
                                    muons       = cms.InputTag("slimmedMuons"),
@@ -527,14 +573,25 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
 #        process.tsk.add(mod)
 #-------------------------------------
 #process.p = cms.Path(process.prefiringweight* process.egammaPostRecoSeq* process.updatedPatJetsTransientCorrectedNewDFTraining* process.FlyingTop,process.tsk)
-process.p = cms.Path(process.GoodVertexFilter* process.prefiringweight* process.egammaPostRecoSeq*  process.pileupJetIdUpdated* process.FlyingTop)
+process.p = cms.Path(
+    process.GoodVertexFilter*
+    process.jetCorrFactors*
+    process.updatedJets*
+    process.tightJetId*
+    process.tightLepVetoJetId *
+    process.pileupJetIdUpdated*
+    process.updatedJetsWithUserData*
+    process.prefiringweight*
+    process.egammaPostRecoSeq*
+    process.FlyingTop
+)
 #process.p = cms.Path(process.prefiringweight* process.egammaPostRecoSeq* process.FlyingTop)
 
 #process.p = cms.Path(process.FlyingTop) 
 # getattr(process,'slimmedJets').addTagInfos = cms.bool(True)
 ########## output of ntuple
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string("Ntuple_50_test.root") )
+process.TFileService = cms.Service("TFileService", fileName = cms.string("Ntuple_TT_test.root") )
 # Ntuple_LO_smu200to500_ctau20
 # process.TFileService = cms.Service("TFileService", fileName = cms.string("UDD_bgctau50_smu275_snu225.root") )
 # process.TFileService = cms.Service("TFileService", fileName = cms.string("TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8_10k_NOdrSigCut.root") )
