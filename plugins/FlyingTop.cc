@@ -10,7 +10,6 @@
 #include <bitset>
 // user include files
 #include "RoccoR.h"
-//#include "RoccoR.cc"
 #include "TH2F.h"
 #include "TTree.h"
 #include "TLorentzVector.h"
@@ -24,9 +23,6 @@
 #include <Math/Functions.h>
 #include <Math/SVector.h>
 #include <Math/SMatrix.h>
-
-// #include "cstdio.h"
-#include <iostream>
 
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
@@ -343,9 +339,9 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     bool showlog            = false;
     
 
-    bool MuonChannel        = true;
+    bool MuonChannel        = false;
     bool ElChannel          = false;
-    bool EMuChannel         = false;
+    bool EMuChannel         = true;
 
 
 
@@ -550,6 +546,8 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float> tree_jet_pt;
     std::vector<float> tree_jet_eta;
     std::vector<float> tree_jet_phi;
+    std::vector<bool>  tree_jet_tightid_LepVeto;
+    std::vector<bool> tree_jet_tightid;
     std::vector<TLorentzVector> tree_reco_jet_P4;
     std::vector<float> tree_jet_HadronFlavour;
     std::vector<float> tree_jet_pileupID;
@@ -1616,6 +1614,8 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_jet_pt"  ,              &tree_jet_pt);
     smalltree->Branch("tree_jet_eta" ,              &tree_jet_eta);
     smalltree->Branch("tree_jet_phi" ,              &tree_jet_phi);
+    smalltree->Branch("tree_jet_tightid", &tree_jet_tightid);
+    smalltree->Branch("tree_jet_tightid_LepVeto", &tree_jet_tightid_LepVeto);
     smalltree->Branch("tree_reco_jet_P4",           &tree_reco_jet_P4,32000,0);
     smalltree->Branch("tree_jet_HadronFlavour",     &tree_jet_HadronFlavour);
     smalltree->Branch("tree_jet_pileupID",          &tree_jet_pileupID);
@@ -3271,8 +3271,7 @@ if ( isMC_ )
                     }//mathcing                                                                                                                                                                                   
 	                else 
                     {
-                      if (mu.isLooseMuon()) {correction = rc.kSmearMC(mu.charge(), mu.pt(), mu.eta(),  mu.phi(),  mu.innerTrack()->hitPattern().trackerLayersWithMeasurement(), gRandom->Rndm(), 0,0); }
-                      else {correction = rc.kSmearMC(mu.charge(), mu.pt(), mu.eta(),  mu.phi(), 1, gRandom->Rndm(), 0,0); }//set the ntrklayermeasurementto 1 by default, there might be a better solution to solve this
+                      if (mu.isGlobalMuon()) {correction = rc.kSmearMC(mu.charge(), mu.pt(), mu.eta(),  mu.phi(),  mu.innerTrack()->hitPattern().trackerLayersWithMeasurement(), gRandom->Rndm(), 0,0); }
                     }
                 }//gen mu                                                                                                                                                                                       
             }// end of MC loop                                                                                                                                                                                
@@ -3331,7 +3330,7 @@ if ( isMC_ )
     EA *= std::pow( R / 0.3, 2 );
     float miniIso = ( chg + TMath::Max( 0.0, neu + pho - (Rho) * EA ) ) / mu.pt();//smaeredPT ???
     tree_muon_miniIso.push_back(miniIso);
-      if(mu.isLooseMuon()){
+      if(mu.isGlobalMuon()){
       //cout<<" muon inner hits="<<mu.innerTrack()->hitPattern().trackerLayersWithMeasurement()<<endl;
       tree_muon_trkLayers.push_back(mu.innerTrack()->hitPattern().trackerLayersWithMeasurement());
     }
@@ -3469,7 +3468,10 @@ if (MuonChannel)
 
     tree_jet_TightJetIDLepVeto.push_back(TightJetIDLepVeto);
     tree_jet_TightJetID.push_back(TightJetID);
-
+    tree_jet_tightid.push_back(jet.userInt("tightId"));
+    tree_jet_tightid_LepVeto.push_back(jet.userInt("tightLepVetoId"));
+    bool pass_JetId_TightLepVeto = jet.userInt("tightLepVetoId");
+    bool pass_JetId_Tight = jet.userInt("tightId"); 
     if ( indjet==0) {jet1_pt = jet.pt();}
     if ( indjet==1) {jet2_pt = jet.pt();}
     tree_jet_E.push_back(jet.energy());
@@ -3573,6 +3575,7 @@ if (MuonChannel)
       TLorentzVector elcor(0.,0.,0.,0);
       TLorentzVector el1(0.,0.,0.,0.);
       el1.SetPxPyPzE(el.px(), el.py(),el.pz(),el.energy());
+      tree_electron_ecal_trk_postcorr.push_back(el.userFloat("ecalTrkEnergyPostCorr"));
       if (el.energy() !=0)
         {
           correction=el.userFloat("ecalTrkEnergyPostCorr")/el.energy();
@@ -3580,8 +3583,9 @@ if (MuonChannel)
       // cout<< " ele pt before CORREC***** = "<<el1.Pt()<<endl;    
       elcor=el1*correction;
       // cout<< " ele pt AFTER CORRECT = "<<elcor.Pt()<<endl;
-      if ((((fabs(el.eta())) > 1.479) && (abs(el.gsfTrack()->dxy(PV.position())) > 0.05 || abs(el.gsfTrack()->dz(PV.position()))  >0.10)) || ((fabs(el.eta())<= 1.479) && (abs(el.gsfTrack()->dxy(PV.position()))>0.10  || abs(el.gsfTrack()->dz(PV.position()))))) continue;                                                                                                                                           
-      if ( !(el.electronID("cutBasedElectronID-Fall17-94X-V2-loose")) ) continue;                                                                                                                                            
+      tree_electron_IsLoose.push_back(  el.electronID("cutBasedElectronID-Fall17-94X-V2-loose"));//for 2018
+      tree_electron_IsMedium.push_back( el.electronID("cutBasedElectronID-Fall17-94X-V2-medium"));//for 2018
+      tree_electron_IsTight.push_back(  el.electronID("cutBasedElectronID-Fall17-94X-V2-tight"));//for 2018                                                                                                                                          
       tree_electron_pt.push_back(     elcor.Pt());
       tree_electron_eta.push_back(    elcor.Eta());//cluster eta
       tree_electron_phi.push_back(    elcor.Phi());
@@ -3592,8 +3596,7 @@ if (MuonChannel)
       tree_electron_py.push_back(     elcor.Py());
       tree_electron_pz.push_back(     elcor.Pz());
       tree_electron_energy.push_back( elcor.E());
-      tree_electron_et.push_back(     el.et());
-      tree_electron_ecal_trk_postcorr.push_back(el.userFloat("ecalTrkEnergyPostCorr"));
+      tree_electron_et.push_back(     el.et()); //TLorentzvector
       tree_electron_charge.push_back( el.charge());
       tree_electron_isoR4.push_back(  el.trackIso());//returns the value of the summed track pt in a cone of deltaR<0.4
       tree_electron_dxy.push_back(    el.gsfTrack()->dxy(PV.position()));
@@ -3603,16 +3606,10 @@ if (MuonChannel)
   // https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideCategoryBasedElectronID
   // HLT Ele23Ele12 noDZ v*
   // HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v
-    tree_electron_IsLoose.push_back(  el.electronID("cutBasedElectronID-Fall17-94X-V2-loose"));//for 2018
-    tree_electron_IsMedium.push_back( el.electronID("cutBasedElectronID-Fall17-94X-V2-medium"));//for 2018
-    tree_electron_IsTight.push_back(  el.electronID("cutBasedElectronID-Fall17-94X-V2-tight"));//for 2018
+    
+
     nEl++;
 
-    // tree_electron_trigger_Ele.push_back(el.triggered("HLT_Ele27_WPTight_Gsf_v*"));
-    // tree_electron_trigger_diEle.push_back(el.triggered("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v*"));
-    if (el.gsfTrack()->dxy(PV.position())>0.05 || el.gsfTrack()->dz(PV.position())>0.1) continue;
-    
-    if (showlog){std::cout<<"prmpt electron"<<std::endl;}
 //       	barrel 	endcap
 // d0, cm 	0.05 	0.10
 // dz, cm 	0.10 	0.20 
@@ -3650,7 +3647,7 @@ if (MuonChannel)
       if ( mupt1 < 10. ) continue; // Zmu filter
       // if ( abs(tree_muon_dxy[mu]) > 0.1 || abs(tree_muon_dz[mu]) > 0.2 || (!tree_muon_trigger_dimu[mu] && !tree_muon_trigger_isomu[mu]) || !tree_muon_isLoose[mu] ) continue; // muons closed to PV
       // if ( abs(tree_muon_dxy[mu]) > 0.1 || abs(tree_muon_dz[mu]) > 0.2 ||  !tree_muon_isLoose[mu] ) continue; //|| !tree_muon_PFIsoLoose[mu] muons closed to PV
-      if ( abs(tree_muon_dxy[index_muon[mu]]) > 0.1 || abs(tree_muon_dz[index_muon[mu]]) > 0.2 ||  !tree_muon_isTight[index_muon[mu]] || !tree_muon_TkIsoLoose[index_muon[mu]] ) continue;//
+      if ( abs(tree_muon_dxy[index_muon[mu]]) > 0.1 || abs(tree_muon_dz[index_muon[mu]]) > 0.2 ||  !tree_muon_isTight[index_muon[mu]]  ) continue;//|| !tree_muon_TkIsoLoose[index_muon[mu]]
       mueta1 = tree_muon_eta[index_muon[mu]];
       muphi1 = tree_muon_phi[index_muon[mu]];
       v1.SetPtEtaPhiM(mupt1,mueta1,muphi1,mu_mass);
@@ -3660,11 +3657,11 @@ if (MuonChannel)
           if ( !tree_muon_isGlobal[index_muon[mu2]] ) continue;
           mupt2  = tree_muon_pt[index_muon[mu2]];
           if ( mupt2 < 10. ) continue;
-          if ( mupt1 < 25. && mupt2 < 25. ) continue; // Zmu Filter
+          if ( mupt1 < 25. && mupt2 < 10. ) continue; // Zmu Filter
           if ( tree_muon_charge[index_muon[mu]] == tree_muon_charge[index_muon[mu2]] && !AllowDiLeptonSameSign) continue;
           // // if ( (tree_muon_trigger_isomu[mu] && (abs(tree_muon_dxy[mu2]) > 0.1 || abs(tree_muon_dz[mu2]) > 0.2 || !tree_muon_isLoose[mu2]))  || (abs(tree_muon_dxy[mu2]) > 0.1 || abs(tree_muon_dz[mu2]) > 0.2 || (!tree_muon_trigger_dimu[mu2] && tree_muon_trigger_dimu[mu] ) || !tree_muon_isLoose[mu2]) ) continue;
           // if ( ( (abs(tree_muon_dxy[mu2]) > 0.1 || abs(tree_muon_dz[mu2]) > 0.2 || !tree_muon_isLoose[mu2] )) ) continue;//|| !tree_muon_PFIsoLoose[mu2]
-          if (  abs(tree_muon_dxy[index_muon[mu2]]) > 0.1 || abs(tree_muon_dz[index_muon[mu2]]) > 0.2 || !tree_muon_isMedium[index_muon[mu2]] || !tree_muon_TkIsoLoose[index_muon[mu2]] ) continue;//|
+          if (  abs(tree_muon_dxy[index_muon[mu2]]) > 0.1 || abs(tree_muon_dz[index_muon[mu2]]) > 0.2 || !tree_muon_isTight[index_muon[mu2]]  ) continue;//|| !tree_muon_TkIsoLoose[index_muon[mu2]]
           // if using LooseID, apply a deltaR criteria of 0.02 between the two muons => https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2
           mueta2 = tree_muon_eta[index_muon[mu2]];
           muphi2 = tree_muon_phi[index_muon[mu2]];
@@ -3700,26 +3697,26 @@ if (MuonChannel)
     { 
       mupt1  = tree_electron_pt[index_el[ele]];
       if ( mupt1 < 10. ) continue; // Zmu filter
-      // if ( abs(tree_electron_dxy[mu]) > 0.1 || abs(tree_electron_dz[mu]) > 0.2 || (!tree_electron_trigger_dimu[mu] && !tree_electron_trigger_isomu[mu]) || !tree_electron_isLoose[mu] ) continue; // electrons closed to PV
-      // if ( abs(tree_electron_dxy[mu]) > 0.1 || abs(tree_electron_dz[mu]) > 0.2 ||  !tree_electron_isLoose[mu] ) continue; //|| !tree_electron_PFIsoLoose[mu] electrons closed to PV
-      if ( abs(tree_electron_dxy[index_el[ele]]) > 0.1 || abs(tree_electron_dz[index_el[ele]]) > 0.2 ||  !tree_electron_IsTight[index_el[ele]] ) continue;//
-
+      if ( !tree_electron_IsLoose[index_el[ele]])continue;
       mueta1 = tree_electron_eta[index_el[ele]];
       muphi1 = tree_electron_phi[index_el[ele]];
+      if ((((mueta1 <= 1.479) && (abs(tree_electron_dxy[index_el[ele]]) > 0.05 || abs(tree_electron_dz[index_el[ele]]))  >0.10)) 
+             || ((mueta1 > 1.556) && (abs(tree_electron_dxy[index_el[ele]])>0.10  || abs(tree_electron_dz[index_el[ele]])>0.2))) continue;  
       v1.SetPtEtaPhiM(mupt1,mueta1,muphi1,mu_mass);
 
       for ( int ele2=ele+1; ele2<nEl; ele2++) 
-        {	    
+        {	
+          if ( !tree_electron_IsLoose[index_el[ele2]])continue;
           mupt2  = tree_electron_pt[index_el[ele2]];
           if ( mupt2 < 10. ) continue;
           if ( mupt1 < 25. && mupt2 < 25. ) continue; // Zmu Filter
           if ( tree_electron_charge[index_el[ele]] == tree_electron_charge[index_el[ele2]] && !AllowDiLeptonSameSign) continue;
           // // if ( (tree_electron_trigger_isomu[mu] && (abs(tree_electron_dxy[mu2]) > 0.1 || abs(tree_electron_dz[mu2]) > 0.2 || !tree_electron_isLoose[mu2]))  || (abs(tree_electron_dxy[mu2]) > 0.1 || abs(tree_electron_dz[mu2]) > 0.2 || (!tree_electron_trigger_dimu[mu2] && tree_electron_trigger_dimu[mu] ) || !tree_electron_isLoose[mu2]) ) continue;
-          // if ( ( (abs(tree_electron_dxy[mu2]) > 0.1 || abs(tree_electron_dz[mu2]) > 0.2 || !tree_electron_isLoose[mu2] )) ) continue;//|| !tree_electron_PFIsoLoose[mu2]
-                if (  abs(tree_electron_dxy[index_el[ele2]]) > 0.1 || abs(tree_electron_dz[index_el[ele2]]) > 0.2 || !tree_electron_IsTight[index_el[ele2]]  ) continue;//|
-
+          // if ( ( (abs(tree_electron_dxy[mu2]) > 0.1 || abs(tree_electron_dz[mu2]) > 0.2 || !tree_electron_isLoose[mu2] )) ) continue;//|| !tree_electron_PFIsoLoose[mu2]                                                                                                                                         
           mueta2 = tree_electron_eta[index_el[ele2]];
           muphi2 = tree_electron_phi[index_el[ele2]];
+          if ((((mueta2 <= 1.479) && (abs(tree_electron_dxy[index_el[ele2]]) > 0.05 || abs(tree_electron_dz[index_el[ele2]]))  >0.10)) 
+             || ((mueta2 > 1.556) && (abs(tree_electron_dxy[index_el[ele2]])>0.10  || abs(tree_electron_dz[index_el[ele2]])>0.2))) continue;  
           v2.SetPtEtaPhiM(mupt2,mueta2,muphi2,mu_mass);
           v = v1 + v2;
           if ( v.Mag() > tree_Mmumu )
@@ -3758,14 +3755,13 @@ if( nmu >=1 && nEl >=1 && EMuChannel)
         for ( int ele = 0; ele < nEl; ele++) 
           {	    
             mupt2  = tree_electron_pt[index_el[ele]];
-          if ( mupt2 < 10. ) continue;
-          if ( mupt1 < 25. && mupt2 < 20. ) continue; // Zmu Filter
+          if ( mupt1 < 25. && mupt2 < 14. ) continue; // Zmu Filter
           if ( tree_electron_charge[index_el[ele]] == tree_muon_charge[index_muon[mu]] && !AllowDiLeptonSameSign) continue;
-         if ( abs(tree_electron_dxy[index_el[ele]]) > 0.1 || abs(tree_electron_dz[index_el[ele]]) > 0.2 ||  !tree_electron_IsTight[index_el[ele]] ) continue;//
-
-          //See selection on leptons on the MuPair creation code
+          if ( !tree_electron_IsLoose[index_el[ele]])continue;
           mueta2 = tree_electron_charge[index_el[ele]];
           muphi2 = tree_electron_charge[index_el[ele]];
+          if ((((mueta1 <= 1.479) && (abs(tree_electron_dxy[index_el[ele]]) > 0.05 || abs(tree_electron_dz[index_el[ele]]))  >0.10)) 
+             || ((mueta1 > 1.556) && (abs(tree_electron_dxy[index_el[ele]])>0.10  || abs(tree_electron_dz[index_el[ele]])>0.2))) continue;  
           v2.SetPtEtaPhiM(mupt2,mueta2,muphi2,mu_mass);
           v = v1 + v2;
           if ( v.Mag() > tree_Mmumu )
@@ -3954,7 +3950,7 @@ if( nmu >=1 && nEl >=1 && EMuChannel)
   if ( (HLT_Ele32_WPTight_Gsf_v || HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v)
        && tree_Mmumu > 10. && ElChannel) tree_Filter = true;
   
-  if ( ( HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v || HLT_IsoMu24_v  ) 
+  if ( ( HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v || HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v ) 
        && tree_Mmumu > 10. && EMuChannel ) tree_Filter = true;
 
 mva_Evts_Mmumu = tree_Mmumu;
@@ -9736,7 +9732,9 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_jet_pt.clear();
     tree_jet_eta.clear();
     tree_jet_phi.clear();
-        tree_reco_jet_P4.clear();
+    tree_jet_tightid_LepVeto.clear();
+    tree_jet_tightid.clear();
+    tree_reco_jet_P4.clear();
     tree_jet_HadronFlavour.clear();
     tree_jet_pileupID.clear();
     tree_jet_btag_DeepCSV.clear();
