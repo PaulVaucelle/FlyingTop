@@ -23,7 +23,10 @@
 #include <Math/Functions.h>
 #include <Math/SVector.h>
 #include <Math/SMatrix.h>
-
+//#include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
+#include "PhysicsTools/Utilities/interface/LumiReweightingStandAlone.h"
+#include "DataFormats/Luminosity/interface/LumiSummary.h"
+#include "DataFormats/Luminosity/interface/LumiDetails.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "CondCore/DBOutputService/interface/PoolDBOutputService.h"
@@ -183,13 +186,15 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
   RoccoR rc;
   //rc.init(edm::FileInPath("FlyingTop/FlyingTop/plugins/RoccoR2017UL.txt").fullPath());
   
-  string RochString;
+   std::string RochString ;
     bool isMC_;
     std::string weightFile_;
     std::string weightFileEVTS_;
     std::string weightFileVtx_;
     std::string weightFileVtxStep1_;
-
+  std::string mcPileupFile_, dataPileupFile_;
+  std::string mcPileupPath_, dataPileupPath_;
+  ///////////////                                    
     const edm::EDGetTokenT<GenEventInfoProduct>         genEventInfoToken_;
     const edm::EDGetTokenT<LHEEventProduct>             LHEEventProductToken_;
     edm::EDGetTokenT<edm::View<reco::GenParticle> > prunedGenToken_;
@@ -204,7 +209,10 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     edm::EDGetTokenT<pat::PackedCandidateCollection>  lostpcToken_; //LOST
 
     std::string parametersDefinerName_;
-    
+  // LumiReWeighting*
+  ///edm::LumiReWeighting lumiWeights_;
+
+  reweight::LumiReWeighting* lumiWeights_;
   ///////////////
   // Ntuple info
 
@@ -233,11 +241,12 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     edm::EDGetTokenT<reco::SuperClusterCollection>superclusterToken_;
     // edm::EDGetTokenT<pat::PackedTriggerPrescales> PrescaleToken_;
     edm::EDGetTokenT< double > prefweight_token;
-
-  edm::EDGetTokenT<double> rho_token_;
+    edm::EDGetTokenT<double> rho_token_;
 
     int runNumber, eventNumber, lumiBlock;
-    float PUweight;
+    double PUweight; 
+    int PU_events, AllPU_events_weight;
+
     double Prefweight;
     int  tree_NbrOfZCand;
     bool tree_Filter;
@@ -246,7 +255,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
 
     int  tree_nTracks, tree_nLostTracks, tree_TRACK_SIZE; 
     int  tree_nFromC = 0, tree_nFromB = 0; 
-    int nEvent;
+    int  nEvent;
     
     float LLP1_pt, LLP1_eta, LLP1_phi, LLP2_pt, LLP2_eta, LLP2_phi;
     float LLP1_x, LLP1_y, LLP1_z, LLP2_x, LLP2_y, LLP2_z;
@@ -332,21 +341,20 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
 
     int index_el[10000];
     double el_pt[10000];
+    
     //  ---------------------------------------------------------------- //
     //  ------- Booleans to activate/desactivate part of the code ------ //
     //  ---------------------------------------------------------------- //
 
     bool showlog            = false;
     
-
-    bool MuonChannel        = false;
+    bool MuonChannel        = true;
     bool ElChannel          = false;
-    bool EMuChannel         = true;
+    bool EMuChannel         = false;
 
-
+    bool AllowDiLeptonSameSign = false;
 
     bool NewCovMat          = true;//Keep True : Allow for Covariance Matrix correction due to the MiniAOD dataformat apporixmation
-    bool AllowDiLeptonSameSign = false;
           //Vetos to find vertices from different secondary interactions
     bool DetailedMap        = true;// Detailed map of the CMS tracker to apply a veto on the tracks of the vertices that belong to this map
         // Vetos applied on tracks of the vertices belonging to V0Candidates, Photon conversions and Secindary Interactions
@@ -388,6 +396,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
 
     float tree_Evt_weight;
     std::vector<float> tree_LHE_Weights;
+
     //--------------------------------
     // primary vertex infos -------
     //--------------------------------
@@ -490,7 +499,6 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float>     tree_SecInt_dca;
     std::vector<bool>      tree_SecInt_selec;
     std::vector<int>       tree_SecInt_layer;
-    std::vector<int>       tree_SecInt_ntrk20;
     std::vector<int>       tree_SecInt_LLP;
     std::vector<float>     tree_SecInt_LLP_dr;
     std::vector<float>     tree_SecInt_LLP_dz;
@@ -539,7 +547,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     // jet infos -------
     //--------------------------------
     
-    int tree_njet;
+    int tree_njet; // only for counting jets without selected muon inside !
     std::vector<bool>  tree_jet_TightJetIDLepVeto;
     std::vector<bool>  tree_jet_TightJetID;
     std::vector<float> tree_jet_E;
@@ -547,8 +555,8 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float> tree_jet_eta;
     std::vector<float> tree_jet_phi;
     std::vector<bool>  tree_jet_tightid_LepVeto;
-    std::vector<bool> tree_jet_tightid;
-    std::vector<TLorentzVector> tree_reco_jet_P4;
+    std::vector<bool>  tree_jet_tightid;
+    // std::vector<TLorentzVector> tree_reco_jet_P4;
     std::vector<float> tree_jet_HadronFlavour;
     std::vector<float> tree_jet_pileupID;
     std::vector<float> tree_jet_btag_DeepCSV;
@@ -630,9 +638,9 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<bool>  tree_muon_PFIsoLoose;
     std::vector<bool>  tree_muon_PFIsoMedium;
     std::vector<bool>  tree_muon_PFIsoTight;
-    std::vector<bool> tree_muon_MiniIsoLoose;
-    std::vector<bool> tree_muon_MiniIsoMedium;
-    std::vector<bool> tree_muon_MiniIsoTight;
+    std::vector<bool>  tree_muon_MiniIsoLoose;
+    std::vector<bool>  tree_muon_MiniIsoMedium;
+    std::vector<bool>  tree_muon_MiniIsoTight;
     std::vector<bool>  tree_muon_TkIsoLoose;
     std::vector<bool>  tree_muon_TkIsoTight;
     std::vector<float> tree_muon_nmu;
@@ -648,8 +656,6 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
    std::vector<float> tree_emu_phi;
    std::vector<float> tree_emu_mass;
 
-  
-
   std::vector<float> tree_recele_px;
   std::vector<float> tree_recele_py;
   std::vector<float> tree_recele_pz;
@@ -657,8 +663,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
   std::vector<float> tree_recmu_px;
   std::vector<float> tree_recmu_py;
   std::vector<float> tree_recmu_pz;
-  std::vector<float>tree_recmu_e;
-
+  std::vector<float> tree_recmu_e;
 
     //-----------------------
     // track info
@@ -718,7 +723,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float>    tree_track_energy;
 
     std::vector< int >    tree_track_Hemi;
-    std::vector< float >  tree_track_Hemi_dR;//dRmin
+    std::vector< float >  tree_track_Hemi_dR; // dRmin
     std::vector< float >  tree_track_Hemi_dRmax;
     std::vector< float >  tree_track_Hemi_mva_NChi2;
     std::vector< bool >   tree_track_Hemi_ping;
@@ -964,439 +969,37 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
 
     //All preselected triggers
 // ----------------Trigger Muon + dilepton-------------
-    bool HLT_Mu27_Ele37_CaloIdL_MW_v;
-    bool HLT_Mu37_Ele27_CaloIdL_MW_v;
-    bool HLT_Mu37_TkMu27_v;
-    bool HLT_Mu3_PFJet40_v;
-    bool HLT_Mu7p5_L2Mu2_Jpsi_v;
-    bool HLT_Mu7p5_L2Mu2_Upsilon_v;
-    bool HLT_Mu7p5_Track2_Jpsi_v;
-    bool HLT_Mu7p5_Track3p5_Jpsi_v;
-    bool HLT_Mu7p5_Track7_Jpsi_v;
-    bool HLT_Mu7p5_Track2_Upsilon_v;
-    bool HLT_Mu7p5_Track3p5_Upsilon_v;
-    bool HLT_Mu7p5_Track7_Upsilon_v;
-    bool HLT_Mu3_L1SingleMu5orSingleMu7_v;
+
     bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v;  // USED in 2016-2018
-    bool HLT_Mu19_TrkIsoVVL_Mu9_TrkIsoVVL_v;
-    bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v;
-    bool HLT_Mu19_TrkIsoVVL_Mu9_TrkIsoVVL_DZ_v;
-    bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v;
-    bool HLT_Mu19_TrkIsoVVL_Mu9_TrkIsoVVL_DZ_Mass8_v;
-    bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v;
-    bool HLT_Mu19_TrkIsoVVL_Mu9_TrkIsoVVL_DZ_Mass3p8_v;
-    bool HLT_Mu25_TkMu0_Onia_v;
-    bool HLT_Mu30_TkMu0_Psi_v;
-    bool HLT_Mu30_TkMu0_Upsilon_v;
-    bool HLT_Mu20_TkMu0_Phi_v;
-    bool HLT_Mu25_TkMu0_Phi_v;
-    bool HLT_Mu12_v;
-    bool HLT_Mu15_v;
-    bool HLT_Mu20_v;
-    bool HLT_Mu27_v;
-    bool HLT_Mu50_v;
-    bool HLT_Mu55_v;
-    bool HLT_Mu12_DoublePFJets40_CaloBTagDeepCSV_p71_v;
-    bool HLT_Mu12_DoublePFJets100_CaloBTagDeepCSV_p71_v;
-    bool HLT_Mu12_DoublePFJets200_CaloBTagDeepCSV_p71_v;
-    bool HLT_Mu12_DoublePFJets350_CaloBTagDeepCSV_p71_v;
-    bool HLT_Mu12_DoublePFJets40MaxDeta1p6_DoubleCaloBTagDeepCSV_p71_v;
-    bool HLT_Mu12_DoublePFJets54MaxDeta1p6_DoubleCaloBTagDeepCSV_p71_v;
-    bool HLT_Mu12_DoublePFJets62MaxDeta1p6_DoubleCaloBTagDeepCSV_p71_v;
-    bool HLT_Mu8_TrkIsoVVL_v;
-    bool HLT_Mu8_DiEle12_CaloIdL_TrackIdL_DZ_v;
-    bool HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v;
-    bool HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT350_DZ_v;
-    bool HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT350_v;
+    bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v; // USED in 2016-2018
     bool HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v;  // USED in 2016-2018
-    bool HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_PFDiJet30_v;
-    bool HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_CaloDiJet30_v;
-    bool HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_PFDiJet30_PFBtagDeepCSV_1p5_v;
-    bool HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_CaloDiJet30_CaloBtagDeepCSV_1p5_v;
     bool HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v;     // USED in 2016-2018
-    bool HLT_Mu17_TrkIsoVVL_v;
-    bool HLT_Mu19_TrkIsoVVL_v;
-    bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v;
     bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v;    // USED in 2016-2018
-    bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v;
     bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v; // USED in 2016-2018
-    bool HLT_Mu12_DoublePhoton20_v;
-    bool HLT_Mu43NoFiltersNoVtx_Photon43_CaloIdL_v;
-    bool HLT_Mu48NoFiltersNoVtx_Photon48_CaloIdL_v;
-    bool HLT_Mu38NoFiltersNoVtxDisplaced_Photon38_CaloIdL_v;
-    bool HLT_Mu43NoFiltersNoVtxDisplaced_Photon43_CaloIdL_v;
-    bool HLT_Mu4_TrkIsoVVL_DiPFJet90_40_DEta3p5_MJJ750_HTT300_PFMETNoMu60_v;
-    bool HLT_Mu8_TrkIsoVVL_DiPFJet40_DEta3p5_MJJ750_HTT300_PFMETNoMu60_v;
-    bool HLT_Mu10_TrkIsoVVL_DiPFJet40_DEta3p5_MJJ750_HTT350_PFMETNoMu60_v;
-    bool HLT_Mu15_IsoVVVL_PFHT450_CaloBTagDeepCSV_4p5_v;
-    bool HLT_Mu15_IsoVVVL_PFHT450_PFMET50_v;
-    bool HLT_Mu15_IsoVVVL_PFHT450_v;
-    bool HLT_Mu50_IsoVVVL_PFHT450_v;
-    bool HLT_Mu15_IsoVVVL_PFHT600_v;
-    bool HLT_Mu3er1p5_PFJet100er2p5_PFMET70_PFMHT70_IDTight_v;
-    bool HLT_Mu3er1p5_PFJet100er2p5_PFMET80_PFMHT80_IDTight_v;
-    bool HLT_Mu3er1p5_PFJet100er2p5_PFMET90_PFMHT90_IDTight_v;
-    bool HLT_Mu3er1p5_PFJet100er2p5_PFMET100_PFMHT100_IDTight_v;
-    bool HLT_Mu3er1p5_PFJet100er2p5_PFMETNoMu70_PFMHTNoMu70_IDTight_v;
-    bool HLT_Mu3er1p5_PFJet100er2p5_PFMETNoMu80_PFMHTNoMu80_IDTight_v;
-    bool HLT_Mu3er1p5_PFJet100er2p5_PFMETNoMu90_PFMHTNoMu90_IDTight_v;
-    bool HLT_Mu3er1p5_PFJet100er2p5_PFMETNoMu100_PFMHTNoMu100_IDTight_v;
-    bool HLT_Mu8_v;
-    bool HLT_Mu17_v;
-    bool HLT_Mu19_v;
-    bool HLT_Mu17_Photon30_IsoCaloId_v;
-    bool HLT_Mu18_Mu9_SameSign_v;
-    bool HLT_Mu18_Mu9_SameSign_DZ_v;
-    bool HLT_Mu18_Mu9_v;
-    bool HLT_Mu18_Mu9_DZ_v;
-    bool HLT_Mu20_Mu10_SameSign_v;
-    bool HLT_Mu20_Mu10_SameSign_DZ_v;
-    bool HLT_Mu20_Mu10_v;
-    bool HLT_Mu20_Mu10_DZ_v;
-    bool HLT_Mu23_Mu12_SameSign_v;
-    bool HLT_Mu23_Mu12_SameSign_DZ_v;
-    bool HLT_Mu23_Mu12_v;
-    bool HLT_Mu23_Mu12_DZ_v;
-    bool HLT_Mu12_IP6_part0_v;
-    bool HLT_Mu12_IP6_part1_v;
-    bool HLT_Mu12_IP6_part2_v;
-    bool HLT_Mu12_IP6_part3_v;
-    bool HLT_Mu12_IP6_part4_v;
-    bool HLT_Mu9_IP5_part0_v;
-    bool HLT_Mu9_IP5_part1_v;
-    bool HLT_Mu9_IP5_part2_v;
-    bool HLT_Mu9_IP5_part3_v;
-    bool HLT_Mu9_IP5_part4_v;
-    bool HLT_Mu7_IP4_part0_v;
-    bool HLT_Mu7_IP4_part1_v;
-    bool HLT_Mu7_IP4_part2_v;
-    bool HLT_Mu7_IP4_part3_v;
-    bool HLT_Mu7_IP4_part4_v;
-    bool HLT_Mu9_IP4_part0_v;
-    bool HLT_Mu9_IP4_part1_v;
-    bool HLT_Mu9_IP4_part2_v;
-    bool HLT_Mu9_IP4_part3_v;
-    bool HLT_Mu9_IP4_part4_v;
-    bool HLT_Mu8_IP5_part0_v;
-    bool HLT_Mu8_IP5_part1_v;
-    bool HLT_Mu8_IP5_part2_v;
-    bool HLT_Mu8_IP5_part3_v;
-    bool HLT_Mu8_IP5_part4_v;
-    bool HLT_Mu8_IP6_part0_v;
-    bool HLT_Mu8_IP6_part1_v;
-    bool HLT_Mu8_IP6_part2_v;
-    bool HLT_Mu8_IP6_part3_v;
-    bool HLT_Mu8_IP6_part4_v;
-    bool HLT_Mu9_IP6_part0_v;
-    bool HLT_Mu9_IP6_part1_v;
-    bool HLT_Mu9_IP6_part2_v;
-    bool HLT_Mu9_IP6_part3_v;
-    bool HLT_Mu9_IP6_part4_v;
-    bool HLT_Mu8_IP3_part0_v;
-    bool HLT_Mu8_IP3_part1_v;
-    bool HLT_Mu8_IP3_part2_v;
-    bool HLT_Mu8_IP3_part3_v;
-    bool HLT_Mu8_IP3_part4_v;
+
 
 // ----------------Trigger Electron-------------
-    bool HLT_Ele27_Ele37_CaloIdL_MW_v;
-    bool HLT_Ele20_WPTight_Gsf_v;
-    bool HLT_Ele15_WPLoose_Gsf_v;
-    bool HLT_Ele17_WPLoose_Gsf_v;
-    bool HLT_Ele20_WPLoose_Gsf_v;
-    bool HLT_Ele20_eta2p1_WPLoose_Gsf_v;
+
     bool HLT_Ele27_WPTight_Gsf_v;   // USED in 2016
-    bool HLT_Ele28_WPTight_Gsf_v;
-    bool HLT_Ele30_WPTight_Gsf_v;
     bool HLT_Ele32_WPTight_Gsf_v;   // USED in 2017-2018
-    bool HLT_Ele35_WPTight_Gsf_v;
-    bool HLT_Ele35_WPTight_Gsf_L1EGMT_v;
-    bool HLT_Ele38_WPTight_Gsf_v;
-    bool HLT_Ele40_WPTight_Gsf_v;
-    bool HLT_Ele32_WPTight_Gsf_L1DoubleEG_v;
-    bool HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_CrossL1_v;
-    bool HLT_Ele24_eta2p1_WPTight_Gsf_MediumChargedIsoPFTauHPS30_eta2p1_CrossL1_v;
-    bool HLT_Ele24_eta2p1_WPTight_Gsf_TightChargedIsoPFTauHPS30_eta2p1_CrossL1_v;
-    bool HLT_Ele24_eta2p1_WPTight_Gsf_LooseChargedIsoPFTauHPS30_eta2p1_TightID_CrossL1_v;
-    bool HLT_Ele24_eta2p1_WPTight_Gsf_MediumChargedIsoPFTauHPS30_eta2p1_TightID_CrossL1_v;
-    bool HLT_Ele24_eta2p1_WPTight_Gsf_TightChargedIsoPFTauHPS30_eta2p1_TightID_CrossL1_v;
-    bool HLT_Ele15_Ele8_CaloIdL_TrackIdL_IsoVL_v;
     bool HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v; // USED in 2016-2018
     bool HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v;    // USED in 2016-2018
-    bool HLT_Ele30_eta2p1_WPTight_Gsf_CentralPFJet35_EleCleaned_v;
-    bool HLT_Ele28_eta2p1_WPTight_Gsf_HT150_v;
-    bool HLT_Ele28_HighEta_SC20_Mass55_v;
-    bool HLT_Ele15_IsoVVVL_PFHT450_CaloBTagDeepCSV_4p5_v;
-    bool HLT_Ele15_IsoVVVL_PFHT450_PFMET50_v;
-    bool HLT_Ele15_IsoVVVL_PFHT450_v;
-    bool HLT_Ele50_IsoVVVL_PFHT450_v;
-    bool HLT_Ele15_IsoVVVL_PFHT600_v;
-    bool HLT_Ele8_CaloIdL_TrackIdL_IsoVL_PFJet30_v;
-    bool HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30_v;
-    bool HLT_Ele15_CaloIdL_TrackIdL_IsoVL_PFJet30_v;
-    bool HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30_v;
-    bool HLT_Ele8_CaloIdM_TrackIdM_PFJet30_v;
-    bool HLT_Ele17_CaloIdM_TrackIdM_PFJet30_v;
-    bool HLT_Ele23_CaloIdM_TrackIdM_PFJet30_v;
-    bool HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v;
-    bool HLT_Ele115_CaloIdVT_GsfTrkIdT_v;
-    bool HLT_Ele135_CaloIdVT_GsfTrkIdT_v;
-    bool HLT_Ele145_CaloIdVT_GsfTrkIdT_v;
-    bool HLT_Ele200_CaloIdVT_GsfTrkIdT_v;
-    bool HLT_Ele250_CaloIdVT_GsfTrkIdT_v;
-    bool HLT_Ele300_CaloIdVT_GsfTrkIdT_v;
-    bool HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL_v;
 
-// ----------------Trigger DoubleMu-------------
-    bool HLT_DoubleMu5_Upsilon_DoubleEle3_CaloIdL_TrackIdL_v;
-    bool HLT_DoubleMu3_DoubleEle7p5_CaloIdL_TrackIdL_Upsilon_v;
-    bool HLT_DoubleMu4_3_Bs_v;
-    bool HLT_DoubleMu4_3_Jpsi_v;
-    bool HLT_DoubleMu4_JpsiTrk_Displaced_v;
-    bool HLT_DoubleMu4_LowMassNonResonantTrk_Displaced_v;
-    bool HLT_DoubleMu3_Trk_Tau3mu_v;
-    bool HLT_DoubleMu3_TkMu_DsTau3Mu_v;
-    bool HLT_DoubleMu4_PsiPrimeTrk_Displaced_v;
-    bool HLT_DoubleMu4_Mass3p8_DZ_PFHT350_v;
-    bool HLT_DoubleMu3_DZ_PFMET50_PFMHT60_v;
-    bool HLT_DoubleMu3_DZ_PFMET70_PFMHT70_v;
-    bool HLT_DoubleMu3_DZ_PFMET90_PFMHT90_v;
-    bool HLT_DoubleMu3_Trk_Tau3mu_NoL1Mass_v;
-    bool HLT_DoubleMu4_Jpsi_Displaced_v;
-    bool HLT_DoubleMu4_Jpsi_NoVertexing_v;
-    bool HLT_DoubleMu4_JpsiTrkTrk_Displaced_v;
-    bool HLT_DoubleMu43NoFiltersNoVtx_v;
-    bool HLT_DoubleMu48NoFiltersNoVtx_v;
-    bool HLT_DoubleMu33NoFiltersNoVtxDisplaced_v;
-    bool HLT_DoubleMu40NoFiltersNoVtxDisplaced_v;
-    bool HLT_DoubleMu20_7_Mass0to30_L1_DM4_v;
-    bool HLT_DoubleMu20_7_Mass0to30_L1_DM4EG_v;
-    bool HLT_DoubleMu20_7_Mass0to30_Photon23_v;
-    bool HLT_DoubleMu2_Jpsi_DoubleTrk1_Phi1p05_v;
-    bool HLT_DoubleMu2_Jpsi_DoubleTkMu0_Phi_v;
-    bool HLT_DoubleMu3_DCA_PFMET50_PFMHT60_v;
+//-------Trigger IsoMu-------//
 
-// ----------------Trigger DoubleEle-------------
-    bool HLT_DoubleEle25_CaloIdL_MW_v;
-    bool HLT_DoubleEle27_CaloIdL_MW_v;
-    bool HLT_DoubleEle33_CaloIdL_MW_v;
-    bool HLT_DoubleEle24_eta2p1_WPTight_Gsf_v;
-    bool HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_DZ_PFHT350_v;
-    bool HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT350_v;
-
-// ----------------Trigger Dimuon0-------------
-    bool HLT_Dimuon0_Jpsi_L1_NoOS_v;
-    bool HLT_Dimuon0_Jpsi_NoVertexing_NoOS_v;
-    bool HLT_Dimuon0_Jpsi_v;
-    bool HLT_Dimuon0_Jpsi_NoVertexing_v;
-    bool HLT_Dimuon0_Jpsi_L1_4R_0er1p5R_v;
-    bool HLT_Dimuon0_Jpsi_NoVertexing_L1_4R_0er1p5R_v;
-    bool HLT_Dimuon0_Jpsi3p5_Muon2_v;
-    bool HLT_Dimuon0_Upsilon_L1_4p5_v;
-    bool HLT_Dimuon0_Upsilon_L1_5_v;
-    bool HLT_Dimuon0_Upsilon_L1_4p5NoOS_v;
-    bool HLT_Dimuon0_Upsilon_L1_4p5er2p0_v;
-    bool HLT_Dimuon0_Upsilon_L1_4p5er2p0M_v;
-    bool HLT_Dimuon0_Upsilon_NoVertexing_v;
-    bool HLT_Dimuon0_Upsilon_L1_5M_v;
-    bool HLT_Dimuon0_LowMass_L1_0er1p5R_v;
-    bool HLT_Dimuon0_LowMass_L1_0er1p5_v;
-    bool HLT_Dimuon0_LowMass_v;
-    bool HLT_Dimuon0_LowMass_L1_4_v;
-    bool HLT_Dimuon0_LowMass_L1_4R_v;
-    bool HLT_Dimuon0_LowMass_L1_TM530_v;
-    bool HLT_Dimuon0_Upsilon_Muon_L1_TM0_v;
-    bool HLT_Dimuon0_Upsilon_Muon_NoL1Mass_v;
+    bool HLT_IsoMu24_v;     // USED in 2016 and 2018
+    bool HLT_IsoMu27_v;     // USED in 2017
 
 // ----------------Trigger PFMET-------------
-    bool HLT_PFMET110_PFMHT110_IDTight_v;
+
     bool HLT_PFMET120_PFMHT120_IDTight_v;   // USED
-    bool HLT_PFMET130_PFMHT130_IDTight_v;
-    bool HLT_PFMET140_PFMHT140_IDTight_v;
-    bool HLT_PFMET100_PFMHT100_IDTight_CaloBTagDeepCSV_3p1_v;
-    bool HLT_PFMET110_PFMHT110_IDTight_CaloBTagDeepCSV_3p1_v;
-    bool HLT_PFMET120_PFMHT120_IDTight_CaloBTagDeepCSV_3p1_v;
-    bool HLT_PFMET130_PFMHT130_IDTight_CaloBTagDeepCSV_3p1_v;
-    bool HLT_PFMET140_PFMHT140_IDTight_CaloBTagDeepCSV_3p1_v;
     bool HLT_PFMET120_PFMHT120_IDTight_PFHT60_v;   // USED
     bool HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60_v;   // USED
     bool HLT_PFMETTypeOne120_PFMHT120_IDTight_PFHT60_v;
-    bool HLT_PFMETTypeOne110_PFMHT110_IDTight_v;
     bool HLT_PFMETTypeOne120_PFMHT120_IDTight_v;
-    bool HLT_PFMETTypeOne130_PFMHT130_IDTight_v;
-    bool HLT_PFMETTypeOne140_PFMHT140_IDTight_v;
-    bool HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v;
     bool HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v;   // USED
-    bool HLT_PFMETNoMu130_PFMHTNoMu130_IDTight_v;
-    bool HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v;
-    bool HLT_PFMET200_NotCleaned_v;
-    bool HLT_PFMET200_HBHECleaned_v;
     bool HLT_PFMET250_HBHECleaned_v;   // USED
-    bool HLT_PFMET300_HBHECleaned_v;
-    bool HLT_PFMET200_HBHE_BeamHaloCleaned_v;
     bool HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v;   // USED
-    bool HLT_PFMET100_PFMHT100_IDTight_PFHT60_v;
-    bool HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60_v;
-    bool HLT_PFMETTypeOne100_PFMHT100_IDTight_PFHT60_v;
-
-// ----------------Trigger HT-------------
-    bool HLT_HT450_Beamspot_v;
-    bool HLT_HT300_Beamspot_v;
-    bool HLT_HT425_v;
-    bool HLT_HT430_DisplacedDijet40_DisplacedTrack_v;
-    bool HLT_HT500_DisplacedDijet40_DisplacedTrack_v;
-    bool HLT_HT430_DisplacedDijet60_DisplacedTrack_v;
-    bool HLT_HT400_DisplacedDijet40_DisplacedTrack_v;
-    bool HLT_HT650_DisplacedDijet60_Inclusive_v;
-    bool HLT_HT550_DisplacedDijet60_Inclusive_v;
-
-// ----------------Trigger AK4-------------
-    bool HLT_AK4CaloJet30_v;
-    bool HLT_AK4CaloJet40_v;
-    bool HLT_AK4CaloJet50_v;
-    bool HLT_AK4CaloJet80_v;
-    bool HLT_AK4CaloJet100_v;
-    bool HLT_AK4CaloJet120_v;
-    bool HLT_AK4PFJet30_v;
-    bool HLT_AK4PFJet50_v;
-    bool HLT_AK4PFJet80_v;
-    bool HLT_AK4PFJet100_v;
-    bool HLT_AK4PFJet120_v;
-
-// ----------------Trigger PFJet-------------
-    bool HLT_PFJet15_v;
-    bool HLT_PFJet25_v;
-    bool HLT_PFJet40_v;
-    bool HLT_PFJet60_v;
-    bool HLT_PFJet80_v;
-    bool HLT_PFJet140_v;
-    bool HLT_PFJet200_v;
-    bool HLT_PFJet260_v;
-    bool HLT_PFJet320_v;
-    bool HLT_PFJet400_v;
-    bool HLT_PFJet450_v;
-    bool HLT_PFJet500_v;
-    bool HLT_PFJet550_v;
-    bool HLT_PFJetFwd15_v;
-    bool HLT_PFJetFwd25_v;
-    bool HLT_PFJetFwd40_v;
-    bool HLT_PFJetFwd60_v;
-    bool HLT_PFJetFwd80_v;
-    bool HLT_PFJetFwd140_v;
-    bool HLT_PFJetFwd200_v;
-    bool HLT_PFJetFwd260_v;
-    bool HLT_PFJetFwd320_v;
-    bool HLT_PFJetFwd400_v;
-    bool HLT_PFJetFwd450_v;
-    bool HLT_PFJetFwd500_v;
-
-//-------Trigger DiPFJetAve-------//
-    bool HLT_DiPFJetAve40_v;
-    bool HLT_DiPFJetAve60_v;
-    bool HLT_DiPFJetAve80_v;
-    bool HLT_DiPFJetAve140_v;
-    bool HLT_DiPFJetAve200_v;
-    bool HLT_DiPFJetAve260_v;
-    bool HLT_DiPFJetAve320_v;
-    bool HLT_DiPFJetAve400_v;
-    bool HLT_DiPFJetAve500_v;
-    bool HLT_DiPFJetAve60_HFJEC_v;
-    bool HLT_DiPFJetAve80_HFJEC_v;
-    bool HLT_DiPFJetAve100_HFJEC_v;
-    bool HLT_DiPFJetAve160_HFJEC_v;
-    bool HLT_DiPFJetAve220_HFJEC_v;
-    bool HLT_DiPFJetAve300_HFJEC_v;
-
-//-------Trigger DoublePFJets-------//
-    bool HLT_DoublePFJets40_CaloBTagDeepCSV_p71_v;
-    bool HLT_DoublePFJets100_CaloBTagDeepCSV_p71_v;
-    bool HLT_DoublePFJets200_CaloBTagDeepCSV_p71_v;
-    bool HLT_DoublePFJets350_CaloBTagDeepCSV_p71_v;
-    bool HLT_DoublePFJets116MaxDeta1p6_DoubleCaloBTagDeepCSV_p71_v;
-    bool HLT_DoublePFJets128MaxDeta1p6_DoubleCaloBTagDeepCSV_p71_v;
-
-//-------Trigger BTagMu-------//
-    bool HLT_BTagMu_AK4DiJet20_Mu5_v;
-    bool HLT_BTagMu_AK4DiJet40_Mu5_v;
-    bool HLT_BTagMu_AK4DiJet70_Mu5_v;
-    bool HLT_BTagMu_AK4DiJet110_Mu5_v;
-    bool HLT_BTagMu_AK4DiJet170_Mu5_v;
-    bool HLT_BTagMu_AK4Jet300_Mu5_v;
-    bool HLT_BTagMu_AK8DiJet170_Mu5_v;
-    bool HLT_BTagMu_AK8Jet170_DoubleMu5_v;
-    bool HLT_BTagMu_AK8Jet300_Mu5_v;
-    bool HLT_BTagMu_AK4DiJet20_Mu5_noalgo_v;
-    bool HLT_BTagMu_AK4DiJet40_Mu5_noalgo_v;
-    bool HLT_BTagMu_AK4DiJet70_Mu5_noalgo_v;
-    bool HLT_BTagMu_AK4DiJet110_Mu5_noalgo_v;
-    bool HLT_BTagMu_AK4DiJet170_Mu5_noalgo_v;
-    bool HLT_BTagMu_AK4Jet300_Mu5_noalgo_v;
-    bool HLT_BTagMu_AK8DiJet170_Mu5_noalgo_v;
-    bool HLT_BTagMu_AK8Jet170_DoubleMu5_noalgo_v;
-    bool HLT_BTagMu_AK8Jet300_Mu5_noalgo_v;
-
-//-------Trigger QuadPFJet-------//
-    bool HLT_QuadPFJet98_83_71_15_DoublePFBTagDeepCSV_1p3_7p7_VBF1_v;
-    bool HLT_QuadPFJet103_88_75_15_DoublePFBTagDeepCSV_1p3_7p7_VBF1_v;
-    bool HLT_QuadPFJet111_90_80_15_DoublePFBTagDeepCSV_1p3_7p7_VBF1_v;
-    bool HLT_QuadPFJet98_83_71_15_PFBTagDeepCSV_1p3_VBF2_v;
-    bool HLT_QuadPFJet103_88_75_15_PFBTagDeepCSV_1p3_VBF2_v;
-    bool HLT_QuadPFJet105_88_76_15_PFBTagDeepCSV_1p3_VBF2_v;
-    bool HLT_QuadPFJet111_90_80_15_PFBTagDeepCSV_1p3_VBF2_v;
-    bool HLT_QuadPFJet98_83_71_15_v;
-    bool HLT_QuadPFJet103_88_75_15_v;
-    bool HLT_QuadPFJet105_88_76_15_v;
-    bool HLT_QuadPFJet111_90_80_15_v;
-    bool HLT_QuadPFJet105_88_76_15_DoublePFBTagDeepCSV_1p3_7p7_VBF1_v;
-
-//-------Trigger IsoMu-------//
-    bool HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_CrossL1_v;
-    bool HLT_IsoMu20_eta2p1_MediumChargedIsoPFTauHPS27_eta2p1_CrossL1_v;
-    bool HLT_IsoMu20_eta2p1_TightChargedIsoPFTauHPS27_eta2p1_CrossL1_v;
-    bool HLT_IsoMu20_eta2p1_LooseChargedIsoPFTauHPS27_eta2p1_TightID_CrossL1_v;
-    bool HLT_IsoMu20_eta2p1_MediumChargedIsoPFTauHPS27_eta2p1_TightID_CrossL1_v;
-    bool HLT_IsoMu20_eta2p1_TightChargedIsoPFTauHPS27_eta2p1_TightID_CrossL1_v;
-    bool HLT_IsoMu24_eta2p1_TightChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_CrossL1_v;
-    bool HLT_IsoMu24_eta2p1_MediumChargedIsoPFTauHPS35_Trk1_TightID_eta2p1_Reg_CrossL1_v;
-    bool HLT_IsoMu24_eta2p1_TightChargedIsoPFTauHPS35_Trk1_TightID_eta2p1_Reg_CrossL1_v;
-    bool HLT_IsoMu24_eta2p1_MediumChargedIsoPFTauHPS35_Trk1_eta2p1_Reg_CrossL1_v;
-    bool HLT_IsoMu27_LooseChargedIsoPFTauHPS20_Trk1_eta2p1_SingleL1_v;
-    bool HLT_IsoMu27_MediumChargedIsoPFTauHPS20_Trk1_eta2p1_SingleL1_v;
-    bool HLT_IsoMu27_TightChargedIsoPFTauHPS20_Trk1_eta2p1_SingleL1_v;
-    bool HLT_IsoMu20_v;
-    bool HLT_IsoMu24_v;     // USED in 2016 and 2018
-    bool HLT_IsoMu24_eta2p1_v;
-    bool HLT_IsoMu27_v;     // USED in 2017
-    bool HLT_IsoMu30_v;
-    bool HLT_IsoMu24_TwoProngs35_v;
-    bool HLT_IsoMu24_eta2p1_MediumChargedIsoPFTau50_Trk30_eta2p1_1pr_v;
-    bool HLT_IsoMu27_MET90_v;
-
-//------------Trigger PFHT--------------//
-    bool HLT_PFHT180_v;
-    bool HLT_PFHT250_v;
-    bool HLT_PFHT370_v;
-    bool HLT_PFHT430_v;
-    bool HLT_PFHT510_v;
-    bool HLT_PFHT590_v;
-    bool HLT_PFHT680_v;
-    bool HLT_PFHT780_v;
-    bool HLT_PFHT890_v;
-    bool HLT_PFHT1050_v;
-    bool HLT_PFHT500_PFMET100_PFMHT100_IDTight_v;   // USED
-    bool HLT_PFHT500_PFMET110_PFMHT110_IDTight_v;
-    bool HLT_PFHT700_PFMET85_PFMHT85_IDTight_v;   // USED
-    bool HLT_PFHT700_PFMET95_PFMHT95_IDTight_v;
-    bool HLT_PFHT800_PFMET75_PFMHT75_IDTight_v;   // USED
-    bool HLT_PFHT800_PFMET85_PFMHT85_IDTight_v;
-    bool HLT_PFHT330PT30_QuadPFJet_75_60_45_40_TriplePFBTagDeepCSV_4p5_v;
-    bool HLT_PFHT330PT30_QuadPFJet_75_60_45_40_v;
-    bool HLT_PFHT400_SixPFJet32_DoublePFBTagDeepCSV_2p94_v;
-    bool HLT_PFHT400_SixPFJet32_v;
-    bool HLT_PFHT450_SixPFJet36_PFBTagDeepCSV_1p59_v;
-    bool HLT_PFHT450_SixPFJet36_v;
-    bool HLT_PFHT350_v;
-    bool HLT_PFHT350MinPFJet15_v;
 
 //------------------------------------
 // - Propagators init. ---------------
@@ -1422,11 +1025,16 @@ typedef ROOT::Math::SVector<double, 3> SVector3;
 // constructors and destructor
 //
 FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
+    RochString (iConfig.getParameter<std::string>("RochString")),
     isMC_(iConfig.getParameter<bool>("isMC")),
     weightFile_( iConfig.getUntrackedParameter<std::string>("weightFileMVA") ),
     weightFileEVTS_ (iConfig.getUntrackedParameter<std::string>("weightFileMVA_EVTS")), 
     weightFileVtx_( iConfig.getUntrackedParameter<std::string>("weightFileMVA_VTX") ),
     weightFileVtxStep1_( iConfig.getUntrackedParameter<std::string>("weightFileMVA_VTX_step1") ),
+    mcPileupFile_       ( iConfig.getParameter<std::string>( "mcpufile" ) ),
+    dataPileupFile_     ( iConfig.getParameter<std::string>( "datapufile" ) ),
+    mcPileupPath_       ( iConfig.getParameter<std::string>( "mcpupath" ) ),
+    dataPileupPath_     ( iConfig.getParameter<std::string>( "datapupath" ) ),
     genEventInfoToken_(    consumes<GenEventInfoProduct>(        iConfig.getParameter<edm::InputTag>("genEventInfoInput"))),
     LHEEventProductToken_( consumes<LHEEventProduct>(            iConfig.getParameter<edm::InputTag>("LHEEventProductInput"))),
     prunedGenToken_(consumes<edm::View<reco::GenParticle> >(     iConfig.getParameter<edm::InputTag>("genpruned"))),
@@ -1457,7 +1065,14 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
    //now do what ever initialization is needed
     nEvent = 0;
     usesResource("TFileService");
-        rc.init(edm::FileInPath("FlyingTop/FlyingTop/plugins/RoccoR2018UL.txt").fullPath());
+
+    rc.init(edm::FileInPath(RochString).fullPath());
+    // rc.init(edm::FileInPath(RochString).fullPath());
+    //LumiWeights_ = edm::LumiReWeighting("FlyingTop/FlyingTop/test/PU/MC/2018Pileup_MC2018UL_bin100.root", "FlyingTop/FlyingTop/test/PU/Data/2018/MyDataPileupHistogram_bin100.root","pileup","pileup");
+    
+    //LumiWeights_ = edm::LumiReWeighting("2018Pileup_MC2018UL_bin100.root","MyDataPileupHistogram_bin100.root","pileup","pileup"); 
+    //lumiWeights_ = edm::LumiReWeighting( mcPileupFile_, dataPileupFile_, mcPileupPath_, dataPileupPath_ );
+    lumiWeights_ = new reweight::LumiReWeighting( mcPileupFile_, dataPileupFile_, mcPileupPath_, dataPileupPath_ );
     smalltree = fs->make<TTree>("ttree", "ttree");
     
     // event info
@@ -1466,9 +1081,11 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("lumiBlock"  ,      &lumiBlock,  "lumiBlock/I");
     smalltree->Branch("tree_Evt_weight",  &tree_Evt_weight, "tree_Evt_weight/I");
     smalltree->Branch("tree_LHE_Weights", &tree_LHE_Weights);
-    smalltree->Branch("PUweight",         &PUweight, "PUweight/F");
+    smalltree->Branch("PUweight", &PUweight, "PUweight/D");
+    smalltree->Branch("PU_events", &PU_events, "PU_events/I");
+    smalltree->Branch("AllPU_events_weight", &AllPU_events_weight, "AllPU_events_weight/I");
+    smalltree->Branch("Prefweight", &Prefweight, "Prefweight/D");
     smalltree->Branch("Prefweight",       &Prefweight, "Prefweight/D");
-
     
     // primary vertex info
     smalltree->Branch("tree_nPV",      &tree_nPV);
@@ -1614,9 +1231,9 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_jet_pt"  ,              &tree_jet_pt);
     smalltree->Branch("tree_jet_eta" ,              &tree_jet_eta);
     smalltree->Branch("tree_jet_phi" ,              &tree_jet_phi);
-    smalltree->Branch("tree_jet_tightid", &tree_jet_tightid);
-    smalltree->Branch("tree_jet_tightid_LepVeto", &tree_jet_tightid_LepVeto);
-    smalltree->Branch("tree_reco_jet_P4",           &tree_reco_jet_P4,32000,0);
+    smalltree->Branch("tree_jet_tightid",           &tree_jet_tightid);
+    smalltree->Branch("tree_jet_tightid_LepVeto",   &tree_jet_tightid_LepVeto);
+    // smalltree->Branch("tree_reco_jet_P4",           &tree_reco_jet_P4,32000,0);
     smalltree->Branch("tree_jet_HadronFlavour",     &tree_jet_HadronFlavour);
     smalltree->Branch("tree_jet_pileupID",          &tree_jet_pileupID);
     smalltree->Branch("tree_jet_btag_DeepCSV",      &tree_jet_btag_DeepCSV);
@@ -1704,8 +1321,6 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_lepton_lepton_dEta",&tree_lepton_lepton_dEta);
     smalltree->Branch("tree_muon_trkLayers", &tree_muon_trkLayers);
         smalltree->Branch("tree_muon_miniIso", &tree_muon_miniIso);
-    
-
     
     smalltree->Branch("tree_recele_px", &tree_recele_px);
     smalltree->Branch("tree_recele_py", &tree_recele_py);
@@ -2020,17 +1635,7 @@ smalltree->Branch("HLT_PFMET250_HBHECleaned_v",&HLT_PFMET250_HBHECleaned_v);
 smalltree->Branch("HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v",&HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v);
 smalltree->Branch("HLT_IsoMu24_v",&HLT_IsoMu24_v);
 smalltree->Branch("HLT_IsoMu27_v",&HLT_IsoMu27_v);
-// // ----------------Trigger PFHT-------------
-smalltree->Branch("HLT_PFHT180_v",&HLT_PFHT180_v);
-smalltree->Branch("HLT_PFHT250_v",&HLT_PFHT250_v);
-smalltree->Branch("HLT_PFHT370_v",&HLT_PFHT370_v);
-smalltree->Branch("HLT_PFHT430_v",&HLT_PFHT430_v);
-smalltree->Branch("HLT_PFHT510_v",&HLT_PFHT510_v);
-smalltree->Branch("HLT_PFHT590_v",&HLT_PFHT590_v);
-smalltree->Branch("HLT_PFHT680_v",&HLT_PFHT680_v);
-smalltree->Branch("HLT_PFHT500_PFMET100_PFMHT100_IDTight_v",&HLT_PFHT500_PFMET100_PFMHT100_IDTight_v);
-smalltree->Branch("HLT_PFHT700_PFMET85_PFMHT85_IDTight_v",&HLT_PFHT700_PFMET85_PFMHT85_IDTight_v);
-smalltree->Branch("HLT_PFHT800_PFMET75_PFMHT75_IDTight_v",&HLT_PFHT800_PFMET75_PFMHT75_IDTight_v);
+
 
 //----------------------------------------
 // - BDT Input Variables -----------------
@@ -2126,7 +1731,6 @@ readerEvts->BookMVA( "BDTG", weightFileEVTS_ ); // root 6.14/09, care compatibli
     readerVtxStep1->AddVariable(" mva_Vtx_MeanDCA",&mva_V_MeanDCA);
 
     readerVtxStep1->BookMVA("BDTG",weightFileVtxStep1_);
- 
 }
 
 
@@ -2283,7 +1887,8 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
             continue;
           }
       }//Pileup info loop ends                                                                                                                                                                
-    PUweight = float(TruePUI);
+    PUweight = lumiWeights_->weight(TruePUI);
+ PU_events = float(TruePUI);
     //  cout<<" pile up weight ="<<PUweight<<endl;
   }
 
@@ -2316,17 +1921,6 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       if (strstr(TName.c_str(),"HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v") &&  triggerH->accept(i)){HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v = true;} else if (strstr(TName.c_str(),"HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v") && !triggerH->accept(i)){HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v = false;};
       if (strstr(TName.c_str(),"HLT_IsoMu24_v") && triggerH->accept(i)){HLT_IsoMu24_v = true;} else if (strstr(TName.c_str(),"HLT_IsoMu24_v") &&!triggerH->accept(i)){HLT_IsoMu24_v = false;};
       if (strstr(TName.c_str(),"HLT_IsoMu27_v") && triggerH->accept(i)){HLT_IsoMu27_v = true;} else if (strstr(TName.c_str(),"HLT_IsoMu27_v") &&!triggerH->accept(i)){HLT_IsoMu27_v = false;};
-      // // ----------------Trigger PFHT-------------
-      if (strstr(TName.c_str(),"HLT_PFHT180_v") && triggerH->accept(i)){HLT_PFHT180_v = true;} else if (strstr(TName.c_str(),"HLT_PFHT180_v") &&!triggerH->accept(i)){HLT_PFHT180_v = false;};
-      if (strstr(TName.c_str(),"HLT_PFHT250_v") && triggerH->accept(i)){HLT_PFHT250_v = true;} else if (strstr(TName.c_str(),"HLT_PFHT250_v") &&!triggerH->accept(i)){HLT_PFHT250_v = false;};
-      if (strstr(TName.c_str(),"HLT_PFHT370_v") && triggerH->accept(i)){HLT_PFHT370_v = true;} else if (strstr(TName.c_str(),"HLT_PFHT370_v") &&!triggerH->accept(i)){HLT_PFHT370_v = false;};
-      if (strstr(TName.c_str(),"HLT_PFHT430_v") && triggerH->accept(i)){HLT_PFHT430_v = true;} else if (strstr(TName.c_str(),"HLT_PFHT430_v") &&!triggerH->accept(i)){HLT_PFHT430_v = false;};
-      if (strstr(TName.c_str(),"HLT_PFHT510_v") && triggerH->accept(i)){HLT_PFHT510_v = true;} else if (strstr(TName.c_str(),"HLT_PFHT510_v") &&!triggerH->accept(i)){HLT_PFHT510_v = false;};
-      if (strstr(TName.c_str(),"HLT_PFHT590_v") && triggerH->accept(i)){HLT_PFHT590_v = true;} else if (strstr(TName.c_str(),"HLT_PFHT590_v") &&!triggerH->accept(i)){HLT_PFHT590_v = false;};
-      if (strstr(TName.c_str(),"HLT_PFHT680_v") && triggerH->accept(i)){HLT_PFHT680_v = true;} else if (strstr(TName.c_str(),"HLT_PFHT680_v") &&!triggerH->accept(i)){HLT_PFHT680_v = false;};
-      if (strstr(TName.c_str(),"HLT_PFHT500_PFMET100_PFMHT100_IDTight_v") && triggerH->accept(i)){HLT_PFHT500_PFMET100_PFMHT100_IDTight_v = true;} else if (strstr(TName.c_str(),"HLT_PFHT500_PFMET100_PFMHT100_IDTight_v") &&!triggerH->accept(i)){HLT_PFHT500_PFMET100_PFMHT100_IDTight_v = false;};
-      if (strstr(TName.c_str(),"HLT_PFHT700_PFMET85_PFMHT85_IDTight_v") && triggerH->accept(i)){HLT_PFHT700_PFMET85_PFMHT85_IDTight_v = true;} else if (strstr(TName.c_str(),"HLT_PFHT700_PFMET85_PFMHT85_IDTight_v") &&!triggerH->accept(i)){HLT_PFHT700_PFMET85_PFMHT85_IDTight_v = false;};
-      if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") && triggerH->accept(i)){HLT_PFHT800_PFMET75_PFMHT75_IDTight_v = true;} else if (strstr(TName.c_str(),"HLT_PFHT800_PFMET75_PFMHT75_IDTight_v") &&!triggerH->accept(i)){HLT_PFHT800_PFMET75_PFMHT75_IDTight_v = false;};
     }
 
   //////////////////////////////////
@@ -2340,24 +1934,24 @@ if ( isMC_ )
   {
     std::vector<double> evtWeights = genEventInfo->weights();
 
-    const gen::PdfInfo *PDF = genEventInfo->pdf();
-    // std::cout<<"scalePDF : "<<PDF->scalePDF<<std::endl;
-    int id1 = PDF->id.first ;// [-4,-3,-2,-1,1,2,3,4]
-    int id2 = PDF->id.second;
-    // std::cout<<"id1 and id2 : "<<id1<<"//"<<id2<<std::endl;
+    // const gen::PdfInfo *PDF = genEventInfo->pdf();
+    // // std::cout<<"scalePDF : "<<PDF->scalePDF<<std::endl;
+    // int id1 = PDF->id.first ;// [-4,-3,-2,-1,1,2,3,4]
+    // int id2 = PDF->id.second;
+    // // std::cout<<"id1 and id2 : "<<id1<<"//"<<id2<<std::endl;
 
-    double x1 = PDF->x.first;
-    double x2 = PDF->x.second;
-    //  std::cout<<"x1 and x2 : "<<x1<<"//"<<x2<<std::endl;
+    // double x1 = PDF->x.first;
+    // double x2 = PDF->x.second;
+    // //  std::cout<<"x1 and x2 : "<<x1<<"//"<<x2<<std::endl;
 
-    double xPDF1 = PDF->xPDF.first;//==0
-    double xPDF2 = PDF->xPDF.second;//==0
-    //  std::cout<<"xPDF1 and xPDF2 : "<<xPDF1<<"//"<<xPDF2<<std::endl;
+    // double xPDF1 = PDF->xPDF.first;//==0
+    // double xPDF2 = PDF->xPDF.second;//==0
+    // //  std::cout<<"xPDF1 and xPDF2 : "<<xPDF1<<"//"<<xPDF2<<std::endl;
 
-    unsigned int ProcID = genEventInfo->signalProcessID();//9999
-	  // double qscale = genEventInfo->qScale();//sameasPDFscale
-    double alphaqcd = genEventInfo->alphaQCD();
-    // std::cout<<"ProcID and qscale and alphaqcd : "<<ProcID<<"//"<<" alphaqcd : "<<alphaqcd<<std::endl;
+    // unsigned int ProcID = genEventInfo->signalProcessID();//9999
+	  // // double qscale = genEventInfo->qScale();//sameasPDFscale
+    // double alphaqcd = genEventInfo->alphaQCD();
+    // // std::cout<<"ProcID and qscale and alphaqcd : "<<ProcID<<"//"<<" alphaqcd : "<<alphaqcd<<std::endl;
 
     for (unsigned int k = 0 ; k<evtWeights.size() ; k++)
       {
@@ -2845,10 +2439,9 @@ if ( isMC_ )
       else if ( dV2 < dV1 && dV2 < 0.01 ) fromLLP = 2;
       else if ( dV0 < 0.01 )		  fromLLP = 0;
 
-
-
     if ( !(abs(genIt.pdgId()) == 6 && abs(mom->pdgId()) == 1000023) 
     && (genIt.pt() < 0.9 || fabs(genIt.eta()) > 4.0) ) continue;
+
   // std::cout << mom->pdgId() << " mom pdg id "<<std::endl;
     // <=> ((If a particle is a top and comes from a neutralino) OR (has a valid pt and eta )) we look for the information of the gen particle
       tree_genParticle_pt.push_back(        genIt.pt());
@@ -2880,6 +2473,9 @@ if ( isMC_ )
         vgen.SetPtEtaPhiM(mom->pt(),mom->eta(),mom->phi(),mom->mass());
         float bg = vgen.P() / mom->mass();
         ct0 = ct / bg;
+        //$$$$
+	      tree_neu_ctau = ct0;
+        //$$$$
       }
       tree_genParticle_ct.push_back(ct);
       tree_genParticle_ct0.push_back(ct0);
@@ -3044,7 +2640,7 @@ if ( isMC_ )
       }
       tree_genPackPart_isFromC.push_back(matchC);
       tree_ngenPackPart++;
-    }//end of loop on packed 
+    } // end of loop on packed 
 
 
     //////////////////////
@@ -3159,7 +2755,7 @@ if ( isMC_ )
               GenVaxis2 -= GenV2;
             }
         } // end loop over gen muons
-    }// end loop over gen jets
+    } // end loop over gen jets
 
 //     ///////////////////////////////
 //     // Invariant Mass of GenAxes 
@@ -3218,8 +2814,6 @@ if ( isMC_ )
   tree_PFMet_phi = -10.;
   tree_PFMet_sig = -10.;
   tree_PFMet_pt = -10.;
-
-  
   if ( PFMETs->size() > 0 ) {
     const pat::MET &themet = PFMETs->front();
     tree_PFMet_et  = themet.et();
@@ -3230,6 +2824,7 @@ if ( isMC_ )
     tree_PFMet_pt  = sqrt(met_x*met_x + met_y*met_y);
   }
 
+
   //////////////////////////////////
   //////////////////////////////////
   ///////////   Muons   ////////////
@@ -3238,7 +2833,7 @@ if ( isMC_ )
   
   int nmu = 0;
   float LT = 0;
-  int genMuons = 0;
+  // int genMuons = 0;
   for (const pat::Muon &mu : *muons)
   {
     if ( mu.pt() < 3. ) continue;
@@ -3248,33 +2843,33 @@ if ( isMC_ )
 
           double correction = 1;
           double  smearedPt=0.;
-          if(!isMC_) 
+          if (!isMC_ ) 
             {
               correction = rc.kScaleDT( mu.charge(), mu.pt(), mu.eta(), mu.phi(), 0, 0);
 	            //cout<<" correction="<<correction <<endl;                                                                                                                                                      
             }
-          if(isMC_) 
+          if ( isMC_ ) 
             {
               for (unsigned int k = 0 ; k < tree_genParticle_pdgId.size() ; k++)
                 {
                   float deta = tree_genParticle_eta[k]-mu.eta();
                   float dphi = tree_genParticle_phi[k]-mu.phi();
                   float dpt  = (tree_genParticle_pt[k]-mu.pt())/mu.pt();                                                                                                        
-	                if(abs(dphi)<0.1 && abs(deta)<0.1 && dpt <0.1 )
+	                if (abs(dphi)<0.1 && abs(deta)<0.1 && dpt <0.1 )
                     {
                       float genmuonpt = 0;
-                      if (abs(tree_genParticle_pdgId[k])==13 && tree_genParticle_pt[k] > 10 && abs(tree_genParticle_eta[k]) <= 2.4)
+                      if ( abs(tree_genParticle_pdgId[k])==13 && tree_genParticle_pt[k] > 10 && abs(tree_genParticle_eta[k]) <= 2.4 )
                         {                                                                                                                         
 	                        genmuonpt = tree_genParticle_pt[k];
                         }
                       correction = rc.kSpreadMC(mu.charge(), mu.pt(), mu.eta(), mu.phi(), genmuonpt, 0, 0);
-                    }//mathcing                                                                                                                                                                                   
+                    } // matching                                                                                                                                                                                   
 	                else 
                     {
                       if (mu.isGlobalMuon()) {correction = rc.kSmearMC(mu.charge(), mu.pt(), mu.eta(),  mu.phi(),  mu.innerTrack()->hitPattern().trackerLayersWithMeasurement(), gRandom->Rndm(), 0,0); }
                     }
-                }//gen mu                                                                                                                                                                                       
-            }// end of MC loop                                                                                                                                                                                
+                } // gen mu                                                                                                                                                                                       
+            } // end of MC loop                                                                                                                                                                                
           smearedPt = mu.pt()*correction;
                                                                                                                                                                 
       if (showlog) std::cout<<"smeared pt vs direct pt "<<smearedPt<<" vs "<<mu.pt()<<std::endl;
@@ -3290,19 +2885,19 @@ if ( isMC_ )
     tree_muon_py.push_back(       mu.py());
     tree_muon_pz.push_back(       mu.pz());
     tree_muon_energy.push_back(   mu.energy());
-    tree_muon_mass.push_back(   mu.mass());
-    tree_muon_dxy.push_back(	  mu.muonBestTrack()->dxy(PV.position()));
+    tree_muon_mass.push_back(     mu.mass());
+    tree_muon_dxy.push_back(	    mu.muonBestTrack()->dxy(PV.position()));
     tree_muon_dxyError.push_back( mu.muonBestTrack()->dxyError());
     tree_muon_dz.push_back(       mu.muonBestTrack()->dz(PV.position()));
     tree_muon_dzError.push_back(  mu.muonBestTrack()->dzError());
     tree_muon_charge.push_back(   mu.charge());
     tree_muon_isLoose.push_back(  mu.isLooseMuon());
-    tree_muon_isMedium.push_back(  mu.isMediumMuon());
+    tree_muon_isMedium.push_back( mu.isMediumMuon());
     tree_muon_isTight.push_back(  mu.isTightMuon(PV));
     tree_muon_isGlobal.push_back( mu.isGlobalMuon());
-    tree_muon_isoR3.push_back(mu.trackIso());
-    tree_muon_trigger_dimu.push_back(mu.triggered("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v*"));  
-    tree_muon_trigger_isomu.push_back(mu.triggered("HLT_IsoMu24_v*"));
+    tree_muon_isoR3.push_back(    mu.trackIso());
+    tree_muon_trigger_dimu.push_back(  mu.triggered("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v*"));  
+    tree_muon_trigger_isomu.push_back( mu.triggered("HLT_IsoMu24_v*"));
     // reco::TrackRef MuonInnerRef = mu.innerTrack();
 
     // https://github.com/cms-sw/cmssw/blob/CMSSW_10_6_X/DataFormats/MuonReco/interface/Muon.h
@@ -3315,7 +2910,8 @@ if ( isMC_ )
     tree_muon_MiniIsoLoose.push_back(mu.passed(reco::Muon::Selector::MiniIsoLoose));//Wrongly stored
     tree_muon_MiniIsoMedium.push_back(mu.passed(reco::Muon::Selector::MiniIsoMedium));//Wrongly stored
     tree_muon_MiniIsoTight.push_back(mu.passed(reco::Muon::Selector::MiniIsoTight));//Wrongly stored
-         double Aeff_Fall17[5] = { 0.0566, 0.0562, 0.0363, 0.0119, 0.0064 };
+    
+    double Aeff_Fall17[5] = { 0.0566, 0.0562, 0.0363, 0.0119, 0.0064 };
     double EA;
     auto iso = mu.miniPFIsolation();
     auto chg = iso.chargedHadronIso();
@@ -3326,47 +2922,52 @@ if ( isMC_ )
     else if( TMath::Abs(mu.eta()) < 2.0 ) EA = Aeff_Fall17[2];
     else if( TMath::Abs(mu.eta()) < 2.2 ) EA = Aeff_Fall17[3];
     else EA = Aeff_Fall17[4];
-    float R = 10.0 / std::min( std::max( mu.pt(), 50.0 ), 200.0 );//smaeredPT ???
+    float R = 10.0 / std::min( std::max( mu.pt(), 50.0 ), 200.0 );
     EA *= std::pow( R / 0.3, 2 );
-    float miniIso = ( chg + TMath::Max( 0.0, neu + pho - (Rho) * EA ) ) / mu.pt();//smaeredPT ???
+    float miniIso = ( chg + TMath::Max( 0.0, neu + pho - (Rho) * EA ) ) / mu.pt();
     tree_muon_miniIso.push_back(miniIso);
-      if(mu.isGlobalMuon()){
+      if ( mu.isGlobalMuon() ) {
       //cout<<" muon inner hits="<<mu.innerTrack()->hitPattern().trackerLayersWithMeasurement()<<endl;
       tree_muon_trkLayers.push_back(mu.innerTrack()->hitPattern().trackerLayersWithMeasurement());
     }
     nmu++;
 
     // Matching to gen muons
-    if ( isMC_ )
-      {
-        bool IsMatched = false;
-        for (unsigned int k = 0 ; k < tree_genParticle_pdgId.size() ; k++)
-          {
-            if (abs(tree_genParticle_pdgId[k])!=13) continue;
-            if (tree_genParticle_charge[k] != mu.charge()) continue;
-            //feels like there are sometimes two gen muons that are ony one?? close to having the same pt eta and phi (deltaQuantity  ~ 0.001) => continue
-            float deta = tree_genParticle_eta[k]-mu.eta();
-            float dphi = tree_genParticle_phi[k]-mu.phi();
-            float dpt  = (tree_genParticle_pt[k]-smearedPt)/tree_genParticle_pt[k];
-            if(abs(dpt)<0.1 && abs(dphi)<0.1 && abs(deta)<0.1 ){IsMatched = true;}
-              genMuons++;
-            if ( IsMatched ) break;
-          }
-      }   
-  }// end loop on muons
+    //$$$$
+//     if ( isMC_ )
+    //     {
+    //       bool IsMatched = false;
+    //       for (unsigned int k = 0 ; k < tree_genParticle_pdgId.size() ; k++)
+    //       {
+    //       if ( abs(tree_genParticle_pdgId[k]) != 13 ) continue;
+    //       if ( tree_genParticle_charge[k] != mu.charge() ) continue;
+    //         //feels like there are sometimes two gen muons that are ony one?? close to having the same pt eta and phi (deltaQuantity  ~ 0.001) => continue
+    //         float deta = tree_genParticle_eta[k]-mu.eta();
+    //         float dphi = tree_genParticle_phi[k]-mu.phi();
+    //         float dpt  = (tree_genParticle_pt[k]-smearedPt)/tree_genParticle_pt[k];
+    //         if(abs(dpt)<0.1 && abs(dphi)<0.1 && abs(deta)<0.1 ){IsMatched = true;}
+    //           genMuons++;
+    //         if ( IsMatched ) break;
+    //       }
+    //     }	
+//$$$$
+  } // end loop on muons
 
-//Please note that after the loop o nmuons that have been corrected, they mya not be ordered by decreasing value of pt
-//=> needs sortings and therefore, accessing the information about muons has to be changed => index_muon[k] instead of k where k is the iterator basically
+// Please note that after the loop on muons that have been corrected, they may not be ordered by decreasing value of pt
+// => needs sorting and therefore, accessing the information about muons has to be changed => index_muon[k] instead of k where k is the iterator basically
   int size_muon = 0;
-    for (unsigned int counter_muon = 0; counter_muon < tree_muon_pt.size(); counter_muon++){muon_pt[counter_muon] = tree_muon_pt[counter_muon];size_muon++;}
-    if ( tree_muon_pt.size() < 10000 ) { TMath::Sort(size_muon, muon_pt, index_muon);}
-//----------------------------------SORTED MUONS --------------------------------------------------------------------//
+    for (unsigned int counter_muon = 0; counter_muon < tree_muon_pt.size(); counter_muon++) {
+      muon_pt[counter_muon] = tree_muon_pt[counter_muon];size_muon++;
+    }
+    if ( tree_muon_pt.size() < 10000 ) { 
+      TMath::Sort(size_muon, muon_pt, index_muon);
+    }
+//----------------------------- SORTED MUONS ----------------------------------------//
 
-if (MuonChannel)
+if ( MuonChannel )
   {  
     // std::cout<<" mu.pt()"<< mu.pt()<<std::endl;
-    if ( nmu >= 1 )
-      {
+    if ( nmu >= 1 ) {
         tree_lepton_leadingpt.push_back(tree_muon_pt[index_muon[0]]);  
         mva_Evts_muon1_pt = tree_muon_pt[index_muon[0]];
       }
@@ -3396,7 +2997,7 @@ if (MuonChannel)
   }
 
   float ST = 0;
-  ST+=LT;
+  ST += LT;
   tree_ST.push_back(ST);
   tree_muon_nmu.push_back(nmu);
 
@@ -3427,29 +3028,25 @@ if (MuonChannel)
     float CHM                 = jet.chargedMultiplicity(); 
     bool TightJetIDLepVeto = false;
     bool TightJetID        = false;
-    if (abs(jet.eta())<=2.6)
+    if (abs(jet.eta()) <= 2.6)
       {
         if (NHF<0.9 && NEMF<0.9 && NumConst>1 && CHF>0 && CHM>0 )
           {
             TightJetID = true;
-            if (MUF<0.8 && CEMF<0.8)// lepton veto
-              {
+            if (MUF<0.8 && CEMF<0.8) // lepton veto
                 TightJetIDLepVeto = true;
-              }
           }
       }
-    if (abs(jet.eta())>2.6 && abs(jet.eta())<=2.7)
+    if (abs(jet.eta()) > 2.6 && abs(jet.eta()) <= 2.7)
       {
         if (NHF<0.9 && NEMF<0.99  && CHM>0)
           {
             TightJetID = true;
-            if (MUF<0.8 && CEMF<0.8)// lepton veto
-              {
+            if (MUF<0.8 && CEMF<0.8) // lepton veto
                 TightJetIDLepVeto = true;
-              }
           }
       }
-    if (abs(jet.eta())<=3.0 && abs(jet.eta())>2.7)
+    if (abs(jet.eta())>2.7 && abs(jet.eta()) <= 3.0)
       {
         if (NEMF<0.99 && NEMF>0.01 && NumNeutralParticles>1)
           {
@@ -3465,13 +3062,13 @@ if (MuonChannel)
             TightJetIDLepVeto = true;
           }
       }
-
+    if (!TightJetIDLepVeto) continue;
     tree_jet_TightJetIDLepVeto.push_back(TightJetIDLepVeto);
     tree_jet_TightJetID.push_back(TightJetID);
     tree_jet_tightid.push_back(jet.userInt("tightId"));
     tree_jet_tightid_LepVeto.push_back(jet.userInt("tightLepVetoId"));
-    bool pass_JetId_TightLepVeto = jet.userInt("tightLepVetoId");
-    bool pass_JetId_Tight = jet.userInt("tightId"); 
+    // bool pass_JetId_TightLepVeto = jet.userInt("tightLepVetoId");
+    // bool pass_JetId_Tight = jet.userInt("tightId"); 
     if ( indjet==0) {jet1_pt = jet.pt();}
     if ( indjet==1) {jet2_pt = jet.pt();}
     tree_jet_E.push_back(jet.energy());
@@ -3511,7 +3108,7 @@ if (MuonChannel)
         if (dRmujet <0.4 && fabs(tree_muon_eta[index_muon[mu]]) < 2.4 && tree_muon_TkIsoLoose[index_muon[mu]] && tree_muon_isLoose[index_muon[mu]] &&  abs(tree_muon_dxy[index_muon[mu]]) < 0.1 
             && abs(tree_muon_dz[index_muon[mu]]) < 0.2) { MuonJetMatching = true; }
       }
-    if ( MuonJetMatching ) { continue; }   
+    if ( MuonJetMatching ) continue;   
     tree_njet++;
   }
 
@@ -3542,7 +3139,7 @@ if (MuonChannel)
         mva_Evts_jet2_pt = 0;
     }
   
-  if( tree_njet>=2 )
+  if ( tree_njet>=2 )
       {
         tree_jet_jet_dR.push_back(Deltar(tree_jet_eta[0],tree_jet_phi[0],tree_jet_eta[1],tree_jet_phi[1]));
         tree_jet_jet_dPhi.push_back(abs(Deltaphi(tree_jet_phi[0],tree_jet_phi[1])));
@@ -3557,6 +3154,7 @@ if (MuonChannel)
       }
 
   tree_HT = HT_val;
+
 
   //////////////////////////////////
   //////////////////////////////////
@@ -3601,15 +3199,11 @@ if (MuonChannel)
       tree_electron_isoR4.push_back(  el.trackIso());//returns the value of the summed track pt in a cone of deltaR<0.4
       tree_electron_dxy.push_back(    el.gsfTrack()->dxy(PV.position()));
       tree_electron_dz.push_back(     el.gsfTrack()->dz(PV.position()));
-
   // https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun2#Working_points_for_94X_and_later
   // https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideCategoryBasedElectronID
   // HLT Ele23Ele12 noDZ v*
   // HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v
-    
-
-    nEl++;
-
+        nEl++;
 //       	barrel 	endcap
 // d0, cm 	0.05 	0.10
 // dz, cm 	0.10 	0.20 
@@ -3618,11 +3212,15 @@ if (MuonChannel)
 //Please note that after the loop on electrons that have been corrected, they mya not be ordered by decreasing value of pt
 //=> needs sortings and therefore, accessing the information about electrons has to be changed => index_el[k] instead of k where k is the iterator basically
     int size_el = 0;
-    for (unsigned int counter_el = 0; counter_el < tree_electron_pt.size(); counter_el++){el_pt[counter_el] = tree_electron_pt[counter_el];size_el++;}
-    if ( tree_electron_pt.size() < 10000 ) { TMath::Sort(size_el, el_pt, index_el);}
+    for (unsigned int counter_el = 0; counter_el < tree_electron_pt.size(); counter_el++) {
+    el_pt[counter_el] = tree_electron_pt[counter_el];size_el++;
+  }
+    if ( tree_electron_pt.size() < 10000 ) { 
+    TMath::Sort(size_el, el_pt, index_el);
+  }
 //-----------------------------Sorted ELECTRONS -------------------------------//
+tree_electron_nEle = nEl;
 
-  tree_electron_nEle=nEl;
 
   //////////////////////////////////
   //////////////////////////////////
@@ -3636,32 +3234,36 @@ if (MuonChannel)
   TLorentzVector v1, v2, v;
   tree_Mmumu = 0.;
   
-//------Muon CHannel------//
-  if ( nmu >= 2 && MuonChannel) 
+//------ Dimuon Channel ------//
+  if ( nmu >= 2 && MuonChannel ) 
   {
-
     for (int mu = 0; mu < nmu-1; mu++)
     { 
       if ( !tree_muon_isGlobal[index_muon[mu]] ) continue;
       mupt1  = tree_muon_pt[index_muon[mu]];
-      if ( mupt1 < 10. ) continue; // Zmu filter
+//$$$$    if ( mupt1 < 10. ) continue; // Zmu filter
+      if ( mupt1 < 25. ) continue; // the first sorted muon has the highest pT
       // if ( abs(tree_muon_dxy[mu]) > 0.1 || abs(tree_muon_dz[mu]) > 0.2 || (!tree_muon_trigger_dimu[mu] && !tree_muon_trigger_isomu[mu]) || !tree_muon_isLoose[mu] ) continue; // muons closed to PV
       // if ( abs(tree_muon_dxy[mu]) > 0.1 || abs(tree_muon_dz[mu]) > 0.2 ||  !tree_muon_isLoose[mu] ) continue; //|| !tree_muon_PFIsoLoose[mu] muons closed to PV
-      if ( abs(tree_muon_dxy[index_muon[mu]]) > 0.1 || abs(tree_muon_dz[index_muon[mu]]) > 0.2 ||  !tree_muon_isTight[index_muon[mu]]  ) continue;//|| !tree_muon_TkIsoLoose[index_muon[mu]]
+      //$$$$    if ( abs(tree_muon_dxy[index_muon[mu]]) > 0.1 || abs(tree_muon_dz[index_muon[mu]]) > 0.2 ||  !tree_muon_isTight[index_muon[mu]]  ) continue;//|| !tree_muon_TkIsoLoose[index_muon[mu]]
+if ( abs(tree_muon_dxy[index_muon[mu]]) > 0.1 || abs(tree_muon_dz[index_muon[mu]]) > 0.2 
+         || !tree_muon_isTight[index_muon[mu]] || !tree_muon_TkIsoTight[mu] ) continue;
       mueta1 = tree_muon_eta[index_muon[mu]];
       muphi1 = tree_muon_phi[index_muon[mu]];
       v1.SetPtEtaPhiM(mupt1,mueta1,muphi1,mu_mass);
 
-      for ( int mu2=mu+1; mu2<nmu; mu2++) 
+      for ( int mu2 = mu+1; mu2 < nmu; mu2++ ) 
         {	    
           if ( !tree_muon_isGlobal[index_muon[mu2]] ) continue;
           mupt2  = tree_muon_pt[index_muon[mu2]];
-          if ( mupt2 < 10. ) continue;
-          if ( mupt1 < 25. && mupt2 < 10. ) continue; // Zmu Filter
-          if ( tree_muon_charge[index_muon[mu]] == tree_muon_charge[index_muon[mu2]] && !AllowDiLeptonSameSign) continue;
+          if ( mupt2 < 10. ) continue; // the second muon has a lower pT
+//$$$$      if ( mupt1 < 25. && mupt2 < 10. ) continue; // Zmu Filter
+          if ( tree_muon_charge[index_muon[mu]] == tree_muon_charge[index_muon[mu2]] && !AllowDiLeptonSameSign ) continue;
           // // if ( (tree_muon_trigger_isomu[mu] && (abs(tree_muon_dxy[mu2]) > 0.1 || abs(tree_muon_dz[mu2]) > 0.2 || !tree_muon_isLoose[mu2]))  || (abs(tree_muon_dxy[mu2]) > 0.1 || abs(tree_muon_dz[mu2]) > 0.2 || (!tree_muon_trigger_dimu[mu2] && tree_muon_trigger_dimu[mu] ) || !tree_muon_isLoose[mu2]) ) continue;
           // if ( ( (abs(tree_muon_dxy[mu2]) > 0.1 || abs(tree_muon_dz[mu2]) > 0.2 || !tree_muon_isLoose[mu2] )) ) continue;//|| !tree_muon_PFIsoLoose[mu2]
-          if (  abs(tree_muon_dxy[index_muon[mu2]]) > 0.1 || abs(tree_muon_dz[index_muon[mu2]]) > 0.2 || !tree_muon_isTight[index_muon[mu2]]  ) continue;//|| !tree_muon_TkIsoLoose[index_muon[mu2]]
+          //$$$$      if ( abs(tree_muon_dxy[index_muon[mu2]]) > 0.1 || abs(tree_muon_dz[index_muon[mu2]]) > 0.2 || !tree_muon_isTight[index_muon[mu2]]  ) continue;//|| !tree_muon_TkIsoLoose[index_muon[mu2]]
+if ( abs(tree_muon_dxy[index_muon[mu2]]) > 0.1 || abs(tree_muon_dz[index_muon[mu2]]) > 0.2 
+           || !tree_muon_isTight[index_muon[mu2]] || !tree_muon_TkIsoTight[mu2] ) continue;
           // if using LooseID, apply a deltaR criteria of 0.02 between the two muons => https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2
           mueta2 = tree_muon_eta[index_muon[mu2]];
           muphi2 = tree_muon_phi[index_muon[mu2]];
@@ -3672,51 +3274,53 @@ if (MuonChannel)
               tree_Mmumu = v.Mag();
               imu1 = index_muon[mu];
               imu2 = index_muon[mu2];
-
             }
         }
     } // end loop on muons
-      if ( imu1 >= 0 && imu2 >= 0 && tree_muon_pt[imu2] > tree_muon_pt[imu1] && MuonChannel ) 
-        {
-          int imu0 = imu2;
-          imu2 = imu1; // muons reco with imu1 having the highest pt
-          imu1 = imu0;
-        }
-        
+      //$$$$ // unuseful as already sorted
+//     if ( imu1 >= 0 && imu2 >= 0 && tree_muon_pt[imu2] > tree_muon_pt[imu1] && MuonChannel ) 
+      //     {
+      //       int imu0 = imu2;
+      //       imu2 = imu1; // muons reco with imu1 having the highest pt
+      //       imu1 = imu0;
+      //     }
+        //$$$$
   }
 
-//------------------------------------//
-//------------------------------------//
-//----------Electron Channel----------//
-//------------------------------------//
-//------------------------------------//
-
-  if ( nEl >= 2 && ElChannel) 
+//---------- Dielectron Channel ----------//
+  if ( nEl >= 2 && ElChannel ) 
   {
     for (int ele = 0; ele < nEl-1; ele++)
     { 
       mupt1  = tree_electron_pt[index_el[ele]];
-      if ( mupt1 < 10. ) continue; // Zmu filter
-      if ( !tree_electron_IsLoose[index_el[ele]])continue;
+      //$$$$    if ( mupt1 < 10. ) continue; // Zmu filter
+    if ( mupt1 < 25. ) continue; // first sorted electron has the highest pT
+      if ( !tree_electron_IsLoose[index_el[ele]] ) continue;
       mueta1 = tree_electron_eta[index_el[ele]];
       muphi1 = tree_electron_phi[index_el[ele]];
-      if ((((mueta1 <= 1.479) && (abs(tree_electron_dxy[index_el[ele]]) > 0.05 || abs(tree_electron_dz[index_el[ele]]))  >0.10)) 
-             || ((mueta1 > 1.556) && (abs(tree_electron_dxy[index_el[ele]])>0.10  || abs(tree_electron_dz[index_el[ele]])>0.2))) continue;  
+      //$$$$ bugs
+//$$$$    if ((((mueta1 <= 1.479) && (abs(tree_electron_dxy[index_el[ele]]) > 0.05 || abs(tree_electron_dz[index_el[ele]]))  >0.10)) 
+             //$$$$    	   || ((mueta1 > 1.556) && (abs(tree_electron_dxy[index_el[ele]])>0.10  || abs(tree_electron_dz[index_el[ele]])>0.2))) continue;  
+if (   (abs(mueta1) <= 1.479 && (abs(tree_electron_dxy[index_el[ele]]) > 0.05 || abs(tree_electron_dz[index_el[ele]]) > 0.10)) 
+    	|| (abs(mueta1) >  1.556 && (abs(tree_electron_dxy[index_el[ele]]) > 0.10 || abs(tree_electron_dz[index_el[ele]]) > 0.20)) ) continue;  
       v1.SetPtEtaPhiM(mupt1,mueta1,muphi1,mu_mass);
 
       for ( int ele2=ele+1; ele2<nEl; ele2++) 
         {	
-          if ( !tree_electron_IsLoose[index_el[ele2]])continue;
+          if ( !tree_electron_IsLoose[index_el[ele2]]) continue;
           mupt2  = tree_electron_pt[index_el[ele2]];
-          if ( mupt2 < 10. ) continue;
-          if ( mupt1 < 25. && mupt2 < 25. ) continue; // Zmu Filter
-          if ( tree_electron_charge[index_el[ele]] == tree_electron_charge[index_el[ele2]] && !AllowDiLeptonSameSign) continue;
+          if ( mupt2 < 10. ) continue; // the second sorted has a lower pT
+//$$$$      if ( mupt1 < 25. && mupt2 < 25. ) continue;
+          if ( tree_electron_charge[index_el[ele]] == tree_electron_charge[index_el[ele2]] && !AllowDiLeptonSameSign ) continue;
           // // if ( (tree_electron_trigger_isomu[mu] && (abs(tree_electron_dxy[mu2]) > 0.1 || abs(tree_electron_dz[mu2]) > 0.2 || !tree_electron_isLoose[mu2]))  || (abs(tree_electron_dxy[mu2]) > 0.1 || abs(tree_electron_dz[mu2]) > 0.2 || (!tree_electron_trigger_dimu[mu2] && tree_electron_trigger_dimu[mu] ) || !tree_electron_isLoose[mu2]) ) continue;
           // if ( ( (abs(tree_electron_dxy[mu2]) > 0.1 || abs(tree_electron_dz[mu2]) > 0.2 || !tree_electron_isLoose[mu2] )) ) continue;//|| !tree_electron_PFIsoLoose[mu2]                                                                                                                                         
           mueta2 = tree_electron_eta[index_el[ele2]];
           muphi2 = tree_electron_phi[index_el[ele2]];
-          if ((((mueta2 <= 1.479) && (abs(tree_electron_dxy[index_el[ele2]]) > 0.05 || abs(tree_electron_dz[index_el[ele2]]))  >0.10)) 
-             || ((mueta2 > 1.556) && (abs(tree_electron_dxy[index_el[ele2]])>0.10  || abs(tree_electron_dz[index_el[ele2]])>0.2))) continue;  
+          //$$$$ bugs
+//$$$$        if ((((mueta2 <= 1.479) && (abs(tree_electron_dxy[index_el[ele2]]) > 0.05 || abs(tree_electron_dz[index_el[ele2]]))  >0.10)) 
+             //$$$$           || ((mueta2 > 1.556) && (abs(tree_electron_dxy[index_el[ele2]])>0.10  || abs(tree_electron_dz[index_el[ele2]])>0.2))) continue;  
+if (   (abs(mueta2) <= 1.479 && (abs(tree_electron_dxy[index_el[ele2]]) > 0.05 || abs(tree_electron_dz[index_el[ele2]]) > 0.10)) 
+       	  || (abs(mueta2) >  1.556 && (abs(tree_electron_dxy[index_el[ele2]]) > 0.10 || abs(tree_electron_dz[index_el[ele2]]) > 0.20)) ) continue;  
           v2.SetPtEtaPhiM(mupt2,mueta2,muphi2,mu_mass);
           v = v1 + v2;
           if ( v.Mag() > tree_Mmumu )
@@ -3727,27 +3331,29 @@ if (MuonChannel)
             }
         }
     } // end loop on electrons
-    if ( imu1 >= 0 && imu2 >= 0 && tree_electron_pt[imu2] > tree_electron_pt[imu1] ) {//problème here
-    int imu0 = imu2;
-    imu2 = imu1; // electrons reco with imu1 having the highest pt
-    imu1 = imu0;
-  }
+    //$$$$ // unuseful as already sorted
+//     if ( imu1 >= 0 && imu2 >= 0 && tree_electron_pt[imu2] > tree_electron_pt[imu1] ) { //problème here
+    //       int imu0 = imu2;
+    //       imu2 = imu1; // electrons reco with imu1 having the highest pt
+    //       imu1 = imu0;
+//     }
+//$$$$
   }
 
-//------------------------------------//
-//------------------------------------//
-//----------   Emu Channel  ----------//
-//------------------------------------//
-//------------------------------------//
+  //----------   EleMu Channel  ----------//
     // if( MuPairs.at(0).first.Pt() > 25 && ElePairs.at(0).first.Pt() > 20  &&  fabs(MuPairs.at(0).first.Eta()) < 2.4 && fabs(ElePairs.at(0).first.Eta()) < 2.4 && (tree_muon_charge[MuPairs.at(0).second]*tree_electron_charge[ElePairs.at(0).second] == -1) && (MuPairs.at(0).first + ElePairs.at(0).first).M() > 10 )
 bool LeadingMuon = true;
-if( nmu >=1 && nEl >=1 && EMuChannel)
+if( nmu >=1 && nEl >=1 && EMuChannel )
   {
     for (int mu = 0; mu < nmu; mu++)
       { 
         if ( !tree_muon_isGlobal[index_muon[mu]] ) continue;
         mupt1  = tree_muon_pt[index_muon[mu]];
-        if ( mupt1 < 10. ) continue; // Zmu filter
+        //$$$$    if ( mupt1 < 10. ) continue;
+    if ( mupt1 < 25. ) continue;
+    if ( abs(tree_muon_dxy[index_muon[mu]]) > 0.1 || abs(tree_muon_dz[index_muon[mu]]) > 0.2 
+         || !tree_muon_isTight[index_muon[mu]] || !tree_muon_TkIsoTight[mu] ) continue;
+//$$$$
         mueta1 = tree_muon_eta[index_muon[mu]];
         muphi1 = tree_muon_phi[index_muon[mu]];
         v1.SetPtEtaPhiM(mupt1,mueta1,muphi1,mu_mass);
@@ -3755,129 +3361,120 @@ if( nmu >=1 && nEl >=1 && EMuChannel)
         for ( int ele = 0; ele < nEl; ele++) 
           {	    
             mupt2  = tree_electron_pt[index_el[ele]];
-          if ( mupt1 < 25. && mupt2 < 14. ) continue; // Zmu Filter
+          //$$$$      if ( mupt1 < 25. && mupt2 < 14. ) continue;
+      if ( mupt2 < 32. ) continue;
           if ( tree_electron_charge[index_el[ele]] == tree_muon_charge[index_muon[mu]] && !AllowDiLeptonSameSign) continue;
-          if ( !tree_electron_IsLoose[index_el[ele]])continue;
+          if ( !tree_electron_IsLoose[index_el[ele]] ) continue;
           mueta2 = tree_electron_charge[index_el[ele]];
           muphi2 = tree_electron_charge[index_el[ele]];
-          if ((((mueta1 <= 1.479) && (abs(tree_electron_dxy[index_el[ele]]) > 0.05 || abs(tree_electron_dz[index_el[ele]]))  >0.10)) 
-             || ((mueta1 > 1.556) && (abs(tree_electron_dxy[index_el[ele]])>0.10  || abs(tree_electron_dz[index_el[ele]])>0.2))) continue;  
+          //$$$$ bugs
+//$$$$      if ((((mueta1 <= 1.479) && (abs(tree_electron_dxy[index_el[ele]]) > 0.05 || abs(tree_electron_dz[index_el[ele]]))  >0.10)) 
+             //$$$$         || ((mueta1 > 1.556) && (abs(tree_electron_dxy[index_el[ele]])>0.10  || abs(tree_electron_dz[index_el[ele]])>0.2))) continue;  
+if (   (abs(mueta2) <= 1.479 && (abs(tree_electron_dxy[index_el[ele]]) > 0.05 || abs(tree_electron_dz[index_el[ele]]) > 0.10)) 
+       	  || (abs(mueta2) >  1.556 && (abs(tree_electron_dxy[index_el[ele]]) > 0.10 || abs(tree_electron_dz[index_el[ele]]) > 0.20)) ) continue;  
           v2.SetPtEtaPhiM(mupt2,mueta2,muphi2,mu_mass);
           v = v1 + v2;
           if ( v.Mag() > tree_Mmumu )
             { // Mag pour masse invariante (magnitude)
               tree_Mmumu = v.Mag();
-              imu1 = mu;
-              imu2 = ele;
+              //$$$$ bug
+//$$$$          imu1 = mu;
+              //$$$$          imu2 = ele;
+          imu1 = index_muon[mu];
+          imu2 = index_el[ele];
             }
-          }
+          } // end loop on electrons
       } // end loop on muons
 
-    if ( imu1 >= 0 && imu2 >= 0 && tree_electron_pt[imu2] > tree_muon_pt[imu1] && EMuChannel) {
-    int imu0 = imu2;
-    imu2 = imu1; // muons reco with imu1 having the highest pt
-    imu1 = imu0;
+    if ( imu1 >= 0 && imu2 >= 0 && tree_electron_pt[imu2] > tree_muon_pt[imu1] && EMuChannel) 
     LeadingMuon = false;
   }
 
-  }
-
-//---------------------------//
-//---------------------------//
 // -- DiElectron Channel ----/
-//---------------------------//
-
-  if (ElChannel)
+if ( ElChannel )
     {
-      if ( nEl >= 1 )
-        {
+      if ( nEl >= 1 ) {
           tree_lepton_leadingpt.push_back(tree_electron_pt[index_el[0]]);  
           mva_Evts_muon1_pt = tree_electron_pt[index_el[0]];
         }
-      if ( nEl > 1 )
-        {
+else {
+      tree_lepton_leadingpt.push_back(0);
+      mva_Evts_muon1_pt=0;
+    }
+      if ( nEl > 1 ) {
           tree_lepton_leadingpt2.push_back(tree_electron_pt[index_el[1]]);
           tree_lepton_lepton_dR.push_back(Deltar( tree_electron_eta[index_el[0]], tree_electron_phi[0], tree_electron_eta[index_el[1]], tree_electron_phi[index_el[1]]));
           tree_lepton_lepton_dPhi.push_back(abs(Deltaphi(tree_electron_phi[index_el[0]],tree_electron_phi[index_el[1]])));
           tree_lepton_lepton_dEta.push_back(abs( tree_electron_eta[index_el[0]]-tree_electron_eta[index_el[1]]));
-          mva_Evts_muon2_pt         = tree_electron_pt[index_el[1]];
-          mva_Evts_muon12_dR        = Deltar( tree_electron_eta[index_el[0]], tree_electron_phi[index_el[0]], tree_electron_eta[index_el[1]], tree_electron_phi[index_el[1]]);
-          mva_Evts_muon12_dPhi      = abs(Deltaphi(tree_electron_phi[index_el[0]],tree_electron_phi[index_el[1]]));
-          mva_Evts_muon12_dEta      = abs( tree_electron_eta[index_el[0]]-tree_electron_eta[index_el[1]]);
+          mva_Evts_muon2_pt 	= tree_electron_pt[index_el[1]];
+          mva_Evts_muon12_dR	= Deltar( tree_electron_eta[index_el[0]], tree_electron_phi[index_el[0]], tree_electron_eta[index_el[1]], tree_electron_phi[index_el[1]]);
+          mva_Evts_muon12_dPhi	= abs(Deltaphi(tree_electron_phi[index_el[0]],tree_electron_phi[index_el[1]]));
+          mva_Evts_muon12_dEta	= abs( tree_electron_eta[index_el[0]]-tree_electron_eta[index_el[1]]);
         }
-      if ( nEl == 0){tree_lepton_leadingpt.push_back(0);mva_Evts_muon1_pt=0;}
-      if ( nEl <= 1)
-        {
+      else {
           tree_lepton_leadingpt2.push_back(0);
           tree_lepton_lepton_dR.push_back(0);
           tree_lepton_lepton_dPhi.push_back(0);
           tree_lepton_lepton_dEta.push_back(0);
-          mva_Evts_muon2_pt         = 0;
-          mva_Evts_muon12_dR        = 0;
-          mva_Evts_muon12_dPhi      = 0;
-          mva_Evts_muon12_dEta      = 0;
+          mva_Evts_muon2_pt 	= 0;
+          mva_Evts_muon12_dR	= 0;
+          mva_Evts_muon12_dPhi	= 0;
+          mva_Evts_muon12_dEta	= 0;
         }
     }
 
-//---------------------------//     
-//---------------------------//
-// -- DiLepton Channel ------//
-//---------------------------//
-//---------------------------//
-
-  if (EMuChannel)
+// -- EMu Channel ------//
+  if ( EMuChannel )
     {
-      if ( nmu >= 1 && LeadingMuon)
-      {
+      if ( nmu >= 1 && LeadingMuon ) {
         tree_lepton_leadingpt.push_back(tree_muon_pt[index_muon[0]]);  
         mva_Evts_muon1_pt = tree_muon_pt[index_muon[0]];
       }
-    else if (nEl >= 1 && !LeadingMuon)
-      {
+    else if ( nEl >= 1 && !LeadingMuon ) {
         tree_lepton_leadingpt.push_back(tree_electron_pt[index_el[0]]);  
         mva_Evts_muon1_pt = tree_electron_pt[index_el[0]];
       }
 
-    if ( nEl > 1 && LeadingMuon)
-      {
+    if ( nEl > 1 && LeadingMuon ) {
         tree_lepton_leadingpt2.push_back(tree_electron_pt[index_el[1]]);
         tree_lepton_lepton_dR.push_back(Deltar( tree_muon_eta[index_muon[0]], tree_muon_phi[index_muon[0]], tree_electron_eta[index_el[1]], tree_electron_phi[index_el[1]]));
         tree_lepton_lepton_dPhi.push_back(abs(Deltaphi(tree_muon_phi[index_muon[0]],tree_electron_phi[index_el[1]])));
         tree_lepton_lepton_dEta.push_back(abs( tree_muon_eta[index_muon[0]]-tree_electron_eta[index_el[1]]));
-        mva_Evts_muon2_pt         = tree_electron_pt[index_el[1]];
-        mva_Evts_muon12_dR        = Deltar( tree_muon_eta[index_muon[0]], tree_muon_phi[index_muon[0]], tree_electron_eta[index_el[1]], tree_electron_phi[index_el[1]]);
-        mva_Evts_muon12_dPhi      = abs(Deltaphi(tree_muon_phi[index_muon[0]],tree_electron_phi[index_el[1]]));
-        mva_Evts_muon12_dEta      = abs( tree_muon_eta[index_muon[0]]-tree_electron_eta[index_el[1]]);
+        mva_Evts_muon2_pt 	= tree_electron_pt[index_el[1]];
+        mva_Evts_muon12_dR	= Deltar( tree_muon_eta[index_muon[0]], tree_muon_phi[index_muon[0]], tree_electron_eta[index_el[1]], tree_electron_phi[index_el[1]]);
+        mva_Evts_muon12_dPhi	= abs(Deltaphi(tree_muon_phi[index_muon[0]],tree_electron_phi[index_el[1]]));
+        mva_Evts_muon12_dEta	= abs( tree_muon_eta[index_muon[0]]-tree_electron_eta[index_el[1]]);
       }
-    else if (nmu > 1 && !LeadingMuon)
-      {
+    else if ( nmu > 1 && !LeadingMuon ) {
         tree_lepton_leadingpt2.push_back(tree_muon_pt[index_muon[1]]);
         tree_lepton_lepton_dR.push_back(Deltar( tree_electron_eta[index_el[0]], tree_electron_phi[index_el[0]], tree_muon_eta[index_muon[1]], tree_muon_phi[index_muon[1]]));
         tree_lepton_lepton_dPhi.push_back(abs(Deltaphi(tree_electron_phi[index_el[0]],tree_muon_phi[index_muon[1]])));
         tree_lepton_lepton_dEta.push_back(abs( tree_electron_eta[index_el[0]]-tree_muon_eta[index_muon[1]]));
-        mva_Evts_muon2_pt         = tree_muon_pt[index_muon[1]];
-        mva_Evts_muon12_dR        = Deltar( tree_electron_eta[index_el[0]], tree_electron_phi[index_el[0]], tree_muon_eta[index_muon[1]], tree_muon_phi[index_muon[1]]);
-        mva_Evts_muon12_dPhi      = abs(Deltaphi(tree_electron_phi[index_el[0]],tree_muon_phi[index_muon[1]]));
-        mva_Evts_muon12_dEta      = abs( tree_electron_eta[index_el[0]]-tree_muon_eta[index_muon[1]]);
+        mva_Evts_muon2_pt 	= tree_muon_pt[index_muon[1]];
+        mva_Evts_muon12_dR	= Deltar( tree_electron_eta[index_el[0]], tree_electron_phi[index_el[0]], tree_muon_eta[index_muon[1]], tree_muon_phi[index_muon[1]]);
+        mva_Evts_muon12_dPhi	= abs(Deltaphi(tree_electron_phi[index_el[0]],tree_muon_phi[index_muon[1]]));
+        mva_Evts_muon12_dEta	= abs( tree_electron_eta[index_el[0]]-tree_muon_eta[index_muon[1]]);
       }
-    if ( (nmu == 0 && LeadingMuon) || (nEl == 0 && !LeadingMuon)){tree_lepton_leadingpt.push_back(0);mva_Evts_muon1_pt=0;}
-    if ( (nmu <= 1 && LeadingMuon) || (nEl <= 1 && !LeadingMuon))
-    {
+    if ( (nmu == 0 && LeadingMuon) || (nEl == 0 && !LeadingMuon) ) {
+      tree_lepton_leadingpt.push_back(0); 
+      mva_Evts_muon1_pt=0;
+    }
+    if ( (nmu <= 1 && LeadingMuon) || (nEl <= 1 && !LeadingMuon) ) {
       tree_lepton_leadingpt2.push_back(0);
       tree_lepton_lepton_dR.push_back(0);
       tree_lepton_lepton_dPhi.push_back(0);
       tree_lepton_lepton_dEta.push_back(0);
-      mva_Evts_muon2_pt         = 0;
+      mva_Evts_muon2_pt	      = 0;
       mva_Evts_muon12_dR        = 0;
       mva_Evts_muon12_dPhi      = 0;
       mva_Evts_muon12_dEta      = 0;
     }
-
     }
 
 //---------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!----------/////
 //After that, call the leading lepton by imu1 index and the sub leading lepton by imu2 index
 //---------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!----------/////
+
 
   //////////////////////////////////
   //////////////////////////////////
@@ -3936,19 +3533,18 @@ if( nmu >=1 && nEl >=1 && EMuChannel)
   if ( tree_Mmumu > 60. )                  tree_NbrOfZCand = 1;
 //   if ( tree_Mmumu > 60. && HT_val > 180. ) tree_Filter = true;
  
-
-//Mu trigger 2018 : HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v || HLT_IsoMu24_v
-//Mu trigger 2017 : HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v || HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v || HLT_IsoMu27_v
+// Mu trigger 2018 : HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v || HLT_IsoMu24_v
+// Mu trigger 2017 : HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v || HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v || HLT_IsoMu27_v
 // Mu trigger 2016 : HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL(_DZ)_v || HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL(_DZ)_v || HLT_TkMu17_TrkIsoVVL_TkMu8_TrkIsoVVL_(DZ)_v  || HLT_IsoMu24_v || HLT_IsoTkMu24_v 
 
   //bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v;    // USED in 2016-2018                                                                                                             
   //  bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v; // USED in 2016-2018  
 
   if ( ( HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v || HLT_IsoMu24_v  ) 
-       && tree_Mmumu > 10. && MuonChannel) tree_Filter = true;
+       && tree_Mmumu > 10. && MuonChannel ) tree_Filter = true;
 
   if ( (HLT_Ele32_WPTight_Gsf_v || HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v)
-       && tree_Mmumu > 10. && ElChannel) tree_Filter = true;
+       && tree_Mmumu > 10. && ElChannel ) tree_Filter = true;
   
   if ( ( HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v || HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v ) 
        && tree_Mmumu > 10. && EMuChannel ) tree_Filter = true;
@@ -3956,13 +3552,13 @@ if( nmu >=1 && nEl >=1 && EMuChannel)
 mva_Evts_Mmumu = tree_Mmumu;
 
     tree_GoodMu1 = -1;
-    if ( imu1 >= 0 ) { 
+    if ( imu1 >= 0 && MuonChannel ) { 
       tree_GoodMu1 = 0;
       if ( tree_muon_isTight[imu1] )    tree_GoodMu1 = 1; 
       if ( tree_muon_TkIsoTight[imu1] ) tree_GoodMu1 += 10;
     }
     tree_GoodMu2 = -1; 
-    if ( imu2 >= 0 ) { 
+    if ( imu2 >= 0 && MuonChannel ) { 
       tree_GoodMu2 = 0;
       if ( tree_muon_isTight[imu2] )    tree_GoodMu2 = 1; 
       if ( tree_muon_TkIsoTight[imu2] ) tree_GoodMu2 += 10;
@@ -3977,14 +3573,13 @@ mva_Evts_Mmumu = tree_Mmumu;
   std::map<size_t , int > trackToAK4SlimmedJetMap;
 
  
-  if ( tree_Filter ) {
-        
+  if ( tree_Filter ) { 
 
   float dRmuon1_jet_min = 0;
   float dRmuon1_jet_max = 0;
   float dRmuon2_jet_min = 0;
   float dRmuon2_jet_max = 0;
-  if (nmu>=2 && tree_njet>=2 && MuonChannel)
+  if ( nmu>=2 && tree_njet>=2 && MuonChannel )
   	{
 		float dRmuon1_jet0=Deltar(tree_muon_eta[imu1],tree_muon_phi[imu1],tree_jet_eta[0],tree_jet_phi[0]);
 		float dRmuon1_jet1=Deltar(tree_muon_eta[imu1],tree_muon_phi[imu1],tree_jet_eta[1],tree_jet_phi[1]);
@@ -4012,7 +3607,7 @@ mva_Evts_Mmumu = tree_Mmumu;
 			}
 	}
 
-if (MuonChannel)
+if ( MuonChannel )
   {
     if (dRmuon1_jet_min<dRmuon2_jet_min)
       {
@@ -4047,16 +3642,15 @@ if (MuonChannel)
   dRmuon2_jet_min = 0;
   dRmuon2_jet_max = 0;
 
-  if (nEl>= 1 &&  nmu >= 1 && tree_njet>=2 && (EMuChannel)) // change meena
+  if ( nEl>= 1 &&  nmu >= 1 && tree_njet>=2 && EMuChannel ) // change meena
   	{ //LeadingMuon hypothesis
       float dRele1_jet0 = Deltar(tree_electron_eta[imu2],tree_electron_phi[imu2],tree_jet_eta[0],tree_jet_phi[0]);                                                                            
 	    float dRele1_jet1 = Deltar(tree_electron_eta[imu2],tree_electron_phi[imu2],tree_jet_eta[1],tree_jet_phi[1]); 
-      if (!LeadingMuon)
+      if ( !LeadingMuon )
         {
           dRele1_jet0 = Deltar(tree_electron_eta[imu1],tree_electron_phi[imu1],tree_jet_eta[0],tree_jet_phi[0]);                                                                            
 	        dRele1_jet1 = Deltar(tree_electron_eta[imu1],tree_electron_phi[imu1],tree_jet_eta[1],tree_jet_phi[1]); 
         }	
-
 	    if (dRele1_jet0 < dRele1_jet1)
 	      {
 	        dRelectron1_jet_min = dRele1_jet0;
@@ -4067,10 +3661,9 @@ if (MuonChannel)
 	      dRelectron1_jet_min = dRele1_jet1;
 	      dRelectron1_jet_max = dRele1_jet0;
 	    }
-
 	  float dRmuon2_jet0=Deltar(tree_muon_eta[imu1],tree_muon_phi[imu1],tree_jet_eta[0],tree_jet_phi[0]);
 	  float dRmuon2_jet1=Deltar(tree_muon_eta[imu1],tree_muon_phi[imu1],tree_jet_eta[1],tree_jet_phi[1]);
-    if (!LeadingMuon)
+    if ( !LeadingMuon )
       {
         dRmuon2_jet0=Deltar(tree_muon_eta[imu2],tree_muon_phi[imu2],tree_jet_eta[0],tree_jet_phi[0]);
 	      dRmuon2_jet1=Deltar(tree_muon_eta[imu2],tree_muon_phi[imu2],tree_jet_eta[1],tree_jet_phi[1]);  
@@ -4087,7 +3680,7 @@ if (MuonChannel)
 	    }
 	}// emu and dijets loop close
 
-if (EMuChannel)
+if ( EMuChannel )
   {
     if (dRelectron1_jet_min<dRmuon2_jet_min)
       {
@@ -4099,7 +3692,6 @@ if (EMuChannel)
         tree_elemu_jet_dRmin.push_back(dRmuon2_jet_min);
         tree_elemu_jet_dRmin.push_back(dRelectron1_jet_min);
       }
-  
     if (dRelectron1_jet_max>dRmuon2_jet_max)
       {
         tree_elemu_jet_dRmax.push_back(dRelectron1_jet_max);
@@ -4119,9 +3711,8 @@ if (EMuChannel)
   dRelectron1_jet_max = 0;
   float dRelectron2_jet_min = 0;
   float dRelectron2_jet_max = 0;
-  if (nEl>= 2  && tree_njet>=2 &&  ElChannel) // change meena
+  if ( nEl>= 2  && tree_njet>=2 &&  ElChannel ) // change meena
   	{
-
 	  float dRele1_jet0 = Deltar(tree_electron_eta[imu1],tree_electron_phi[imu1],tree_jet_eta[0],tree_jet_phi[0]);                                                                            
 	  float dRele1_jet1 = Deltar(tree_electron_eta[imu1],tree_electron_eta[imu1],tree_jet_eta[1],tree_jet_phi[1]); 	
 	  //}
@@ -4149,7 +3740,7 @@ if (EMuChannel)
 	    }
 	}// emu and dijets loop close
 
-if (ElChannel)
+if ( ElChannel )
   {
     if (dRelectron1_jet_min<dRelectron2_jet_min)
       {
@@ -4161,7 +3752,6 @@ if (ElChannel)
         tree_ele_jet_dRmin.push_back(dRelectron2_jet_min);
         tree_ele_jet_dRmin.push_back(dRelectron1_jet_min);
       }
-  
     if (dRelectron1_jet_max>dRmuon2_jet_max)
       {
         tree_ele_jet_dRmax.push_back(dRelectron1_jet_max);
@@ -4175,6 +3765,7 @@ if (ElChannel)
     mva_Evts_muon_jet_dRmin = tree_ele_jet_dRmin[0];
     mva_Evts_muon_jet_dRmax = tree_ele_jet_dRmax[0];
   }
+
   
        /////////////////////////////////////////////////////////
     //-------------------------------------------------------
@@ -4203,11 +3794,10 @@ if (ElChannel)
       float jet_pt  = jet.pt();
       float jet_eta = jet.eta();
       float jet_phi = jet.phi();
-      float jet_px = jet.px();
-      float jet_py = jet.py();
-      float jet_pz = jet.pz();
-      float jet_e = jet.energy();
-      float jetp = sqrt(jet_px*jet_px+jet_py*jet_py+jet_pz*jet_pz);
+      float jet_px  = jet.px();
+      float jet_py  = jet.py();
+      float jet_pz  = jet.pz();
+      float jet_e   = jet.energy();
       float DeepFlavourb = jet.bDiscriminator("pfDeepFlavourJetTags:probb");
       float DeepFlavourbb = jet.bDiscriminator("pfDeepFlavourJetTags:probbb");
       float DeepFlavourblep = jet.bDiscriminator("pfDeepFlavourJetTags:problepb");
@@ -4228,7 +3818,7 @@ if (ElChannel)
       float deltaR1 = 1000., deltaR2 = 1000.;
       float ptlep1 = -10, ptlep2 = -10, etalep1= -10, etalep2= -10, philep1= -10, philep2= -10; // to be used instead on focusing on a specific channel
       float pxlep1= -10, pxlep2= -10, pylep1= -10, pylep2= -10, pzlep1= -10, pzlep2= -10, Elep1= -10, Elep2= -10;
-      if (MuonChannel && nmu >=2)
+      if ( MuonChannel && nmu >=2 )
         {
           ptlep1  = tree_muon_pt[imu1];
           ptlep2  = tree_muon_pt[imu2];
@@ -4247,7 +3837,7 @@ if (ElChannel)
           Elep2  = tree_muon_energy[imu2];
 
         }
-      if (ElChannel && nEl>=2)
+      if ( ElChannel && nEl>=2 )
         {
           ptlep1  = tree_electron_pt[imu1];
           ptlep2  = tree_electron_pt[imu2];
@@ -4265,9 +3855,9 @@ if (ElChannel)
           Elep1  = tree_electron_energy[imu1]; 
           Elep2  = tree_electron_energy[imu2];
         }
-      if (EMuChannel && nmu>=1 && nEl>=1 )
+      if ( EMuChannel && nmu>=1 && nEl>=1 )
         {
-          if (LeadingMuon)
+          if ( LeadingMuon )
             {
               ptlep1  = tree_muon_pt[imu1];
               ptlep2  = tree_electron_pt[imu2];
@@ -4305,10 +3895,8 @@ if (ElChannel)
             }
         }
 
-
       if ( imu1 >= 0 ) deltaR1 = Deltar( jet_eta, jet_phi, etalep1, philep1 );
       if ( imu2 >= 0 ) deltaR2 = Deltar( jet_eta, jet_phi, etalep2, philep2 );
-        
 
       if ( deltaR1 < 0.4 || deltaR2 < 0.4 )
       {
@@ -4407,7 +3995,6 @@ if (ElChannel)
         if (btag2[i]>0.7264 && ActivateBtagLog) {std::cout<<"Tight b jet ID"<<std::endl;}
       }
     }       // end Loop on jet
-    
      
     float axis1_eta = vaxis1.Eta();
     float axis1_phi = vaxis1.Phi();
@@ -4423,7 +4010,10 @@ if (ElChannel)
 //     // force the axes to the true LLP
 //     vaxis1 = vneu[0];
 //     vaxis2 = vneu[1];
- 
+//     axis1_eta = vaxis1.Eta();
+//     axis1_phi = vaxis1.Phi();
+//     axis2_eta = vaxis2.Eta();
+//     axis2_phi = vaxis2.Phi();
 
     ///////////////////////////////
     // Invariant Mass of Axes 
@@ -4449,14 +4039,14 @@ if (ElChannel)
         // Avoid prompt leptons
         float dRAxis1muon = Deltar( vaxis1.Eta(), vaxis1.Phi(), tree_muon_eta[index_muon[i]], tree_muon_phi[index_muon[i]] );
         float dRAxis2muon = Deltar( vaxis2.Eta(), vaxis2.Phi(), tree_muon_eta[index_muon[i]], tree_muon_phi[index_muon[i]] );
-        if (dRAxis1muon<1.5  )
+        if ( dRAxis1muon<1.5 )
           {
             temp_px1 += tree_muon_px[index_muon[i]];
             temp_py1 += tree_muon_py[index_muon[i]];
             temp_pz1 += tree_muon_pz[index_muon[i]];
             temp_e1  += tree_muon_energy[index_muon[i]];
           }
-        if(dRAxis2muon<1.5)
+        if ( dRAxis2muon<1.5 )
           {
             temp_px2 += tree_muon_px[index_muon[i]];
             temp_py2 += tree_muon_py[index_muon[i]];
@@ -4467,18 +4057,18 @@ if (ElChannel)
 
     for (int i = 0 ; i <nEl ; i++)
       {
-	if((((fabs(tree_electron_eta[index_el[i]])) <= 1.479) && (abs(tree_electron_dxy[index_el[i]]) < 0.05 || abs(tree_electron_dz[index_el[i]]) < 0.10)) && ((fabs(tree_electron_eta[index_el[i]]) > 1.479) && ((abs(tree_electron_dxy[index_el[i]])) < 0.10  || abs(tree_electron_dz[index_el[i]]) < 0.20))) continue; //check meena
+	      if ((((fabs(tree_electron_eta[index_el[i]])) <= 1.479) && (abs(tree_electron_dxy[index_el[i]]) < 0.05 || abs(tree_electron_dz[index_el[i]]) < 0.10)) && ((fabs(tree_electron_eta[index_el[i]]) > 1.479) && ((abs(tree_electron_dxy[index_el[i]])) < 0.10  || abs(tree_electron_dz[index_el[i]]) < 0.20))) continue; //check meena
         // Avoid prompt leptons
         float dRAxis1electron = Deltar( vaxis1.Eta(), vaxis1.Phi(), tree_electron_eta[index_el[i]], tree_electron_phi[index_el[i]] );
         float dRAxis2electron = Deltar( vaxis2.Eta(), vaxis2.Phi(), tree_electron_eta[index_el[i]], tree_electron_phi[index_el[i]] );
-        if (dRAxis1electron<1.5  )
+        if ( dRAxis1electron<1.5 )
           {
             temp_px1 += tree_electron_px[index_el[i]];
             temp_py1 += tree_electron_py[index_el[i]];
             temp_pz1 += tree_electron_pz[index_el[i]];
             temp_e1  += tree_electron_energy[index_el[i]];
           }
-        if(dRAxis2electron<1.5)
+        if ( dRAxis2electron<1.5 )
           {
             temp_px2 += tree_electron_px[index_el[i]];
             temp_py2 += tree_electron_py[index_el[i]];
@@ -4500,8 +4090,7 @@ if (ElChannel)
     //------------------------------------//
     //----------DIMuon Channel -----------//
     //------------------------------------//
-
-    if (MuonChannel && nmu>=2)
+    if ( MuonChannel && nmu>=2 )
       {
         float dR1 = Deltar(tree_muon_eta[imu1],tree_muon_phi[imu1],vaxis1.Eta(),vaxis1.Phi());
         float dR2 = Deltar(tree_muon_eta[imu2],tree_muon_phi[imu2],vaxis1.Eta(),vaxis1.Phi());
@@ -4521,11 +4110,10 @@ if (ElChannel)
     //------------------------------------//
     //----------DiElectron Channel -----------//
     //------------------------------------//
-    if (ElChannel && nEl>=2)
+    if ( ElChannel && nEl>=2 )
       {
         float dR1 = Deltar(tree_electron_eta[imu1],tree_electron_phi[imu1],vaxis1.Eta(),vaxis1.Phi());
         float dR2 = Deltar(tree_electron_eta[imu2],tree_electron_phi[imu2],vaxis1.Eta(),vaxis1.Phi());
-
         if (dR1 < dR2)
           {
             temp_px1+= tree_electron_px[imu1];temp_py1+= tree_electron_py[imu1],temp_pz1+= tree_electron_pz[imu1],temp_e1+= tree_electron_energy[imu1];
@@ -4543,15 +4131,13 @@ if (ElChannel)
     //------------------------------------//
     if (EMuChannel && nEl>=1 && nmu>=1 )
       {
-
         float dR1 = Deltar(tree_muon_eta[imu1],tree_muon_phi[imu1],vaxis1.Eta(),vaxis1.Phi());
         float dR2 = Deltar(tree_electron_eta[imu2],tree_electron_phi[imu2],vaxis1.Eta(),vaxis1.Phi());
-        if (!LeadingMuon)
+        if ( !LeadingMuon )
           {
             dR1 = Deltar(tree_electron_eta[imu1],tree_electron_phi[imu1],vaxis1.Eta(),vaxis1.Phi());
             dR2 = Deltar(tree_muon_eta[imu2],tree_muon_phi[imu2],vaxis1.Eta(),vaxis1.Phi());
           }
-
         if (dR1 < dR2)
           {
             temp_px1+= tree_muon_px[imu1];temp_py1+= tree_muon_py[imu1],temp_pz1+= tree_muon_pz[imu1],temp_e1+= tree_muon_energy[imu1];
@@ -4563,7 +4149,6 @@ if (ElChannel)
             temp_px2+= tree_electron_px[imu1];temp_py2+= tree_electron_py[imu1],temp_pz2+= tree_electron_pz[imu1],temp_e2+= tree_electron_energy[imu1];
           }
       }
-
 
     TLorentzVector TLorentzCombinedAxis1(temp_px1,temp_py1,temp_pz1,temp_e1);
     TLorentzVector TLorentzCombinedAxis2(temp_px2,temp_py2,temp_pz2,temp_e2);
@@ -4596,9 +4181,6 @@ if (ElChannel)
         }
       }
     float axis1_dR = dR_axis;
-    // float axis2_eta = vaxis2.Eta();
-    // float axis2_phi = vaxis2.Phi();
-
     float axis2_dR = dR2;
     float dR_axis12 = 10.;
     if ( isMC_ )
@@ -4621,7 +4203,7 @@ if (ElChannel)
         // cout << " dR_axis12 " << dR_axis12 << endl;
       
     ///////////////////////////////////////////////////////
-    // Compare between the gen enutralino and the reco axis from gen jets and with the reco axis with reco jets
+    // Compare between the gen neutralino and the reco axis from gen jets and with the reco axis with reco jets
     ///////////////////////////////////////////////////////
     if ( isMC_ )
       {
@@ -4721,6 +4303,7 @@ if (ElChannel)
   mva_Evts_LooseAxes        = LooseAxesStatus;
   mva_Evts_MediumAxes       = MediumAxesStatus;
   mva_Evts_TightAxes        = TightAxesStatus;
+
 
   //////////////////////////////////
   //////////////////////////////////
@@ -5741,12 +5324,11 @@ if (ElChannel)
 	else {
           tree_SecInt_LLP.push_back(0);
 	}
-}
+} // endif MC
+
 	bool SecInt_selec = false;
- 
 	if ( distsigXY > 100. && angleXY > 0.9 && theSecInt->mass() < 2. &&
              theSecInt->vertexNormalizedChi2() < 10. ) SecInt_selec = true; //&& dca < 1.
- 
         tree_SecInt_selec.push_back(   SecInt_selec);
 
 	// tracker active layers
@@ -8052,12 +7634,12 @@ else if ( !( tk_pt > pt_Cut && tk_NChi2 < NChi2_Cut && tk_drSig > drSig_Cut ) ) 
     float Vtx1_ntk = Vtx_ntk;
     float Vtx1_chi = Vtx_chi;
     float Vtx1_step = Vtx_step;
-    float Vtx1_r = sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y);
-    float Vtx1_z = Vtx_z;
+    // float Vtx1_r = sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y);
+    // float Vtx1_z = Vtx_z;
     float Vtx1_MTW = MeanWeight;
     float Vtx1_Mass = sqrt(Total4Vector1.Mag2());
     float H1_Mass = sqrt(TLorentzAxis1.Mag2());
-    float Vtx1_dist = recD;
+    // float Vtx1_dist = recD;
 
     float Vtx1_MeanDCA = DCA_VTX_Meand;
     if (Vtx1_Weights.size() != Vtx1_index.size()){ std::cout<<"size Vtx1_weights and Vtx1_index and  ntracks and chi and step: "<<Vtx1_Weights.size()<<" and "<<Vtx1_index.size()<<" and "<<Vtx_ntk<<" and "<<Vtx_chi<<" and "<<Vtx_step<<std::endl;}
@@ -9320,12 +8902,12 @@ if (Vtx2_index.size() != Vtx2_Weights.size()) {std::cout<<"size Vtx2_weights and
     float Vtx2_ntk = Vtx_ntk;
     float Vtx2_chi = Vtx_chi;
     float Vtx2_step = Vtx_step;
-    float Vtx2_r = sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y);
-    float Vtx2_z = Vtx_z;
+    // float Vtx2_r = sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y);
+    // float Vtx2_z = Vtx_z;
     float Vtx2_MTW = MeanWeight;
     float Vtx2_Mass = sqrt(Total4Vector2.Mag2());
     float H2_Mass = sqrt(TLorentzAxis2.Mag2());
-    float Vtx2_dist = recD;
+    // float Vtx2_dist = recD;
     float Vtx2_MeanDCA = DCA_VTX_Meand;
 
     // -------------------------------------------//
@@ -9523,8 +9105,8 @@ float Vtx2_ntrk20=0;
             mva_V_nTrks  =  Vtx2_ntk;
             mva_V_chi    =  Vtx2_chi;
             mva_V_step   =  Vtx2_step;
-            // mva_V_r  =   Vtx2_r;
-            // mva_V_z  =    Vtx2_z;
+            // mva_V_r  =	Vtx2_r;
+            // mva_V_z  =	 Vtx2_z;
             mva_V_MTW    =  Vtx2_MTW;
             mva_V_Mass   =  Vtx2_Mass;
             mva_H_Mass   =  H2_Mass;
@@ -9560,6 +9142,7 @@ float Vtx2_ntrk20=0;
       double Vtx2_bdtVal_Step1 = -10; 
       Vtx2_bdtVal_Step1 = readerVtxStep1->EvaluateMVA("BDTG");
       tree_Hemi_Vtx_MVAval_Step1.push_back(Vtx2_bdtVal_Step1);
+
   } // endif Filter
 
 
@@ -9734,7 +9317,7 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_jet_phi.clear();
     tree_jet_tightid_LepVeto.clear();
     tree_jet_tightid.clear();
-    tree_reco_jet_P4.clear();
+    // tree_reco_jet_P4.clear();
     tree_jet_HadronFlavour.clear();
     tree_jet_pileupID.clear();
     tree_jet_btag_DeepCSV.clear();
@@ -9938,7 +9521,6 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_genPackPart_charge.clear();
     tree_genPackPart_pdgId.clear();
     tree_genPackPart_mass.clear();
-
     tree_genPackPart_x.clear();
     tree_genPackPart_y.clear();
     tree_genPackPart_z.clear();
@@ -10038,8 +9620,6 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_Hemi_LLP_x.clear();
     tree_Hemi_LLP_y.clear();
     tree_Hemi_LLP_z.clear();
-
-
     tree_Hemi_Vtx_step.clear();
     tree_Hemi_Vtx_NChi2.clear();
     tree_Hemi_Vtx_nTrks.clear();
@@ -10073,7 +9653,6 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_Hemi_Vtx_TVtx_dy.clear();
     tree_Hemi_Vtx_TVtx_dz.clear();
     tree_Hemi_Vtx_TVtx_NChi2.clear();
-
     tree_Hemi_Vtx_dist.clear();
     tree_Hemi_Vtx_dx.clear();
     tree_Hemi_Vtx_dy.clear();
@@ -10093,5 +9672,4 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_Hemi_LooseBTag_axes.clear();
     tree_Hemi_MediumBTag_axes.clear();
     tree_Hemi_TightBTag_axes.clear();
-
 }
