@@ -28,8 +28,8 @@ else:
 ## 102X_dataRun2_Sep2018Rereco_v1 => /MuonEG/Run2018B-17Sep2018-v1/MINIAOD                                                                                                                
 # FlyingTopAnalyzer                                                                                          
 
-# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 process.GoodVertexFilter = cms.EDFilter("VertexSelector",
                                         src = cms.InputTag("offlineSlimmedPrimaryVertices"),
@@ -52,52 +52,52 @@ process.source = cms.Source("PoolSource",
                                 # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_1.root'
 
 # # 70cm -------------------------------------------------------------------------------
-#        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_1.root',
-#        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_2.root',
-#        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_3.root',
-#        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_4.root',
-#        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_5.root',
-#       'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_6.root',
-#       'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_7.root',
-#        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_8.root',
-#        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_9.root',
-#        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_10.root'
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_1.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_2.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_3.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_4.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_5.root',
+    #   'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_6.root',
+    #   'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_7.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_8.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_9.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_10.root'
 
                                 # # 50cm---------------------------------------------------
-                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_1.root',
-                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_2.root',
-                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_3.root',
-                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_4.root',
-                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_5.root',
-                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_6.root',
-                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_7.root',
-                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_8.root',
-                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_9.root',
-                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_10.root'
+                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_1.root',
+                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_2.root',
+                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_3.root',
+                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_4.root',
+                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_5.root',
+                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_6.root',
+                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_7.root',
+                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_8.root',
+                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_9.root',
+                                'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_10.root'
 
 # # #30cm-------------------------
-#         'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_1.root',
-#        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_2.root',
-#        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_3.root',
-#        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_4.root',
-#        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_5.root',
-#       'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_6.root',
-#        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_7.root',
-#        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_8.root',
-#        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_9.root',
-#        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_10.root'
+    #     'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_1.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_2.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_3.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_4.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_5.root',
+    #   'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_6.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_7.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_8.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_9.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_10.root'
 
 # # 10cm-----------
-        # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_1.root',
-        #'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_2.root',
-       # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_3.root',
-       #'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_4.root',
-       # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_5.root',
-       # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_6.root',
-       # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_7.root',
-       # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_8.root',
-       # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_9.root',
-       # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_10.root'
+    #     'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_1.root',
+    #     'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_2.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_3.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_4.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_5.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_6.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_7.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_8.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_9.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_10.root'
 # $$
 
 ##TT samples
@@ -106,9 +106,9 @@ process.source = cms.Source("PoolSource",
     # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/564C53A2-0646-A24D-B580-AEBF43B22A7B.root',
     # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/6C51F452-445D-7547-B585-BDA1278294AE.root',
 
-    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/0023597E-6F49-214D-A518-CC9330A404BD.root',
-    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/00B564A1-86ED-2C45-8159-5FE8CA552C71.root',
-    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/041BD979-6754-BC42-8A91-8698F5744F27.root',
+    # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/0023597E-6F49-214D-A518-CC9330A404BD.root',
+    # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/00B564A1-86ED-2C45-8159-5FE8CA552C71.root',
+    # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/041BD979-6754-BC42-8A91-8698F5744F27.root',
     # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/0938183D-C346-BE42-AD41-EAAB4DD5F61C.root',
     # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/11E8D8AA-5485-2B43-937C-2137A3A95624.root',
     # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/1207B318-4CEB-AF41-B68C-2BD3598339F0.root',
@@ -424,10 +424,187 @@ process.source = cms.Source("PoolSource",
 # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu250_ctau240/231011_072813/0000/MINIAODSIM_v16_L1v1_10.root',
 
 
+# # #################smu 300 neu 250 ctau100
 
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau100/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau100/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau100/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau100/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau100/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau100/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau100/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau100/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau100/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018_LO/UDD_2018_LO_smu300_neu250_lamE-2_ctau100/MINIAODSIM_v16_L1v1_10.root'
+
+# DYM50
+#     'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/001C8DDF-599C-5E45-BF2C-76F887C9ADE9.root',
+#      'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/01522709-8919-C542-91B2-2262F3995F48.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/015753DA-CD2E-F546-9A7B-9DD451DEA159.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/01C7FCCE-F23B-2242-BF72-73AA8BAF4C47.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/02991CFE-6B1C-6148-8837-3D68EB56C8C9.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/02FD7B88-3EDC-C64D-8E18-F9A8F9E7E7DF.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/03311968-AA82-2F46-8949-F39CBA6E33CC.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/035BDD75-657D-3E4D-BB95-06F715874873.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/03A89FD2-3EA0-5F47-9877-CA74F8A01950.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/059DAA5D-FF55-C64B-BA61-2F4D084E3A1E.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/05EC91D0-CAED-2A4B-B25A-4189C5C951F6.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/069E946D-802D-8A4B-BA0B-E73E3CDC7BCD.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/06D81BB9-375D-C746-AF50-67BD16501B82.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/06FEF028-669E-3642-81EE-27B06A97BC9C.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/077533C3-85C2-1C48-A029-34E755781A26.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/0789E1C9-5C74-A44D-AFB9-F46EC27DEB10.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/08B421E5-B5B0-3940-92D7-E7421CE78AA8.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/093E3572-4578-D342-B2A6-D3FD4E049C0E.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/0997B6BB-EB0D-CD4E-8F7E-7F145E7A9AEE.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/0A3663AA-EB69-6344-A787-E622693E26A6.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/0B706D8E-F68B-DD45-A986-E4A3689A4531.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/0BC4DB6D-A6D2-464A-AA77-BC1F7E4E52F2.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/0CEE97C2-FC2E-3848-A9AA-6EE57219F97C.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/0D720AB7-12F3-144B-B81A-5B5D603C2BC7.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/0DB0D698-946B-7149-AEFA-200F94986EBB.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/0DC91181-1A95-D24C-B58A-C3FE6FD64F94.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/0E9A1DE3-8B33-8948-8ED7-9134D88E6004.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/0EA4DA82-4D8B-3B49-9AB3-07128CAE0296.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/0F5DDB72-13E4-0945-A34E-959D60A70868.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/0FC94000-7AF7-4A47-A3EE-721BDDC32DF9.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/11103D7B-D884-7744-BF07-536EA418F6F0.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/112B54FA-9CF7-0C42-A228-4BFE04BDAA8D.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/11827714-A478-2D4A-A968-D5C340DC2335.root',
+# 'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/11C2016B-D8C8-1641-95B4-42930ADC4335.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/1218A43F-2F71-B649-9963-19166FC68509.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/12A5308C-C8FA-DC42-9813-B45BBDF4A56F.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/13B2279B-8ADC-E945-990A-581F3408C35E.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/1578F2E4-D79D-7B4A-839F-D037933AB67D.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/16C21BAB-0411-ED48-996E-37BB2195B011.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/16E6ECD2-560E-6344-93FE-4A727A195BA1.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/16F638B5-48A5-5D48-892A-7552C7457620.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/17803CB6-AA01-FB4A-951D-A090C273654C.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/17AAEF93-B0AE-9440-BC3B-C7511157A5B1.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/1819A02B-9630-1E40-BD85-232FAF014F3E.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/1873AC42-133F-BA44-BC24-B4315F1B38C1.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/18916CB9-2107-9647-835C-CB2B6D45E5C3.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/193B4ACF-4FDC-5746-B6E1-A5FB9BEA6CC5.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/19841D9D-54C4-9640-B42D-AB7A6A84FA0C.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/19A4BD1F-EBAA-CC48-A0F1-0E628BF1B028.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/19A51DDC-742F-EF47-91D9-D1010AB742A0.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/19A91FDE-44E5-F248-A07B-B4CFD30BF149.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/19DCEA8C-7F8F-F34F-A7A5-517D27D65DAF.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/1A00818F-24B4-5342-BDB7-F2DEB6686091.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/1A4E8B78-2535-5A4C-809D-8E3F5F0010AD.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/1AE43FCE-69A2-DB45-8277-3B6A476D0F0B.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/1BF69BD0-39B3-4642-AD14-277EF956D3EB.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/1C431755-105A-464D-B099-416FF564D5D5.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/1CBF78A6-A4FC-3F46-A7E5-FB7A407D4D9F.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/1D88B92C-DCCC-C442-8323-0407EBEEEE77.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/1E0DDC2C-F8BB-374D-A00B-77627AFB92F0.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/1E8FF42F-58B6-E941-AC74-8D8131B4BFDE.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/20147561-35B0-5E45-AD55-91BFEFE491D1.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/206C1852-FD74-2344-8DFF-E5792CB2EAAB.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/20F2105A-F471-4147-91CE-C0EC1F893686.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/22242799-25ED-8146-87E8-471CF72D4334.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/230D9833-C988-3F4D-8539-08443DB5D74B.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/266573BB-CF15-3B4C-88E4-710E8FAD70E7.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/2792BBE6-FB96-1E4C-BBA7-0B8EB6ED06BA.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/2821C780-9B3A-324F-9B18-F2B9C49E73BE.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/284B9F60-CE95-9142-9ABC-49DE67762CBF.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/28BBD339-BEAA-B148-A0A0-FC85E6C5451D.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/29D45569-4826-2344-9193-F4071A720A9F.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/2AC9D3D8-B47C-184E-8FC2-71CF5D59CB36.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/2BC4FCA4-3F34-2141-8D3E-B5553E7582F4.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/2D6B952F-122C-B440-8398-643F148FD554.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/2DBAAA93-1984-CF43-9F1E-110E9AB37FD0.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/2F1EC487-5FE5-C049-A504-9B091D2F6E9F.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/3106808A-A2CE-864B-BA4A-B5260FD012B8.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/31C04865-65FD-BC41-9675-7E21CCAEC6B6.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/35557DDE-C2E0-A54A-A092-1C8984910B31.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/35E7C1BB-84DF-CC4E-B9E0-5931B0C13DE7.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/369F8A2E-11FB-D848-8FD7-F2C737640DEA.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/36C7C2F8-F785-3242-8427-7ABFBCF7684E.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/371B67C7-3399-FD41-801E-64F5C1C21EB3.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/386BF912-8016-E644-8D46-4D72AB950C96.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/3A282FF1-2262-E142-A3DE-A3128577160B.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/3BFCCAFE-37F7-F841-8066-10E1B298F2AC.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/3C362AD9-969F-2146-A8D6-A4E8E26CB4B4.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/3C5559A3-C5BF-E246-8635-A569B89E474C.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/3C5F5250-8AE5-9E4D-B7A5-9C158212EC82.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/3C76F160-EB37-6A46-8253-203CDDAD34CF.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/3CEF106A-8B25-5A42-AAE9-860D1ECBDB34.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/3DC47A03-48B3-F945-BF60-72C09D37B38A.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/3DDA7F11-6FAE-AE4E-AE40-3D05F2A1620D.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/3DF4BA2F-444A-2F46-8DF8-E8074D251C14.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/3DFD0B21-8C09-E646-9423-F944E550199D.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/3E00A6A7-2AD9-6D4E-9075-61E93E04B88D.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/3E32083D-F30A-984B-BAEB-725C945B25B2.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/402D73C7-FE83-C14D-A3BD-C55A37D0E45D.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/4039836C-844E-E24E-B130-550A901F0349.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/40667CCA-1E86-D44A-9067-6E449A87530A.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/41C2071D-EE5A-5849-80BB-A2614A3866C1.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/42BA2532-0C5D-A744-987A-7B3A6C04F071.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/431192D1-936F-CD49-977A-97A598759694.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/454F59F4-6AB3-C74F-964B-CD8081FB4586.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/470467C4-F735-784E-AD4F-5601C8C13169.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/47861CE9-2547-9646-A872-47315C8C8871.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/47C7108E-DAE2-3B45-A7E0-8297B0B4DE68.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/48A79C40-A538-E743-A1EE-E383F67E7256.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/48E86767-BDFD-1E47-B7FE-415960CCBF6B.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/4A55B8AC-8A4E-6C49-82EE-EB5D2AC8BAF1.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/4AA50662-AE98-3243-ACCB-BF8DCA3C82CB.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/4AB9B611-E012-A044-BE10-970850D30AC1.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/4B536C2B-F075-9C49-B032-C577417ABE79.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/4B7084B1-C7E2-4B48-B473-EC9C046A249B.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/4DC81A62-66BC-6248-B3C0-20938EFFDB3D.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/4E63A500-7C8C-B54B-977F-644C5577E214.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/4F132011-38DE-764C-B52A-0983AA61CC3B.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/4FD27CE6-0888-064F-A26E-673BC9B42E79.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/508C54AF-9980-A246-888A-3DD3D72289FF.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/50F68336-FA50-374F-9418-F2183B3A2A48.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/516635C2-DA22-FD43-9737-D7D6DF50B1E0.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/5169D9A1-30F3-C647-B23B-A54B5EF73968.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/517F989E-AC8F-E342-9452-8D1346C447A0.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/51A8D7EA-4A3C-2142-A701-8FC6497515A9.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/51BDE0E6-5214-A548-A228-8122F8C35BF3.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/534C146E-E0FD-8147-85B9-787294A22681.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/53ED64BD-405D-8E43-BC48-3155096AAAE6.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/551AE7FD-5F1B-654C-9C6B-83B0B32BD78B.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/55353174-C59F-ED48-9AF6-81A4805916C2.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/55A76F90-A2F7-D24A-BE73-F56CA50AB7FD.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/56D22CD0-B03E-DB4F-A246-3C330112C2AF.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/579DD16E-2DCC-DB4A-AD84-5541AA9B9653.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/57E6619D-8997-744F-AB62-B5FF98247557.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/581F25D2-5A6E-8E46-9D6A-EC109FB42051.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/5845CE12-830B-B545-9D8D-254DB201CA5D.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/594EF710-6AEE-D346-8013-A5687819947A.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/5A5CEC5D-0D44-C645-91BC-D6C05E29F5AF.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/5C76A0F3-DA3E-B743-B615-63C9065A0428.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/5CCCF4E1-81E7-8445-9173-9AA6FA3A8F52.root',
+#  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/5EE47880-81FA-CD42-A9E7-FC556E8CC9E1.root'
                            
-                            )
 )
+)
+
+# DY1JetsToLL_M-10to50_MatchEWPDG20_TuneCP5_13TeV-madgraphMLM-pythia8
+# DY1JetsToLL_M-50_MatchEWPDG20_TuneCP5_13TeV-madgraphMLM-pythia8
+# DY2JetsToLL_M-10to50_MatchEWPDG20_TuneCP5_13TeV-madgraphMLM-pythia8
+# DY2JetsToLL_M-50_MatchEWPDG20_TuneCP5_13TeV-madgraphMLM-pythia8
+# DY3JetsToLL_M-10to50_MatchEWPDG20_TuneCP5_13TeV-madgraphMLM-pythia8
+# DY3JetsToLL_M-50_MatchEWPDG20_TuneCP5_13TeV-madgraphMLM-pythia8
+# DY4JetsToLL_M-10to50_MatchEWPDG20_TuneCP5_13TeV-madgraphMLM-pythia8
+# DY4JetsToLL_M-50_MatchEWPDG20_TuneCP5_13TeV-madgraphMLM-pythia8
+# DYBJetsToLL_M-50_Zpt-100to200_TuneCP5_13TeV-madgraphMLM-pythia8
+# DYBJetsToLL_M-50_Zpt-200toInf_TuneCP5_13TeV-madgraphMLM-pythia8
+# TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8
+# TTJets_DiLept_genMET-150_TuneCP5_13TeV-madgraphMLM-pythia8
+# TTJets_HT-1200to2500_TuneCP5_13TeV-madgraphMLM-pythia8
+# TTJets_HT-2500toInf_TuneCP5_13TeV-madgraphMLM-pythia8
+# TTJets_HT-600to800_TuneCP5_13TeV-madgraphMLM-pythia8
+# TTJets_HT-800to1200_TuneCP5_13TeV-madgraphMLM-pythia8
+# TTJets_SingleLeptFromT_TuneCP5_13TeV-madgraphMLM-pythia8
+# TTJets_SingleLeptFromT_genMET-150_TuneCP5_13TeV-madgraphMLM-pythia8
+# TTJets_SingleLeptFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8
+# TTJets_SingleLeptFromTbar_genMET-150_TuneCP5_13TeV-madgraphMLM-pythia8
+# TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8
+
 
 # //btagging
 # from PhysicsTools.PatAlgos.tools.helpers import getPatAlgosToolsTask
@@ -541,12 +718,18 @@ process.prefiringweight = l1PrefiringWeightProducer.clone(
 
 process.options = cms.untracked.PSet( )
 process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
-
-                                    isMC =cms.bool(IsMC),
+                                #    RochString = cms.string("./FlyingTop/FlyingTop/test/"), 
+                                #    Roccor = cms.FileInPath("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"),
+                                    isMC =cms.bool(IsMC), 
+                                    RochString = cms.string("FlyingTop/FlyingTop/data/RoccoR2018UL.txt"),
                                    weightFileMVA = cms.untracked.string( "TMVAClassification_BDTG_TRKSEL_.weights.xml"),#track selection
                                    weightFileMVA_EVTS = cms.untracked.string("TMVAClassification_BDTG_EVTSEL_.weights.xml"),#evts selection
                                    weightFileMVA_VTX = cms.untracked.string("TMVAClassification_BDTG_VTXSEL_.weights.xml"),#vtx selection
                                    weightFileMVA_VTX_step1 = cms.untracked.string("TMVAClassification_BDTG_VTXSel_TIGHTWP.weights.xml"),#vtx selection
+                                   mcpufile = cms.string("Pileup_MC2018UL_bin100.root"),
+                                   mcpupath = cms.string("pileup"),
+                                   datapufile = cms.string("MyDataPileupHistogram_bin100.root"),
+                                   datapupath = cms.string("pileup"),
                                    genEventInfoInput        = cms.InputTag("generator"),
                                    LHEEventProductInput     = cms.InputTag("externalLHEProducer"),#source or externalLHEProducer
                                    genpruned   = cms.InputTag('prunedGenParticles'),
@@ -591,7 +774,7 @@ process.p = cms.Path(
 # getattr(process,'slimmedJets').addTagInfos = cms.bool(True)
 ########## output of ntuple
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string("Ntuple_TT_test.root") )
+process.TFileService = cms.Service("TFileService", fileName = cms.string("Ntuple_50_test.root") )
 # Ntuple_LO_smu200to500_ctau20
 # process.TFileService = cms.Service("TFileService", fileName = cms.string("UDD_bgctau50_smu275_snu225.root") )
 # process.TFileService = cms.Service("TFileService", fileName = cms.string("TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8_10k_NOdrSigCut.root") )
