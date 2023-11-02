@@ -33,7 +33,8 @@ void TreeReader::Loop(TString sample, bool Signal)//void TreeReader::Loop(TStrin
 // METHOD2: replace line
 //    fChain->GetEntry(jentry);       //read all branches
 //by  b_branchname->GetEntry(ientry); //read only this branch
-   TString thesample  = sample;
+// TString thesample = sample.substr();
+  TString thesample  = sample;
    TFile * theoutputfile = new TFile( ("outputroot/histofile_"+thesample+".root").Data() , "recreate");
    std::ofstream ofs ("outputroot/Efficacity_"+thesample+".txt", std::ofstream::out);
 
@@ -52,6 +53,9 @@ void TreeReader::Loop(TString sample, bool Signal)//void TreeReader::Loop(TStrin
 
    float TightWP = 0.85;// for tracks => everytime Tight is mentioned, it is a refrence to this value.
    float LooseWP = 0.; // for tracks => same for loose
+
+   float EVTSWP = 0;
+   float VTXWP = 0.5;
 
    // -------- List of variables ---------------//
 
@@ -72,10 +76,15 @@ void TreeReader::Loop(TString sample, bool Signal)//void TreeReader::Loop(TStrin
    float nFilterEvt = 0;
    float nSelecBDTVtx = 0;
    float nSelecBDTVtxTight = 0;
+   float nSelecBDTVtxTight_step12 = 0;
+
 
    float nEvts_w2Vtx = 0;
    float nEvts_w2TightVtx = 0;
    float nEvts_w2TightBDTVtx = 0;
+
+  float nEvts_w2TightBDTVtx_step12 = 0;
+  float nEvts_w1TightBDTVtx_step12 = 0;
 
   float nEvts_w1TightVtx = 0 ;
   float nEvts_w1TightBDTVtx = 0;
@@ -274,6 +283,13 @@ int nStep_MuonMuonJetdRmax = (6-MuonJetdRCutmax)/dMuonJetdRmax;//1000-20/dpt
 float nEvts_MuonJetdRmax[48] = {0};
 //------------------------------
 
+// //-------------HemiCombinedLeptonMass----------//
+float Hemi_CombinedHemiLeptonMassCut = 0;
+float dSmuonMass = 10;
+int nStep_SmuonMass = (1400-Hemi_CombinedHemiLeptonMassCut)/dSmuonMass;//1000-20/dpt
+float nEvts_Hemi_CombinedHemiLeptonMass[140] = {0};
+//------------------------------
+
 
    // -------------End of list of variables ----------//
 
@@ -300,7 +316,7 @@ if (thesample == "10_test")
     {        
       XS = 0.0035;//this is for 14tev
     }
-if (thesample == "DYToJets_LL_M10to50")
+if (thesample == "DYJetsToLL_M10to50")
     {        
       XS = 15910.0;
     }
@@ -338,13 +354,73 @@ if (thesample == "ZZTo2Q2L_mllmin4p0")
     }
 if (thesample == "TTTo2L2Nu")
     {        
-      XS = 687.1;
+      // XS = 687.1;
+      XS = 88.3;
     }
 if (thesample == "DYJetsToLL_M50")
     {        
       XS = 5379;
     }
+if (thesample == "ttWJetsToLNu_5f_EWK")
+    {        
+      XS = 0.290;// not found on XSDB, no file on tier2...approximation
+      //Took 0.868 pb (CMS-TOP-21-011)
+     // as a starting point and then divided by 3 (lepton universality)
+    }
 
+if (thesample == "TTZToLL_5f")
+    {        
+      XS = 0.05188;//Not found on XSDB => used ana.py macro : 5.188e-02 +- 2.437e-04 pb
+    }
+
+if (thesample == "TTToHadronic")
+    {        
+      XS = 687.1;
+    }
+if (thesample == "TTWW")
+    {        
+      XS = 0.006992;//found on XSDB
+    }
+
+
+if (thesample.Contains("smu200"))
+    {        
+      XS = 0.01;//found on XSDB
+    }
+    if (thesample.Contains("smu250"))
+    {        
+      XS = 0.0045;//found on XSDB
+    }
+    if (thesample.Contains("smu300"))
+    {        
+      XS = 0.002;//found on XSDB
+    }
+
+    if (thesample.Contains("smu350"))
+    {        
+      XS = 0.001;//found on XSDB
+    }
+
+    if (thesample.Contains("smu400"))
+    {        
+      XS = 0.0006;//found on XSDB
+    }
+
+    if (thesample.Contains("smu450"))
+    {        
+      XS = 0.0004;//found on XSDB
+    }
+
+    if (thesample.Contains("smu500"))
+    {        
+      XS = 0.00025;//found on XSDB
+    }
+    if (thesample == "smu300_250_240")
+    {        
+      XS = 0.002;//found on XSDB
+    }
+
+  float lumiRun2 = 136000 ; //pb-1
   float Nevent = nentries;
   NormFactor =  XS/nentries;
 
@@ -357,15 +433,112 @@ if (thesample == "DYJetsToLL_M50")
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
       // if (Cut(ientry) < 0) continue;
-      // std::cout<<"event : "<<jentry<<std::endl;
+            // std::cout<<"event : "<<jentry<<std::endl;
       fillHisto("Filter", "Offline+Online", thesample, tree_Filter, 1);
 
    if (tree_Filter)
       {
       nFilterEvt++;
+      fillHisto("DiMuon_Mass","noSel", thesample,  tree_Mmumu, XS/nentries);
 
-      if (tree_Evts_MVAval->at(0)< -0.58){continue;}
+      fillHisto("Evts_MVAVal","noSel", thesample , tree_Evts_MVAval,1);
+
+
+        if (thesample == "LO_smu200to500_ctau20" && Signal)
+    {        
+      int Msmu = tree_smu_mass;
+      int Mneu = tree_neu_mass;
+      if ( Msmu > 180 && Msmu < 220 )      Msmu = 200;
+      else if ( Msmu > 230 && Msmu < 270 ) Msmu = 250;
+      else if ( Msmu > 280 && Msmu < 320 ) Msmu = 300;
+      else if ( Msmu > 380 && Msmu < 420 ) Msmu = 400;
+      else if ( Msmu > 480 && Msmu < 520 ) Msmu = 500;
+      else cout << " !!! smu mass out of range !!! " << Msmu;
+      if ( Mneu > 170 && Mneu < 190 )      Mneu = 180;
+      else if ( Mneu > 190 && Mneu < 210 ) Mneu = 200;
+      else if ( Mneu > 240 && Mneu < 260 ) Mneu = 250;
+      else if ( Mneu > 270 && Mneu < 290 ) Mneu = 280;
+      else if ( Mneu > 290 && Mneu < 310 ) Mneu = 300;
+      else if ( Mneu > 340 && Mneu < 360 ) Mneu = 350;
+      else if ( Mneu > 370 && Mneu < 390 ) Mneu = 380;
+      else if ( Mneu > 390 && Mneu < 410 ) Mneu = 400;
+      else if ( Mneu > 440 && Mneu < 460 ) Mneu = 450;
+      else if ( Mneu > 470 && Mneu < 490 ) Mneu = 480;
+      else cout << " !!! neu mass out of range !!! " << Mneu;
+
+
+      
+      if ((Msmu-Mneu) == 20){fillHisto("hSim_EVTBDT","dm20",  thesample,tree_Evts_MVAval ,1.);}
+      if ((Msmu-Mneu) == 50){fillHisto("hSim_EVTBDT","dm50",  thesample,tree_Evts_MVAval ,1.);}
+      if ((Msmu-Mneu) == 100){fillHisto("hSim_EVTBDT","dm100",  thesample,tree_Evts_MVAval ,1.);}
+      if ((Msmu-Mneu) == 150){fillHisto("hSim_EVTBDT","dm150",  thesample,tree_Evts_MVAval ,1.);}
+      if ((Msmu-Mneu) == 200){fillHisto("hSim_EVTBDT","dm200",  thesample,tree_Evts_MVAval ,1.);}
+      if ((Msmu-Mneu) == 250){fillHisto("hSim_EVTBDT","dm250",  thesample,tree_Evts_MVAval ,1.);}
+      if ((Msmu-Mneu) == 300){fillHisto("hSim_EVTBDT","dm300",  thesample,tree_Evts_MVAval ,1.);}
+      if ((Msmu-Mneu) == 320){fillHisto("hSim_EVTBDT","dm320",  thesample,tree_Evts_MVAval ,1.);}
+     
+
+      int ngenpart =  tree_genParticle_pt->size();
+      for (int i=0; i<ngenpart; i++)    // Loop on GenParticle
+        {
+          float pdgId = tree_genParticle_pdgId->at(i); 
+          float mother_pdgId = tree_genParticle_mother_pdgId->at(i); 
+          float ct0 = tree_genParticle_ct0->at(i);
+
+          // top quark from neutralino
+          if ( abs(pdgId) == 6 && abs(mother_pdgId) == 1000023 ) 
+            {            
+              if ((Msmu-Mneu) == 20){fillHisto("hSim_ct0","dm20",  thesample,ct0 ,1.);fillHisto("hBDT_MET","EVT_dm20", thesample,tree_PFMet_et,1.);fillHisto("hBDT_TRACK_SIZE","EVT_dm20", thesample,tree_TRACK_SIZE,1.);fillHisto("hBDT_muon_leadingpt","EVT_dm20", thesample,tree_lepton_leadingpt->at(0),1.); fillHisto("hBDT_muon_leadingpt2","EVT_dm20", thesample,tree_lepton_leadingpt2->at(0),1.); fillHisto("hBDT_jet_leadingpt","EVT_dm20", thesample,tree_jet_leadingpt->at(0),1.);fillHisto("hBDT_jet_leadingpt2","EVT_dm20", thesample,tree_jet_leadingpt2->at(0),1.);fillHisto("hBDT_muon_muon_dR","EVT_dm20", thesample,tree_lepton_lepton_dR->at(0),1.);fillHisto("hBDT_muon_muon_dPhi","EVT_dm20", thesample,tree_lepton_lepton_dPhi->at(0),1.);fillHisto("hBDT_muon_muon_dEta","EVT_dm20", thesample,tree_lepton_lepton_dEta->at(0),1.);fillHisto("hBDT_jet_jet_dR","EVT_dm20", thesample,tree_jet_jet_dR->at(0),1.);fillHisto("hBDT_jet_jet_dPhi","EVT_dm20", thesample,tree_jet_jet_dPhi->at(0),1.);fillHisto("hBDT_jet_jet_dEta","EVT_dm20", thesample,tree_jet_jet_dEta->at(0),1.);fillHisto("hBDT_muon_jet_dRmin","EVT_dm20", thesample,tree_muon_jet_dRmin->at(0),1.);fillHisto("hBDT_muon_jet_dRmax","EVT_dm20", thesample,tree_muon_jet_dRmax->at(0),1.);fillHisto("hBDT_HT","EVT_dm20", thesample,tree_HT,1.);fillHisto("hBDT_ST","EVT_dm20", thesample,tree_LT,1.);fillHisto("hBDT_njet","EVT_dm20", thesample,tree_njet,1.);fillHisto("hBDT_muon_nmu","EVT_dm20", thesample,tree_nmu,1.);fillHisto("hBDT_Hemi_LooseBTag_axes","EVT_dm20", thesample,tree_Hemi_LooseBTag_axes->at(0),1.); fillHisto("hBDT_Hemi_MediumBTag_axes","EVT_dm20", thesample,tree_Hemi_MediumBTag_axes->at(0),1.);fillHisto("hBDT_Hemi_TightBTag_axes","EVT_dm20", thesample,tree_Hemi_TightBTag_axes->at(0),1.);}
+              if ((Msmu-Mneu) == 50){fillHisto("hSim_ct0","dm50",  thesample,ct0 ,1.);fillHisto("hBDT_MET","EVT_dm50", thesample,tree_PFMet_et,1.);fillHisto("hBDT_TRACK_SIZE","EVT_dm50", thesample,tree_TRACK_SIZE,1.);fillHisto("hBDT_muon_leadingpt","EVT_dm50", thesample,tree_lepton_leadingpt->at(0),1.); fillHisto("hBDT_muon_leadingpt2","EVT_dm50", thesample,tree_lepton_leadingpt2->at(0),1.); fillHisto("hBDT_jet_leadingpt","EVT_dm50", thesample,tree_jet_leadingpt->at(0),1.);fillHisto("hBDT_jet_leadingpt2","EVT_dm50", thesample,tree_jet_leadingpt2->at(0),1.);fillHisto("hBDT_muon_muon_dR","EVT_dm50", thesample,tree_lepton_lepton_dR->at(0),1.);fillHisto("hBDT_muon_muon_dPhi","EVT_dm50", thesample,tree_lepton_lepton_dPhi->at(0),1.);fillHisto("hBDT_muon_muon_dEta","EVT_dm50", thesample,tree_lepton_lepton_dEta->at(0),1.);fillHisto("hBDT_jet_jet_dR","EVT_dm50", thesample,tree_jet_jet_dR->at(0),1.);fillHisto("hBDT_jet_jet_dPhi","EVT_dm50", thesample,tree_jet_jet_dPhi->at(0),1.);fillHisto("hBDT_jet_jet_dEta","EVT_dm50", thesample,tree_jet_jet_dEta->at(0),1.);fillHisto("hBDT_muon_jet_dRmin","EVT_dm50", thesample,tree_muon_jet_dRmin->at(0),1.);fillHisto("hBDT_muon_jet_dRmax","EVT_dm50", thesample,tree_muon_jet_dRmax->at(0),1.);fillHisto("hBDT_HT","EVT_dm50", thesample,tree_HT,1.);fillHisto("hBDT_ST","EVT_dm50", thesample,tree_LT,1.);fillHisto("hBDT_njet","EVT_dm50", thesample,tree_njet,1.);fillHisto("hBDT_muon_nmu","EVT_dm50", thesample,tree_nmu,1.);fillHisto("hBDT_Hemi_LooseBTag_axes","EVT_dm50", thesample,tree_Hemi_LooseBTag_axes->at(0),1.); fillHisto("hBDT_Hemi_MediumBTag_axes","EVT_dm50", thesample,tree_Hemi_MediumBTag_axes->at(0),1.);fillHisto("hBDT_Hemi_TightBTag_axes","EVT_dm50", thesample,tree_Hemi_TightBTag_axes->at(0),1.);}
+              if ((Msmu-Mneu) == 100){fillHisto("hSim_ct0","dm100",  thesample,ct0 ,1.);fillHisto("hBDT_MET","EVT_dm100", thesample,tree_PFMet_et,1.);fillHisto("hBDT_TRACK_SIZE","EVT_dm100", thesample,tree_TRACK_SIZE,1.);fillHisto("hBDT_muon_leadingpt","EVT_dm100", thesample,tree_lepton_leadingpt->at(0),1.); fillHisto("hBDT_muon_leadingpt2","EVT_dm100", thesample,tree_lepton_leadingpt2->at(0),1.); fillHisto("hBDT_jet_leadingpt","EVT_dm100", thesample,tree_jet_leadingpt->at(0),1.);fillHisto("hBDT_jet_leadingpt2","EVT_dm100", thesample,tree_jet_leadingpt2->at(0),1.);fillHisto("hBDT_muon_muon_dR","EVT_dm100", thesample,tree_lepton_lepton_dR->at(0),1.);fillHisto("hBDT_muon_muon_dPhi","EVT_dm100", thesample,tree_lepton_lepton_dPhi->at(0),1.);fillHisto("hBDT_muon_muon_dEta","EVT_dm100", thesample,tree_lepton_lepton_dEta->at(0),1.);fillHisto("hBDT_jet_jet_dR","EVT_dm100", thesample,tree_jet_jet_dR->at(0),1.);fillHisto("hBDT_jet_jet_dPhi","EVT_dm100", thesample,tree_jet_jet_dPhi->at(0),1.);fillHisto("hBDT_jet_jet_dEta","EVT_dm100", thesample,tree_jet_jet_dEta->at(0),1.);fillHisto("hBDT_muon_jet_dRmin","EVT_dm100", thesample,tree_muon_jet_dRmin->at(0),1.);fillHisto("hBDT_muon_jet_dRmax","EVT_dm100", thesample,tree_muon_jet_dRmax->at(0),1.);fillHisto("hBDT_HT","EVT_dm100", thesample,tree_HT,1.);fillHisto("hBDT_ST","EVT_dm100", thesample,tree_LT,1.);fillHisto("hBDT_njet","EVT_dm100", thesample,tree_njet,1.);fillHisto("hBDT_muon_nmu","EVT_dm100", thesample,tree_nmu,1.);fillHisto("hBDT_Hemi_LooseBTag_axes","EVT_dm100", thesample,tree_Hemi_LooseBTag_axes->at(0),1.); fillHisto("hBDT_Hemi_MediumBTag_axes","EVT_dm100", thesample,tree_Hemi_MediumBTag_axes->at(0),1.);fillHisto("hBDT_Hemi_TightBTag_axes","EVT_dm100", thesample,tree_Hemi_TightBTag_axes->at(0),1.);}
+              if ((Msmu-Mneu) == 150){fillHisto("hSim_ct0","dm150",  thesample,ct0 ,1.);fillHisto("hBDT_MET","EVT_dm150", thesample,tree_PFMet_et,1.);fillHisto("hBDT_TRACK_SIZE","EVT_dm150", thesample,tree_TRACK_SIZE,1.);fillHisto("hBDT_muon_leadingpt","EVT_dm150", thesample,tree_lepton_leadingpt->at(0),1.); fillHisto("hBDT_muon_leadingpt2","EVT_dm150", thesample,tree_lepton_leadingpt2->at(0),1.); fillHisto("hBDT_jet_leadingpt","EVT_dm150", thesample,tree_jet_leadingpt->at(0),1.);fillHisto("hBDT_jet_leadingpt2","EVT_dm150", thesample,tree_jet_leadingpt2->at(0),1.);fillHisto("hBDT_muon_muon_dR","EVT_dm150", thesample,tree_lepton_lepton_dR->at(0),1.);fillHisto("hBDT_muon_muon_dPhi","EVT_dm150", thesample,tree_lepton_lepton_dPhi->at(0),1.);fillHisto("hBDT_muon_muon_dEta","EVT_dm150", thesample,tree_lepton_lepton_dEta->at(0),1.);fillHisto("hBDT_jet_jet_dR","EVT_dm150", thesample,tree_jet_jet_dR->at(0),1.);fillHisto("hBDT_jet_jet_dPhi","EVT_dm150", thesample,tree_jet_jet_dPhi->at(0),1.);fillHisto("hBDT_jet_jet_dEta","EVT_dm150", thesample,tree_jet_jet_dEta->at(0),1.);fillHisto("hBDT_muon_jet_dRmin","EVT_dm150", thesample,tree_muon_jet_dRmin->at(0),1.);fillHisto("hBDT_muon_jet_dRmax","EVT_dm150", thesample,tree_muon_jet_dRmax->at(0),1.);fillHisto("hBDT_HT","EVT_dm150", thesample,tree_HT,1.);fillHisto("hBDT_ST","EVT_dm150", thesample,tree_LT,1.);fillHisto("hBDT_njet","EVT_dm150", thesample,tree_njet,1.);fillHisto("hBDT_muon_nmu","EVT_dm150", thesample,tree_nmu,1.);fillHisto("hBDT_Hemi_LooseBTag_axes","EVT_dm150", thesample,tree_Hemi_LooseBTag_axes->at(0),1.); fillHisto("hBDT_Hemi_MediumBTag_axes","EVT_dm150", thesample,tree_Hemi_MediumBTag_axes->at(0),1.);fillHisto("hBDT_Hemi_TightBTag_axes","EVT_dm150", thesample,tree_Hemi_TightBTag_axes->at(0),1.);}
+              if ((Msmu-Mneu) == 200){fillHisto("hSim_ct0","dm200",  thesample,ct0 ,1.);fillHisto("hBDT_MET","EVT_dm200", thesample,tree_PFMet_et,1.);fillHisto("hBDT_TRACK_SIZE","EVT_dm200", thesample,tree_TRACK_SIZE,1.);fillHisto("hBDT_muon_leadingpt","EVT_dm200", thesample,tree_lepton_leadingpt->at(0),1.); fillHisto("hBDT_muon_leadingpt2","EVT_dm200", thesample,tree_lepton_leadingpt2->at(0),1.); fillHisto("hBDT_jet_leadingpt","EVT_dm200", thesample,tree_jet_leadingpt->at(0),1.);fillHisto("hBDT_jet_leadingpt2","EVT_dm200", thesample,tree_jet_leadingpt2->at(0),1.);fillHisto("hBDT_muon_muon_dR","EVT_dm200", thesample,tree_lepton_lepton_dR->at(0),1.);fillHisto("hBDT_muon_muon_dPhi","EVT_dm200", thesample,tree_lepton_lepton_dPhi->at(0),1.);fillHisto("hBDT_muon_muon_dEta","EVT_dm200", thesample,tree_lepton_lepton_dEta->at(0),1.);fillHisto("hBDT_jet_jet_dR","EVT_dm200", thesample,tree_jet_jet_dR->at(0),1.);fillHisto("hBDT_jet_jet_dPhi","EVT_dm200", thesample,tree_jet_jet_dPhi->at(0),1.);fillHisto("hBDT_jet_jet_dEta","EVT_dm200", thesample,tree_jet_jet_dEta->at(0),1.);fillHisto("hBDT_muon_jet_dRmin","EVT_dm200", thesample,tree_muon_jet_dRmin->at(0),1.);fillHisto("hBDT_muon_jet_dRmax","EVT_dm200", thesample,tree_muon_jet_dRmax->at(0),1.);fillHisto("hBDT_HT","EVT_dm200", thesample,tree_HT,1.);fillHisto("hBDT_ST","EVT_dm200", thesample,tree_LT,1.);fillHisto("hBDT_njet","EVT_dm200", thesample,tree_njet,1.);fillHisto("hBDT_muon_nmu","EVT_dm200", thesample,tree_nmu,1.);fillHisto("hBDT_Hemi_LooseBTag_axes","EVT_dm200", thesample,tree_Hemi_LooseBTag_axes->at(0),1.); fillHisto("hBDT_Hemi_MediumBTag_axes","EVT_dm200", thesample,tree_Hemi_MediumBTag_axes->at(0),1.);fillHisto("hBDT_Hemi_TightBTag_axes","EVT_dm200", thesample,tree_Hemi_TightBTag_axes->at(0),1.);}
+              if ((Msmu-Mneu) == 250){fillHisto("hSim_ct0","dm250",  thesample,ct0 ,1.);fillHisto("hBDT_MET","EVT_dm250", thesample,tree_PFMet_et,1.);fillHisto("hBDT_TRACK_SIZE","EVT_dm250", thesample,tree_TRACK_SIZE,1.);fillHisto("hBDT_muon_leadingpt","EVT_dm250", thesample,tree_lepton_leadingpt->at(0),1.); fillHisto("hBDT_muon_leadingpt2","EVT_dm250", thesample,tree_lepton_leadingpt2->at(0),1.); fillHisto("hBDT_jet_leadingpt","EVT_dm250", thesample,tree_jet_leadingpt->at(0),1.);fillHisto("hBDT_jet_leadingpt2","EVT_dm250", thesample,tree_jet_leadingpt2->at(0),1.);fillHisto("hBDT_muon_muon_dR","EVT_dm250", thesample,tree_lepton_lepton_dR->at(0),1.);fillHisto("hBDT_muon_muon_dPhi","EVT_dm250", thesample,tree_lepton_lepton_dPhi->at(0),1.);fillHisto("hBDT_muon_muon_dEta","EVT_dm250", thesample,tree_lepton_lepton_dEta->at(0),1.);fillHisto("hBDT_jet_jet_dR","EVT_dm250", thesample,tree_jet_jet_dR->at(0),1.);fillHisto("hBDT_jet_jet_dPhi","EVT_dm250", thesample,tree_jet_jet_dPhi->at(0),1.);fillHisto("hBDT_jet_jet_dEta","EVT_dm250", thesample,tree_jet_jet_dEta->at(0),1.);fillHisto("hBDT_muon_jet_dRmin","EVT_dm250", thesample,tree_muon_jet_dRmin->at(0),1.);fillHisto("hBDT_muon_jet_dRmax","EVT_dm250", thesample,tree_muon_jet_dRmax->at(0),1.);fillHisto("hBDT_HT","EVT_dm250", thesample,tree_HT,1.);fillHisto("hBDT_ST","EVT_dm250", thesample,tree_LT,1.);fillHisto("hBDT_njet","EVT_dm250", thesample,tree_njet,1.);fillHisto("hBDT_muon_nmu","EVT_dm250", thesample,tree_nmu,1.);fillHisto("hBDT_Hemi_LooseBTag_axes","EVT_dm250", thesample,tree_Hemi_LooseBTag_axes->at(0),1.); fillHisto("hBDT_Hemi_MediumBTag_axes","EVT_dm250", thesample,tree_Hemi_MediumBTag_axes->at(0),1.);fillHisto("hBDT_Hemi_TightBTag_axes","EVT_dm250", thesample,tree_Hemi_TightBTag_axes->at(0),1.);}
+              if ((Msmu-Mneu) == 300){fillHisto("hSim_ct0","dm300",  thesample,ct0 ,1.);fillHisto("hBDT_MET","EVT_dm300", thesample,tree_PFMet_et,1.);fillHisto("hBDT_TRACK_SIZE","EVT_dm300", thesample,tree_TRACK_SIZE,1.);fillHisto("hBDT_muon_leadingpt","EVT_dm300", thesample,tree_lepton_leadingpt->at(0),1.); fillHisto("hBDT_muon_leadingpt2","EVT_dm300", thesample,tree_lepton_leadingpt2->at(0),1.); fillHisto("hBDT_jet_leadingpt","EVT_dm300", thesample,tree_jet_leadingpt->at(0),1.);fillHisto("hBDT_jet_leadingpt2","EVT_dm300", thesample,tree_jet_leadingpt2->at(0),1.);fillHisto("hBDT_muon_muon_dR","EVT_dm300", thesample,tree_lepton_lepton_dR->at(0),1.);fillHisto("hBDT_muon_muon_dPhi","EVT_dm300", thesample,tree_lepton_lepton_dPhi->at(0),1.);fillHisto("hBDT_muon_muon_dEta","EVT_dm300", thesample,tree_lepton_lepton_dEta->at(0),1.);fillHisto("hBDT_jet_jet_dR","EVT_dm300", thesample,tree_jet_jet_dR->at(0),1.);fillHisto("hBDT_jet_jet_dPhi","EVT_dm300", thesample,tree_jet_jet_dPhi->at(0),1.);fillHisto("hBDT_jet_jet_dEta","EVT_dm300", thesample,tree_jet_jet_dEta->at(0),1.);fillHisto("hBDT_muon_jet_dRmin","EVT_dm300", thesample,tree_muon_jet_dRmin->at(0),1.);fillHisto("hBDT_muon_jet_dRmax","EVT_dm300", thesample,tree_muon_jet_dRmax->at(0),1.);fillHisto("hBDT_HT","EVT_dm300", thesample,tree_HT,1.);fillHisto("hBDT_ST","EVT_dm300", thesample,tree_LT,1.);fillHisto("hBDT_njet","EVT_dm300", thesample,tree_njet,1.);fillHisto("hBDT_muon_nmu","EVT_dm300", thesample,tree_nmu,1.);fillHisto("hBDT_Hemi_LooseBTag_axes","EVT_dm300", thesample,tree_Hemi_LooseBTag_axes->at(0),1.); fillHisto("hBDT_Hemi_MediumBTag_axes","EVT_dm300", thesample,tree_Hemi_MediumBTag_axes->at(0),1.);fillHisto("hBDT_Hemi_TightBTag_axes","EVT_dm300", thesample,tree_Hemi_TightBTag_axes->at(0),1.);}
+              if ((Msmu-Mneu) == 320){fillHisto("hSim_ct0","dm320",  thesample,ct0 ,1.);fillHisto("hBDT_MET","EVT_dm320", thesample,tree_PFMet_et,1.);fillHisto("hBDT_TRACK_SIZE","EVT_dm320", thesample,tree_TRACK_SIZE,1.);fillHisto("hBDT_muon_leadingpt","EVT_dm320", thesample,tree_lepton_leadingpt->at(0),1.); fillHisto("hBDT_muon_leadingpt2","EVT_dm320", thesample,tree_lepton_leadingpt2->at(0),1.); fillHisto("hBDT_jet_leadingpt","EVT_dm320", thesample,tree_jet_leadingpt->at(0),1.);fillHisto("hBDT_jet_leadingpt2","EVT_dm320", thesample,tree_jet_leadingpt2->at(0),1.);fillHisto("hBDT_muon_muon_dR","EVT_dm320", thesample,tree_lepton_lepton_dR->at(0),1.);fillHisto("hBDT_muon_muon_dPhi","EVT_dm320", thesample,tree_lepton_lepton_dPhi->at(0),1.);fillHisto("hBDT_muon_muon_dEta","EVT_dm320", thesample,tree_lepton_lepton_dEta->at(0),1.);fillHisto("hBDT_jet_jet_dR","EVT_dm320", thesample,tree_jet_jet_dR->at(0),1.);fillHisto("hBDT_jet_jet_dPhi","EVT_dm320", thesample,tree_jet_jet_dPhi->at(0),1.);fillHisto("hBDT_jet_jet_dEta","EVT_dm320", thesample,tree_jet_jet_dEta->at(0),1.);fillHisto("hBDT_muon_jet_dRmin","EVT_dm320", thesample,tree_muon_jet_dRmin->at(0),1.);fillHisto("hBDT_muon_jet_dRmax","EVT_dm320", thesample,tree_muon_jet_dRmax->at(0),1.);fillHisto("hBDT_HT","EVT_dm320", thesample,tree_HT,1.);fillHisto("hBDT_ST","EVT_dm320", thesample,tree_LT,1.);fillHisto("hBDT_njet","EVT_dm320", thesample,tree_njet,1.);fillHisto("hBDT_muon_nmu","EVT_dm320", thesample,tree_nmu,1.);fillHisto("hBDT_Hemi_LooseBTag_axes","EVT_dm320", thesample,tree_Hemi_LooseBTag_axes->at(0),1.); fillHisto("hBDT_Hemi_MediumBTag_axes","EVT_dm320", thesample,tree_Hemi_MediumBTag_axes->at(0),1.);fillHisto("hBDT_Hemi_TightBTag_axes","EVT_dm320", thesample,tree_Hemi_TightBTag_axes->at(0),1.);}
+            } 
+
+        }    // End Loop on GenParticle
+      fillHisto("hGen_Msmu","noSel",  thesample, tree_smu_mass ,1.);
+      fillHisto("hGen_Mneu","noSel",  thesample, tree_neu_mass ,1.);
+
+    }
+  // BDT EVTS SELCTION VARIABLES
+    fillHisto("hBDT_MET","EVT", thesample,tree_PFMet_et,1.);
+    fillHisto("hBDT_TRACK_SIZE","EVT", thesample,tree_TRACK_SIZE,1.);
+    fillHisto("hBDT_muon_leadingpt","EVT", thesample,tree_lepton_leadingpt->at(0),1.);
+    fillHisto("hBDT_muon_leadingpt2","EVT", thesample,tree_lepton_leadingpt2->at(0),1.);
+    fillHisto("hBDT_jet_leadingpt","EVT", thesample,tree_jet_leadingpt->at(0),1.);
+    fillHisto("hBDT_jet_leadingpt2","EVT", thesample,tree_jet_leadingpt2->at(0),1.);
+    fillHisto("hBDT_muon_muon_dR","EVT", thesample,tree_lepton_lepton_dR->at(0),1.);
+    fillHisto("hBDT_muon_muon_dPhi","EVT", thesample,tree_lepton_lepton_dPhi->at(0),1.);
+    fillHisto("hBDT_muon_muon_dEta","EVT", thesample,tree_lepton_lepton_dEta->at(0),1.);
+    fillHisto("hBDT_jet_jet_dR","EVT", thesample,tree_jet_jet_dR->at(0),1.);
+    fillHisto("hBDT_jet_jet_dPhi","EVT", thesample,tree_jet_jet_dPhi->at(0),1.);
+    fillHisto("hBDT_jet_jet_dEta","EVT", thesample,tree_jet_jet_dEta->at(0),1.);
+    fillHisto("hBDT_muon_jet_dRmin","EVT", thesample,tree_muon_jet_dRmin->at(0),1.);
+    fillHisto("hBDT_muon_jet_dRmax","EVT", thesample,tree_muon_jet_dRmax->at(0),1.);
+    fillHisto("hBDT_HT","EVT", thesample,tree_HT,1.);
+    fillHisto("hBDT_ST","EVT", thesample,tree_LT,1.);
+    fillHisto("hBDT_njet","EVT", thesample,tree_njet,1.);
+    fillHisto("hBDT_muon_nmu","EVT", thesample,tree_muon_pt->size(),1.);
+    fillHisto("hBDT_Hemi_LooseBTag_axes","EVT", thesample,tree_Hemi_LooseBTag_axes->at(0),1.);
+    fillHisto("hBDT_Hemi_MediumBTag_axes","EVT", thesample,tree_Hemi_MediumBTag_axes->at(0),1.);
+    fillHisto("hBDT_Hemi_TightBTag_axes","EVT", thesample,tree_Hemi_TightBTag_axes->at(0),1.);
+    
+
+
+      float HighMass = tree_Hemi_CombinedHemiLeptonMass->at(1);
+      if(tree_Hemi_CombinedHemiLeptonMass->at(0)>tree_Hemi_CombinedHemiLeptonMass->at(1))
+        {
+          HighMass = tree_Hemi_CombinedHemiLeptonMass->at(0);
+        }
+      fillHisto("hData_HighSmuonMass","NoSel",thesample,HighMass,1);
+      // if (tree_Evts_MVAval <  EVTSWP){continue;}
+      // if (HighMass < 200) continue;
       nEvts++;
+
+
       //*******************************
       //loop on Muons
       //*******************************
@@ -375,7 +548,7 @@ if (thesample == "DYJetsToLL_M50")
             fillHisto("RecoMuo_pT", "noSel",  thesample,  tree_muon_pt->at(iMuon) , 1.);
             
          }
-
+      
       //*******************************
       //loop on V0 Candidates
       //*******************************
@@ -401,6 +574,7 @@ if (thesample == "DYJetsToLL_M50")
 
       //*******************************
       //loop on Sec. Interactions
+      //*******************************
 
       for (unsigned int iSecInt = 0; iSecInt <tree_SecInt_mass->size(); iSecInt++)
          {
@@ -430,15 +604,111 @@ if (thesample == "DYJetsToLL_M50")
          }
 
       //*******************************
+      //loop on jets
+      //*******************************
+
+    for (unsigned int k = 0 ; k < tree_jet_pt->size(); k++)
+      {
+        fillHisto("hData_jet_pt","",            thesample, tree_jet_pt->at(k),1.);
+        fillHisto("hData_jet_eta","",           thesample, tree_jet_eta->at(k),1.);
+        fillHisto("hData_jet_btag_Deepjet","",  thesample, tree_jet_btag_DeepJet->at(k),1.);
+        fillHisto("hData_jet_HadronFlavour","", thesample, tree_jet_HadronFlavour->at(k),1.);
+        
+        if (abs(tree_jet_HadronFlavour->at(k))==5 && tree_jet_pileupID->at(k)>=0)//Probably an issue here since it is said that pileup ID has to be applied before any corrections 
+                                                                                 // but corrections are already applied before running the code..... 
+         {
+            fillHisto2D("hData_BtagEff_Denom","",   thesample, tree_jet_pt->at(k),tree_jet_eta->at(k),1 );
+            if (tree_jet_btag_DeepJet->at(k) >= 0.7100)//tight WP of Btag
+               {
+                  fillHisto2D("hData_BtagEff_Num","",     thesample, tree_jet_pt->at(k),tree_jet_eta->at(k),1 );
+               }
+         }
+        
+        
+      }
+      //*******************************
       //loop on tracks
       //*******************************
 
       n_TotalTrks += tree_track_MVAval->size();
 
+    if (thesample == "LO_smu200to500_ctau20" && Signal)
+    {        
+      
+      int Msmu = tree_smu_mass;
+      int Mneu = tree_neu_mass;
+      if ( Msmu > 180 && Msmu < 220 )      Msmu = 200;
+      else if ( Msmu > 230 && Msmu < 270 ) Msmu = 250;
+      else if ( Msmu > 280 && Msmu < 320 ) Msmu = 300;
+      else if ( Msmu > 380 && Msmu < 420 ) Msmu = 400;
+      else if ( Msmu > 480 && Msmu < 520 ) Msmu = 500;
+      else cout << " !!! smu mass out of range !!! " << Msmu;
+      if ( Mneu > 170 && Mneu < 190 )      Mneu = 180;
+      else if ( Mneu > 190 && Mneu < 210 ) Mneu = 200;
+      else if ( Mneu > 240 && Mneu < 260 ) Mneu = 250;
+      else if ( Mneu > 270 && Mneu < 290 ) Mneu = 280;
+      else if ( Mneu > 290 && Mneu < 310 ) Mneu = 300;
+      else if ( Mneu > 340 && Mneu < 360 ) Mneu = 350;
+      else if ( Mneu > 370 && Mneu < 390 ) Mneu = 380;
+      else if ( Mneu > 390 && Mneu < 410 ) Mneu = 400;
+      else if ( Mneu > 440 && Mneu < 460 ) Mneu = 450;
+      else if ( Mneu > 470 && Mneu < 490 ) Mneu = 480;
+      else cout << " !!! neu mass out of range !!! " << Mneu;
+    //  std::cout<<"Msmu and Mneu : "<<Msmu<<" and "<<Mneu<<std::endl;
+      if ((Msmu-Mneu) == 20){ for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++){fillHisto("hSim_TRKBDT","dm20",  thesample,tree_track_MVAval->at(iTrk) ,1.);}}
+      if ((Msmu-Mneu) == 50){ for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++){fillHisto("hSim_TRKBDT","dm50",  thesample,tree_track_MVAval->at(iTrk) ,1.);}}
+      if ((Msmu-Mneu) == 100){ for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++){fillHisto("hSim_TRKBDT","dm100",  thesample,tree_track_MVAval->at(iTrk) ,1.);}}
+      if ((Msmu-Mneu) == 150){ for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++){fillHisto("hSim_TRKBDT","dm150",  thesample,tree_track_MVAval->at(iTrk) ,1.);}}
+      if ((Msmu-Mneu) == 200){ for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++){fillHisto("hSim_TRKBDT","dm200",  thesample,tree_track_MVAval->at(iTrk) ,1.);}}
+      if ((Msmu-Mneu) == 250){ for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++){fillHisto("hSim_TRKBDT","dm250",  thesample,tree_track_MVAval->at(iTrk) ,1.);}}
+      if ((Msmu-Mneu) == 300){ for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++){fillHisto("hSim_TRKBDT","dm300",  thesample,tree_track_MVAval->at(iTrk) ,1.);}}
+      if ((Msmu-Mneu) == 320){ for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++){fillHisto("hSim_TRKBDT","dm320",  thesample,tree_track_MVAval->at(iTrk) ,1.);}}
+
+      int ngenpart =  tree_genParticle_pt->size();
+      for (int i=0; i<ngenpart; i++)    // Loop on GenParticle
+        {
+          float pdgId = tree_genParticle_pdgId->at(i); 
+          float mother_pdgId = tree_genParticle_mother_pdgId->at(i); 
+          float ct0 = tree_genParticle_ct0->at(i);
+
+          // top quark from neutralino
+          if ( abs(pdgId) == 6 && abs(mother_pdgId) == 1000023 ) 
+            {            
+              if ((Msmu-Mneu) == 20){fillHisto("hSim_ct0","dm20_TRKBDT",  thesample,ct0 ,1.);for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++){fillHisto("hBDT_lost","TRK_dm20", thesample,tree_track_lost->at(iTrk),1.);fillHisto("hBDT_dz","TRK_dm20", thesample,tree_track_dz->at(iTrk),1.);fillHisto("hBDT_dxy","TRK_dm20", thesample,tree_track_dxy->at(iTrk),1.);fillHisto("hBDT_pt","TRK_dm20", thesample,tree_track_pt->at(iTrk),1.);fillHisto("hBDT_eta","TRK_dm20", thesample,tree_track_eta->at(iTrk),1.);fillHisto("hBDT_NChi2","TRK_dm20", thesample,tree_track_NChi2->at(iTrk),1.);fillHisto("hBDT_nhits","TRK_dm20", thesample,tree_track_nHit->at(iTrk),1.);fillHisto("hBDT_iJet","TRK_dm20", thesample,tree_track_iJet->at(iTrk),1.);fillHisto("hBDT_drSig","TRK_dm20", thesample,tree_track_drSig->at(iTrk),1.);fillHisto("hBDT_dzSig","TRK_dm20", thesample,tree_track_dzSig->at(iTrk),1.);fillHisto("hBDT_ntrk10","TRK_dm20", thesample,tree_track_ntrk10->at(iTrk),1.);fillHisto("hBDT_ntrk20","TRK_dm20", thesample,tree_track_ntrk20->at(iTrk),1.);fillHisto("hBDT_ntrk30","TRK_dm20", thesample,tree_track_ntrk30->at(iTrk),1.);fillHisto("hBDT_ntrk40","TRK_dm20", thesample,tree_track_ntrk40->at(iTrk),1.);fillHisto("hBDT_Hemi_dR","TRK_dm20", thesample,tree_track_Hemi_dR->at(iTrk),1.);fillHisto("hBDT_Hemi_dRmax","TRK_dm20", thesample,tree_track_Hemi_dRmax->at(iTrk),1.);}}
+              if ((Msmu-Mneu) == 50){fillHisto("hSim_ct0","dm50_TRKBDT",  thesample,ct0 ,1.);for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++){fillHisto("hBDT_lost","TRK_dm50", thesample,tree_track_lost->at(iTrk),1.);fillHisto("hBDT_dz","TRK_dm50", thesample,tree_track_dz->at(iTrk),1.);fillHisto("hBDT_dxy","TRK_dm50", thesample,tree_track_dxy->at(iTrk),1.);fillHisto("hBDT_pt","TRK_dm50", thesample,tree_track_pt->at(iTrk),1.);fillHisto("hBDT_eta","TRK_dm50", thesample,tree_track_eta->at(iTrk),1.);fillHisto("hBDT_NChi2","TRK_dm50", thesample,tree_track_NChi2->at(iTrk),1.);fillHisto("hBDT_nhits","TRK_dm50", thesample,tree_track_nHit->at(iTrk),1.);fillHisto("hBDT_iJet","TRK_dm50", thesample,tree_track_iJet->at(iTrk),1.);fillHisto("hBDT_drSig","TRK_dm50", thesample,tree_track_drSig->at(iTrk),1.);fillHisto("hBDT_dzSig","TRK_dm50", thesample,tree_track_dzSig->at(iTrk),1.);fillHisto("hBDT_ntrk10","TRK_dm50", thesample,tree_track_ntrk10->at(iTrk),1.);fillHisto("hBDT_ntrk20","TRK_dm50", thesample,tree_track_ntrk20->at(iTrk),1.);fillHisto("hBDT_ntrk30","TRK_dm50", thesample,tree_track_ntrk30->at(iTrk),1.);fillHisto("hBDT_ntrk40","TRK_dm50", thesample,tree_track_ntrk40->at(iTrk),1.);fillHisto("hBDT_Hemi_dR","TRK_dm50", thesample,tree_track_Hemi_dR->at(iTrk),1.);fillHisto("hBDT_Hemi_dRmax","TRK_dm50", thesample,tree_track_Hemi_dRmax->at(iTrk),1.);}}
+              if ((Msmu-Mneu) == 100){fillHisto("hSim_ct0","dm100_TRKBDT",  thesample,ct0 ,1.);for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++){fillHisto("hBDT_lost","TRK_dm100", thesample,tree_track_lost->at(iTrk),1.);fillHisto("hBDT_dz","TRK_dm100", thesample,tree_track_dz->at(iTrk),1.);fillHisto("hBDT_dxy","TRK_dm100", thesample,tree_track_dxy->at(iTrk),1.);fillHisto("hBDT_pt","TRK_dm100", thesample,tree_track_pt->at(iTrk),1.);fillHisto("hBDT_eta","TRK_dm100", thesample,tree_track_eta->at(iTrk),1.);fillHisto("hBDT_NChi2","TRK_dm100", thesample,tree_track_NChi2->at(iTrk),1.);fillHisto("hBDT_nhits","TRK_dm100", thesample,tree_track_nHit->at(iTrk),1.);fillHisto("hBDT_iJet","TRK_dm100", thesample,tree_track_iJet->at(iTrk),1.);fillHisto("hBDT_drSig","TRK_dm100", thesample,tree_track_drSig->at(iTrk),1.);fillHisto("hBDT_dzSig","TRK_dm100", thesample,tree_track_dzSig->at(iTrk),1.);fillHisto("hBDT_ntrk10","TRK_dm100", thesample,tree_track_ntrk10->at(iTrk),1.);fillHisto("hBDT_ntrk20","TRK_dm100", thesample,tree_track_ntrk20->at(iTrk),1.);fillHisto("hBDT_ntrk30","TRK_dm100", thesample,tree_track_ntrk30->at(iTrk),1.);fillHisto("hBDT_ntrk40","TRK_dm100", thesample,tree_track_ntrk40->at(iTrk),1.);fillHisto("hBDT_Hemi_dR","TRK_dm100", thesample,tree_track_Hemi_dR->at(iTrk),1.);fillHisto("hBDT_Hemi_dRmax","TRK_dm100", thesample,tree_track_Hemi_dRmax->at(iTrk),1.);}}
+              if ((Msmu-Mneu) == 150){fillHisto("hSim_ct0","dm150_TRKBDT",  thesample,ct0 ,1.);for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++){fillHisto("hBDT_lost","TRK_dm150", thesample,tree_track_lost->at(iTrk),1.);fillHisto("hBDT_dz","TRK_dm150", thesample,tree_track_dz->at(iTrk),1.);fillHisto("hBDT_dxy","TRK_dm150", thesample,tree_track_dxy->at(iTrk),1.);fillHisto("hBDT_pt","TRK_dm150", thesample,tree_track_pt->at(iTrk),1.);fillHisto("hBDT_eta","TRK_dm150", thesample,tree_track_eta->at(iTrk),1.);fillHisto("hBDT_NChi2","TRK_dm150", thesample,tree_track_NChi2->at(iTrk),1.);fillHisto("hBDT_nhits","TRK_dm150", thesample,tree_track_nHit->at(iTrk),1.);fillHisto("hBDT_iJet","TRK_dm150", thesample,tree_track_iJet->at(iTrk),1.);fillHisto("hBDT_drSig","TRK_dm150", thesample,tree_track_drSig->at(iTrk),1.);fillHisto("hBDT_dzSig","TRK_dm150", thesample,tree_track_dzSig->at(iTrk),1.);fillHisto("hBDT_ntrk10","TRK_dm150", thesample,tree_track_ntrk10->at(iTrk),1.);fillHisto("hBDT_ntrk20","TRK_dm150", thesample,tree_track_ntrk20->at(iTrk),1.);fillHisto("hBDT_ntrk30","TRK_dm150", thesample,tree_track_ntrk30->at(iTrk),1.);fillHisto("hBDT_ntrk40","TRK_dm150", thesample,tree_track_ntrk40->at(iTrk),1.);fillHisto("hBDT_Hemi_dR","TRK_dm150", thesample,tree_track_Hemi_dR->at(iTrk),1.);fillHisto("hBDT_Hemi_dRmax","TRK_dm150", thesample,tree_track_Hemi_dRmax->at(iTrk),1.);}}
+              if ((Msmu-Mneu) == 200){fillHisto("hSim_ct0","dm200_TRKBDT",  thesample,ct0 ,1.);for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++){fillHisto("hBDT_lost","TRK_dm200", thesample,tree_track_lost->at(iTrk),1.);fillHisto("hBDT_dz","TRK_dm200", thesample,tree_track_dz->at(iTrk),1.);fillHisto("hBDT_dxy","TRK_dm200", thesample,tree_track_dxy->at(iTrk),1.);fillHisto("hBDT_pt","TRK_dm200", thesample,tree_track_pt->at(iTrk),1.);fillHisto("hBDT_eta","TRK_dm200", thesample,tree_track_eta->at(iTrk),1.);fillHisto("hBDT_NChi2","TRK_dm200", thesample,tree_track_NChi2->at(iTrk),1.);fillHisto("hBDT_nhits","TRK_dm200", thesample,tree_track_nHit->at(iTrk),1.);fillHisto("hBDT_iJet","TRK_dm200", thesample,tree_track_iJet->at(iTrk),1.);fillHisto("hBDT_drSig","TRK_dm200", thesample,tree_track_drSig->at(iTrk),1.);fillHisto("hBDT_dzSig","TRK_dm200", thesample,tree_track_dzSig->at(iTrk),1.);fillHisto("hBDT_ntrk10","TRK_dm200", thesample,tree_track_ntrk10->at(iTrk),1.);fillHisto("hBDT_ntrk20","TRK_dm200", thesample,tree_track_ntrk20->at(iTrk),1.);fillHisto("hBDT_ntrk30","TRK_dm200", thesample,tree_track_ntrk30->at(iTrk),1.);fillHisto("hBDT_ntrk40","TRK_dm200", thesample,tree_track_ntrk40->at(iTrk),1.);fillHisto("hBDT_Hemi_dR","TRK_dm200", thesample,tree_track_Hemi_dR->at(iTrk),1.);fillHisto("hBDT_Hemi_dRmax","TRK_dm200", thesample,tree_track_Hemi_dRmax->at(iTrk),1.);}}
+              if ((Msmu-Mneu) == 250){fillHisto("hSim_ct0","dm250_TRKBDT",  thesample,ct0 ,1.);for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++){fillHisto("hBDT_lost","TRK_dm250", thesample,tree_track_lost->at(iTrk),1.);fillHisto("hBDT_dz","TRK_dm250", thesample,tree_track_dz->at(iTrk),1.);fillHisto("hBDT_dxy","TRK_dm250", thesample,tree_track_dxy->at(iTrk),1.);fillHisto("hBDT_pt","TRK_dm250", thesample,tree_track_pt->at(iTrk),1.);fillHisto("hBDT_eta","TRK_dm250", thesample,tree_track_eta->at(iTrk),1.);fillHisto("hBDT_NChi2","TRK_dm250", thesample,tree_track_NChi2->at(iTrk),1.);fillHisto("hBDT_nhits","TRK_dm250", thesample,tree_track_nHit->at(iTrk),1.);fillHisto("hBDT_iJet","TRK_dm250", thesample,tree_track_iJet->at(iTrk),1.);fillHisto("hBDT_drSig","TRK_dm250", thesample,tree_track_drSig->at(iTrk),1.);fillHisto("hBDT_dzSig","TRK_dm250", thesample,tree_track_dzSig->at(iTrk),1.);fillHisto("hBDT_ntrk10","TRK_dm250", thesample,tree_track_ntrk10->at(iTrk),1.);fillHisto("hBDT_ntrk20","TRK_dm250", thesample,tree_track_ntrk20->at(iTrk),1.);fillHisto("hBDT_ntrk30","TRK_dm250", thesample,tree_track_ntrk30->at(iTrk),1.);fillHisto("hBDT_ntrk40","TRK_dm250", thesample,tree_track_ntrk40->at(iTrk),1.);fillHisto("hBDT_Hemi_dR","TRK_dm250", thesample,tree_track_Hemi_dR->at(iTrk),1.);fillHisto("hBDT_Hemi_dRmax","TRK_dm250", thesample,tree_track_Hemi_dRmax->at(iTrk),1.);}}
+              if ((Msmu-Mneu) == 300){fillHisto("hSim_ct0","dm300_TRKBDT",  thesample,ct0 ,1.);for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++){fillHisto("hBDT_lost","TRK_dm300", thesample,tree_track_lost->at(iTrk),1.);fillHisto("hBDT_dz","TRK_dm300", thesample,tree_track_dz->at(iTrk),1.);fillHisto("hBDT_dxy","TRK_dm300", thesample,tree_track_dxy->at(iTrk),1.);fillHisto("hBDT_pt","TRK_dm300", thesample,tree_track_pt->at(iTrk),1.);fillHisto("hBDT_eta","TRK_dm300", thesample,tree_track_eta->at(iTrk),1.);fillHisto("hBDT_NChi2","TRK_dm300", thesample,tree_track_NChi2->at(iTrk),1.);fillHisto("hBDT_nhits","TRK_dm300", thesample,tree_track_nHit->at(iTrk),1.);fillHisto("hBDT_iJet","TRK_dm300", thesample,tree_track_iJet->at(iTrk),1.);fillHisto("hBDT_drSig","TRK_dm300", thesample,tree_track_drSig->at(iTrk),1.);fillHisto("hBDT_dzSig","TRK_dm300", thesample,tree_track_dzSig->at(iTrk),1.);fillHisto("hBDT_ntrk10","TRK_dm300", thesample,tree_track_ntrk10->at(iTrk),1.);fillHisto("hBDT_ntrk20","TRK_dm300", thesample,tree_track_ntrk20->at(iTrk),1.);fillHisto("hBDT_ntrk30","TRK_dm300", thesample,tree_track_ntrk30->at(iTrk),1.);fillHisto("hBDT_ntrk40","TRK_dm300", thesample,tree_track_ntrk40->at(iTrk),1.);fillHisto("hBDT_Hemi_dR","TRK_dm300", thesample,tree_track_Hemi_dR->at(iTrk),1.);fillHisto("hBDT_Hemi_dRmax","TRK_dm300", thesample,tree_track_Hemi_dRmax->at(iTrk),1.);}}
+              if ((Msmu-Mneu) == 320){fillHisto("hSim_ct0","dm320_TRKBDT",  thesample,ct0 ,1.);for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++){fillHisto("hBDT_lost","TRK_dm320", thesample,tree_track_lost->at(iTrk),1.);fillHisto("hBDT_dz","TRK_dm320", thesample,tree_track_dz->at(iTrk),1.);fillHisto("hBDT_dxy","TRK_dm320", thesample,tree_track_dxy->at(iTrk),1.);fillHisto("hBDT_pt","TRK_dm320", thesample,tree_track_pt->at(iTrk),1.);fillHisto("hBDT_eta","TRK_dm320", thesample,tree_track_eta->at(iTrk),1.);fillHisto("hBDT_NChi2","TRK_dm320", thesample,tree_track_NChi2->at(iTrk),1.);fillHisto("hBDT_nhits","TRK_dm320", thesample,tree_track_nHit->at(iTrk),1.);fillHisto("hBDT_iJet","TRK_dm320", thesample,tree_track_iJet->at(iTrk),1.);fillHisto("hBDT_drSig","TRK_dm320", thesample,tree_track_drSig->at(iTrk),1.);fillHisto("hBDT_dzSig","TRK_dm320", thesample,tree_track_dzSig->at(iTrk),1.);fillHisto("hBDT_ntrk10","TRK_dm320", thesample,tree_track_ntrk10->at(iTrk),1.);fillHisto("hBDT_ntrk20","TRK_dm320", thesample,tree_track_ntrk20->at(iTrk),1.);fillHisto("hBDT_ntrk30","TRK_dm320", thesample,tree_track_ntrk30->at(iTrk),1.);fillHisto("hBDT_ntrk40","TRK_dm320", thesample,tree_track_ntrk40->at(iTrk),1.);fillHisto("hBDT_Hemi_dR","TRK_dm320", thesample,tree_track_Hemi_dR->at(iTrk),1.);fillHisto("hBDT_Hemi_dRmax","TRK_dm320", thesample,tree_track_Hemi_dRmax->at(iTrk),1.);}}
+
+            } 
+
+        }    // End Loop on GenParticle  
+    }
+
       for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++)
          {
           //--- Track pre-selected ---------//
           //get total number of tracks bfore any selection with tree_TRACK_SIZE
+               
+                fillHisto("hBDT_lost","TRK", thesample,tree_track_lost->at(iTrk),1.);
+                fillHisto("hBDT_dz","TRK", thesample,tree_track_dz->at(iTrk),1.);
+                fillHisto("hBDT_dxy","TRK", thesample,tree_track_dxy->at(iTrk),1.);
+                fillHisto("hBDT_pt","TRK", thesample,tree_track_pt->at(iTrk),1.);
+                fillHisto("hBDT_eta","TRK", thesample,tree_track_eta->at(iTrk),1.);
+                fillHisto("hBDT_NChi2","TRK", thesample,tree_track_NChi2->at(iTrk),1.);
+                fillHisto("hBDT_nhits","TRK", thesample,tree_track_nHit->at(iTrk),1.);
+                fillHisto("hBDT_iJet","TRK", thesample,tree_track_iJet->at(iTrk),1.);
+                fillHisto("hBDT_drSig","TRK", thesample,tree_track_drSig->at(iTrk),1.);
+                fillHisto("hBDT_dzSig","TRK", thesample,tree_track_dzSig->at(iTrk),1.);
+                fillHisto("hBDT_ntrk10","TRK", thesample,tree_track_ntrk10->at(iTrk),1.);
+                fillHisto("hBDT_ntrk20","TRK", thesample,tree_track_ntrk20->at(iTrk),1.);
+                fillHisto("hBDT_ntrk30","TRK", thesample,tree_track_ntrk30->at(iTrk),1.);
+                fillHisto("hBDT_ntrk40","TRK", thesample,tree_track_ntrk40->at(iTrk),1.);
+                fillHisto("hBDT_Hemi_dR","TRK", thesample,tree_track_Hemi_dR->at(iTrk),1.);
+                fillHisto("hBDT_Hemi_dRmax","TRK", thesample,tree_track_Hemi_dRmax->at(iTrk),1.);
 
           //----------Tracks selected by the BDT
             fillHisto("hData_MVAVal","noSel", thesample,tree_track_MVAval->at(iTrk),1.);
@@ -472,6 +742,7 @@ if (thesample == "DYJetsToLL_M50")
 
       int nTightVertex = 0;
       float nSelecBDTVtxTight_evt = 0;
+      float nSelecBDTVtxTight_step12_evt = 0;
       for(unsigned int iVtx = 0; iVtx <tree_Hemi->size(); iVtx ++)
          {
             fillHisto("hData_Hemi_Vtx_NChi2","noSel",   thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);
@@ -507,9 +778,21 @@ if (thesample == "DYJetsToLL_M50")
                         fillHisto("hData_Hemi_Vtx_r","GoodRecoVtx",       thesample,tree_Hemi_Vtx_r->at(iVtx),1.);
                         fillHisto("hData_Hemi_Vtx_z","GoodRecoVtx",       thesample,tree_Hemi_Vtx_z->at(iVtx),1.);
                         fillHisto("hData_Hemi_Vtx_MVAval","GoodRecoVtx",  thesample,tree_Hemi_Vtx_MVAval->at(iVtx),1.);
+                            fillHisto("hBDT_nTrks",     "VTX", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);
+                            fillHisto("hBDT_NChi2",     "VTX", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);
+                            fillHisto("hBDT_step",      "VTX", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);
+                            fillHisto("hBDT_r",         "VTX", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);
+                            fillHisto("hBDT_z",         "VTX", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);
+                            fillHisto("hBDT_MWT",       "VTX", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);
+                            fillHisto("hBDT_Vtx_Mass",  "VTX", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);
+                            fillHisto("hBDT_Hemi_Mass", "VTX", thesample,tree_Hemi_Mass->at(iVtx),1.);
+                            fillHisto("hBDT_dist",      "VTX", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);
+                            fillHisto("hBDT_ntrk10",    "VTX", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);
+                            fillHisto("hBDT_ntrk20",    "VTX", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);
+                            fillHisto("hBDT_MeanDCA",   "VTX", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);
                         // if (tree_Hemi_Vtx_MVAval->size()!=tree_Hemi_Vtx_step->size())
                         //   {std::cout<<"trere is an issue"<<std::endl;}
-                        if (tree_Hemi_Vtx_MVAval->at(iVtx)>0)
+                        if (tree_Hemi_Vtx_MVAval->at(iVtx)>VTXWP)
                           {
                             nSelecBDTVtx++;
                           }
@@ -555,10 +838,15 @@ if (thesample == "DYJetsToLL_M50")
                               fillHisto("hData_Hemi_Vtx_z","GoodRecoVtx_TightWP",       thesample,tree_Hemi_Vtx_z->at(iVtx),1.);
                               fillHisto("hData_Hemi_Vtx_MVAval","GoodRecoVtx_TightWP",  thesample,tree_Hemi_Vtx_MVAval->at(iVtx),1.);
                               nTightVertex++;
-                              if (tree_Hemi_Vtx_MVAval_Step1->at(iVtx)>0)
+                              if (tree_Hemi_Vtx_MVAval->at(iVtx)>VTXWP)
                                 {
                                   nSelecBDTVtxTight++;
                                   nSelecBDTVtxTight_evt++;
+                                }
+                              if (tree_Hemi_Vtx_MVAval_Step1->at(iVtx)>VTXWP)
+                                {
+                                  nSelecBDTVtxTight_step12++;
+                                  nSelecBDTVtxTight_step12_evt++;
                                 }
                               
                               if (Signal)
@@ -576,8 +864,74 @@ if (thesample == "DYJetsToLL_M50")
                                 }
 
                               nRecoVertexTightWP++;
-                              MeanDistanceTightWP +=  tree_Hemi_Vtx_dist->at(iVtx);              
-                      
+                              MeanDistanceTightWP +=  tree_Hemi_Vtx_dist->at(iVtx);    
+
+                              if (thesample == "LO_smu200to500_ctau20" && Signal)
+                              {        
+                                int Msmu = tree_smu_mass;
+                                int Mneu = tree_neu_mass;
+                                if ( Msmu > 180 && Msmu < 220 )      Msmu = 200;
+                                else if ( Msmu > 230 && Msmu < 270 ) Msmu = 250;
+                                else if ( Msmu > 280 && Msmu < 320 ) Msmu = 300;
+                                else if ( Msmu > 380 && Msmu < 420 ) Msmu = 400;
+                                else if ( Msmu > 480 && Msmu < 520 ) Msmu = 500;
+                                else cout << " !!! smu mass out of range !!! " << Msmu;
+                                if ( Mneu > 170 && Mneu < 190 )      Mneu = 180;
+                                else if ( Mneu > 190 && Mneu < 210 ) Mneu = 200;
+                                else if ( Mneu > 240 && Mneu < 260 ) Mneu = 250;
+                                else if ( Mneu > 270 && Mneu < 290 ) Mneu = 280;
+                                else if ( Mneu > 290 && Mneu < 310 ) Mneu = 300;
+                                else if ( Mneu > 340 && Mneu < 360 ) Mneu = 350;
+                                else if ( Mneu > 370 && Mneu < 390 ) Mneu = 380;
+                                else if ( Mneu > 390 && Mneu < 410 ) Mneu = 400;
+                                else if ( Mneu > 440 && Mneu < 460 ) Mneu = 450;
+                                else if ( Mneu > 470 && Mneu < 490 ) Mneu = 480;
+                                else cout << " !!! neu mass out of range !!! " << Mneu;
+     
+                                if ((Msmu-Mneu) == 20){ fillHisto("hSim_VTXBDT","dm20",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm20", thesample,tree_Hemi_Mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
+                                if ((Msmu-Mneu) == 50){ fillHisto("hSim_VTXBDT","dm50",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm50", thesample,tree_Hemi_Mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
+                                if ((Msmu-Mneu) == 100){ fillHisto("hSim_VTXBDT","dm100",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm100", thesample,tree_Hemi_Mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
+                                if ((Msmu-Mneu) == 150){ fillHisto("hSim_VTXBDT","dm150",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm150", thesample,tree_Hemi_Mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
+                                if ((Msmu-Mneu) == 200){ fillHisto("hSim_VTXBDT","dm200",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm200", thesample,tree_Hemi_Mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
+                                if ((Msmu-Mneu) == 250){ fillHisto("hSim_VTXBDT","dm250",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm250", thesample,tree_Hemi_Mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
+                                if ((Msmu-Mneu) == 300){ fillHisto("hSim_VTXBDT","dm300",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm300", thesample,tree_Hemi_Mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
+                                if ((Msmu-Mneu) == 320){ fillHisto("hSim_VTXBDT","dm320",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm320", thesample,tree_Hemi_Mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
+
+                                int ngenpart =  tree_genParticle_pt->size();
+                                for (int i=0; i<ngenpart; i++)    // Loop on GenParticle
+                                  {
+                                    float pdgId = tree_genParticle_pdgId->at(i); 
+                                    float mother_pdgId = tree_genParticle_mother_pdgId->at(i); 
+                                    float ct0 = tree_genParticle_ct0->at(i);
+
+                                    // top quark from neutralino
+                                    if ( abs(pdgId) == 6 && abs(mother_pdgId) == 1000023 ) 
+                                      {            
+                                        if ((Msmu-Mneu) == 20){fillHisto("hSim_ct0","dm20_VTXBDT",  thesample,ct0 ,1.);}
+                                        if ((Msmu-Mneu) == 50){fillHisto("hSim_ct0","dm50_VTXBDT",  thesample,ct0 ,1.);}
+                                        if ((Msmu-Mneu) == 100){fillHisto("hSim_ct0","dm100_VTXBDT",  thesample,ct0 ,1.);}
+                                        if ((Msmu-Mneu) == 150){fillHisto("hSim_ct0","dm150_VTXBDT",  thesample,ct0 ,1.);}
+                                        if ((Msmu-Mneu) == 200){fillHisto("hSim_ct0","dm200_VTXBDT",  thesample,ct0 ,1.);}
+                                        if ((Msmu-Mneu) == 250){fillHisto("hSim_ct0","dm250_VTXBDT",  thesample,ct0 ,1.);}
+                                        if ((Msmu-Mneu) == 300){fillHisto("hSim_ct0","dm300_VTXBDT",  thesample,ct0 ,1.);}
+                                        if ((Msmu-Mneu) == 320){fillHisto("hSim_ct0","dm320_VTXBDT",  thesample,ct0 ,1.);}
+                                      } 
+
+                                  }    // End Loop on GenParticle  
+                              }
+                            fillHisto("hBDT_nTrks",     "VTX_TightWP", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);
+                            fillHisto("hBDT_NChi2",     "VTX_TightWP", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);
+                            fillHisto("hBDT_step",      "VTX_TightWP", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);
+                            fillHisto("hBDT_r",         "VTX_TightWP", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);
+                            fillHisto("hBDT_z",         "VTX_TightWP", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);
+                            fillHisto("hBDT_MWT",       "VTX_TightWP", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);
+                            fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);
+                            fillHisto("hBDT_Hemi_Mass", "VTX_TightWP", thesample,tree_Hemi_Mass->at(iVtx),1.);
+                            fillHisto("hBDT_dist",      "VTX_TightWP", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);
+                            fillHisto("hBDT_ntrk10",    "VTX_TightWP", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);
+                            fillHisto("hBDT_ntrk20",    "VTX_TightWP", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);
+                            fillHisto("hBDT_MeanDCA",   "VTX_TightWP", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);
+    
                            }
                           
                      }// End Tight WP
@@ -631,6 +985,8 @@ if (thesample == "DYJetsToLL_M50")
         if (nTightVertex==1){nEvts_w1TightVtx++;}
         if (nSelecBDTVtxTight_evt == 2){nEvts_w2TightBDTVtx++;}
         if (nSelecBDTVtxTight_evt == 1){nEvts_w1TightBDTVtx++;}
+        if (nSelecBDTVtxTight_step12_evt == 2){ nEvts_w2TightBDTVtx_step12++; }
+        if (nSelecBDTVtxTight_step12_evt == 1){ nEvts_w1TightBDTVtx_step12++;}
          //---------------Vtx Selection Variables----------------//
   //------------------MWT CUT -------------------//
   for (int i =0 ;i<nSteps+1;i++)
@@ -808,6 +1164,17 @@ if (thesample == "DYJetsToLL_M50")
         }
     }
 
+//--------Smuon_InvMass------
+  for (int i =0 ;i<nStep_SmuonMass;i++)
+    {
+      for (unsigned int j = 0 ; j< tree_Hemi->size();j++)
+        {
+          nEvts_Hemi_CombinedHemiLeptonMass[i]++;
+
+        }
+    }
+
+
 //--------Vtx_DCA tracks------
 
   for (int i =0 ;i<nStep_DCA;i++)
@@ -855,9 +1222,9 @@ for (int i = 0 ; i < nStep_jet2_pt ; i++)
 //--------Leadingmuon pt------
 for (int i = 0 ; i < nStep_muon_pt ; i++)
   {
-    for (unsigned int j = 0 ; j < tree_muon_leadingpt->size() ; j++)
+    for (unsigned int j = 0 ; j < tree_lepton_leadingpt->size() ; j++)
       {
-        if (tree_muon_leadingpt->at(j) > (MuonPTCut+i*dpt_muon))
+        if (tree_lepton_leadingpt->at(j) > (MuonPTCut+i*dpt_muon))
           {
             nEvts_muonpt[i]++;
           }
@@ -867,9 +1234,9 @@ for (int i = 0 ; i < nStep_muon_pt ; i++)
 //--------subLeading muon pt------
 for (int i = 0 ; i < nStep_muon2_pt ; i++)
   {
-    for (unsigned int j = 0 ; j < tree_muon_leadingpt2->size() ; j++)
+    for (unsigned int j = 0 ; j < tree_lepton_leadingpt2->size() ; j++)
       {
-        if (tree_muon_leadingpt2->at(j) >= (Muon2PTCut+i*dpt_muon2))
+        if (tree_lepton_leadingpt2->at(j) >= (Muon2PTCut+i*dpt_muon2))
           {
             nEvts_muon2pt[i]++;
           }
@@ -892,9 +1259,9 @@ for (int i = 0 ; i < nStep_HT_pt ; i++)
 
 for (int i = 0 ; i < nStep_ST_pt ; i++)
   {
-    for (unsigned int j = 0 ; j < tree_ST->size() ; j++)
+    for (unsigned int j = 0 ; j < tree_lepton_leadingpt->size() ; j++)
       {
-        if (tree_ST->at(j) > (STCut+i*dpt_ST))
+        if (tree_LT > (STCut+i*dpt_ST))
           {
             nEvts_ST[i]++;
           }
@@ -904,7 +1271,7 @@ for (int i = 0 ; i < nStep_ST_pt ; i++)
 //--------nJets
 for (int i = 0 ; i < nStep_nJet ; i++)
   {
-    for (unsigned int j = 0 ; j < tree_ST->size() ; j++)
+    for (unsigned int j = 0 ; j < tree_lepton_leadingpt->size() ; j++)
       {
         if (tree_njet > (nJetCut+i*dnJet_ST))
           {
@@ -915,25 +1282,25 @@ for (int i = 0 ; i < nStep_nJet ; i++)
 
   //-------------nmu----------//
 
-for (int i = 0 ; i < nStep_nMuon ; i++)
-  {
-    for (unsigned int j = 0 ; j < tree_muon_nmu->size() ; j++)
-      {
-        if (tree_muon_nmu->at(j) > (nMuonCut+i*dnMuon))
-          {
-            nEvts_nMuon[i]++;
-          }
-      }
-  }
+// for (int i = 0 ; i < nStep_nMuon ; i++)
+//   {
+//     for (unsigned int j = 0 ; j < tree_muon_pt->size() ; j++)
+//       {
+//         if (tree_muon_nmu->at(j) > (nMuonCut+i*dnMuon))
+//           {
+//             nEvts_nMuon[i]++;
+//           }
+//       }
+//   }
 // //------------------------------
 
 // //-------------muon_muon_dR----------//
 
 for (int i = 0 ; i < nStep_MuondR ; i++)
   {
-    for (unsigned int j = 0 ; j < tree_muon_muon_dR->size() ; j++)
+    for (unsigned int j = 0 ; j < tree_lepton_lepton_dR->size() ; j++)
       {
-        if (tree_muon_muon_dR->at(j) > (MuondRCut+i*dMuondR))
+        if (tree_lepton_lepton_dR->at(j) > (MuondRCut+i*dMuondR))
           {
             nEvts_MuondR[i]++;
           }
@@ -945,9 +1312,9 @@ for (int i = 0 ; i < nStep_MuondR ; i++)
 
 for (int i = 0 ; i < nStep_MuondPhi ; i++)
   {
-    for (unsigned int j = 0 ; j < tree_muon_muon_dPhi->size() ; j++)
+    for (unsigned int j = 0 ; j < tree_lepton_lepton_dPhi->size() ; j++)
       {
-        if (tree_muon_muon_dPhi->at(j) > (MuondPhiCut+i*dMuondPhi))
+        if (tree_lepton_lepton_dPhi->at(j) > (MuondPhiCut+i*dMuondPhi))
           {
             nEvts_MuondPhi[i]++;
           }
@@ -959,9 +1326,9 @@ for (int i = 0 ; i < nStep_MuondPhi ; i++)
 
 for (int i = 0 ; i < nStep_MuondEta ; i++)
   {
-    for (unsigned int j = 0 ; j < tree_muon_muon_dEta->size() ; j++)
+    for (unsigned int j = 0 ; j < tree_lepton_lepton_dEta->size() ; j++)
       {
-        if (tree_muon_muon_dEta->at(j) > (MuondEtaCut+i*dMuondEta ))
+        if (tree_lepton_lepton_dEta->at(j) > (MuondEtaCut+i*dMuondEta ))
           {
             nEvts_MuondEta[i]++;
           }
@@ -1041,17 +1408,296 @@ for (int i = 0 ; i < nStep_MuonJetdRmin ; i++)
   for (int i =0 ;i<nSteps_BDT;i++)
     {
 
-      for (unsigned int j = 0 ; j< tree_Evts_MVAval->size();j++)
+      for (unsigned int j = 0 ; j< tree_lepton_leadingpt->size();j++)
         {
-          if ( tree_Evts_MVAval->at(j)>(MeanBDTcut+i*dBDT) )
+          if ( tree_Evts_MVAval>(MeanBDTcut+i*dBDT) )
             {
               nSelecEvts[i]++;
             }
         }
     }
 // std::cout<<"debugB"<<std::endl;
-      }// End of Tree_FIlter
-   }// End Global Loop
+
+      //*******************************
+      // Loop on Gen Particles
+      //*******************************
+
+////////                                                               ////////
+////////                          GENERATION                           ////////
+////////                                                               ////////
+
+  if (thesample == "LO_smu200to500_ctau20" && Signal)
+    {    
+          
+      int Msmu = tree_smu_mass;
+      int Mneu = tree_neu_mass;
+      if ( Msmu > 180 && Msmu < 220 )      Msmu = 200;
+      else if ( Msmu > 230 && Msmu < 270 ) Msmu = 250;
+      else if ( Msmu > 280 && Msmu < 320 ) Msmu = 300;
+      else if ( Msmu > 380 && Msmu < 420 ) Msmu = 400;
+      else if ( Msmu > 480 && Msmu < 520 ) Msmu = 500;
+      else cout << " !!! smu mass out of range !!! " << Msmu;
+      if ( Mneu > 170 && Mneu < 190 )      Mneu = 180;
+      else if ( Mneu > 190 && Mneu < 210 ) Mneu = 200;
+      else if ( Mneu > 240 && Mneu < 260 ) Mneu = 250;
+      else if ( Mneu > 270 && Mneu < 290 ) Mneu = 280;
+      else if ( Mneu > 290 && Mneu < 310 ) Mneu = 300;
+      else if ( Mneu > 340 && Mneu < 360 ) Mneu = 350;
+      else if ( Mneu > 370 && Mneu < 390 ) Mneu = 380;
+      else if ( Mneu > 390 && Mneu < 410 ) Mneu = 400;
+      else if ( Mneu > 440 && Mneu < 460 ) Mneu = 450;
+      else if ( Mneu > 470 && Mneu < 490 ) Mneu = 480;
+      else cout << " !!! neu mass out of range !!! " << Mneu;
+        
+
+      // fillHisto("hGen_Msmu","noSel",  thesample, tree_smu_mass ,1.);
+      // fillHisto("hGen_Mneu","noSel",  thesample, tree_neu_mass ,1.);
+
+      int ngenpart =  tree_genParticle_pt->size();
+      for (int i=0; i<ngenpart; i++)    // Loop on GenParticle
+        {
+          float pdgId = tree_genParticle_pdgId->at(i); 
+          float mother_pdgId = tree_genParticle_mother_pdgId->at(i); 
+          float ct0 = tree_genParticle_ct0->at(i);
+
+          // top quark from neutralino
+          if ( abs(pdgId) == 6 && abs(mother_pdgId) == 1000023 ) 
+            {
+              fillHisto("hGen_ct0","noSel",  thesample, ct0 ,1.);
+              
+              if ( Msmu == 200 && Mneu == 180 ) fillHisto("hGen_ct0","smu200_neu180",  thesample, ct0 ,1.);
+              if ( Msmu == 250 && Mneu == 200 ) fillHisto("hGen_ct0","smu250_neu200",  thesample, ct0 ,1.);
+              if ( Msmu == 300 && Mneu == 180 ) fillHisto("hGen_ct0","smu300_neu180",  thesample, ct0 ,1.);
+              if ( Msmu == 300 && Mneu == 200 ) fillHisto("hGen_ct0","smu300_neu200",  thesample, ct0 ,1.);
+              if ( Msmu == 300 && Mneu == 250 ) fillHisto("hGen_ct0","smu300_neu250",  thesample, ct0 ,1.);
+              if ( Msmu == 300 && Mneu == 280 ) fillHisto("hGen_ct0","smu300_neu280",  thesample, ct0 ,1.);
+              if ( Msmu == 400 && Mneu == 180 ) fillHisto("hGen_ct0","smu400_neu180",  thesample, ct0 ,1.);
+              if ( Msmu == 400 && Mneu == 200 ) fillHisto("hGen_ct0","smu400_neu200",  thesample, ct0 ,1.);
+              if ( Msmu == 400 && Mneu == 250 ) fillHisto("hGen_ct0","smu400_neu250",  thesample, ct0 ,1.);
+              if ( Msmu == 400 && Mneu == 300 ) fillHisto("hGen_ct0","smu400_neu300",  thesample, ct0 ,1.);
+              if ( Msmu == 400 && Mneu == 350 ) fillHisto("hGen_ct0","smu400_neu350",  thesample, ct0 ,1.);
+              if ( Msmu == 400 && Mneu == 380 ) fillHisto("hGen_ct0","smu400_neu380",  thesample, ct0 ,1.);
+              if ( Msmu == 500 && Mneu == 180 ) fillHisto("hGen_ct0","smu500_neu180",  thesample, ct0 ,1.);
+              if ( Msmu == 500 && Mneu == 200 ) fillHisto("hGen_ct0","smu500_neu200",  thesample, ct0 ,1.);
+              if ( Msmu == 500 && Mneu == 250 ) fillHisto("hGen_ct0","smu500_neu250",  thesample, ct0 ,1.);
+              if ( Msmu == 500 && Mneu == 300 ) fillHisto("hGen_ct0","smu500_neu300",  thesample, ct0 ,1.);
+              if ( Msmu == 500 && Mneu == 350 ) fillHisto("hGen_ct0","smu500_neu350",  thesample, ct0 ,1.);
+              if ( Msmu == 500 && Mneu == 400 ) fillHisto("hGen_ct0","smu500_neu400",  thesample, ct0 ,1.);
+              if ( Msmu == 500 && Mneu == 450 ) fillHisto("hGen_ct0","smu500_neu450",  thesample, ct0 ,1.);
+              if ( Msmu == 500 && Mneu == 480 ) fillHisto("hGen_ct0","smu500_neu480",  thesample, ct0 ,1.);
+            } 
+
+        }    // End Loop on GenParticle
+
+////////                                                               ////////
+////////                         PRESELECTION                          ////////
+////////                                                               ////////
+
+      bool Filter = tree_Filter; // Loose ID and Loose Iso for both muons
+      //$$   if ( tree_GoodMu1 != 11 || tree_GoodMu2 != 11 ) Filter = false; // Tight ID and Tight Iso for both muons
+
+      if ( Msmu == 200 && Mneu == 180 ) fillHisto("hSim_Filter","smu200_neu180",  thesample, Filter ,1.);
+      if ( Msmu == 250 && Mneu == 200 ) fillHisto("hSim_Filter","smu250_neu200",  thesample, Filter ,1.);
+      if ( Msmu == 300 && Mneu == 180 ) fillHisto("hSim_Filter","smu300_neu180",  thesample, Filter ,1.);
+      if ( Msmu == 300 && Mneu == 200 ) fillHisto("hSim_Filter","smu300_neu200",  thesample, Filter ,1.);
+      if ( Msmu == 300 && Mneu == 250 ) fillHisto("hSim_Filter","smu300_neu250",  thesample, Filter ,1.);
+      if ( Msmu == 300 && Mneu == 280 ) fillHisto("hSim_Filter","smu300_neu280",  thesample, Filter ,1.);
+      if ( Msmu == 400 && Mneu == 180 ) fillHisto("hSim_Filter","smu400_neu180",  thesample, Filter ,1.);
+      if ( Msmu == 400 && Mneu == 200 ) fillHisto("hSim_Filter","smu400_neu200",  thesample, Filter ,1.);
+      if ( Msmu == 400 && Mneu == 250 ) fillHisto("hSim_Filter","smu400_neu250",  thesample, Filter ,1.);
+      if ( Msmu == 400 && Mneu == 300 ) fillHisto("hSim_Filter","smu400_neu300",  thesample, Filter ,1.);
+      if ( Msmu == 400 && Mneu == 350 ) fillHisto("hSim_Filter","smu400_neu350",  thesample, Filter ,1.);
+      if ( Msmu == 400 && Mneu == 380 ) fillHisto("hSim_Filter","smu400_neu380",  thesample, Filter ,1.);
+      if ( Msmu == 500 && Mneu == 180 ) fillHisto("hSim_Filter","smu500_neu180",  thesample, Filter ,1.);
+      if ( Msmu == 500 && Mneu == 200 ) fillHisto("hSim_Filter","smu500_neu200",  thesample, Filter ,1.);
+      if ( Msmu == 500 && Mneu == 250 ) fillHisto("hSim_Filter","smu500_neu250",  thesample, Filter ,1.);
+      if ( Msmu == 500 && Mneu == 300 ) fillHisto("hSim_Filter","smu500_neu300",  thesample, Filter ,1.);
+      if ( Msmu == 500 && Mneu == 350 ) fillHisto("hSim_Filter","smu500_neu350",  thesample, Filter ,1.);
+      if ( Msmu == 500 && Mneu == 400 ) fillHisto("hSim_Filter","smu500_neu400",  thesample, Filter ,1.);
+      if ( Msmu == 500 && Mneu == 450 ) fillHisto("hSim_Filter","smu500_neu450",  thesample, Filter ,1.);
+      if ( Msmu == 500 && Mneu == 480 ) fillHisto("hSim_Filter","smu500_neu480",  thesample, Filter ,1.);
+
+      //$$
+      if ( !Filter ) continue; 
+      //$$
+
+
+///////////////////////
+// Delta R between hemisphere axis and closest neutralino
+
+   int nHemi = tree_Hemi_dR->size();
+   for (int i=0; i<nHemi; i++) {   // Loop on hemispheres
+     float dR = tree_Hemi_dR->at(i);
+     
+     if ( Msmu == 200 && Mneu == 180 ) fillHisto("hSim_Hemi_dR","smu200_neu180",  thesample, dR ,1.);
+     if ( Msmu == 250 && Mneu == 200 ) fillHisto("hSim_Hemi_dR","smu250_neu200",  thesample, dR ,1.);
+     if ( Msmu == 300 && Mneu == 180 ) fillHisto("hSim_Hemi_dR","smu300_neu180",  thesample, dR ,1.);
+     if ( Msmu == 300 && Mneu == 200 ) fillHisto("hSim_Hemi_dR","smu300_neu200",  thesample, dR ,1.);
+     if ( Msmu == 300 && Mneu == 250 ) fillHisto("hSim_Hemi_dR","smu300_neu250",  thesample, dR ,1.);
+     if ( Msmu == 300 && Mneu == 280 ) fillHisto("hSim_Hemi_dR","smu300_neu280",  thesample, dR ,1.);
+     if ( Msmu == 400 && Mneu == 180 ) fillHisto("hSim_Hemi_dR","smu300_neu180",  thesample, dR ,1.);
+     if ( Msmu == 400 && Mneu == 200 ) fillHisto("hSim_Hemi_dR","smu400_neu200",  thesample, dR ,1.);
+     if ( Msmu == 400 && Mneu == 250 ) fillHisto("hSim_Hemi_dR","smu400_neu250",  thesample, dR ,1.);
+     if ( Msmu == 400 && Mneu == 300 ) fillHisto("hSim_Hemi_dR","smu400_neu300",  thesample, dR ,1.);
+     if ( Msmu == 400 && Mneu == 350 ) fillHisto("hSim_Hemi_dR","smu400_neu350",  thesample, dR ,1.);
+     if ( Msmu == 400 && Mneu == 380 ) fillHisto("hSim_Hemi_dR","smu400_neu380",  thesample, dR ,1.);
+     if ( Msmu == 500 && Mneu == 180 ) fillHisto("hSim_Hemi_dR","smu500_neu180",  thesample, dR ,1.);
+     if ( Msmu == 500 && Mneu == 200 ) fillHisto("hSim_Hemi_dR","smu500_neu200",  thesample, dR ,1.);
+     if ( Msmu == 500 && Mneu == 250 ) fillHisto("hSim_Hemi_dR","smu500_neu250",  thesample, dR ,1.);
+     if ( Msmu == 500 && Mneu == 300 ) fillHisto("hSim_Hemi_dR","smu500_neu300",  thesample, dR ,1.);
+     if ( Msmu == 500 && Mneu == 350 ) fillHisto("hSim_Hemi_dR","smu500_neu350",  thesample, dR ,1.);
+     if ( Msmu == 500 && Mneu == 400 ) fillHisto("hSim_Hemi_dR","smu500_neu400",  thesample, dR ,1.);
+     if ( Msmu == 500 && Mneu == 450 ) fillHisto("hSim_Hemi_dR","smu500_neu450",  thesample, dR ,1.);
+     if ( Msmu == 500 && Mneu == 480 ) fillHisto("hSim_Hemi_dR","smu500_neu480",  thesample, dR ,1.);
+
+     float dist = tree_Hemi_Vtx_dist->at(i);
+     float NChi2 = tree_Hemi_Vtx_NChi2->at(i);
+     
+   if ( NChi2 > 0. && NChi2 < 10. ) {
+
+      
+     if ( Msmu == 200 && Mneu == 180 ) fillHisto("hData_Hemi_Vtx_dist","smu200_neu180",  thesample, dist ,1.);
+     if ( Msmu == 250 && Mneu == 200 ) fillHisto("hData_Hemi_Vtx_dist","smu250_neu200",  thesample, dist ,1.);
+     if ( Msmu == 300 && Mneu == 180 ) fillHisto("hData_Hemi_Vtx_dist","smu300_neu180",  thesample, dist ,1.);
+     if ( Msmu == 300 && Mneu == 200 ) fillHisto("hData_Hemi_Vtx_dist","smu300_neu200",  thesample, dist ,1.);
+     if ( Msmu == 300 && Mneu == 250 ) fillHisto("hData_Hemi_Vtx_dist","smu300_neu250",  thesample, dist ,1.);
+     if ( Msmu == 300 && Mneu == 280 ) fillHisto("hData_Hemi_Vtx_dist","smu300_neu280",  thesample, dist ,1.);
+     if ( Msmu == 400 && Mneu == 180 ) fillHisto("hData_Hemi_Vtx_dist","smu400_neu180",  thesample, dist ,1.);
+     if ( Msmu == 400 && Mneu == 200 ) fillHisto("hData_Hemi_Vtx_dist","smu400_neu200",  thesample, dist ,1.);
+     if ( Msmu == 400 && Mneu == 250 ) fillHisto("hData_Hemi_Vtx_dist","smu400_neu250",  thesample, dist ,1.);
+     if ( Msmu == 400 && Mneu == 300 ) fillHisto("hData_Hemi_Vtx_dist","smu400_neu300",  thesample, dist ,1.);
+     if ( Msmu == 400 && Mneu == 350 ) fillHisto("hData_Hemi_Vtx_dist","smu400_neu350",  thesample, dist ,1.);
+     if ( Msmu == 400 && Mneu == 380 ) fillHisto("hData_Hemi_Vtx_dist","smu400_neu380",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 180 ) fillHisto("hData_Hemi_Vtx_dist","smu500_neu180",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 200 ) fillHisto("hData_Hemi_Vtx_dist","smu500_neu200",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 250 ) fillHisto("hData_Hemi_Vtx_dist","smu500_neu250",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 300 ) fillHisto("hData_Hemi_Vtx_dist","smu500_neu300",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 350 ) fillHisto("hData_Hemi_Vtx_dist","smu500_neu350",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 400 ) fillHisto("hData_Hemi_Vtx_dist","smu500_neu400",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 450 ) fillHisto("hData_Hemi_Vtx_dist","smu500_neu450",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 480 ) fillHisto("hData_Hemi_Vtx_dist","smu500_neu480",  thesample, dist ,1.);
+   }
+   else {
+     if ( Msmu == 200 && Mneu == 180 ) fillHisto("hData_Hemi_Vtx_dist","smu200_neu180",  thesample, -1 ,1.);
+     if ( Msmu == 250 && Mneu == 200 ) fillHisto("hData_Hemi_Vtx_dist","smu250_neu200",  thesample, -1 ,1.);
+     if ( Msmu == 300 && Mneu == 180 ) fillHisto("hData_Hemi_Vtx_dist","smu300_neu180",  thesample, -1 ,1.);
+     if ( Msmu == 300 && Mneu == 200 ) fillHisto("hData_Hemi_Vtx_dist","smu300_neu200",  thesample, -1 ,1.);
+     if ( Msmu == 300 && Mneu == 250 ) fillHisto("hData_Hemi_Vtx_dist","smu300_neu250",  thesample, -1 ,1.);
+     if ( Msmu == 300 && Mneu == 280 ) fillHisto("hData_Hemi_Vtx_dist","smu300_neu280",  thesample, -1 ,1.);
+     if ( Msmu == 400 && Mneu == 180 ) fillHisto("hData_Hemi_Vtx_dist","smu400_neu180",  thesample, -1 ,1.);
+     if ( Msmu == 400 && Mneu == 200 ) fillHisto("hData_Hemi_Vtx_dist","smu400_neu200",  thesample, -1 ,1.);
+     if ( Msmu == 400 && Mneu == 250 ) fillHisto("hData_Hemi_Vtx_dist","smu400_neu250",  thesample, -1 ,1.);
+     if ( Msmu == 400 && Mneu == 300 ) fillHisto("hData_Hemi_Vtx_dist","smu400_neu300",  thesample, -1 ,1.);
+     if ( Msmu == 400 && Mneu == 350 ) fillHisto("hData_Hemi_Vtx_dist","smu400_neu350",  thesample, -1 ,1.);
+     if ( Msmu == 400 && Mneu == 380 ) fillHisto("hData_Hemi_Vtx_dist","smu400_neu380",  thesample, -1 ,1.);
+     if ( Msmu == 500 && Mneu == 180 ) fillHisto("hData_Hemi_Vtx_dist","smu500_neu180",  thesample, -1 ,1.);
+     if ( Msmu == 500 && Mneu == 200 ) fillHisto("hData_Hemi_Vtx_dist","smu500_neu200",  thesample, -1 ,1.);
+     if ( Msmu == 500 && Mneu == 250 ) fillHisto("hData_Hemi_Vtx_dist","smu500_neu250",  thesample, -1 ,1.);
+     if ( Msmu == 500 && Mneu == 300 ) fillHisto("hData_Hemi_Vtx_dist","smu500_neu300",  thesample, -1 ,1.);
+     if ( Msmu == 500 && Mneu == 350 ) fillHisto("hData_Hemi_Vtx_dist","smu500_neu350",  thesample, -1 ,1.);
+     if ( Msmu == 500 && Mneu == 400 ) fillHisto("hData_Hemi_Vtx_dist","smu500_neu400",  thesample, -1 ,1.);
+     if ( Msmu == 500 && Mneu == 450 ) fillHisto("hData_Hemi_Vtx_dist","smu500_neu450",  thesample, -1 ,1.);
+     if ( Msmu == 500 && Mneu == 480 ) fillHisto("hData_Hemi_Vtx_dist","smu500_neu480",  thesample, -1 ,1.);
+   }
+    
+   if ( NChi2 > 0. && NChi2 < 10. && tree_Hemi_LLP_ping->at(i) ) {
+     if ( Msmu == 200 && Mneu == 180 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu200_neu180",  thesample, dist ,1.);
+     if ( Msmu == 250 && Mneu == 200 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu250_neu200",  thesample, dist ,1.);
+     if ( Msmu == 300 && Mneu == 180 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu300_neu180",  thesample, dist ,1.);
+     if ( Msmu == 300 && Mneu == 200 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu300_neu200",  thesample, dist ,1.);
+     if ( Msmu == 300 && Mneu == 250 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu300_neu250",  thesample, dist ,1.);
+     if ( Msmu == 300 && Mneu == 280 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu300_neu280",  thesample, dist ,1.);
+     if ( Msmu == 400 && Mneu == 180 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu400_neu180",  thesample, dist ,1.);
+     if ( Msmu == 400 && Mneu == 200 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu400_neu200",  thesample, dist ,1.);
+     if ( Msmu == 400 && Mneu == 250 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu400_neu250",  thesample, dist ,1.);
+     if ( Msmu == 400 && Mneu == 300 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu400_neu300",  thesample, dist ,1.);
+     if ( Msmu == 400 && Mneu == 350 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu400_neu350",  thesample, dist ,1.);
+     if ( Msmu == 400 && Mneu == 380 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu400_neu380",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 180 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu180",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 200 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu200",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 250 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu250",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 300 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu300",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 350 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu350",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 400 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu400",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 450 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu450",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 480 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu480",  thesample, dist ,1.);
+   }
+   else {
+     if ( Msmu == 200 && Mneu == 180 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu200_neu180",  thesample, -1 ,1.);
+     if ( Msmu == 250 && Mneu == 200 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu250_neu200",  thesample, -1 ,1.);
+     if ( Msmu == 300 && Mneu == 180 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu300_neu180",  thesample, -1,1.);
+     if ( Msmu == 300 && Mneu == 200 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu300_neu200",  thesample, -1,1.);
+     if ( Msmu == 300 && Mneu == 250 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu300_neu250",  thesample, -1,1.);
+     if ( Msmu == 300 && Mneu == 280 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu300_neu280",  thesample, -1,1.);
+     if ( Msmu == 400 && Mneu == 180 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu400_neu180",  thesample, -1,1.);
+     if ( Msmu == 400 && Mneu == 200 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu400_neu200",  thesample, -1,1.);
+     if ( Msmu == 400 && Mneu == 250 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu400_neu250",  thesample, -1,1.);
+     if ( Msmu == 400 && Mneu == 300 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu400_neu300",  thesample, -1,1.);
+     if ( Msmu == 400 && Mneu == 350 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu400_neu350",  thesample, -1,1.);
+     if ( Msmu == 400 && Mneu == 380 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu400_neu380",  thesample, -1,1.);
+     if ( Msmu == 500 && Mneu == 180 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu180",  thesample, -1,1.);
+     if ( Msmu == 500 && Mneu == 200 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu200",  thesample, -1,1.);
+     if ( Msmu == 500 && Mneu == 250 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu250",  thesample, -1,1.);
+     if ( Msmu == 500 && Mneu == 300 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu300",  thesample, -1,1.);
+     if ( Msmu == 500 && Mneu == 350 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu350",  thesample, -1,1.);
+     if ( Msmu == 500 && Mneu == 400 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu400",  thesample, -1,1.);
+     if ( Msmu == 500 && Mneu == 450 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu450",  thesample, -1,1.);
+     if ( Msmu == 500 && Mneu == 480 ) fillHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu480",  thesample, -1,1.);
+
+   }
+     
+   if ( NChi2 > 0. && NChi2 < 10. && tree_Hemi_LLP_ping->at(i) && (tree_Hemi_Vtx_step->at(i) == 1 || tree_Hemi_Vtx_step->at(i) == 2) ) {
+     if ( Msmu == 200 && Mneu == 180 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu200_neu180",  thesample, dist ,1.);
+     if ( Msmu == 250 && Mneu == 200 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu250_neu200",  thesample, dist ,1.);
+     if ( Msmu == 300 && Mneu == 180 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu300_neu180",  thesample, dist ,1.);
+     if ( Msmu == 300 && Mneu == 200 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu300_neu200",  thesample, dist ,1.);
+     if ( Msmu == 300 && Mneu == 250 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu300_neu250",  thesample, dist ,1.);
+     if ( Msmu == 300 && Mneu == 280 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu300_neu280",  thesample, dist ,1.);
+     if ( Msmu == 400 && Mneu == 180 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu400_neu180",  thesample, dist ,1.);
+     if ( Msmu == 400 && Mneu == 200 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu400_neu200",  thesample, dist ,1.);
+     if ( Msmu == 400 && Mneu == 250 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu400_neu250",  thesample, dist ,1.);
+     if ( Msmu == 400 && Mneu == 300 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu400_neu300",  thesample, dist ,1.);
+     if ( Msmu == 400 && Mneu == 350 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu400_neu350",  thesample, dist ,1.);
+     if ( Msmu == 400 && Mneu == 380 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu400_neu380",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 180 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu180",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 200 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu200",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 250 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu250",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 300 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu300",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 350 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu350",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 400 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu400",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 450 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu450",  thesample, dist ,1.);
+     if ( Msmu == 500 && Mneu == 480 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu480",  thesample, dist ,1.);
+
+   }
+   else {
+     if ( Msmu == 200 && Mneu == 180 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu200_neu180",  thesample, -1,1.);
+     if ( Msmu == 250 && Mneu == 200 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu250_neu200",  thesample, -1,1.);
+     if ( Msmu == 300 && Mneu == 180 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu300_neu180",  thesample, -1,1.);
+     if ( Msmu == 300 && Mneu == 200 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu300_neu200",  thesample, -1,1.);
+     if ( Msmu == 300 && Mneu == 250 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu300_neu250",  thesample, -1,1.);
+     if ( Msmu == 300 && Mneu == 280 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu300_neu280",  thesample, -1,1.);
+     if ( Msmu == 400 && Mneu == 180 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu400_neu180",  thesample, -1,1.);
+     if ( Msmu == 400 && Mneu == 200 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu400_neu200",  thesample, -1,1.);
+     if ( Msmu == 400 && Mneu == 250 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu400_neu250",  thesample, -1,1.);
+     if ( Msmu == 400 && Mneu == 300 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu400_neu300",  thesample, -1,1.);
+     if ( Msmu == 400 && Mneu == 350 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu400_neu350",  thesample, -1,1.);
+     if ( Msmu == 400 && Mneu == 380 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu400_neu380",  thesample, -1,1.);
+     if ( Msmu == 500 && Mneu == 180 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu180",  thesample, -1,1.);
+     if ( Msmu == 500 && Mneu == 200 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu200",  thesample, -1,1.);
+     if ( Msmu == 500 && Mneu == 250 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu250",  thesample, -1,1.);
+     if ( Msmu == 500 && Mneu == 300 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu300",  thesample, -1,1.);
+     if ( Msmu == 500 && Mneu == 350 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu350",  thesample, -1,1.);
+     if ( Msmu == 500 && Mneu == 400 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu400",  thesample, -1,1.);
+     if ( Msmu == 500 && Mneu == 450 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu450",  thesample, -1,1.);
+     if ( Msmu == 500 && Mneu == 480 ) fillHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu480",  thesample, -1,1.);
+   }
+
+   }
+
+
+    } // end loop on sample 200to500
+  }// End of Tree_FIlter
+}// End Global Loop
 
 
     //-----------------------------------//
@@ -1123,6 +1769,13 @@ for (int h = 0 ; h < nStep_dd; h++)
       fillHisto("hData_Hemi_Mass","NoSel",  thesample,HemiMassCut+h*dHemiMass ,nEvts_Hemi_Mass[h]/nRecoVertex);
       fillHisto("hData_Hemi_Mass","TightWP",  thesample,HemiMassCut+h*dHemiMass ,nEvts_Hemi_Mass_step1[h]/nRecoVertexTightWP);
   }
+
+//Smuon mass
+  for (int h = 0 ; h < nStep_SmuonMass; h++)
+  {
+      fillHisto("hData_Hemi_SmuonMass","NoSel",  thesample,Hemi_CombinedHemiLeptonMassCut+h*dSmuonMass ,nEvts_Hemi_CombinedHemiLeptonMass[h]/(2*nEvts));
+  }
+
 //-----------------------------------------------
 // std::cout<<"bug starts here 10"<<std::endl;
 //--------Vtx_DCA tracks------
@@ -1260,40 +1913,121 @@ for(int h =0 ; h < nStep_nJet;h++)
    ofs<<" NRecoVertexEff TightWp: "<<100*nRecoVertexTightWP/nRecoVertex<<" per cent of "<<NRecoVertexEff<<std::endl;
    ofs<<"  NRecoVertexEff  LooseWP: "<<100*nRecoVertexLooseWP/nRecoVertex<<" per cent of "<<NRecoVertexEff<<std::endl;
    ofs<<" //----------------- End of Table ---------------\\ "<<std::endl; 
+      ofs<<" "<<std::endl;
+   ofs<<"Event yields for each step : "<<std::endl;
+   ofs<<"Nevents: "<<nentries*NormFactor*lumiRun2<<std::endl;
+   ofs<<"Online+Offline Selection : "<<nFilterEvt*NormFactor*lumiRun2<<std::endl;
+   ofs<<"EVTS BDT for WP "<<EVTSWP <<" : "<<nEvts*NormFactor*lumiRun2<<std::endl;
+   ofs<<"Vertex Reco: "<<nRecoVertex*(NormFactor/2)*lumiRun2<<std::endl;
+   ofs<<"Vtx BDT3 > cut "<<VTXWP <<": "<<nSelecBDTVtx*(NormFactor/2)*lumiRun2<<std::endl;
+   ofs<<"BDT2-Tight Vertex only : "<<nRecoVertexTightWP*(NormFactor/2)*lumiRun2<<std::endl;
+   ofs<<"BDT2-Tight BDT3 Vtx > cut "<<VTXWP <<": "<<nSelecBDTVtxTight*(NormFactor/2)*lumiRun2<<std::endl;
+   ofs<<"Two BDT2-Tight vertices : "<<nEvts_w2TightVtx*(NormFactor)*lumiRun2<<std::endl;
+   ofs<<"Two BDT2-Tight BDT3 Vtx > cut "<<VTXWP <<": "<<nEvts_w2TightBDTVtx*(NormFactor)*lumiRun2<<std::endl;
+   ofs<<"Two BDT2-Tight BDT3bis Vtx > cut "<<VTXWP <<": "<<nEvts_w2TightBDTVtx_step12*(NormFactor)*lumiRun2<<std::endl;
+   ofs<<"One BDT2-Tight Vertex: "<<nEvts_w1TightVtx*(NormFactor)*lumiRun2<<std::endl;
+   ofs<<"One BDT2-Tight BDT3 Vtx > cut "<<VTXWP <<": "<<nEvts_w1TightBDTVtx*(NormFactor)*lumiRun2<<std::endl;
+   ofs<<"One BDT2-Tight BDT3bis Vtx > cut "<<VTXWP <<": "<<nEvts_w1TightBDTVtx_step12*(NormFactor)*lumiRun2<<std::endl;
+   ofs<<" //----------------- End of Event yields ---------------\\ "<<std::endl;
+   ofs<<" "<<std::endl;
+   ofs<<"Selection Efficiency of each step : "<<std::endl;
+   ofs<<"Nevents: "<<(nentries/nentries)*1 <<std::endl;
+   ofs<<"Online+Offline Selection : "<<(nFilterEvt/nentries)*1 <<std::endl;
+   ofs<<"EVTS BDT for WP "<<EVTSWP <<" : "<<(nEvts/nFilterEvt)*1 <<std::endl;
+   ofs<<"Vertex Reco: "<<(nRecoVertex/(2*nEvts))*(0.5) <<std::endl;
+   ofs<<"Vtx BDT3 > cut "<<VTXWP <<": "<<(nSelecBDTVtx/(2*nRecoVertex))*(0.5) <<std::endl;
+   ofs<<"BDT2-Tight Vertex only : "<<(nRecoVertexTightWP/(2*nSelecBDTVtx))*(0.5) <<std::endl;
+   ofs<<"BDT2-Tight BDT3 Vtx > cut "<<VTXWP <<": "<<(nSelecBDTVtxTight_step12/(2*nRecoVertexTightWP))*(0.5) <<std::endl;
+   ofs<<"Two BDT2-Tight vertices : "<<(2*nEvts_w2TightVtx/nRecoVertexTightWP)*(1) <<std::endl;
+   ofs<<"Two BDT2-Tight BDT3 Vtx > cut "<<VTXWP <<": "<<(2*nEvts_w2TightBDTVtx/nRecoVertexTightWP)*(1) <<std::endl;
+   ofs<<"Two BDT2-Tight BDT3bis Vtx > cut "<<VTXWP <<": "<<(2*nEvts_w2TightBDTVtx_step12/nRecoVertexTightWP)*(1) <<std::endl;
+   ofs<<"One BDT2-Tight Vertex: "<<(2*nEvts_w1TightVtx/nRecoVertexTightWP)*(1) <<std::endl;
+   ofs<<"One BDT2-Tight BDT3 Vtx > cut "<<VTXWP <<": "<<(2*nEvts_w1TightBDTVtx/nRecoVertexTightWP)*(1) <<std::endl;
+   ofs<<"One BDT2-Tight BDT3bis Vtx > cut "<<VTXWP <<": "<<(2*nEvts_w1TightBDTVtx_step12/nRecoVertexTightWP)*(1) <<std::endl;
+   ofs<<" //----------------- End of selection efficiency ---------------\\ "<<std::endl;
+   ofs<<"NormFactor : "<<NormFactor<<std::endl;
+   ofs<<" "<<std::endl;
    ofs.close();
+
+
+    // Efficiency of each step
+    fillHisto("hData_Vtx_SelectionEff","Step",thesample,0,nentries/nentries);
+    fillHisto("hData_Vtx_SelectionEff","Step",thesample,1,nFilterEvt/nentries);
+    fillHisto("hData_Vtx_SelectionEff","Step",thesample,2,nEvts/nFilterEvt);
+    fillHisto("hData_Vtx_SelectionEff","Step",thesample,3,nRecoVertex/(2*nEvts));
+    fillHisto("hData_Vtx_SelectionEff","Step",thesample,4,nSelecBDTVtx/(2*nRecoVertex));
+    fillHisto("hData_Vtx_SelectionEff","Step",thesample,5,nRecoVertexTightWP/(2*nSelecBDTVtx));
+    fillHisto("hData_Vtx_SelectionEff","Step",thesample,6,nSelecBDTVtxTight_step12/(2*nRecoVertexTightWP));
+    fillHisto("hData_Vtx_SelectionEff","Step",thesample,7,2*nEvts_w2TightVtx/nRecoVertexTightWP);
+    fillHisto("hData_Vtx_SelectionEff","Step",thesample,8,2*nEvts_w2TightBDTVtx_step12/nRecoVertexTightWP);
+    fillHisto("hData_Vtx_SelectionEff","Step",thesample,9,2*nEvts_w1TightVtx/nRecoVertexTightWP);
+    fillHisto("hData_Vtx_SelectionEff","Step",thesample,10,2*nEvts_w1TightBDTVtx_step12/nRecoVertexTightWP);
+
 
     fillHisto("hData_Trks_Selection","Step",thesample,0,LooseTrks_Eff);
     fillHisto("hData_Trks_Selection","Step",thesample,1,TightTrks_Eff);
 
+    //Normalized by Number of events * cross section
     fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,0,nentries*NormFactor);
     fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,1,nFilterEvt*NormFactor);
     fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,2,nEvts*NormFactor);
     fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,3,nRecoVertex*NormFactor/2);
     fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,4,nSelecBDTVtx*NormFactor/2);
     fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,5,nRecoVertexTightWP*NormFactor/2);
-    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,6,nSelecBDTVtxTight*NormFactor/2);
+    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,6,nSelecBDTVtxTight_step12*NormFactor/2);
     fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,7,nEvts_w2TightVtx*NormFactor);
-    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,8,nEvts_w2TightBDTVtx*NormFactor);
+    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,8,nEvts_w2TightBDTVtx_step12*NormFactor);
     fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,9,nEvts_w1TightVtx*NormFactor);
-    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,10,nEvts_w1TightBDTVtx*NormFactor);
+    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,10,nEvts_w1TightBDTVtx_step12*NormFactor);
 
+  // Normalized by Number of evens
     fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,0,nentries/nentries);
     fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,1,nFilterEvt/nentries);
     fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,2,nEvts/nentries);
     fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,3,nRecoVertex/(2*nentries));
     fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,4,nSelecBDTVtx/(2*nentries));
     fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,5,nRecoVertexTightWP/(2*nentries));
-    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,6,nSelecBDTVtxTight/(2*nentries));
+    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,6,nSelecBDTVtxTight_step12/(2*nentries));
     fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,7,nEvts_w2TightVtx/(nentries));
-    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,8,nEvts_w2TightBDTVtx/nentries);
+    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,8,nEvts_w2TightBDTVtx_step12/nentries);
     fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,9,nEvts_w1TightVtx/nentries);
-    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,10,nEvts_w1TightBDTVtx/nentries);
+    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,10,nEvts_w1TightBDTVtx_step12/nentries);
+
+
+//Event Yields
+    fillHisto("hData_Vtx_Selection","Step",thesample,0,nentries);
+    fillHisto("hData_Vtx_Selection","Step",thesample,1,nFilterEvt);
+    fillHisto("hData_Vtx_Selection","Step",thesample,2,nEvts);
+    fillHisto("hData_Vtx_Selection","Step",thesample,3,nRecoVertex/2);
+    fillHisto("hData_Vtx_Selection","Step",thesample,4,nSelecBDTVtx/2);
+    fillHisto("hData_Vtx_Selection","Step",thesample,5,nRecoVertexTightWP/2);
+    fillHisto("hData_Vtx_Selection","Step",thesample,6,nSelecBDTVtxTight_step12/2);
+    fillHisto("hData_Vtx_Selection","Step",thesample,7,nEvts_w2TightVtx);
+    fillHisto("hData_Vtx_Selection","Step",thesample,8,nEvts_w2TightBDTVtx_step12);
+    fillHisto("hData_Vtx_Selection","Step",thesample,9,nEvts_w1TightVtx);
+    fillHisto("hData_Vtx_Selection","Step",thesample,10,nEvts_w1TightBDTVtx_step12);
+
+
+//Normalization histogram
+    fillHisto("hData_Vtx_Total","Step",thesample,0,1/NormFactor);
+    fillHisto("hData_Vtx_Total","Step",thesample,1,1/NormFactor);
+    fillHisto("hData_Vtx_Total","Step",thesample,2,1/NormFactor);
+    fillHisto("hData_Vtx_Total","Step",thesample,3,1/NormFactor);
+    fillHisto("hData_Vtx_Total","Step",thesample,4,1/NormFactor);
+    fillHisto("hData_Vtx_Total","Step",thesample,5,1/NormFactor);
+    fillHisto("hData_Vtx_Total","Step",thesample,6,1/NormFactor);
+    fillHisto("hData_Vtx_Total","Step",thesample,7,1/NormFactor);
+    fillHisto("hData_Vtx_Total","Step",thesample,8,1/NormFactor);
+    fillHisto("hData_Vtx_Total","Step",thesample,9,1/NormFactor);
+    fillHisto("hData_Vtx_Total","Step",thesample,10,1/NormFactor);
+
+
+
 
    theoutputfile->Write();
    //deleteHisto();
    theoutputfile->Close();
    delete theoutputfile;
-
 }
 
 
@@ -1310,10 +2044,13 @@ void TreeReader::initializeHisto(TString sample, bool isfirstset){
 
    if(isfirstset){
       numb_histo = 0;
+      numb_histo_2D_ = 0;
       TH1F * first_emptyHisto = new TH1F("first_emptyHisto", "first_emptyHisto", 100, 0, 1000);
+      TH2F * first_emptyHisto_2D = new TH2F("first_emptyHisto_2D", "first_emptyHisto_2D", 100, 0, 1000,100,0,1000);
       histo_list_.push_back(first_emptyHisto);
-  
+      histo_list_2D_.push_back(first_emptyHisto_2D);
       numb_histo++;
+      numb_histo_2D_++;
    }
 
    // ---------------------------- Filter (Online+Offline Selection)--------------
@@ -1325,12 +2062,20 @@ void TreeReader::initializeHisto(TString sample, bool isfirstset){
 // pt1 > 25GeV & pt2 > 10GeV
 // Mμμ > 10 GeV (remove low-resonances)
 
+  //------------------------Gen Infos --------------------------------------------
+
+  addHisto("hGen_Msmu","noSel",sample.Data(),361,159.5,520.5);
+  addHisto("hGen_Mneu","noSel",sample.Data(),361,159.5,520.5);
+  addHisto("hGen_ct0","noSel",sample.Data(),200,0.,200.);
+
+  //-------------------------- EVTS ----------------------------------------------
    addHisto("Filter", "Offline+Online", sample.Data(), 2,0,2);
    addHisto("hData_Evts","BDT",  sample.Data(),101,-1,1);
    //----------------------------- Muons -----------------------------------------
 
    addHisto("RecoMuo_pT", "noSel", sample.Data(),  100, 0, 100);
-
+   addHisto("DiMuon_Mass","noSel", sample.Data(),  1200, 0 ,1200);
+   addHisto("Evts_MVAVal","noSel", sample.Data() , 101,-1,1);
    // --------------------------  V0 Candidates ----------------------------------
 
    addHisto("hData_reco_K0_mass","noSel", sample.Data(),101,0.42,0.58);
@@ -1360,6 +2105,15 @@ void TreeReader::initializeHisto(TString sample, bool isfirstset){
    addHisto("hData_reco_SecInt_r","TrackerMatched",    sample.Data(),200,0,100);
    addHisto("hData_reco_SecInt_z","TrackerMatched",    sample.Data(),401,-200,200);
 
+   // ------------------------ Jets   -------------------------------------------
+
+   addHisto("hData_jet_pt","",            sample.Data(),  800,0,1600);
+   addHisto("hData_jet_eta","",           sample.Data(),  26,-6.5,6.5);
+   addHisto("hData_jet_btag_Deepjet","",  sample.Data(),  100,0,1);
+   addHisto("hData_jet_HadronFlavour","", sample.Data(),  6,0,6);
+
+   addHisto2D("hData_BtagEff_Denom","",   sample.Data(),100,0,1000,8,-4,4 );
+   addHisto2D("hData_BtagEff_Num","",     sample.Data(),100,0,1000,26,-6.5,6.5 );
    // ------------------------ Tracks -------------------------------------------
 
    addHisto("hData_MVAVal","noSel",                sample.Data(),101,-1,1);
@@ -1495,6 +2249,8 @@ void TreeReader::initializeHisto(TString sample, bool isfirstset){
    addHisto("hData_Hemi_Mass","TightWP",                   sample.Data(),140,0,1400);
    addHisto("hData_Vtx_DCA","NoSel",                       sample.Data(),100,0,100);
    addHisto("hData_Vtx_DCA","TightWP",                     sample.Data(),100,0,100);
+   addHisto("hData_Hemi_SmuonMass","NoSel",                sample.Data(),1400,0,14000);
+   addHisto("hData_HighSmuonMass","NoSel",                 sample.Data(),1400,0,14000);
 
    //----------Tracks Selection -------------//
 
@@ -1502,8 +2258,697 @@ void TreeReader::initializeHisto(TString sample, bool isfirstset){
 
     //----------Vtx Selection -------------//
 
-    addHisto("hData_Vtx_SelectionNXSNormalized","Step",                 sample.Data(),11,0,11);
-    addHisto("hData_Vtx_SelectionNNormalized","Step",                 sample.Data(),11,0,11);
+    addHisto("hData_Vtx_Selection","Step",                 sample.Data(),11,0,11);
+    addHisto("hData_Vtx_SelectionNXSNormalized","Step",    sample.Data(),11,0,11);
+
+    addHisto("hData_Vtx_SelectionNNormalized","Step",       sample.Data(),11,0,11);
+    addHisto("hData_Vtx_Total","Step",                      sample.Data(),11,0,11);
+    addHisto("hData_Vtx_SelectionEff","Step",               sample.Data(),11,0,11);
+
+
+    //-------------Gen Infos---------------//
+
+    
+    addHisto("hGen_ct0","smu200_neu180",  sample.Data(), 200,0.,200.);
+    addHisto("hGen_ct0","smu250_neu200",  sample.Data(), 200,0.,200.);
+    addHisto("hGen_ct0","smu300_neu180",  sample.Data(), 200,0.,200.);
+    addHisto("hGen_ct0","smu300_neu200",  sample.Data(), 200,0.,200.);
+    addHisto("hGen_ct0","smu300_neu250",  sample.Data(), 200,0.,200.);
+    addHisto("hGen_ct0","smu300_neu280",  sample.Data(), 200,0.,200.);
+    addHisto("hGen_ct0","smu400_neu180",  sample.Data(), 200,0.,200.);
+    addHisto("hGen_ct0","smu400_neu200",  sample.Data(), 200,0.,200.);
+    addHisto("hGen_ct0","smu400_neu250",  sample.Data(), 200,0.,200.);
+    addHisto("hGen_ct0","smu400_neu300",  sample.Data(), 200,0.,200.);
+    addHisto("hGen_ct0","smu400_neu350",  sample.Data(), 200,0.,200.);
+    addHisto("hGen_ct0","smu400_neu380",  sample.Data(), 200,0.,200.);
+    addHisto("hGen_ct0","smu500_neu180",  sample.Data(), 200,0.,200.);
+    addHisto("hGen_ct0","smu500_neu200",  sample.Data(), 200,0.,200.);
+    addHisto("hGen_ct0","smu500_neu250",  sample.Data(), 200,0.,200.);
+    addHisto("hGen_ct0","smu500_neu300",  sample.Data(), 200,0.,200.);
+    addHisto("hGen_ct0","smu500_neu350",  sample.Data(), 200,0.,200.);
+    addHisto("hGen_ct0","smu500_neu400",  sample.Data(), 200,0.,200.);
+    addHisto("hGen_ct0","smu500_neu450",  sample.Data(), 200,0.,200.);
+    addHisto("hGen_ct0","smu500_neu480",  sample.Data(), 200,0.,200.);
+
+    addHisto("hSim_Filter","smu200_neu180",  sample.Data(),2,-0.5,1.5);
+    addHisto("hSim_Filter","smu250_neu200",  sample.Data(),2,-0.5,1.5);
+    addHisto("hSim_Filter","smu300_neu180",  sample.Data(),2,-0.5,1.5);
+    addHisto("hSim_Filter","smu300_neu200",  sample.Data(),2,-0.5,1.5);
+    addHisto("hSim_Filter","smu300_neu250",  sample.Data(),2,-0.5,1.5);
+    addHisto("hSim_Filter","smu300_neu280",  sample.Data(),2,-0.5,1.5);
+    addHisto("hSim_Filter","smu400_neu180",  sample.Data(),2,-0.5,1.5);
+    addHisto("hSim_Filter","smu400_neu200",  sample.Data(),2,-0.5,1.5);
+    addHisto("hSim_Filter","smu400_neu250",  sample.Data(),2,-0.5,1.5);
+    addHisto("hSim_Filter","smu400_neu300",  sample.Data(),2,-0.5,1.5);
+    addHisto("hSim_Filter","smu400_neu350",  sample.Data(),2,-0.5,1.5);
+    addHisto("hSim_Filter","smu400_neu380",  sample.Data(),2,-0.5,1.5);
+    addHisto("hSim_Filter","smu500_neu180",  sample.Data(),2,-0.5,1.5);
+    addHisto("hSim_Filter","smu500_neu200",  sample.Data(),2,-0.5,1.5);
+    addHisto("hSim_Filter","smu500_neu250",  sample.Data(),2,-0.5,1.5);
+    addHisto("hSim_Filter","smu500_neu300",  sample.Data(),2,-0.5,1.5);
+    addHisto("hSim_Filter","smu500_neu350",  sample.Data(),2,-0.5,1.5);
+    addHisto("hSim_Filter","smu500_neu400",  sample.Data(),2,-0.5,1.5);
+    addHisto("hSim_Filter","smu500_neu450",  sample.Data(),2,-0.5,1.5);
+    addHisto("hSim_Filter","smu500_neu480",  sample.Data(),2,-0.5,1.5);
+
+    addHisto("hSim_Hemi_dR","smu200_neu180",  sample.Data(),33,0.,3.3);
+    addHisto("hSim_Hemi_dR","smu250_neu200",  sample.Data(),33,0.,3.3);
+    addHisto("hSim_Hemi_dR","smu300_neu180",  sample.Data(),33,0.,3.3);
+    addHisto("hSim_Hemi_dR","smu300_neu200",  sample.Data(),33,0.,3.3);
+    addHisto("hSim_Hemi_dR","smu300_neu250",  sample.Data(),33,0.,3.3);
+    addHisto("hSim_Hemi_dR","smu300_neu280",  sample.Data(),33,0.,3.3);
+    addHisto("hSim_Hemi_dR","smu400_neu180",  sample.Data(),33,0.,3.3);
+    addHisto("hSim_Hemi_dR","smu400_neu200",  sample.Data(),33,0.,3.3);
+    addHisto("hSim_Hemi_dR","smu400_neu250",  sample.Data(),33,0.,3.3);
+    addHisto("hSim_Hemi_dR","smu400_neu300",  sample.Data(),33,0.,3.3);
+    addHisto("hSim_Hemi_dR","smu400_neu350",  sample.Data(),33,0.,3.3);
+    addHisto("hSim_Hemi_dR","smu400_neu380",  sample.Data(),33,0.,3.3);
+    addHisto("hSim_Hemi_dR","smu500_neu180",  sample.Data(),33,0.,3.3);
+    addHisto("hSim_Hemi_dR","smu500_neu200",  sample.Data(),33,0.,3.3);
+    addHisto("hSim_Hemi_dR","smu500_neu250",  sample.Data(),33,0.,3.3);
+    addHisto("hSim_Hemi_dR","smu500_neu300",  sample.Data(),33,0.,3.3);
+    addHisto("hSim_Hemi_dR","smu500_neu350",  sample.Data(),33,0.,3.3);
+    addHisto("hSim_Hemi_dR","smu500_neu400",  sample.Data(),33,0.,3.3);
+    addHisto("hSim_Hemi_dR","smu500_neu450",  sample.Data(),33,0.,3.3);
+    addHisto("hSim_Hemi_dR","smu500_neu480",  sample.Data(),33,0.,3.3);
+
+    addHisto("hData_Hemi_Vtx_dist","smu200_neu180",  sample.Data(),200,0.,200.);
+    addHisto("hData_Hemi_Vtx_dist","smu250_neu200",  sample.Data(), 200,0.,200.);
+    addHisto("hData_Hemi_Vtx_dist","smu300_neu180",  sample.Data(), 200,0.,200.);
+    addHisto("hData_Hemi_Vtx_dist","smu300_neu200",  sample.Data(), 200,0.,200.);
+    addHisto("hData_Hemi_Vtx_dist","smu300_neu250",  sample.Data(), 200,0.,200.);
+    addHisto("hData_Hemi_Vtx_dist","smu300_neu280",  sample.Data(), 200,0.,200.);
+    addHisto("hData_Hemi_Vtx_dist","smu400_neu180",  sample.Data(), 200,0.,200.);
+    addHisto("hData_Hemi_Vtx_dist","smu400_neu200",  sample.Data(), 200,0.,200.);
+    addHisto("hData_Hemi_Vtx_dist","smu400_neu250",  sample.Data(), 200,0.,200.);
+    addHisto("hData_Hemi_Vtx_dist","smu400_neu300",  sample.Data(), 200,0.,200.);
+    addHisto("hData_Hemi_Vtx_dist","smu400_neu350",  sample.Data(), 200,0.,200.);
+    addHisto("hData_Hemi_Vtx_dist","smu400_neu380",  sample.Data(), 200,0.,200.);
+    addHisto("hData_Hemi_Vtx_dist","smu500_neu180",  sample.Data(), 200,0.,200.);
+    addHisto("hData_Hemi_Vtx_dist","smu500_neu200",  sample.Data(), 200,0.,200.);
+    addHisto("hData_Hemi_Vtx_dist","smu500_neu250",  sample.Data(), 200,0.,200.);
+    addHisto("hData_Hemi_Vtx_dist","smu500_neu300",  sample.Data(), 200,0.,200.);
+    addHisto("hData_Hemi_Vtx_dist","smu500_neu350",  sample.Data(), 200,0.,200.);
+    addHisto("hData_Hemi_Vtx_dist","smu500_neu400",  sample.Data(), 200,0.,200.);
+    addHisto("hData_Hemi_Vtx_dist","smu500_neu450",  sample.Data(), 200,0.,200.);
+    addHisto("hData_Hemi_Vtx_dist","smu500_neu480",  sample.Data(), 200,0.,200.);
+
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu200_neu180",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu250_neu200",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu300_neu180",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu300_neu200",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu300_neu250",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu300_neu280",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu400_neu180",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu400_neu200",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu400_neu250",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu400_neu300",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu400_neu350",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu400_neu380",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu180",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu200",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu250",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu300",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu350",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu400",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu450",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_all","smu500_neu480",  sample.Data(), 200,0.,200.);
+
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu200_neu180",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu250_neu200",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu300_neu180",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu300_neu200",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu300_neu250",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu300_neu280",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu400_neu180",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu400_neu200",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu400_neu250",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu400_neu300",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu400_neu350",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu400_neu380",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu180",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu200",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu250",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu300",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu350",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu400",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu450",  sample.Data(), 200,0.,200.);
+    addHisto("hSim_Hemi_Vtx_dist_ping_step1","smu500_neu480",  sample.Data(), 200,0.,200.);
+
+
+    addHisto("hSim_EVTBDT","dm20",   sample.Data(),101,-1,1);
+    addHisto("hSim_EVTBDT","dm50",   sample.Data(),101,-1,1);
+    addHisto("hSim_EVTBDT","dm100",   sample.Data(),101,-1,1);
+    addHisto("hSim_EVTBDT","dm150",   sample.Data(),101,-1,1);
+    addHisto("hSim_EVTBDT","dm200",   sample.Data(),101,-1,1);
+    addHisto("hSim_EVTBDT","dm250",   sample.Data(),101,-1,1);
+    addHisto("hSim_EVTBDT","dm300",   sample.Data(),101,-1,1);
+    addHisto("hSim_EVTBDT","dm320",   sample.Data(),101,-1,1);
+
+    addHisto("hSim_ct0","dm20",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm50",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm100",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm150",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm200",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm250",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm300",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm320",  sample.Data(),200,0.,200.);
+
+    addHisto("hSim_TRKBDT","dm20",  sample.Data(),101,-1,1);
+    addHisto("hSim_TRKBDT","dm50",  sample.Data(),101,-1,1);
+    addHisto("hSim_TRKBDT","dm100",  sample.Data(),101,-1,1);
+    addHisto("hSim_TRKBDT","dm150",  sample.Data(),101,-1,1);
+    addHisto("hSim_TRKBDT","dm200",  sample.Data(),101,-1,1);
+    addHisto("hSim_TRKBDT","dm250",  sample.Data(),101,-1,1);
+    addHisto("hSim_TRKBDT","dm300",  sample.Data(),101,-1,1);
+    addHisto("hSim_TRKBDT","dm320",  sample.Data(),101,-1,1);
+
+    addHisto("hSim_ct0","dm20_TRKBDT",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm50_TRKBDT",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm100_TRKBDT",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm150_TRKBDT",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm200_TRKBDT",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm250_TRKBDT",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm300_TRKBDT",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm320_TRKBDT",  sample.Data(),200,0.,200.);
+
+    addHisto("hSim_VTXBDT","dm20",  sample.Data(),101,-1,1);
+    addHisto("hSim_VTXBDT","dm50",  sample.Data(),101,-1,1);
+    addHisto("hSim_VTXBDT","dm100",  sample.Data(),101,-1,1);
+    addHisto("hSim_VTXBDT","dm150",  sample.Data(),101,-1,1);
+    addHisto("hSim_VTXBDT","dm200",  sample.Data(),101,-1,1);
+    addHisto("hSim_VTXBDT","dm250",  sample.Data(),101,-1,1);
+    addHisto("hSim_VTXBDT","dm300",  sample.Data(),101,-1,1);
+    addHisto("hSim_VTXBDT","dm320",  sample.Data(),101,-1,1);
+
+    addHisto("hSim_ct0","dm20_VTXBDT",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm50_VTXBDT",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm100_VTXBDT",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm150_VTXBDT",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm200_VTXBDT",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm250_VTXBDT",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm300_VTXBDT",  sample.Data(),200,0.,200.);
+    addHisto("hSim_ct0","dm320_VTXBDT",  sample.Data(),200,0.,200.);
+
+    addHisto("hBDT_MET","EVT",                  sample.Data(),150,0,1500);
+    addHisto("hBDT_TRACK_SIZE","EVT",           sample.Data(),4100,0,4100);
+    addHisto("hBDT_muon_leadingpt","EVT",       sample.Data(),100,20,520);
+    addHisto("hBDT_muon_leadingpt2","EVT",      sample.Data(),100,10,510);
+    addHisto("hBDT_jet_leadingpt","EVT",        sample.Data(),100,30,1030);
+    addHisto("hBDT_jet_leadingpt2","EVT",       sample.Data(),100,20,1020);
+    addHisto("hBDT_muon_muon_dR","EVT",         sample.Data(),100,0,5);
+    addHisto("hBDT_muon_muon_dPhi","EVT",       sample.Data(),70,0,3.5);
+    addHisto("hBDT_muon_muon_dEta","EVT",       sample.Data(),80,0,4);
+    addHisto("hBDT_jet_jet_dR","EVT",           sample.Data(),100,0,5);
+    addHisto("hBDT_jet_jet_dPhi","EVT",         sample.Data(),70,0,3.5);
+    addHisto("hBDT_jet_jet_dEta","EVT",         sample.Data(),80,0,4);
+    addHisto("hBDT_muon_jet_dRmin","EVT",       sample.Data(),50,0,5);
+    addHisto("hBDT_muon_jet_dRmax","EVT",       sample.Data(),50,0,5);
+    addHisto("hBDT_HT","EVT",                   sample.Data(),200,100,2100);
+    addHisto("hBDT_ST","EVT",                   sample.Data(),50,30,530);
+    addHisto("hBDT_njet","EVT",                 sample.Data(),20,0,20);
+    addHisto("hBDT_muon_nmu","EVT",             sample.Data(),20,0,20);
+    addHisto("hBDT_Hemi_LooseBTag_axes","EVT",  sample.Data(),2,0,2);
+    addHisto("hBDT_Hemi_MediumBTag_axes","EVT", sample.Data(),2,0,2);
+    addHisto("hBDT_Hemi_TightBTag_axes","EVT",  sample.Data(),2,0,2);
+
+    // eat sleep and repeat ---------------------//
+
+    addHisto("hBDT_MET","EVT_dm20",                  sample.Data(),150,0,1500);
+    addHisto("hBDT_TRACK_SIZE","EVT_dm20",           sample.Data(),4100,0,4100);
+    addHisto("hBDT_muon_leadingpt","EVT_dm20",       sample.Data(),100,20,520);
+    addHisto("hBDT_muon_leadingpt2","EVT_dm20",      sample.Data(),100,10,510);
+    addHisto("hBDT_jet_leadingpt","EVT_dm20",        sample.Data(),100,30,1030);
+    addHisto("hBDT_jet_leadingpt2","EVT_dm20",       sample.Data(),100,20,1020);
+    addHisto("hBDT_muon_muon_dR","EVT_dm20",         sample.Data(),100,0,5);
+    addHisto("hBDT_muon_muon_dPhi","EVT_dm20",       sample.Data(),70,0,3.5);
+    addHisto("hBDT_muon_muon_dEta","EVT_dm20",       sample.Data(),80,0,4);
+    addHisto("hBDT_jet_jet_dR","EVT_dm20",           sample.Data(),100,0,5);
+    addHisto("hBDT_jet_jet_dPhi","EVT_dm20",         sample.Data(),70,0,3.5);
+    addHisto("hBDT_jet_jet_dEta","EVT_dm20",         sample.Data(),80,0,4);
+    addHisto("hBDT_muon_jet_dRmin","EVT_dm20",       sample.Data(),50,0,5);
+    addHisto("hBDT_muon_jet_dRmax","EVT_dm20",       sample.Data(),50,0,5);
+    addHisto("hBDT_HT","EVT_dm20",                   sample.Data(),200,100,2100);
+    addHisto("hBDT_ST","EVT_dm20",                   sample.Data(),50,30,530);
+    addHisto("hBDT_njet","EVT_dm20",                 sample.Data(),20,0,20);
+    addHisto("hBDT_muon_nmu","EVT_dm20",             sample.Data(),20,0,20);
+    addHisto("hBDT_Hemi_LooseBTag_axes","EVT_dm20",  sample.Data(),2,0,2);
+    addHisto("hBDT_Hemi_MediumBTag_axes","EVT_dm20", sample.Data(),2,0,2);
+    addHisto("hBDT_Hemi_TightBTag_axes","EVT_dm20",  sample.Data(),2,0,2);
+
+        addHisto("hBDT_MET","EVT_dm50",                  sample.Data(),150,0,1500);
+    addHisto("hBDT_TRACK_SIZE","EVT_dm50",           sample.Data(),4100,0,4100);
+    addHisto("hBDT_muon_leadingpt","EVT_dm50",       sample.Data(),100,20,520);
+    addHisto("hBDT_muon_leadingpt2","EVT_dm50",      sample.Data(),100,10,510);
+    addHisto("hBDT_jet_leadingpt","EVT_dm50",        sample.Data(),100,30,1030);
+    addHisto("hBDT_jet_leadingpt2","EVT_dm50",       sample.Data(),100,20,1020);
+    addHisto("hBDT_muon_muon_dR","EVT_dm50",         sample.Data(),100,0,5);
+    addHisto("hBDT_muon_muon_dPhi","EVT_dm50",       sample.Data(),70,0,3.5);
+    addHisto("hBDT_muon_muon_dEta","EVT_dm50",       sample.Data(),80,0,4);
+    addHisto("hBDT_jet_jet_dR","EVT_dm50",           sample.Data(),100,0,5);
+    addHisto("hBDT_jet_jet_dPhi","EVT_dm50",         sample.Data(),70,0,3.5);
+    addHisto("hBDT_jet_jet_dEta","EVT_dm50",         sample.Data(),80,0,4);
+    addHisto("hBDT_muon_jet_dRmin","EVT_dm50",       sample.Data(),50,0,5);
+    addHisto("hBDT_muon_jet_dRmax","EVT_dm50",       sample.Data(),50,0,5);
+    addHisto("hBDT_HT","EVT_dm50",                   sample.Data(),200,100,2100);
+    addHisto("hBDT_ST","EVT_dm50",                   sample.Data(),50,30,530);
+    addHisto("hBDT_njet","EVT_dm50",                 sample.Data(),20,0,20);
+    addHisto("hBDT_muon_nmu","EVT_dm50",             sample.Data(),20,0,20);
+    addHisto("hBDT_Hemi_LooseBTag_axes","EVT_dm50",  sample.Data(),2,0,2);
+    addHisto("hBDT_Hemi_MediumBTag_axes","EVT_dm50", sample.Data(),2,0,2);
+    addHisto("hBDT_Hemi_TightBTag_axes","EVT_dm50",  sample.Data(),2,0,2);
+
+        addHisto("hBDT_MET","EVT_dm100",                  sample.Data(),150,0,1500);
+    addHisto("hBDT_TRACK_SIZE","EVT_dm100",           sample.Data(),4100,0,4100);
+    addHisto("hBDT_muon_leadingpt","EVT_dm100",       sample.Data(),100,20,520);
+    addHisto("hBDT_muon_leadingpt2","EVT_dm100",      sample.Data(),100,10,510);
+    addHisto("hBDT_jet_leadingpt","EVT_dm100",        sample.Data(),100,30,1030);
+    addHisto("hBDT_jet_leadingpt2","EVT_dm100",       sample.Data(),100,20,1020);
+    addHisto("hBDT_muon_muon_dR","EVT_dm100",         sample.Data(),100,0,5);
+    addHisto("hBDT_muon_muon_dPhi","EVT_dm100",       sample.Data(),70,0,3.5);
+    addHisto("hBDT_muon_muon_dEta","EVT_dm100",       sample.Data(),80,0,4);
+    addHisto("hBDT_jet_jet_dR","EVT_dm100",           sample.Data(),100,0,5);
+    addHisto("hBDT_jet_jet_dPhi","EVT_dm100",         sample.Data(),70,0,3.5);
+    addHisto("hBDT_jet_jet_dEta","EVT_dm100",         sample.Data(),80,0,4);
+    addHisto("hBDT_muon_jet_dRmin","EVT_dm100",       sample.Data(),50,0,5);
+    addHisto("hBDT_muon_jet_dRmax","EVT_dm100",       sample.Data(),50,0,5);
+    addHisto("hBDT_HT","EVT_dm100",                   sample.Data(),200,100,2100);
+    addHisto("hBDT_ST","EVT_dm100",                   sample.Data(),50,30,530);
+    addHisto("hBDT_njet","EVT_dm100",                 sample.Data(),20,0,20);
+    addHisto("hBDT_muon_nmu","EVT_dm100",             sample.Data(),20,0,20);
+    addHisto("hBDT_Hemi_LooseBTag_axes","EVT_dm100",  sample.Data(),2,0,2);
+    addHisto("hBDT_Hemi_MediumBTag_axes","EVT_dm100", sample.Data(),2,0,2);
+    addHisto("hBDT_Hemi_TightBTag_axes","EVT_dm100",  sample.Data(),2,0,2);
+
+        addHisto("hBDT_MET","EVT_dm150",                  sample.Data(),150,0,1500);
+    addHisto("hBDT_TRACK_SIZE","EVT_dm150",           sample.Data(),4100,0,4100);
+    addHisto("hBDT_muon_leadingpt","EVT_dm150",       sample.Data(),100,20,520);
+    addHisto("hBDT_muon_leadingpt2","EVT_dm150",      sample.Data(),100,10,510);
+    addHisto("hBDT_jet_leadingpt","EVT_dm150",        sample.Data(),100,30,1030);
+    addHisto("hBDT_jet_leadingpt2","EVT_dm150",       sample.Data(),100,20,1020);
+    addHisto("hBDT_muon_muon_dR","EVT_dm150",         sample.Data(),100,0,5);
+    addHisto("hBDT_muon_muon_dPhi","EVT_dm150",       sample.Data(),70,0,3.5);
+    addHisto("hBDT_muon_muon_dEta","EVT_dm150",       sample.Data(),80,0,4);
+    addHisto("hBDT_jet_jet_dR","EVT_dm150",           sample.Data(),100,0,5);
+    addHisto("hBDT_jet_jet_dPhi","EVT_dm150",         sample.Data(),70,0,3.5);
+    addHisto("hBDT_jet_jet_dEta","EVT_dm150",         sample.Data(),80,0,4);
+    addHisto("hBDT_muon_jet_dRmin","EVT_dm150",       sample.Data(),50,0,5);
+    addHisto("hBDT_muon_jet_dRmax","EVT_dm150",       sample.Data(),50,0,5);
+    addHisto("hBDT_HT","EVT_dm150",                   sample.Data(),200,100,2100);
+    addHisto("hBDT_ST","EVT_dm150",                   sample.Data(),50,30,530);
+    addHisto("hBDT_njet","EVT_dm150",                 sample.Data(),20,0,20);
+    addHisto("hBDT_muon_nmu","EVT_dm150",             sample.Data(),20,0,20);
+    addHisto("hBDT_Hemi_LooseBTag_axes","EVT_dm150",  sample.Data(),2,0,2);
+    addHisto("hBDT_Hemi_MediumBTag_axes","EVT_dm150", sample.Data(),2,0,2);
+    addHisto("hBDT_Hemi_TightBTag_axes","EVT_dm150",  sample.Data(),2,0,2);
+
+        addHisto("hBDT_MET","EVT_dm200",                  sample.Data(),150,0,1500);
+    addHisto("hBDT_TRACK_SIZE","EVT_dm200",           sample.Data(),4100,0,4100);
+    addHisto("hBDT_muon_leadingpt","EVT_dm200",       sample.Data(),100,20,520);
+    addHisto("hBDT_muon_leadingpt2","EVT_dm200",      sample.Data(),100,10,510);
+    addHisto("hBDT_jet_leadingpt","EVT_dm200",        sample.Data(),100,30,1030);
+    addHisto("hBDT_jet_leadingpt2","EVT_dm200",       sample.Data(),100,20,1020);
+    addHisto("hBDT_muon_muon_dR","EVT_dm200",         sample.Data(),100,0,5);
+    addHisto("hBDT_muon_muon_dPhi","EVT_dm200",       sample.Data(),70,0,3.5);
+    addHisto("hBDT_muon_muon_dEta","EVT_dm200",       sample.Data(),80,0,4);
+    addHisto("hBDT_jet_jet_dR","EVT_dm200",           sample.Data(),100,0,5);
+    addHisto("hBDT_jet_jet_dPhi","EVT_dm200",         sample.Data(),70,0,3.5);
+    addHisto("hBDT_jet_jet_dEta","EVT_dm200",         sample.Data(),80,0,4);
+    addHisto("hBDT_muon_jet_dRmin","EVT_dm200",       sample.Data(),50,0,5);
+    addHisto("hBDT_muon_jet_dRmax","EVT_dm200",       sample.Data(),50,0,5);
+    addHisto("hBDT_HT","EVT_dm200",                   sample.Data(),200,100,2100);
+    addHisto("hBDT_ST","EVT_dm200",                   sample.Data(),50,30,530);
+    addHisto("hBDT_njet","EVT_dm200",                 sample.Data(),20,0,20);
+    addHisto("hBDT_muon_nmu","EVT_dm200",             sample.Data(),20,0,20);
+    addHisto("hBDT_Hemi_LooseBTag_axes","EVT_dm200",  sample.Data(),2,0,2);
+    addHisto("hBDT_Hemi_MediumBTag_axes","EVT_dm200", sample.Data(),2,0,2);
+    addHisto("hBDT_Hemi_TightBTag_axes","EVT_dm200",  sample.Data(),2,0,2);
+
+        addHisto("hBDT_MET","EVT_dm250",                  sample.Data(),150,0,1500);
+    addHisto("hBDT_TRACK_SIZE","EVT_dm250",           sample.Data(),4100,0,4100);
+    addHisto("hBDT_muon_leadingpt","EVT_dm250",       sample.Data(),100,20,520);
+    addHisto("hBDT_muon_leadingpt2","EVT_dm250",      sample.Data(),100,10,510);
+    addHisto("hBDT_jet_leadingpt","EVT_dm250",        sample.Data(),100,30,1030);
+    addHisto("hBDT_jet_leadingpt2","EVT_dm250",       sample.Data(),100,20,1020);
+    addHisto("hBDT_muon_muon_dR","EVT_dm250",         sample.Data(),100,0,5);
+    addHisto("hBDT_muon_muon_dPhi","EVT_dm250",       sample.Data(),70,0,3.5);
+    addHisto("hBDT_muon_muon_dEta","EVT_dm250",       sample.Data(),80,0,4);
+    addHisto("hBDT_jet_jet_dR","EVT_dm250",           sample.Data(),100,0,5);
+    addHisto("hBDT_jet_jet_dPhi","EVT_dm250",         sample.Data(),70,0,3.5);
+    addHisto("hBDT_jet_jet_dEta","EVT_dm250",         sample.Data(),80,0,4);
+    addHisto("hBDT_muon_jet_dRmin","EVT_dm250",       sample.Data(),50,0,5);
+    addHisto("hBDT_muon_jet_dRmax","EVT_dm250",       sample.Data(),50,0,5);
+    addHisto("hBDT_HT","EVT_dm250",                   sample.Data(),200,100,2100);
+    addHisto("hBDT_ST","EVT_dm250",                   sample.Data(),50,30,530);
+    addHisto("hBDT_njet","EVT_dm250",                 sample.Data(),20,0,20);
+    addHisto("hBDT_muon_nmu","EVT_dm250",             sample.Data(),20,0,20);
+    addHisto("hBDT_Hemi_LooseBTag_axes","EVT_dm250",  sample.Data(),2,0,2);
+    addHisto("hBDT_Hemi_MediumBTag_axes","EVT_dm250", sample.Data(),2,0,2);
+    addHisto("hBDT_Hemi_TightBTag_axes","EVT_dm250",  sample.Data(),2,0,2);
+
+        addHisto("hBDT_MET","EVT_dm300",                  sample.Data(),150,0,1500);
+    addHisto("hBDT_TRACK_SIZE","EVT_dm300",           sample.Data(),4100,0,4100);
+    addHisto("hBDT_muon_leadingpt","EVT_dm300",       sample.Data(),100,20,520);
+    addHisto("hBDT_muon_leadingpt2","EVT_dm300",      sample.Data(),100,10,510);
+    addHisto("hBDT_jet_leadingpt","EVT_dm300",        sample.Data(),100,30,1030);
+    addHisto("hBDT_jet_leadingpt2","EVT_dm300",       sample.Data(),100,20,1020);
+    addHisto("hBDT_muon_muon_dR","EVT_dm300",         sample.Data(),100,0,5);
+    addHisto("hBDT_muon_muon_dPhi","EVT_dm300",       sample.Data(),70,0,3.5);
+    addHisto("hBDT_muon_muon_dEta","EVT_dm300",       sample.Data(),80,0,4);
+    addHisto("hBDT_jet_jet_dR","EVT_dm300",           sample.Data(),100,0,5);
+    addHisto("hBDT_jet_jet_dPhi","EVT_dm300",         sample.Data(),70,0,3.5);
+    addHisto("hBDT_jet_jet_dEta","EVT_dm300",         sample.Data(),80,0,4);
+    addHisto("hBDT_muon_jet_dRmin","EVT_dm300",       sample.Data(),50,0,5);
+    addHisto("hBDT_muon_jet_dRmax","EVT_dm300",       sample.Data(),50,0,5);
+    addHisto("hBDT_HT","EVT_dm300",                   sample.Data(),200,100,2100);
+    addHisto("hBDT_ST","EVT_dm300",                   sample.Data(),50,30,530);
+    addHisto("hBDT_njet","EVT_dm300",                 sample.Data(),20,0,20);
+    addHisto("hBDT_muon_nmu","EVT_dm300",             sample.Data(),20,0,20);
+    addHisto("hBDT_Hemi_LooseBTag_axes","EVT_dm300",  sample.Data(),2,0,2);
+    addHisto("hBDT_Hemi_MediumBTag_axes","EVT_dm300", sample.Data(),2,0,2);
+    addHisto("hBDT_Hemi_TightBTag_axes","EVT_dm300",  sample.Data(),2,0,2);
+
+        addHisto("hBDT_MET","EVT_dm320",                  sample.Data(),150,0,1500);
+    addHisto("hBDT_TRACK_SIZE","EVT_dm320",           sample.Data(),4100,0,4100);
+    addHisto("hBDT_muon_leadingpt","EVT_dm320",       sample.Data(),100,20,520);
+    addHisto("hBDT_muon_leadingpt2","EVT_dm320",      sample.Data(),100,10,510);
+    addHisto("hBDT_jet_leadingpt","EVT_dm320",        sample.Data(),100,30,1030);
+    addHisto("hBDT_jet_leadingpt2","EVT_dm320",       sample.Data(),100,20,1020);
+    addHisto("hBDT_muon_muon_dR","EVT_dm320",         sample.Data(),100,0,5);
+    addHisto("hBDT_muon_muon_dPhi","EVT_dm320",       sample.Data(),70,0,3.5);
+    addHisto("hBDT_muon_muon_dEta","EVT_dm320",       sample.Data(),80,0,4);
+    addHisto("hBDT_jet_jet_dR","EVT_dm320",           sample.Data(),100,0,5);
+    addHisto("hBDT_jet_jet_dPhi","EVT_dm320",         sample.Data(),70,0,3.5);
+    addHisto("hBDT_jet_jet_dEta","EVT_dm320",         sample.Data(),80,0,4);
+    addHisto("hBDT_muon_jet_dRmin","EVT_dm320",       sample.Data(),50,0,5);
+    addHisto("hBDT_muon_jet_dRmax","EVT_dm320",       sample.Data(),50,0,5);
+    addHisto("hBDT_HT","EVT_dm320",                   sample.Data(),200,100,2100);
+    addHisto("hBDT_ST","EVT_dm320",                   sample.Data(),50,30,530);
+    addHisto("hBDT_njet","EVT_dm320",                 sample.Data(),20,0,20);
+    addHisto("hBDT_muon_nmu","EVT_dm320",             sample.Data(),20,0,20);
+    addHisto("hBDT_Hemi_LooseBTag_axes","EVT_dm320",  sample.Data(),2,0,2);
+    addHisto("hBDT_Hemi_MediumBTag_axes","EVT_dm320", sample.Data(),2,0,2);
+    addHisto("hBDT_Hemi_TightBTag_axes","EVT_dm320",  sample.Data(),2,0,2);
+
+
+
+
+
+    // ------------ zzzzzzzzzzzzzzzzzzzzzzzz --///////////////
+    addHisto("hBDT_lost","TRK",                 sample.Data(),2,0,2);
+    addHisto("hBDT_dz","TRK",                   sample.Data(),400,-200,200);
+    addHisto("hBDT_dxy","TRK",                  sample.Data(),200,-100,100);
+    addHisto("hBDT_pt","TRK",                   sample.Data(),100,0,200);
+    addHisto("hBDT_eta","TRK",                  sample.Data(),80,-4,4);
+    addHisto("hBDT_NChi2","TRK",                sample.Data(),5,0,5);
+    addHisto("hBDT_nhits","TRK",                sample.Data(),35,0,35);
+    addHisto("hBDT_iJet","TRK",                 sample.Data(),20,0,20);
+    addHisto("hBDT_drSig","TRK",                sample.Data(),1000,0,2000);
+    addHisto("hBDT_dzSig","TRK",                sample.Data(),1000,0,2000);
+    addHisto("hBDT_ntrk10","TRK",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk20","TRK",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk30","TRK",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk40","TRK",               sample.Data(),100,0,100);
+    addHisto("hBDT_Hemi_dR","TRK",              sample.Data(),100,0,6);
+    addHisto("hBDT_Hemi_dRmax","TRK",           sample.Data(),100,0,6);
+
+    // eat sleep and repeat -------------------------//
+
+    addHisto("hBDT_lost","TRK_dm20",                 sample.Data(),2,0,2);
+    addHisto("hBDT_dz","TRK_dm20",                   sample.Data(),400,-200,200);
+    addHisto("hBDT_dxy","TRK_dm20",                  sample.Data(),200,-100,100);
+    addHisto("hBDT_pt","TRK_dm20",                   sample.Data(),100,0,200);
+    addHisto("hBDT_eta","TRK_dm20",                  sample.Data(),80,-4,4);
+    addHisto("hBDT_NChi2","TRK_dm20",                sample.Data(),5,0,5);
+    addHisto("hBDT_nhits","TRK_dm20",                sample.Data(),35,0,35);
+    addHisto("hBDT_iJet","TRK_dm20",                 sample.Data(),20,0,20);
+    addHisto("hBDT_drSig","TRK_dm20",                sample.Data(),1000,0,2000);
+    addHisto("hBDT_dzSig","TRK_dm20",                sample.Data(),1000,0,2000);
+    addHisto("hBDT_ntrk10","TRK_dm20",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk20","TRK_dm20",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk30","TRK_dm20",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk40","TRK_dm20",               sample.Data(),100,0,100);
+    addHisto("hBDT_Hemi_dR","TRK_dm20",              sample.Data(),100,0,6);
+    addHisto("hBDT_Hemi_dRmax","TRK_dm20",           sample.Data(),100,0,6);
+
+        addHisto("hBDT_lost","TRK_dm50",                 sample.Data(),2,0,2);
+    addHisto("hBDT_dz","TRK_dm50",                   sample.Data(),400,-200,200);
+    addHisto("hBDT_dxy","TRK_dm50",                  sample.Data(),200,-100,100);
+    addHisto("hBDT_pt","TRK_dm50",                   sample.Data(),100,0,200);
+    addHisto("hBDT_eta","TRK_dm50",                  sample.Data(),80,-4,4);
+    addHisto("hBDT_NChi2","TRK_dm50",                sample.Data(),5,0,5);
+    addHisto("hBDT_nhits","TRK_dm50",                sample.Data(),35,0,35);
+    addHisto("hBDT_iJet","TRK_dm50",                 sample.Data(),20,0,20);
+    addHisto("hBDT_drSig","TRK_dm50",                sample.Data(),1000,0,2000);
+    addHisto("hBDT_dzSig","TRK_dm50",                sample.Data(),1000,0,2000);
+    addHisto("hBDT_ntrk10","TRK_dm50",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk20","TRK_dm50",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk30","TRK_dm50",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk40","TRK_dm50",               sample.Data(),100,0,100);
+    addHisto("hBDT_Hemi_dR","TRK_dm50",              sample.Data(),100,0,6);
+    addHisto("hBDT_Hemi_dRmax","TRK_dm50",           sample.Data(),100,0,6);
+
+
+        addHisto("hBDT_lost","TRK_dm100",                 sample.Data(),2,0,2);
+    addHisto("hBDT_dz","TRK_dm100",                   sample.Data(),400,-200,200);
+    addHisto("hBDT_dxy","TRK_dm100",                  sample.Data(),200,-100,100);
+    addHisto("hBDT_pt","TRK_dm100",                   sample.Data(),100,0,200);
+    addHisto("hBDT_eta","TRK_dm100",                  sample.Data(),80,-4,4);
+    addHisto("hBDT_NChi2","TRK_dm100",                sample.Data(),5,0,5);
+    addHisto("hBDT_nhits","TRK_dm100",                sample.Data(),35,0,35);
+    addHisto("hBDT_iJet","TRK_dm100",                 sample.Data(),20,0,20);
+    addHisto("hBDT_drSig","TRK_dm100",                sample.Data(),1000,0,2000);
+    addHisto("hBDT_dzSig","TRK_dm100",                sample.Data(),1000,0,2000);
+    addHisto("hBDT_ntrk10","TRK_dm100",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk20","TRK_dm100",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk30","TRK_dm100",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk40","TRK_dm100",               sample.Data(),100,0,100);
+    addHisto("hBDT_Hemi_dR","TRK_dm100",              sample.Data(),100,0,6);
+    addHisto("hBDT_Hemi_dRmax","TRK_dm100",           sample.Data(),100,0,6);
+
+        addHisto("hBDT_lost","TRK_dm150",                 sample.Data(),2,0,2);
+    addHisto("hBDT_dz","TRK_dm150",                   sample.Data(),400,-200,200);
+    addHisto("hBDT_dxy","TRK_dm150",                  sample.Data(),200,-100,100);
+    addHisto("hBDT_pt","TRK_dm150",                   sample.Data(),100,0,200);
+    addHisto("hBDT_eta","TRK_dm150",                  sample.Data(),80,-4,4);
+    addHisto("hBDT_NChi2","TRK_dm150",                sample.Data(),5,0,5);
+    addHisto("hBDT_nhits","TRK_dm150",                sample.Data(),35,0,35);
+    addHisto("hBDT_iJet","TRK_dm150",                 sample.Data(),20,0,20);
+    addHisto("hBDT_drSig","TRK_dm150",                sample.Data(),1000,0,2000);
+    addHisto("hBDT_dzSig","TRK_dm150",                sample.Data(),1000,0,2000);
+    addHisto("hBDT_ntrk10","TRK_dm150",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk20","TRK_dm150",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk30","TRK_dm150",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk40","TRK_dm150",               sample.Data(),100,0,100);
+    addHisto("hBDT_Hemi_dR","TRK_dm150",              sample.Data(),100,0,6);
+    addHisto("hBDT_Hemi_dRmax","TRK_dm150",           sample.Data(),100,0,6);
+
+        addHisto("hBDT_lost","TRK_dm200",                 sample.Data(),2,0,2);
+    addHisto("hBDT_dz","TRK_dm200",                   sample.Data(),400,-200,200);
+    addHisto("hBDT_dxy","TRK_dm200",                  sample.Data(),200,-100,100);
+    addHisto("hBDT_pt","TRK_dm200",                   sample.Data(),100,0,200);
+    addHisto("hBDT_eta","TRK_dm200",                  sample.Data(),80,-4,4);
+    addHisto("hBDT_NChi2","TRK_dm200",                sample.Data(),5,0,5);
+    addHisto("hBDT_nhits","TRK_dm200",                sample.Data(),35,0,35);
+    addHisto("hBDT_iJet","TRK_dm200",                 sample.Data(),20,0,20);
+    addHisto("hBDT_drSig","TRK_dm200",                sample.Data(),1000,0,2000);
+    addHisto("hBDT_dzSig","TRK_dm200",                sample.Data(),1000,0,2000);
+    addHisto("hBDT_ntrk10","TRK_dm200",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk20","TRK_dm200",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk30","TRK_dm200",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk40","TRK_dm200",               sample.Data(),100,0,100);
+    addHisto("hBDT_Hemi_dR","TRK_dm200",              sample.Data(),100,0,6);
+    addHisto("hBDT_Hemi_dRmax","TRK_dm200",           sample.Data(),100,0,6);
+
+        addHisto("hBDT_lost","TRK_dm250",                 sample.Data(),2,0,2);
+    addHisto("hBDT_dz","TRK_dm250",                   sample.Data(),400,-200,200);
+    addHisto("hBDT_dxy","TRK_dm250",                  sample.Data(),200,-100,100);
+    addHisto("hBDT_pt","TRK_dm250",                   sample.Data(),100,0,200);
+    addHisto("hBDT_eta","TRK_dm250",                  sample.Data(),80,-4,4);
+    addHisto("hBDT_NChi2","TRK_dm250",                sample.Data(),5,0,5);
+    addHisto("hBDT_nhits","TRK_dm250",                sample.Data(),35,0,35);
+    addHisto("hBDT_iJet","TRK_dm250",                 sample.Data(),20,0,20);
+    addHisto("hBDT_drSig","TRK_dm250",                sample.Data(),1000,0,2000);
+    addHisto("hBDT_dzSig","TRK_dm250",                sample.Data(),1000,0,2000);
+    addHisto("hBDT_ntrk10","TRK_dm250",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk20","TRK_dm250",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk30","TRK_dm250",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk40","TRK_dm250",               sample.Data(),100,0,100);
+    addHisto("hBDT_Hemi_dR","TRK_dm250",              sample.Data(),100,0,6);
+    addHisto("hBDT_Hemi_dRmax","TRK_dm250",           sample.Data(),100,0,6);
+
+        addHisto("hBDT_lost","TRK_dm300",                 sample.Data(),2,0,2);
+    addHisto("hBDT_dz","TRK_dm300",                   sample.Data(),400,-200,200);
+    addHisto("hBDT_dxy","TRK_dm300",                  sample.Data(),200,-100,100);
+    addHisto("hBDT_pt","TRK_dm300",                   sample.Data(),100,0,200);
+    addHisto("hBDT_eta","TRK_dm300",                  sample.Data(),80,-4,4);
+    addHisto("hBDT_NChi2","TRK_dm300",                sample.Data(),5,0,5);
+    addHisto("hBDT_nhits","TRK_dm300",                sample.Data(),35,0,35);
+    addHisto("hBDT_iJet","TRK_dm300",                 sample.Data(),20,0,20);
+    addHisto("hBDT_drSig","TRK_dm300",                sample.Data(),1000,0,2000);
+    addHisto("hBDT_dzSig","TRK_dm300",                sample.Data(),1000,0,2000);
+    addHisto("hBDT_ntrk10","TRK_dm300",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk20","TRK_dm300",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk30","TRK_dm300",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk40","TRK_dm300",               sample.Data(),100,0,100);
+    addHisto("hBDT_Hemi_dR","TRK_dm300",              sample.Data(),100,0,6);
+    addHisto("hBDT_Hemi_dRmax","TRK_dm300",           sample.Data(),100,0,6);
+
+            addHisto("hBDT_lost","TRK_dm320",                 sample.Data(),2,0,2);
+    addHisto("hBDT_dz","TRK_dm320",                   sample.Data(),400,-200,200);
+    addHisto("hBDT_dxy","TRK_dm320",                  sample.Data(),200,-100,100);
+    addHisto("hBDT_pt","TRK_dm320",                   sample.Data(),100,0,200);
+    addHisto("hBDT_eta","TRK_dm320",                  sample.Data(),80,-4,4);
+    addHisto("hBDT_NChi2","TRK_dm320",                sample.Data(),5,0,5);
+    addHisto("hBDT_nhits","TRK_dm320",                sample.Data(),35,0,35);
+    addHisto("hBDT_iJet","TRK_dm320",                 sample.Data(),20,0,20);
+    addHisto("hBDT_drSig","TRK_dm320",                sample.Data(),1000,0,2000);
+    addHisto("hBDT_dzSig","TRK_dm320",                sample.Data(),1000,0,2000);
+    addHisto("hBDT_ntrk10","TRK_dm320",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk20","TRK_dm320",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk30","TRK_dm320",               sample.Data(),100,0,100);
+    addHisto("hBDT_ntrk40","TRK_dm320",               sample.Data(),100,0,100);
+    addHisto("hBDT_Hemi_dR","TRK_dm320",              sample.Data(),100,0,6);
+    addHisto("hBDT_Hemi_dRmax","TRK_dm320",           sample.Data(),100,0,6);
+
+
+    // ---------- zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz--//
+
+    addHisto("hBDT_nTrks","VTX",                sample.Data(),50,2,52);
+    addHisto("hBDT_NChi2","VTX",                sample.Data(),40,0,10);
+    addHisto("hBDT_step","VTX",                 sample.Data(),5,0,5);
+    addHisto("hBDT_r","VTX",                    sample.Data(),100,0,100);
+    addHisto("hBDT_z","VTX",                    sample.Data(),200,0,200);
+    addHisto("hBDT_MWT","VTX",                  sample.Data(),1001,1.5,2.5);
+    addHisto("hBDT_Vtx_Mass","VTX",             sample.Data(),1400,0,14000);
+    addHisto("hBDT_Hemi_Mass","VTX",            sample.Data(),140,0,1400);
+    addHisto("hBDT_dist","VTX",                 sample.Data(),200,0,200);
+    addHisto("hBDT_ntrk10","VTX",               sample.Data(),50,0,50);
+    addHisto("hBDT_ntrk20","VTX",               sample.Data(),50,0,50);
+    addHisto("hBDT_MeanDCA","VTX",              sample.Data(),100,0,1);
+
+    addHisto("hBDT_nTrks","VTX_TightWP",                sample.Data(),50,2,52);
+    addHisto("hBDT_NChi2","VTX_TightWP",                sample.Data(),40,0,10);
+    addHisto("hBDT_step","VTX_TightWP",                 sample.Data(),5,0,5);
+    addHisto("hBDT_r","VTX_TightWP",                    sample.Data(),100,0,100);
+    addHisto("hBDT_z","VTX_TightWP",                    sample.Data(),200,0,200);
+    addHisto("hBDT_MWT","VTX_TightWP",                  sample.Data(),1001,1.5,2.5);
+    addHisto("hBDT_Vtx_Mass","VTX_TightWP",             sample.Data(),1400,0,14000);
+    addHisto("hBDT_Hemi_Mass","VTX_TightWP",            sample.Data(),140,0,1400);
+    addHisto("hBDT_dist","VTX_TightWP",                 sample.Data(),200,0,200);
+    addHisto("hBDT_ntrk10","VTX_TightWP",               sample.Data(),50,0,50);
+    addHisto("hBDT_ntrk20","VTX_TightWP",               sample.Data(),50,0,50);
+    addHisto("hBDT_MeanDCA","VTX_TightWP",              sample.Data(),100,0,1);
+
+  // Eat sleep and repeat -----------------------------------------------------
+
+      addHisto("hBDT_nTrks","VTX_TightWP_dm20",                sample.Data(),50,2,52);
+    addHisto("hBDT_NChi2","VTX_TightWP_dm20",                sample.Data(),40,0,10);
+    addHisto("hBDT_step","VTX_TightWP_dm20",                 sample.Data(),5,0,5);
+    addHisto("hBDT_r","VTX_TightWP_dm20",                    sample.Data(),100,0,100);
+    addHisto("hBDT_z","VTX_TightWP_dm20",                    sample.Data(),200,0,200);
+    addHisto("hBDT_MWT","VTX_TightWP_dm20",                  sample.Data(),1001,1.5,2.5);
+    addHisto("hBDT_Vtx_Mass","VTX_TightWP_dm20",             sample.Data(),1400,0,14000);
+    addHisto("hBDT_Hemi_Mass","VTX_TightWP_dm20",            sample.Data(),140,0,1400);
+    addHisto("hBDT_dist","VTX_TightWP_dm20",                 sample.Data(),200,0,200);
+    addHisto("hBDT_ntrk10","VTX_TightWP_dm20",               sample.Data(),50,0,50);
+    addHisto("hBDT_ntrk20","VTX_TightWP_dm20",               sample.Data(),50,0,50);
+    addHisto("hBDT_MeanDCA","VTX_TightWP_dm20",              sample.Data(),100,0,1);
+
+    
+        addHisto("hBDT_nTrks","VTX_TightWP_dm50",                sample.Data(),50,2,52);
+    addHisto("hBDT_NChi2","VTX_TightWP_dm50",                sample.Data(),40,0,10);
+    addHisto("hBDT_step","VTX_TightWP_dm50",                 sample.Data(),5,0,5);
+    addHisto("hBDT_r","VTX_TightWP_dm50",                    sample.Data(),100,0,100);
+    addHisto("hBDT_z","VTX_TightWP_dm50",                    sample.Data(),200,0,200);
+    addHisto("hBDT_MWT","VTX_TightWP_dm50",                  sample.Data(),1001,1.5,2.5);
+    addHisto("hBDT_Vtx_Mass","VTX_TightWP_dm50",             sample.Data(),1400,0,14000);
+    addHisto("hBDT_Hemi_Mass","VTX_TightWP_dm50",            sample.Data(),140,0,1400);
+    addHisto("hBDT_dist","VTX_TightWP_dm50",                 sample.Data(),200,0,200);
+    addHisto("hBDT_ntrk10","VTX_TightWP_dm50",               sample.Data(),50,0,50);
+    addHisto("hBDT_ntrk20","VTX_TightWP_dm50",               sample.Data(),50,0,50);
+    addHisto("hBDT_MeanDCA","VTX_TightWP_dm50",              sample.Data(),100,0,1);
+
+
+    addHisto("hBDT_nTrks","VTX_TightWP_dm100",                sample.Data(),50,2,52);
+    addHisto("hBDT_NChi2","VTX_TightWP_dm100",                sample.Data(),40,0,10);
+    addHisto("hBDT_step","VTX_TightWP_dm100",                 sample.Data(),5,0,5);
+    addHisto("hBDT_r","VTX_TightWP_dm100",                    sample.Data(),100,0,100);
+    addHisto("hBDT_z","VTX_TightWP_dm100",                    sample.Data(),200,0,200);
+    addHisto("hBDT_MWT","VTX_TightWP_dm100",                  sample.Data(),1001,1.5,2.5);
+    addHisto("hBDT_Vtx_Mass","VTX_TightWP_dm100",             sample.Data(),1400,0,14000);
+    addHisto("hBDT_Hemi_Mass","VTX_TightWP_dm100",            sample.Data(),140,0,1400);
+    addHisto("hBDT_dist","VTX_TightWP_dm100",                 sample.Data(),200,0,200);
+    addHisto("hBDT_ntrk10","VTX_TightWP_dm100",               sample.Data(),50,0,50);
+    addHisto("hBDT_ntrk20","VTX_TightWP_dm100",               sample.Data(),50,0,50);
+    addHisto("hBDT_MeanDCA","VTX_TightWP_dm100",              sample.Data(),100,0,1);
+
+    addHisto("hBDT_nTrks","VTX_TightWP_dm150",                sample.Data(),50,2,52);
+    addHisto("hBDT_NChi2","VTX_TightWP_dm150",                sample.Data(),40,0,10);
+    addHisto("hBDT_step","VTX_TightWP_dm150",                 sample.Data(),5,0,5);
+    addHisto("hBDT_r","VTX_TightWP_dm150",                    sample.Data(),100,0,100);
+    addHisto("hBDT_z","VTX_TightWP_dm150",                    sample.Data(),200,0,200);
+    addHisto("hBDT_MWT","VTX_TightWP_dm150",                  sample.Data(),1001,1.5,2.5);
+    addHisto("hBDT_Vtx_Mass","VTX_TightWP_dm150",             sample.Data(),1400,0,14000);
+    addHisto("hBDT_Hemi_Mass","VTX_TightWP_dm150",            sample.Data(),140,0,1400);
+    addHisto("hBDT_dist","VTX_TightWP_dm150",                 sample.Data(),200,0,200);
+    addHisto("hBDT_ntrk10","VTX_TightWP_dm150",               sample.Data(),50,0,50);
+    addHisto("hBDT_ntrk20","VTX_TightWP_dm150",               sample.Data(),50,0,50);
+    addHisto("hBDT_MeanDCA","VTX_TightWP_dm150",              sample.Data(),100,0,1);
+
+    addHisto("hBDT_nTrks","VTX_TightWP_dm200",                sample.Data(),50,2,52);
+    addHisto("hBDT_NChi2","VTX_TightWP_dm200",                sample.Data(),40,0,10);
+    addHisto("hBDT_step","VTX_TightWP_dm200",                 sample.Data(),5,0,5);
+    addHisto("hBDT_r","VTX_TightWP_dm200",                    sample.Data(),100,0,100);
+    addHisto("hBDT_z","VTX_TightWP_dm200",                    sample.Data(),200,0,200);
+    addHisto("hBDT_MWT","VTX_TightWP_dm200",                  sample.Data(),1001,1.5,2.5);
+    addHisto("hBDT_Vtx_Mass","VTX_TightWP_dm200",             sample.Data(),1400,0,14000);
+    addHisto("hBDT_Hemi_Mass","VTX_TightWP_dm200",            sample.Data(),140,0,1400);
+    addHisto("hBDT_dist","VTX_TightWP_dm200",                 sample.Data(),200,0,200);
+    addHisto("hBDT_ntrk10","VTX_TightWP_dm200",               sample.Data(),50,0,50);
+    addHisto("hBDT_ntrk20","VTX_TightWP_dm200",               sample.Data(),50,0,50);
+    addHisto("hBDT_MeanDCA","VTX_TightWP_dm200",              sample.Data(),100,0,1);
+
+    addHisto("hBDT_nTrks","VTX_TightWP_dm250",                sample.Data(),50,2,52);
+    addHisto("hBDT_NChi2","VTX_TightWP_dm250",                sample.Data(),40,0,10);
+    addHisto("hBDT_step","VTX_TightWP_dm250",                 sample.Data(),5,0,5);
+    addHisto("hBDT_r","VTX_TightWP_dm250",                    sample.Data(),100,0,100);
+    addHisto("hBDT_z","VTX_TightWP_dm250",                    sample.Data(),200,0,200);
+    addHisto("hBDT_MWT","VTX_TightWP_dm250",                  sample.Data(),1001,1.5,2.5);
+    addHisto("hBDT_Vtx_Mass","VTX_TightWP_dm250",             sample.Data(),1400,0,14000);
+    addHisto("hBDT_Hemi_Mass","VTX_TightWP_dm250",            sample.Data(),140,0,1400);
+    addHisto("hBDT_dist","VTX_TightWP_dm250",                 sample.Data(),200,0,200);
+    addHisto("hBDT_ntrk10","VTX_TightWP_dm250",               sample.Data(),50,0,50);
+    addHisto("hBDT_ntrk20","VTX_TightWP_dm250",               sample.Data(),50,0,50);
+    addHisto("hBDT_MeanDCA","VTX_TightWP_dm250",              sample.Data(),100,0,1);
+
+    addHisto("hBDT_nTrks","VTX_TightWP_dm300",                sample.Data(),50,2,52);
+    addHisto("hBDT_NChi2","VTX_TightWP_dm300",                sample.Data(),40,0,10);
+    addHisto("hBDT_step","VTX_TightWP_dm300",                 sample.Data(),5,0,5);
+    addHisto("hBDT_r","VTX_TightWP_dm300",                    sample.Data(),100,0,100);
+    addHisto("hBDT_z","VTX_TightWP_dm300",                    sample.Data(),200,0,200);
+    addHisto("hBDT_MWT","VTX_TightWP_dm300",                  sample.Data(),1001,1.5,2.5);
+    addHisto("hBDT_Vtx_Mass","VTX_TightWP_dm300",             sample.Data(),1400,0,14000);
+    addHisto("hBDT_Hemi_Mass","VTX_TightWP_dm300",            sample.Data(),140,0,1400);
+    addHisto("hBDT_dist","VTX_TightWP_dm300",                 sample.Data(),200,0,200);
+    addHisto("hBDT_ntrk10","VTX_TightWP_dm300",               sample.Data(),50,0,50);
+    addHisto("hBDT_ntrk20","VTX_TightWP_dm300",               sample.Data(),50,0,50);
+    addHisto("hBDT_MeanDCA","VTX_TightWP_dm300",              sample.Data(),100,0,1);
+
+    addHisto("hBDT_nTrks","VTX_TightWP_dm320",                sample.Data(),50,2,52);
+    addHisto("hBDT_NChi2","VTX_TightWP_dm320",                sample.Data(),40,0,10);
+    addHisto("hBDT_step","VTX_TightWP_dm320",                 sample.Data(),5,0,5);
+    addHisto("hBDT_r","VTX_TightWP_dm320",                    sample.Data(),100,0,100);
+    addHisto("hBDT_z","VTX_TightWP_dm320",                    sample.Data(),200,0,200);
+    addHisto("hBDT_MWT","VTX_TightWP_dm320",                  sample.Data(),1001,1.5,2.5);
+    addHisto("hBDT_Vtx_Mass","VTX_TightWP_dm320",             sample.Data(),1400,0,14000);
+    addHisto("hBDT_Hemi_Mass","VTX_TightWP_dm320",            sample.Data(),140,0,1400);
+    addHisto("hBDT_dist","VTX_TightWP_dm320",                 sample.Data(),200,0,200);
+    addHisto("hBDT_ntrk10","VTX_TightWP_dm320",               sample.Data(),50,0,50);
+    addHisto("hBDT_ntrk20","VTX_TightWP_dm320",               sample.Data(),50,0,50);
+    addHisto("hBDT_MeanDCA","VTX_TightWP_dm320",              sample.Data(),100,0,1);
+
+    // --------------- zzzzzzzzzzzzzzzzzzzzzzzzzzzz ------------------------------------//
 }
 
 
@@ -1524,13 +2969,20 @@ void TreeReader::addHisto(TString var, TString selstep, TString sample, int nbin
 
   histo_list_.push_back(thehisto);
   histo_map_[name.Data()] = numb_histo;
-  
-
-
   numb_histo++;
-  
 }
 
+void TreeReader::addHisto2D(TString var, TString selstep, TString sample, int nxbins, float xmin, float xmax, int nybins, float ymin, float ymax){
+ 
+  TString name =  var+"_"+selstep+"__"+sample;
+  TH2F * thehisto = new TH2F(name,name,nxbins,xmin,xmax,nybins,ymin,ymax);
+  // thehisto->Sumw2();
+  thehisto->SetOption("COL");
+
+  histo_list_2D_.push_back(thehisto);
+  histo_map_2D_[name.Data()] = numb_histo_2D_;
+  numb_histo_2D_++;
+}
 
 //-------------------------------------------------------------
 //fill histograms
@@ -1549,6 +3001,19 @@ void TreeReader::fillHisto( TString var, TString selstep, TString sample, float 
     cout << "   please check the naming conventions " << endl;
     cout << "   histo name "  << name << endl;
   }else  histo_list_[histo_map_[name.Data()]]->Fill(val, weight);
+  
+}
+
+
+void TreeReader::fillHisto2D( TString var, TString selstep, TString sample, float xval,float yval, float weight){
+  TString name = var+"_"+selstep+"__"+sample;
+
+
+  if(histo_map_2D_[name.Data()] == 0) {
+    cout << "   WARNING trying to fill a non existing histograms " << endl;
+    cout << "   please check the naming conventions " << endl;
+    cout << "   histo name "  << name << endl;
+  }else  histo_list_2D_[histo_map_2D_[name.Data()]]->Fill(xval,yval, weight);
   
 }
 
