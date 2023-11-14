@@ -103,7 +103,7 @@ cmsRun flyingtop.py (to run locally)
   
  crab submit -c crab_config_mc_2018.py (use grid : don't forget the certificate)
  
-# To run jobs :
+# To run jobs (Bkg):
 
 ./multicrab --crabCmd submit  (edit to choose the samples)
 
@@ -111,13 +111,15 @@ cmsRun flyingtop.py (to run locally)
 
 ./multicrab --crabCmd getoutput --workArea ./<work_directory> --crabCmdOpts --checksum=no  (to retrieve the root files)
 
-# To merge the outputfiles, use the haddWithWeights.py macro:
+#To run jobs (Signal):
+
+python multirun.py
+
+# To merge the outputfiles, use the haddCorr.py macro:
 
 Please check the paths so that they correspond to your envrionment
 
-python haddWithWeights.py <work_directory>/
-
-Please do not forget the "/" after <work_directory>
+python haddCorr.py 
 
 # To run TreeReader.C (current version gives efficiencies for the different selections and the reconstruction of vertices + a txt file to summarize it)
 
@@ -125,13 +127,10 @@ Please do not forget the "/" after <work_directory>
 
 root
 
-.L TreeReader.C+
-
-### If the message "creating library " appears, you can try :
+.L TreeReader.C
 
 .L runTreeReader.C
 
-### Else (it somehow happens that the command above crashes) copy paste the macro in the root terminal :)
 
 
 
