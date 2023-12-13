@@ -460,6 +460,7 @@ if (thesample.Contains("smu200"))
 
    if (tree_Filter)
       {
+        if (tree_njetNOmu == 0) continue;
       nFilterEvt++;
 
     // Daniel ----------------------//
@@ -551,7 +552,7 @@ if (thesample.Contains("smu200"))
       else if ( Msmu > 280 && Msmu < 320 ) Msmu = 300;
       else if ( Msmu > 380 && Msmu < 420 ) Msmu = 400;
       else if ( Msmu > 480 && Msmu < 520 ) Msmu = 500;
-      else cout << " !!! smu mass out of range !!! " << Msmu;
+      // else cout << " !!! smu mass out of range !!! " << Msmu;
       if ( Mneu > 170 && Mneu < 190 )      Mneu = 180;
       else if ( Mneu > 190 && Mneu < 210 ) Mneu = 200;
       else if ( Mneu > 240 && Mneu < 260 ) Mneu = 250;
@@ -562,7 +563,7 @@ if (thesample.Contains("smu200"))
       else if ( Mneu > 390 && Mneu < 410 ) Mneu = 400;
       else if ( Mneu > 440 && Mneu < 460 ) Mneu = 450;
       else if ( Mneu > 470 && Mneu < 490 ) Mneu = 480;
-      else cout << " !!! neu mass out of range !!! " << Mneu;
+      // else cout << " !!! neu mass out of range !!! " << Mneu;
 
 
       
@@ -740,7 +741,7 @@ if (thesample.Contains("smu200"))
       else if ( Msmu > 280 && Msmu < 320 ) Msmu = 300;
       else if ( Msmu > 380 && Msmu < 420 ) Msmu = 400;
       else if ( Msmu > 480 && Msmu < 520 ) Msmu = 500;
-      else cout << " !!! smu mass out of range !!! " << Msmu;
+      // else cout << " !!! smu mass out of range !!! " << Msmu;
       if ( Mneu > 170 && Mneu < 190 )      Mneu = 180;
       else if ( Mneu > 190 && Mneu < 210 ) Mneu = 200;
       else if ( Mneu > 240 && Mneu < 260 ) Mneu = 250;
@@ -751,7 +752,7 @@ if (thesample.Contains("smu200"))
       else if ( Mneu > 390 && Mneu < 410 ) Mneu = 400;
       else if ( Mneu > 440 && Mneu < 460 ) Mneu = 450;
       else if ( Mneu > 470 && Mneu < 490 ) Mneu = 480;
-      else cout << " !!! neu mass out of range !!! " << Mneu;
+      // else cout << " !!! neu mass out of range !!! " << Mneu;
     //  std::cout<<"Msmu and Mneu : "<<Msmu<<" and "<<Mneu<<std::endl;
       if ((Msmu-Mneu) == 20){ for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++){fillHisto("hSim_TRKBDT","dm20",  thesample,tree_track_MVAval->at(iTrk) ,1.);}}
       if ((Msmu-Mneu) == 50){ for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++){fillHisto("hSim_TRKBDT","dm50",  thesample,tree_track_MVAval->at(iTrk) ,1.);}}
@@ -1003,7 +1004,7 @@ if (thesample.Contains("smu200"))
                                 else if ( Msmu > 280 && Msmu < 320 ) Msmu = 300;
                                 else if ( Msmu > 380 && Msmu < 420 ) Msmu = 400;
                                 else if ( Msmu > 480 && Msmu < 520 ) Msmu = 500;
-                                else cout << " !!! smu mass out of range !!! " << Msmu;
+                                // else cout << " !!! smu mass out of range !!! " << Msmu;
                                 if ( Mneu > 170 && Mneu < 190 )      Mneu = 180;
                                 else if ( Mneu > 190 && Mneu < 210 ) Mneu = 200;
                                 else if ( Mneu > 240 && Mneu < 260 ) Mneu = 250;
@@ -1014,7 +1015,7 @@ if (thesample.Contains("smu200"))
                                 else if ( Mneu > 390 && Mneu < 410 ) Mneu = 400;
                                 else if ( Mneu > 440 && Mneu < 460 ) Mneu = 450;
                                 else if ( Mneu > 470 && Mneu < 490 ) Mneu = 480;
-                                else cout << " !!! neu mass out of range !!! " << Mneu;
+                                // else cout << " !!! neu mass out of range !!! " << Mneu;
      
                                 if ((Msmu-Mneu) == 20){ fillHisto("hSim_VTXBDT","dm20",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm20", thesample,tree_Hemi_mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
                                 if ((Msmu-Mneu) == 50){ fillHisto("hSim_VTXBDT","dm50",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm50", thesample,tree_Hemi_mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
@@ -1617,7 +1618,7 @@ for (int i = 0 ; i < nStep_MuonJetdRmin ; i++)
       else if ( Msmu > 280 && Msmu < 320 ) Msmu = 300;
       else if ( Msmu > 380 && Msmu < 420 ) Msmu = 400;
       else if ( Msmu > 480 && Msmu < 520 ) Msmu = 500;
-      else cout << " !!! smu mass out of range !!! " << Msmu;
+      // else cout << " !!! smu mass out of range !!! " << Msmu;
       if ( Mneu > 170 && Mneu < 190 )      Mneu = 180;
       else if ( Mneu > 190 && Mneu < 210 ) Mneu = 200;
       else if ( Mneu > 240 && Mneu < 260 ) Mneu = 250;
@@ -1628,7 +1629,7 @@ for (int i = 0 ; i < nStep_MuonJetdRmin ; i++)
       else if ( Mneu > 390 && Mneu < 410 ) Mneu = 400;
       else if ( Mneu > 440 && Mneu < 460 ) Mneu = 450;
       else if ( Mneu > 470 && Mneu < 490 ) Mneu = 480;
-      else cout << " !!! neu mass out of range !!! " << Mneu;
+      // else cout << " !!! neu mass out of range !!! " << Mneu;
         
 
       // fillHisto("hGen_Msmu","noSel",  thesample, tree_smu_mass ,1.);
