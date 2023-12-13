@@ -38,17 +38,17 @@ process.GoodVertexFilter = cms.EDFilter("VertexSelector",
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
 #$$
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau300/MINIAODSIM_v16_L1v1_1.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau300/MINIAODSIM_v16_L1v1_2.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau300/MINIAODSIM_v16_L1v1_3.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau300/MINIAODSIM_v16_L1v1_4.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau300/MINIAODSIM_v16_L1v1_5.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau300/MINIAODSIM_v16_L1v1_6.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau300/MINIAODSIM_v16_L1v1_7.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau300/MINIAODSIM_v16_L1v1_9.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau300/MINIAODSIM_v16_L1v1_8.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau300/MINIAODSIM_v16_L1v1_9.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau300/MINIAODSIM_v16_L1v1_10.root'
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau1000/MINIAODSIM_v16_L1v1_1.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau1000/MINIAODSIM_v16_L1v1_2.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau1000/MINIAODSIM_v16_L1v1_3.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau1000/MINIAODSIM_v16_L1v1_4.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau1000/MINIAODSIM_v16_L1v1_5.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau1000/MINIAODSIM_v16_L1v1_6.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau1000/MINIAODSIM_v16_L1v1_7.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau1000/MINIAODSIM_v16_L1v1_9.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau1000/MINIAODSIM_v16_L1v1_8.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau1000/MINIAODSIM_v16_L1v1_9.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu500_neu480_ctau1000/MINIAODSIM_v16_L1v1_10.root'
 #$$
     )
 )
@@ -150,10 +150,10 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
 #     weightFileMVA_EVTS = cms.untracked.string("BDTG_EvtsSel_SIG50vsAll.xml"),#evts selection
 #     weightFileMVA_VTX = cms.untracked.string("BDTG_VtxSel_SIG50vsBKGtt.xml"),#vtx selection
 #     weightFileMVA_VTX_step1 = cms.untracked.string("BDTG_VtxSel_SIG50vsBKGtt_step1.xml"),#vtx selection
-    weightFileMVA = cms.untracked.string( "TMVAClassification_BDTG_TRKSEL_.weights.xml"),#track selection
-    weightFileMVA_EVTS = cms.untracked.string("TMVAClassification_BDTG_EVTSEL_.weights.xml"),#evts selection
-    weightFileMVA_VTX = cms.untracked.string("TMVAClassification_BDTG_VTXSEL_.weights.xml"),#vtx selection
-    weightFileMVA_VTX_step1 = cms.untracked.string("TMVAClassification_BDTG_VTXSel_TIGHTWP.weights.xml"),#vtx selection
+    weightFileMVA = cms.untracked.string( "BDT_TRK_ALLSignal.xml"),#track selection
+    weightFileMVA_EVTS = cms.untracked.string("BDT_EVT_ALLSignal.xml"),#evts selection
+    weightFileMVA_VTX = cms.untracked.string("BDT_VTX_ALLSTEPS_ALLSignal.xml"),#vtx selection
+    weightFileMVA_VTX_step1 = cms.untracked.string("BDT_VTX_STEPS12_ALLSignal.xml"),#vtx selection
     mcpufile = cms.string("Pileup_MC2018UL_bin100.root"),
     mcpupath = cms.string("pileup"),
     datapufile = cms.string("MyDataPileupHistogram_bin100.root"),
@@ -198,7 +198,7 @@ process.p = cms.Path(
 
 ########## output of ntuple
 #$$
-process.TFileService = cms.Service("TFileService", fileName = cms.string("RPV_2018_smu500_neu480_ctau300.root") )
+process.TFileService = cms.Service("TFileService", fileName = cms.string("RPV_2018_smu500_neu480_ctau1000.root") )
 #$$
 
 process.options.numberOfThreads=cms.untracked.uint32(4)
