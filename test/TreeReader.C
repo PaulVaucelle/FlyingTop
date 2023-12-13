@@ -6,6 +6,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <chrono>
+#include <ctime> 
 using namespace std;
 
 void TreeReader::Loop(TString sample, bool Signal)//void TreeReader::Loop(TString sample)
@@ -66,6 +68,7 @@ void TreeReader::Loop(TString sample, bool Signal)//void TreeReader::Loop(TStrin
    float LooseTrks_Eff = 0.;
 
    float nRecoVertex = 0;
+   float nRecoVertex2Trks = 0;
    float MeanDistance = 0;
    float nRecoVertexTightWP = 0;
    float MeanDistanceTightWP = 0;
@@ -287,7 +290,7 @@ float nEvts_MuonJetdRmax[48] = {0};
 float Hemi_CombinedHemiLeptonMassCut = 0;
 float dSmuonMass = 10;
 int nStep_SmuonMass = (1400-Hemi_CombinedHemiLeptonMassCut)/dSmuonMass;//1000-20/dpt
-float nEvts_Hemi_CombinedHemiLeptonMass[140] = {0};
+float nEvts_Hemi_CombinedHemiLeptonMass[200] = {0};
 //------------------------------
 
 
@@ -422,6 +425,8 @@ if (thesample.Contains("smu200"))
 
   float lumiRun2 = 136000 ; //pb-1
   float Nevent = nentries;
+  if (nentries>10000000){nentries = 10000000;}
+  
   NormFactor =  XS/nentries;
 
   cout<< "Line : "  << __LINE__ << " " << nentries << endl;
@@ -429,22 +434,115 @@ if (thesample.Contains("smu200"))
 
 
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
+    
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
       // if (Cut(ientry) < 0) continue;
+      auto tim = std::chrono::system_clock::now();
+      std::time_t start = std::chrono::system_clock::to_time_t(tim);
+      if (jentry==0.1*nentries) {std::cout<<"10/100 :"<<std::ctime(&start)<<std::endl;}
+      if (jentry==0.2*nentries) {std::cout<<"20/100 :"<<std::ctime(&start)<<std::endl;}
+      if (jentry==0.3*nentries) {std::cout<<"30/100 :"<<std::ctime(&start)<<std::endl;}
+      if (jentry==0.4*nentries) {std::cout<<"40/100 :"<<std::ctime(&start)<<std::endl;}
+      if (jentry==0.5*nentries) {std::cout<<"50/100 :"<<std::ctime(&start)<<std::endl;}
+      if (jentry==0.6*nentries) {std::cout<<"60/100 :"<<std::ctime(&start)<<std::endl;}
+      if (jentry==0.7*nentries) {std::cout<<"70/100 :"<<std::ctime(&start)<<std::endl;}
+      if (jentry==0.8*nentries) {std::cout<<"80/100 :"<<std::ctime(&start)<<std::endl;}
+      if (jentry==0.9*nentries) {std::cout<<"90/100 :"<<std::ctime(&start)<<std::endl;}
+      
             // std::cout<<"event : "<<jentry<<std::endl;
       fillHisto("Filter", "Offline+Online", thesample, tree_Filter, 1);
+
+
+
+
 
    if (tree_Filter)
       {
       nFilterEvt++;
+
+    // Daniel ----------------------//
+
+    fillHisto("hData_njet","NoSel",  thesample,tree_njet ,1.);
+    fillHisto("hData_njetNOmu","NoSel",  thesample,tree_njetNOmu ,1.);
+    fillHisto("hData_Mmumu","NoSel",  thesample,tree_Mmumu ,1.);
+    fillHisto("hData_BDTevt","NoSel",  thesample,tree_Evts_MVAval ,1.);
+  
+    int nHemi = tree_Hemi_njet->size();
+    for (int i=0; i<nHemi; i++) 
+      {   // Loop on hemispheres
+        int njet = tree_Hemi_njet->at(i);
+        fillHisto("hData_Hemi_njet","NoSel",  thesample,njet ,1.);
+
+        if ( njet >= 2 ) fillHisto("hData_Hemi_mass","NoSel",  thesample,tree_Hemi_mass->at(i) ,1.);
+        if ( njet >= 2 ) fillHisto("hData_Hemi_massTot","NoSel",  thesample,tree_HemiMu_mass->at(i) ,1.);
+        if ( tree_Hemi_Vtx_NChi2->at(i) > 0. && tree_Hemi_Vtx_NChi2->at(i) < 10. ) 
+          {
+            fillHisto("hData_Hemi_Vtx_njet","NoSel",  thesample,njet ,1.);
+            if ( njet >= 2 ) fillHisto("hData_Hemi_Vtx_mass","NoSel",  thesample,tree_Hemi_mass->at(i) ,1.);
+            if ( njet >= 2 ) fillHisto("hData_Hemi_Vtx_massTot","NoSel",  thesample,tree_HemiMu_mass->at(i) ,1.);
+          }
+        if ( i == 0 ) 
+          {
+            fillHisto("hData_Hemi1_njet","NoSel",  thesample,njet ,1.);
+            if ( njet >= 2 ) fillHisto("hData_Hemi1_mass","NoSel",  thesample,tree_Hemi_mass->at(i) ,1.);
+            if ( njet >= 2 ) fillHisto("hData_Hemi1_massTot","NoSel",  thesample,tree_HemiMu_mass->at(i) ,1.);
+            if ( tree_Hemi_Vtx_NChi2->at(i) > 0. && tree_Hemi_Vtx_NChi2->at(i) < 10. ) 
+              {
+                fillHisto("hData_Hemi1_Vtx_dist","NoSel",  thesample,tree_Hemi_Vtx_dist->at(i) ,1.);
+                fillHisto("hData_Hemi1_Vtx_BDTvtx","NoSel",  thesample,tree_Hemi_Vtx_MVAval->at(i) ,1.);
+                fillHisto("hData_Hemi1_Vtx_njet","NoSel",  thesample,njet ,1.);
+                if ( njet >= 2 ) fillHisto("hData_Hemi1_Vtx_mass","NoSel",  thesample,tree_Hemi_mass->at(i) ,1.);
+                if ( njet >= 2 ) fillHisto("hData_Hemi1_Vtx_massTot","NoSel",  thesample,tree_HemiMu_mass->at(i) ,1.);
+              }
+          }
+        else 
+          {
+            fillHisto("hData_Hemi2_njet","NoSel",  thesample,njet ,1.);
+            if ( njet >= 2 ) fillHisto("hData_Hemi2_mass","NoSel",  thesample,tree_Hemi_mass->at(i) ,1.);
+            if ( njet >= 2 ) fillHisto("hData_Hemi2_massTot","NoSel",  thesample,tree_HemiMu_mass->at(i) ,1.);
+            if ( tree_Hemi_Vtx_NChi2->at(i) > 0. && tree_Hemi_Vtx_NChi2->at(i) < 10. ) 
+              {
+                fillHisto("hData_Hemi2_Vtx_dist","NoSel",  thesample,tree_Hemi_Vtx_dist->at(i) ,1.);
+                fillHisto("hData_Hemi2_Vtx_BDTvtx","NoSel",  thesample,tree_Hemi_Vtx_MVAval->at(i) ,1.);
+                fillHisto("hData_Hemi2_Vtx_njet","NoSel",  thesample,njet ,1.);
+                if ( njet >= 2 ) fillHisto("hData_Hemi2_Vtx_mass","NoSel",  thesample,tree_Hemi_mass->at(i) ,1.);
+                if ( njet >= 2 ) fillHisto("hData_Hemi2_Vtx_massTot","NoSel",  thesample,tree_HemiMu_mass->at(i) ,1.);
+              }
+          }
+      } // end loop on hemispheres
+
+   if ( (tree_Hemi_Vtx_NChi2->at(0) > 0. && tree_Hemi_Vtx_NChi2->at(0) < 10.)
+     || (tree_Hemi_Vtx_NChi2->at(1) > 0. && tree_Hemi_Vtx_NChi2->at(1) < 10.) ) 
+      {
+          fillHisto("hData_vtx1_Mmumu","NoSel",  thesample,tree_Mmumu ,1.);
+          if ( tree_Evts_MVAval > 0. ) fillHisto("hData_BDTevt1_Mmumu","NoSel",  thesample,tree_Mmumu ,1.);
+          if ( tree_Hemi_Vtx_MVAval->at(0) > 0.5 || tree_Hemi_Vtx_MVAval->at(1) > 0.5 ) 
+            fillHisto("hData_BDTvtx1_Mmumu","NoSel",  thesample,tree_Mmumu ,1.);
+          if ( tree_Evts_MVAval > 0. && 
+        ( tree_Hemi_Vtx_MVAval->at(0) > 0.5 || tree_Hemi_Vtx_MVAval->at(1) > 0.5 ) ) 
+            fillHisto("hData_BDTevtvtx1_Mmumu","NoSel",  thesample,tree_Mmumu ,1.);
+      }
+
+   if ( (tree_Hemi_Vtx_NChi2->at(0) > 0. && tree_Hemi_Vtx_NChi2->at(0) < 10.)
+     && (tree_Hemi_Vtx_NChi2->at(1) > 0. && tree_Hemi_Vtx_NChi2->at(1) < 10.) ) {
+     fillHisto("hData_vtx2_Mmumu","NoSel",  thesample,tree_Mmumu ,1.);
+     if ( tree_Evts_MVAval > 0. )  fillHisto("hData_BDTevt2_Mmumu","NoSel",  thesample,tree_Mmumu ,1.);
+     if ( tree_Hemi_Vtx_MVAval->at(0) > 0.5 && tree_Hemi_Vtx_MVAval->at(1) > 0.5 ) 
+     fillHisto("hData_BDTvtx2_Mmumu","NoSel",  thesample,tree_Mmumu ,1.);
+     if ( tree_Evts_MVAval > 0. && 
+        ( tree_Hemi_Vtx_MVAval->at(0) > 0.5 && tree_Hemi_Vtx_MVAval->at(1) > 0.5 ) ) 
+     fillHisto("hData_BDTevtvtx2_Mmumu","NoSel",  thesample,tree_Mmumu ,1.);
+   }
+    //end of  Daniel's part ----------------------//
+
+
       fillHisto("DiMuon_Mass","noSel", thesample,  tree_Mmumu, XS/nentries);
 
       fillHisto("Evts_MVAVal","noSel", thesample , tree_Evts_MVAval,1);
 
-
-        if (thesample == "LO_smu200to500_ctau20" && Signal)
+   if ( Signal)
     {        
       int Msmu = tree_smu_mass;
       int Mneu = tree_neu_mass;
@@ -528,16 +626,16 @@ if (thesample.Contains("smu200"))
     
 
 
-      float HighMass = tree_Hemi_CombinedHemiLeptonMass->at(1);
-      if(tree_Hemi_CombinedHemiLeptonMass->at(0)>tree_Hemi_CombinedHemiLeptonMass->at(1))
+      float HighMass = tree_HemiMu_mass->at(1);
+      if(tree_HemiMu_mass->at(0)>tree_HemiMu_mass->at(1))
         {
-          HighMass = tree_Hemi_CombinedHemiLeptonMass->at(0);
+          HighMass = tree_HemiMu_mass->at(0);
         }
       fillHisto("hData_HighSmuonMass","NoSel",thesample,HighMass,1);
-      // if (tree_Evts_MVAval <  EVTSWP){continue;}
+      if (tree_Evts_MVAval <  EVTSWP){continue;}
       // if (HighMass < 200) continue;
+      fillHisto("DiMuon_Mass","EVTSel", thesample,  tree_Mmumu, XS/nentries); //!!!!
       nEvts++;
-
 
       //*******************************
       //loop on Muons
@@ -632,7 +730,7 @@ if (thesample.Contains("smu200"))
 
       n_TotalTrks += tree_track_MVAval->size();
 
-    if (thesample == "LO_smu200to500_ctau20" && Signal)
+    if ( Signal)
     {        
       
       int Msmu = tree_smu_mass;
@@ -730,11 +828,19 @@ if (thesample.Contains("smu200"))
       //*******************************
       //loop on Axes
       //*******************************
-      
-      for(unsigned int iAxes = 0; iAxes < tree_Hemi_dR12->size(); iAxes ++)
-         {
-            fillHisto("hData_dR_RecoReco","noSel",  thesample, tree_Hemi_dR12->at(iAxes),1.);
-         }
+      if (Signal)
+        {
+          for(unsigned int iAxes = 0; iAxes < tree_Hemi_dR12->size(); iAxes ++)
+            {
+              fillHisto("hData_dR_RecoReco","noSel",  thesample, tree_Hemi_dR12->at(iAxes),1.);
+              //Generated Info between the two axes (and also witht he reco axes)
+              fillHisto("hSim_dR_GenGen","noSel", thesample, tree_Hemi_LLP_dR12->at(iAxes),1);
+              fillHisto("hSim_dPhi_GenGen","noSel", thesample, tree_genAxis_dPhineuneu->at(iAxes),1);
+              fillHisto("hSim_dEta_GenGen","noSel", thesample, tree_genAxis_dEtaneuneu->at(iAxes),1);
+              fillHisto("hSim_dR_GenReco","noSel", thesample, tree_Hemi_LLP_dR->at(iAxes),1);
+            }
+        }
+
 
       //*******************************
       //loop on Reco Vertices
@@ -743,6 +849,11 @@ if (thesample.Contains("smu200"))
       int nTightVertex = 0;
       float nSelecBDTVtxTight_evt = 0;
       float nSelecBDTVtxTight_step12_evt = 0;
+      int countReco = 0;
+      int countRecoGood = 0;
+      int countRecoTight12 = 0;
+      int countRecoTight12_BDT3 = 0;
+      int countRecoTight12_BDT3bis = 0;
       for(unsigned int iVtx = 0; iVtx <tree_Hemi->size(); iVtx ++)
          {
             fillHisto("hData_Hemi_Vtx_NChi2","noSel",   thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);
@@ -784,17 +895,23 @@ if (thesample.Contains("smu200"))
                             fillHisto("hBDT_r",         "VTX", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);
                             fillHisto("hBDT_z",         "VTX", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);
                             fillHisto("hBDT_MWT",       "VTX", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);
+                            fillHisto2D("MWTVsnTrks",   "VTX", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),tree_Hemi_Vtx_nTrks->at(iVtx),1.);
+                            
                             fillHisto("hBDT_Vtx_Mass",  "VTX", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);
-                            fillHisto("hBDT_Hemi_Mass", "VTX", thesample,tree_Hemi_Mass->at(iVtx),1.);
+                            fillHisto("hBDT_Hemi_Mass", "VTX", thesample,tree_Hemi_mass->at(iVtx),1.);
                             fillHisto("hBDT_dist",      "VTX", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);
                             fillHisto("hBDT_ntrk10",    "VTX", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);
                             fillHisto("hBDT_ntrk20",    "VTX", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);
                             fillHisto("hBDT_MeanDCA",   "VTX", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);
+                            countReco++;
+                            
                         // if (tree_Hemi_Vtx_MVAval->size()!=tree_Hemi_Vtx_step->size())
                         //   {std::cout<<"trere is an issue"<<std::endl;}
                         if (tree_Hemi_Vtx_MVAval->at(iVtx)>VTXWP)
                           {
                             nSelecBDTVtx++;
+                            countRecoGood++;
+                            
                           }
                         if (Signal)
                           {
@@ -809,7 +926,10 @@ if (thesample.Contains("smu200"))
                                 fillHisto("hSim_Hemi_Vtx_dist","Ping",   thesample,tree_Hemi_LLP_dist->at(iVtx),1);                         
                               }
                           }
-
+                        if (tree_Hemi_Vtx_nTrks->at(iVtx)==2)
+                          {
+                            nRecoVertex2Trks++;
+                          }
                         
                         nRecoVertex++;
                         MeanDistance +=  tree_Hemi_Vtx_dist->at(iVtx);              
@@ -838,17 +958,25 @@ if (thesample.Contains("smu200"))
                               fillHisto("hData_Hemi_Vtx_z","GoodRecoVtx_TightWP",       thesample,tree_Hemi_Vtx_z->at(iVtx),1.);
                               fillHisto("hData_Hemi_Vtx_MVAval","GoodRecoVtx_TightWP",  thesample,tree_Hemi_Vtx_MVAval->at(iVtx),1.);
                               nTightVertex++;
+                              countRecoTight12++;
+
+
+                              
                               if (tree_Hemi_Vtx_MVAval->at(iVtx)>VTXWP)
                                 {
                                   nSelecBDTVtxTight++;
                                   nSelecBDTVtxTight_evt++;
+                                  countRecoTight12_BDT3++;
+                                  
                                 }
                               if (tree_Hemi_Vtx_MVAval_Step1->at(iVtx)>VTXWP)
                                 {
                                   nSelecBDTVtxTight_step12++;
                                   nSelecBDTVtxTight_step12_evt++;
+                                  countRecoTight12_BDT3bis++;
+                                  
                                 }
-                              
+
                               if (Signal)
                                 {
                                   if (tree_Hemi_LLP_ping->at(iVtx))
@@ -866,7 +994,7 @@ if (thesample.Contains("smu200"))
                               nRecoVertexTightWP++;
                               MeanDistanceTightWP +=  tree_Hemi_Vtx_dist->at(iVtx);    
 
-                              if (thesample == "LO_smu200to500_ctau20" && Signal)
+                              if ( Signal)
                               {        
                                 int Msmu = tree_smu_mass;
                                 int Mneu = tree_neu_mass;
@@ -888,14 +1016,14 @@ if (thesample.Contains("smu200"))
                                 else if ( Mneu > 470 && Mneu < 490 ) Mneu = 480;
                                 else cout << " !!! neu mass out of range !!! " << Mneu;
      
-                                if ((Msmu-Mneu) == 20){ fillHisto("hSim_VTXBDT","dm20",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm20", thesample,tree_Hemi_Mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
-                                if ((Msmu-Mneu) == 50){ fillHisto("hSim_VTXBDT","dm50",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm50", thesample,tree_Hemi_Mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
-                                if ((Msmu-Mneu) == 100){ fillHisto("hSim_VTXBDT","dm100",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm100", thesample,tree_Hemi_Mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
-                                if ((Msmu-Mneu) == 150){ fillHisto("hSim_VTXBDT","dm150",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm150", thesample,tree_Hemi_Mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
-                                if ((Msmu-Mneu) == 200){ fillHisto("hSim_VTXBDT","dm200",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm200", thesample,tree_Hemi_Mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
-                                if ((Msmu-Mneu) == 250){ fillHisto("hSim_VTXBDT","dm250",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm250", thesample,tree_Hemi_Mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
-                                if ((Msmu-Mneu) == 300){ fillHisto("hSim_VTXBDT","dm300",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm300", thesample,tree_Hemi_Mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
-                                if ((Msmu-Mneu) == 320){ fillHisto("hSim_VTXBDT","dm320",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm320", thesample,tree_Hemi_Mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
+                                if ((Msmu-Mneu) == 20){ fillHisto("hSim_VTXBDT","dm20",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm20", thesample,tree_Hemi_mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm20", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
+                                if ((Msmu-Mneu) == 50){ fillHisto("hSim_VTXBDT","dm50",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm50", thesample,tree_Hemi_mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm50", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
+                                if ((Msmu-Mneu) == 100){ fillHisto("hSim_VTXBDT","dm100",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm100", thesample,tree_Hemi_mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm100", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
+                                if ((Msmu-Mneu) == 150){ fillHisto("hSim_VTXBDT","dm150",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm150", thesample,tree_Hemi_mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm150", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
+                                if ((Msmu-Mneu) == 200){ fillHisto("hSim_VTXBDT","dm200",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm200", thesample,tree_Hemi_mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm200", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
+                                if ((Msmu-Mneu) == 250){ fillHisto("hSim_VTXBDT","dm250",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm250", thesample,tree_Hemi_mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm250", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
+                                if ((Msmu-Mneu) == 300){ fillHisto("hSim_VTXBDT","dm300",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm300", thesample,tree_Hemi_mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm300", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
+                                if ((Msmu-Mneu) == 320){ fillHisto("hSim_VTXBDT","dm320",  thesample,tree_Hemi_Vtx_MVAval_Step1->at(iVtx) ,1.);fillHisto("hBDT_nTrks",     "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);fillHisto("hBDT_NChi2",     "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);fillHisto("hBDT_step",      "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_step->at(iVtx),1.);fillHisto("hBDT_r",         "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);fillHisto("hBDT_z",         "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);fillHisto("hBDT_MWT",       "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);fillHisto("hBDT_Hemi_Mass", "VTX_TightWP_dm320", thesample,tree_Hemi_mass->at(iVtx),1.);fillHisto("hBDT_dist",      "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);fillHisto("hBDT_ntrk10",    "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);fillHisto("hBDT_ntrk20",    "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);fillHisto("hBDT_MeanDCA",   "VTX_TightWP_dm320", thesample,tree_Hemi_Vtx_track_MeanDCA_d->at(iVtx),1.);}
 
                                 int ngenpart =  tree_genParticle_pt->size();
                                 for (int i=0; i<ngenpart; i++)    // Loop on GenParticle
@@ -925,8 +1053,9 @@ if (thesample.Contains("smu200"))
                             fillHisto("hBDT_r",         "VTX_TightWP", thesample,tree_Hemi_Vtx_r->at(iVtx),1.);
                             fillHisto("hBDT_z",         "VTX_TightWP", thesample,tree_Hemi_Vtx_z->at(iVtx),1.);
                             fillHisto("hBDT_MWT",       "VTX_TightWP", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),1.);
+                            fillHisto2D("MWTVsnTrks",   "VTX_TightWP", thesample,tree_Hemi_Vtx_MeantrackWeight->at(iVtx),tree_Hemi_Vtx_nTrks->at(iVtx),1.);
                             fillHisto("hBDT_Vtx_Mass",  "VTX_TightWP", thesample,tree_Hemi_Vtx_Mass->at(iVtx),1.);
-                            fillHisto("hBDT_Hemi_Mass", "VTX_TightWP", thesample,tree_Hemi_Mass->at(iVtx),1.);
+                            fillHisto("hBDT_Hemi_Mass", "VTX_TightWP", thesample,tree_Hemi_mass->at(iVtx),1.);
                             fillHisto("hBDT_dist",      "VTX_TightWP", thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);
                             fillHisto("hBDT_ntrk10",    "VTX_TightWP", thesample,tree_Hemi_Vtx_ntrk10->at(iVtx),1.);
                             fillHisto("hBDT_ntrk20",    "VTX_TightWP", thesample,tree_Hemi_Vtx_ntrk20->at(iVtx),1.);
@@ -985,15 +1114,65 @@ if (thesample.Contains("smu200"))
         if (nTightVertex==1){nEvts_w1TightVtx++;}
         if (nSelecBDTVtxTight_evt == 2){nEvts_w2TightBDTVtx++;}
         if (nSelecBDTVtxTight_evt == 1){nEvts_w1TightBDTVtx++;}
-        if (nSelecBDTVtxTight_step12_evt == 2){ nEvts_w2TightBDTVtx_step12++; }
-        if (nSelecBDTVtxTight_step12_evt == 1){ nEvts_w1TightBDTVtx_step12++;}
+        if (nSelecBDTVtxTight_step12_evt == 2){ nEvts_w2TightBDTVtx_step12++;fillHisto("DiMuon_Mass","2TightVtx", thesample,  tree_Mmumu, XS/(nentries));} //!!!! 
+        if (nSelecBDTVtxTight_step12_evt == 1){ nEvts_w1TightBDTVtx_step12++;fillHisto("DiMuon_Mass","1TightVtx", thesample,  tree_Mmumu, XS/(nentries));} //!!!!
+        if (countReco > 0 ){fillHisto("DiMuon_Mass","RecoVtx", thesample,  tree_Mmumu, XS/(nentries));} //!!!!
+        if (countRecoGood >0 ){fillHisto("DiMuon_Mass","RecoVtx_Good_BDT3", thesample,  tree_Mmumu, XS/(nentries));};//!!!!
+        if (countRecoTight12 >0 ){fillHisto("DiMuon_Mass","RecoVtx_TightWP", thesample,  tree_Mmumu, XS/(nentries)); }
+        if (countRecoTight12_BDT3>0){fillHisto("DiMuon_Mass","RecoVtx_TightWP_BDT3", thesample,  tree_Mmumu, XS/(nentries));}//!!!!
+        if (countRecoTight12_BDT3bis>0){fillHisto("DiMuon_Mass","RecoVtx_TightWP_BDT3bis", thesample,  tree_Mmumu, XS/(nentries)); }//!!!!
+
+      //*****************************************
+      // Resolution on the reconstructed vertices
+      //*****************************************
+
+      	// in PXB:
+	// ttree->Draw("tree_SecInt_LLP_dr","tree_SecInt_LLP>0&&tree_SecInt_selec&&tree_SecInt_r>2.6&&tree_SecInt_r<20&&abs(tree_SecInt_z)<27&&tree_SecInt_LLP_dr/tree_SecInt_r<0.1&&tree_SecInt_LLP_dr>0.12")
+	// in TIB:
+	// ttree->Draw("tree_SecInt_LLP_dr","tree_SecInt_LLP>0&&tree_SecInt_selec&&tree_SecInt_r>22&&tree_SecInt_r<52&&abs(tree_SecInt_z)<68&&tree_SecInt_LLP_dr/tree_SecInt_r<0.1&&tree_SecInt_LLP_dr>0.8")
+	// in TOB:
+	// ttree->Draw("tree_SecInt_LLP_dr","tree_SecInt_LLP>0&&tree_SecInt_selec&&tree_SecInt_r>50&&tree_SecInt_r<60&&abs(tree_SecInt_z)<108&&tree_SecInt_LLP_dr/tree_SecInt_r<0.1&&tree_SecInt_LLP_dr>3")
+	// in PXF:
+	// ttree->Draw("tree_SecInt_LLP_dz","tree_SecInt_LLP>0&&tree_SecInt_selec&&tree_SecInt_r>4.5&&tree_SecInt_r<16.5&&abs(tree_SecInt_z)>30&&abs(tree_SecInt_z)<50&&tree_SecInt_LLP_dr/tree_SecInt_r<0.1&&tree_SecInt_LLP_dz>1")
+	// in TID:
+	// ttree->Draw("tree_SecInt_LLP_dz","tree_SecInt_LLP>0&&tree_SecInt_selec&&tree_SecInt_r>22&&tree_SecInt_r<52&&abs(tree_SecInt_z)>70&&abs(tree_SecInt_z)<110&&tree_SecInt_LLP_dr/tree_SecInt_r<0.1&&tree_SecInt_LLP_dz>2.5")
+	// in TEC:
+	// ttree->Draw("tree_SecInt_LLP_dz","tree_SecInt_LLP>0&&tree_SecInt_selec&&tree_SecInt_r>20&&tree_SecInt_r<75&&abs(tree_SecInt_z)>120&&abs(tree_SecInt_z)<200&&tree_SecInt_LLP_dr/tree_SecInt_r<0.1&&tree_SecInt_LLP_dz>5")
+
+  for (unsigned int i = 0; i < tree_SecInt_x->size(); i++)
+    {
+      // res in the transverse plane
+      if (tree_SecInt_LLP->at(i)>0 && tree_SecInt_selec->at(i) && (tree_SecInt_LLP_dd->at(i)/tree_SecInt_d->at(i))<0.1)
+        {
+          fillHisto("TranseverseResolution","NoSel", thesample,  tree_SecInt_LLP_dr->at(i),1);
+          fillHisto("TranseverseDistance","NoSel", thesample,  tree_SecInt_r->at(i),1);
+          fillHisto2D("TransverseResVsDistance","NoSel",thesample,  tree_SecInt_r->at(i),tree_SecInt_LLP_dr->at(i),1);
+        }
+      // res along the z-axis
+      if (tree_SecInt_LLP->at(i)>0 && tree_SecInt_selec->at(i) && (tree_SecInt_LLP_dd->at(i)/tree_SecInt_d->at(i))<0.1)
+        {
+          fillHisto("LongitudinalResolution","NoSel", thesample,  tree_SecInt_LLP_dz->at(i),1);
+          fillHisto("LongitudinalDistance","NoSel", thesample,  tree_SecInt_z->at(i),1);
+          fillHisto2D("LongitudinalResVsDistance","NoSel",thesample,  tree_SecInt_z->at(i),tree_SecInt_LLP_dz->at(i),1);
+
+        }
+            // res along the z-axis
+      if (tree_SecInt_LLP->at(i)>0 && tree_SecInt_selec->at(i) && (tree_SecInt_LLP_dd->at(i)/tree_SecInt_d->at(i))<0.1)
+        {
+          fillHisto("3DResolution","NoSel", thesample,  tree_SecInt_LLP_dd->at(i),1);
+          fillHisto("3DDistance","NoSel", thesample,  tree_SecInt_d->at(i),1);
+          fillHisto2D("3DResVsDistance","NoSel",thesample,  tree_SecInt_d->at(i),tree_SecInt_LLP_dd->at(i),1);
+        }
+      
+    }
+
          //---------------Vtx Selection Variables----------------//
   //------------------MWT CUT -------------------//
   for (int i =0 ;i<nSteps+1;i++)
     {
       for (unsigned int j = 0 ; j< tree_Hemi->size();j++)
         {
-          if (tree_Hemi_Vtx_NChi2->at(j)>0 && tree_Hemi_Vtx_NChi2->at(j)<10 && tree_Hemi_Vtx_MeantrackWeight->at(j)>(MeanTWcut+i*dTW) )
+          if (tree_Hemi_Vtx_NChi2->at(j)>0 && tree_Hemi_Vtx_NChi2->at(j)<10 && tree_Hemi_Vtx_MeantrackWeight->at(j)>(MeanTWcut+i*dTW) && tree_Hemi_Vtx_nTrks->at(j)==2 )
             {
               nSelecVtx[i]++;
               
@@ -1153,7 +1332,7 @@ if (thesample.Contains("smu200"))
     {
       for (unsigned int j = 0 ; j< tree_Hemi->size();j++)
         {
-          if (tree_Hemi_Vtx_NChi2->at(j)>0 && tree_Hemi_Vtx_NChi2->at(j)<10 && tree_Hemi_Mass->at(j)>=(HemiMassCut+i*dHemiMass))
+          if (tree_Hemi_Vtx_NChi2->at(j)>0 && tree_Hemi_Vtx_NChi2->at(j)<10 && tree_Hemi_mass->at(j)>=(HemiMassCut+i*dHemiMass))
             {
               nEvts_Hemi_Mass[i]++;
               if (tree_Hemi_Vtx_step->at(j)==1 || tree_Hemi_Vtx_step->at(j)==2)
@@ -1169,8 +1348,10 @@ if (thesample.Contains("smu200"))
     {
       for (unsigned int j = 0 ; j< tree_Hemi->size();j++)
         {
-          nEvts_Hemi_CombinedHemiLeptonMass[i]++;
-
+          if (tree_Hemi_mass->at(j)>=(Hemi_CombinedHemiLeptonMassCut+i*dSmuonMass))
+            {
+              nEvts_Hemi_CombinedHemiLeptonMass[i]++;
+            }
         }
     }
 
@@ -1426,7 +1607,7 @@ for (int i = 0 ; i < nStep_MuonJetdRmin ; i++)
 ////////                          GENERATION                           ////////
 ////////                                                               ////////
 
-  if (thesample == "LO_smu200to500_ctau20" && Signal)
+  if (Signal)
     {    
           
       int Msmu = tree_smu_mass;
@@ -1525,9 +1706,9 @@ for (int i = 0 ; i < nStep_MuonJetdRmin ; i++)
 ///////////////////////
 // Delta R between hemisphere axis and closest neutralino
 
-   int nHemi = tree_Hemi_dR->size();
+   int nHemi = tree_Hemi_LLP_dR->size();
    for (int i=0; i<nHemi; i++) {   // Loop on hemispheres
-     float dR = tree_Hemi_dR->at(i);
+     float dR = tree_Hemi_LLP_dR->at(i);
      
      if ( Msmu == 200 && Mneu == 180 ) fillHisto("hSim_Hemi_dR","smu200_neu180",  thesample, dR ,1.);
      if ( Msmu == 250 && Mneu == 200 ) fillHisto("hSim_Hemi_dR","smu250_neu200",  thesample, dR ,1.);
@@ -1931,70 +2112,147 @@ for(int h =0 ; h < nStep_nJet;h++)
    ofs<<" //----------------- End of Event yields ---------------\\ "<<std::endl;
    ofs<<" "<<std::endl;
    ofs<<"Selection Efficiency of each step : "<<std::endl;
-   ofs<<"Nevents: "<<(nentries/nentries)*1 <<std::endl;
-   ofs<<"Online+Offline Selection : "<<(nFilterEvt/nentries)*1 <<std::endl;
-   ofs<<"EVTS BDT for WP "<<EVTSWP <<" : "<<(nEvts/nFilterEvt)*1 <<std::endl;
-   ofs<<"Vertex Reco: "<<(nRecoVertex/(2*nEvts))*(0.5) <<std::endl;
-   ofs<<"Vtx BDT3 > cut "<<VTXWP <<": "<<(nSelecBDTVtx/(2*nRecoVertex))*(0.5) <<std::endl;
-   ofs<<"BDT2-Tight Vertex only : "<<(nRecoVertexTightWP/(2*nSelecBDTVtx))*(0.5) <<std::endl;
-   ofs<<"BDT2-Tight BDT3 Vtx > cut "<<VTXWP <<": "<<(nSelecBDTVtxTight_step12/(2*nRecoVertexTightWP))*(0.5) <<std::endl;
-   ofs<<"Two BDT2-Tight vertices : "<<(2*nEvts_w2TightVtx/nRecoVertexTightWP)*(1) <<std::endl;
-   ofs<<"Two BDT2-Tight BDT3 Vtx > cut "<<VTXWP <<": "<<(2*nEvts_w2TightBDTVtx/nRecoVertexTightWP)*(1) <<std::endl;
+   ofs<<"Nevents: "<<(nentries/nentries) <<std::endl;
+   ofs<<"Online+Offline Selection : "<<(nFilterEvt/nentries) <<std::endl;
+   ofs<<"EVTS BDT for WP "<<EVTSWP <<" : "<<(nEvts/nFilterEvt) <<std::endl;
+   ofs<<"Vertex Reco: "<<(nRecoVertex/(2*nEvts)) <<std::endl;
+   ofs<<"Vtx BDT3 > cut "<<VTXWP <<": "<<(nSelecBDTVtx/(nRecoVertex)) <<std::endl;
+    ofs<<"BDT2-Tight Vertex only : "<<(nRecoVertexTightWP/(nRecoVertex)) <<std::endl;
+   ofs<<"BDT2-Tight BDT3 Vtx > cut "<<VTXWP <<": "<<(nSelecBDTVtxTight/(nRecoVertexTightWP)) <<std::endl;
+     ofs<<"Two BDT2-Tight vertices : "<<(2*nEvts_w2TightVtx/nRecoVertexTightWP)*(1) <<std::endl;
+  //  ofs<<"Two BDT2-Tight BDT3 Vtx > cut "<<VTXWP <<": "<<(2*nEvts_w2TightBDTVtx/nRecoVertexTightWP)*(1) <<std::endl;
    ofs<<"Two BDT2-Tight BDT3bis Vtx > cut "<<VTXWP <<": "<<(2*nEvts_w2TightBDTVtx_step12/nRecoVertexTightWP)*(1) <<std::endl;
    ofs<<"One BDT2-Tight Vertex: "<<(2*nEvts_w1TightVtx/nRecoVertexTightWP)*(1) <<std::endl;
-   ofs<<"One BDT2-Tight BDT3 Vtx > cut "<<VTXWP <<": "<<(2*nEvts_w1TightBDTVtx/nRecoVertexTightWP)*(1) <<std::endl;
+  //  ofs<<"One BDT2-Tight BDT3 Vtx > cut "<<VTXWP <<": "<<(2*nEvts_w1TightBDTVtx/nRecoVertexTightWP)*(1) <<std::endl;
    ofs<<"One BDT2-Tight BDT3bis Vtx > cut "<<VTXWP <<": "<<(2*nEvts_w1TightBDTVtx_step12/nRecoVertexTightWP)*(1) <<std::endl;
    ofs<<" //----------------- End of selection efficiency ---------------\\ "<<std::endl;
    ofs<<"NormFactor : "<<NormFactor<<std::endl;
    ofs<<" "<<std::endl;
    ofs.close();
 
-
-    // Efficiency of each step
-    fillHisto("hData_Vtx_SelectionEff","Step",thesample,0,nentries/nentries);
-    fillHisto("hData_Vtx_SelectionEff","Step",thesample,1,nFilterEvt/nentries);
-    fillHisto("hData_Vtx_SelectionEff","Step",thesample,2,nEvts/nFilterEvt);
-    fillHisto("hData_Vtx_SelectionEff","Step",thesample,3,nRecoVertex/(2*nEvts));
-    fillHisto("hData_Vtx_SelectionEff","Step",thesample,4,nSelecBDTVtx/(2*nRecoVertex));
-    fillHisto("hData_Vtx_SelectionEff","Step",thesample,5,nRecoVertexTightWP/(2*nSelecBDTVtx));
-    fillHisto("hData_Vtx_SelectionEff","Step",thesample,6,nSelecBDTVtxTight_step12/(2*nRecoVertexTightWP));
-    fillHisto("hData_Vtx_SelectionEff","Step",thesample,7,2*nEvts_w2TightVtx/nRecoVertexTightWP);
-    fillHisto("hData_Vtx_SelectionEff","Step",thesample,8,2*nEvts_w2TightBDTVtx_step12/nRecoVertexTightWP);
-    fillHisto("hData_Vtx_SelectionEff","Step",thesample,9,2*nEvts_w1TightVtx/nRecoVertexTightWP);
-    fillHisto("hData_Vtx_SelectionEff","Step",thesample,10,2*nEvts_w1TightBDTVtx_step12/nRecoVertexTightWP);
-
-
     fillHisto("hData_Trks_Selection","Step",thesample,0,LooseTrks_Eff);
     fillHisto("hData_Trks_Selection","Step",thesample,1,TightTrks_Eff);
 
-    //Normalized by Number of events * cross section
-    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,0,nentries*NormFactor);
-    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,1,nFilterEvt*NormFactor);
-    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,2,nEvts*NormFactor);
-    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,3,nRecoVertex*NormFactor/2);
-    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,4,nSelecBDTVtx*NormFactor/2);
-    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,5,nRecoVertexTightWP*NormFactor/2);
-    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,6,nSelecBDTVtxTight_step12*NormFactor/2);
-    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,7,nEvts_w2TightVtx*NormFactor);
-    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,8,nEvts_w2TightBDTVtx_step12*NormFactor);
-    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,9,nEvts_w1TightVtx*NormFactor);
-    fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,10,nEvts_w1TightBDTVtx_step12*NormFactor);
+      //first : Event Yields for Run 2 with 138 fb-1..
+      // ... Normalized by Number of events to get the correct errors
 
-  // Normalized by Number of evens
-    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,0,nentries/nentries);
-    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,1,nFilterEvt/nentries);
-    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,2,nEvts/nentries);
-    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,3,nRecoVertex/(2*nentries));
-    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,4,nSelecBDTVtx/(2*nentries));
-    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,5,nRecoVertexTightWP/(2*nentries));
-    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,6,nSelecBDTVtxTight_step12/(2*nentries));
-    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,7,nEvts_w2TightVtx/(nentries));
-    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,8,nEvts_w2TightBDTVtx_step12/nentries);
-    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,9,nEvts_w1TightVtx/nentries);
-    fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,10,nEvts_w1TightBDTVtx_step12/nentries);
+      //then : Efficiency of each step
+
+    // then : Normalized by Number of events * cross section
+    
+    // then : Normalized by Number of events
+
+  for (int i = 0 ; i < nentries ; i++)
+    {
+      fillHisto("hData_EventYields","Step",thesample,0,NormFactor*lumiRun2);// We fill for the Number of event counted by the selectino (numerator) to have the statistical 
+                                                                                  // instead of filling with a weight eaquals to theNumber of event selected/ nentries.....
+      fillHisto("hData_Vtx_SelectionEff","Step",thesample,0,NormFactor/XS);
+      fillHisto("hData_Vtx_SelectionEff","Total",thesample,0,NormFactor/XS);
+      fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,0,1*NormFactor);
+      fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,0,NormFactor/XS);
+    }
+  for (int i = 0 ; i < nFilterEvt ; i++)
+    {
+      fillHisto("hData_EventYields","Step",thesample,1,NormFactor*lumiRun2);
+      fillHisto("hData_Vtx_SelectionEff","Step",thesample,1,NormFactor/XS);
+      fillHisto("hData_Vtx_SelectionEff","Total",thesample,1,NormFactor/XS);
+      fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,1,1*NormFactor);
+      fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,1,NormFactor/XS);
+    }
+
+  for (int i = 0 ; i < nEvts ; i++)
+    {
+      fillHisto("hData_EventYields","Step",thesample,2,NormFactor*lumiRun2);
+      fillHisto("hData_Vtx_SelectionEff","Step",thesample,2,1/nFilterEvt);
+      fillHisto("hData_Vtx_SelectionEff","Total",thesample,2,NormFactor/XS);
+      fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,2,1*NormFactor);
+      fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,2,NormFactor/XS);
+    }
+    
+
+  for (int i = 0 ; i < nRecoVertex ; i++)
+    {
+      fillHisto("hData_EventYields","Step",thesample,3,lumiRun2*NormFactor/2);
+      fillHisto("hData_Vtx_SelectionEff","Step",thesample,3,1/(2*nEvts));
+      fillHisto("hData_Vtx_SelectionEff","Total",thesample,3,NormFactor/(2*XS));
+      fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,3,1*NormFactor/2);
+      fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,3,NormFactor/(2*XS));
+    }
+    
+
+  for (int i = 0 ; i < nSelecBDTVtx ; i++)
+    {
+      fillHisto("hData_EventYields","Step",thesample,4,lumiRun2*NormFactor/2);
+      fillHisto("hData_Vtx_SelectionEff","Step",thesample,4,1/(2*nRecoVertex));
+      fillHisto("hData_Vtx_SelectionEff","Total",thesample,4,NormFactor/(2*XS));
+      fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,4,1*NormFactor/2);
+      fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,4,NormFactor/(2*XS));
+    }
+
+  for (int i = 0 ; i < nRecoVertexTightWP ; i++)
+    {
+      fillHisto("hData_EventYields","Step",thesample,5,lumiRun2*NormFactor/2);
+      fillHisto("hData_Vtx_SelectionEff","Step",thesample,5,1/(2*nSelecBDTVtx));
+      fillHisto("hData_Vtx_SelectionEff","Total",thesample,5,NormFactor/(2*XS));
+      fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,5,1*NormFactor/2);
+      fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,5,NormFactor/(2*XS));
+    }
+    
+
+  for (int i = 0 ; i < nSelecBDTVtxTight_step12 ; i++)
+    {
+      fillHisto("hData_EventYields","Step",thesample,6,lumiRun2*NormFactor/2);
+      fillHisto("hData_Vtx_SelectionEff","Step",thesample,6,1/(2*nRecoVertexTightWP));
+      fillHisto("hData_Vtx_SelectionEff","Total",thesample,6,NormFactor/(2*XS));
+      fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,6,1*NormFactor/2);
+      fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,6,NormFactor/(2*XS));
+    }
+    
+
+  for (int i = 0 ; i < nEvts_w2TightVtx ; i++)
+    {
+      fillHisto("hData_EventYields","Step",thesample,7,NormFactor*lumiRun2);
+      fillHisto("hData_Vtx_SelectionEff","Step",thesample,7,2*1/nRecoVertexTightWP);
+      fillHisto("hData_Vtx_SelectionEff","Total",thesample,7,NormFactor/XS);
+      fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,7,1*NormFactor);
+      fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,7,NormFactor/(XS));
+    }
+    
+
+  for (int i = 0 ; i < nEvts_w2TightBDTVtx_step12 ; i++)
+    {
+      fillHisto("hData_EventYields","Step",thesample,8,NormFactor*lumiRun2);
+      fillHisto("hData_Vtx_SelectionEff","Step",thesample,8,2*1/nRecoVertexTightWP);
+      fillHisto("hData_Vtx_SelectionEff","Total",thesample,8,NormFactor/XS);
+      fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,8,1*NormFactor);
+      fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,8,NormFactor/(XS));
+    }
+    
+
+  for (int i = 0 ; i < nEvts_w1TightVtx ; i++)
+    {
+      fillHisto("hData_EventYields","Step",thesample,9,NormFactor*lumiRun2);
+      fillHisto("hData_Vtx_SelectionEff","Step",thesample,9,2*1/nRecoVertexTightWP);
+      fillHisto("hData_Vtx_SelectionEff","Total",thesample,9,NormFactor/XS);
+      fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,9,1*NormFactor);
+      fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,9,NormFactor/(XS));
+    }
+    
+
+  for (int i = 0 ; i < nEvts_w1TightBDTVtx_step12 ; i++)
+    {
+      fillHisto("hData_EventYields","Step",thesample,10,NormFactor*lumiRun2);
+      fillHisto("hData_Vtx_SelectionEff","Step",thesample,10,2*1/nRecoVertexTightWP);
+      fillHisto("hData_Vtx_SelectionEff","Total",thesample,10,NormFactor/XS);
+      fillHisto("hData_Vtx_SelectionNXSNormalized","Step",thesample,10,1*NormFactor);
+      fillHisto("hData_Vtx_SelectionNNormalized","Step",thesample,10,NormFactor/(XS));
+    }
+    
 
 
-//Event Yields
+
+  
+//Non-normalized Event yields
     fillHisto("hData_Vtx_Selection","Step",thesample,0,nentries);
     fillHisto("hData_Vtx_Selection","Step",thesample,1,nFilterEvt);
     fillHisto("hData_Vtx_Selection","Step",thesample,2,nEvts);
@@ -2062,6 +2320,43 @@ void TreeReader::initializeHisto(TString sample, bool isfirstset){
 // pt1 > 25GeV & pt2 > 10GeV
 // Mμμ > 10 GeV (remove low-resonances)
 
+//-----------Daniel ------//
+    addHisto("hData_njet","NoSel",            sample.Data(),21,-0.5,20.5);
+    addHisto("hData_njetNOmu","NoSel",        sample.Data(),21,-0.5,20.5);
+    addHisto("hData_Mmumu","NoSel",           sample.Data(),25,0.,500.);
+    addHisto("hData_BDTevt","NoSel",          sample.Data(),50,-1.,1.);
+    addHisto("hData_Hemi_njet","NoSel",       sample.Data(),21,-0.5,20.5);
+    addHisto("hData_Hemi_mass","NoSel",       sample.Data(),30,0.,600.);
+    addHisto("hData_Hemi_massTot","NoSel",    sample.Data(),25,0.,1000.);
+    addHisto("hData_Hemi_Vtx_njet","NoSel",   sample.Data(),21,-0.5,20.5);
+    addHisto("hData_Hemi_Vtx_mass","NoSel",   sample.Data(),30,0.,600.);
+    addHisto("hData_Hemi_Vtx_massTot","NoSel",sample.Data(),25,0.,1000.);
+    addHisto("hData_Hemi1_njet","NoSel",      sample.Data(),21,-0.5,20.5);
+    addHisto("hData_Hemi1_mass","NoSel",      sample.Data(),30,0.,600.);
+    addHisto("hData_Hemi1_massTot","NoSel",   sample.Data(),25,0.,1000.);
+    addHisto("hData_Hemi1_Vtx_dist","NoSel",  sample.Data(),25,0.,100.);
+    addHisto("hData_Hemi1_Vtx_BDTvtx","NoSel",sample.Data(),50,-1.,1.);
+    addHisto("hData_Hemi1_Vtx_njet","NoSel",  sample.Data(),21,-0.5,20.5);
+    addHisto("hData_Hemi1_Vtx_mass","NoSel",  sample.Data(),30,0.,600.);
+    addHisto("hData_Hemi1_Vtx_massTot","NoSel",sample.Data(),25,0.,1000.);
+    addHisto("hData_Hemi2_njet","NoSel",      sample.Data(),21,-0.5,20.5);
+    addHisto("hData_Hemi2_mass","NoSel",      sample.Data(),30,0.,600.);
+    addHisto("hData_Hemi2_massTot","NoSel",   sample.Data(),25,0.,1000.);
+    addHisto("hData_Hemi2_Vtx_dist","NoSel",  sample.Data(),25,0.,100.);
+    addHisto("hData_Hemi2_Vtx_BDTvtx","NoSel",sample.Data(),50,-1.,1.);
+    addHisto("hData_Hemi2_Vtx_njet","NoSel",  sample.Data(),21,-0.5,20.5);
+    addHisto("hData_Hemi2_Vtx_mass","NoSel",  sample.Data(),30,0.,600.);
+    addHisto("hData_Hemi2_Vtx_massTot","NoSel",sample.Data(),25,0.,1000.);
+    
+    addHisto("hData_vtx1_Mmumu","NoSel",      sample.Data(),25,0.,500.);
+    addHisto("hData_BDTevt1_Mmumu","NoSel",  sample.Data(),25,0.,500.);
+    addHisto("hData_BDTvtx1_Mmumu","NoSel",   sample.Data(),25,0.,500.);
+    addHisto("hData_BDTevtvtx1_Mmumu","NoSel",sample.Data(),25,0.,500.);
+    addHisto("hData_vtx2_Mmumu","NoSel",      sample.Data(),25,0.,500.);
+    addHisto("hData_BDTevt2_Mmumu","NoSel",  sample.Data(),25,0.,500.);
+    addHisto("hData_BDTvtx2_Mmumu","NoSel",   sample.Data(),25,0.,500.);
+    addHisto("hData_BDTevtvtx2_Mmumu","NoSel",sample.Data(),25,0.,500.);
+
   //------------------------Gen Infos --------------------------------------------
 
   addHisto("hGen_Msmu","noSel",sample.Data(),361,159.5,520.5);
@@ -2073,9 +2368,21 @@ void TreeReader::initializeHisto(TString sample, bool isfirstset){
    addHisto("hData_Evts","BDT",  sample.Data(),101,-1,1);
    //----------------------------- Muons -----------------------------------------
 
-   addHisto("RecoMuo_pT", "noSel", sample.Data(),  100, 0, 100);
-   addHisto("DiMuon_Mass","noSel", sample.Data(),  1200, 0 ,1200);
+   addHisto("RecoMuo_pT", "noSel",                      sample.Data(),  100, 0, 100);
+
+   addHisto("DiMuon_Mass","noSel",                      sample.Data(),  24,0,600); //!!!!
+   addHisto("DiMuon_Mass","EVTSel",                     sample.Data(),  24,0,600); //!!!!
+   addHisto("DiMuon_Mass","RecoVtx",                    sample.Data(),  24,0,600); //!!!!
+   addHisto("DiMuon_Mass","RecoVtx_TightWP",            sample.Data(),  24,0,600); //!!!!
+   addHisto("DiMuon_Mass","RecoVtx_Good_BDT3",          sample.Data(),  24,0,600); //!!!!
+   addHisto("DiMuon_Mass","RecoVtx_TightWP_BDT3",       sample.Data(),  24,0,600); //!!!!
+   addHisto("DiMuon_Mass","RecoVtx_TightWP_BDT3bis",    sample.Data(),  24,0,600); //!!!!
+   addHisto("DiMuon_Mass","2TightVtx",                  sample.Data(),  24,0,600); //!!!! 
+   addHisto("DiMuon_Mass","1TightVtx",                  sample.Data(),  24,0,600); //!!!!
+   
    addHisto("Evts_MVAVal","noSel", sample.Data() , 101,-1,1);
+
+
    // --------------------------  V0 Candidates ----------------------------------
 
    addHisto("hData_reco_K0_mass","noSel", sample.Data(),101,0.42,0.58);
@@ -2105,6 +2412,18 @@ void TreeReader::initializeHisto(TString sample, bool isfirstset){
    addHisto("hData_reco_SecInt_r","TrackerMatched",    sample.Data(),200,0,100);
    addHisto("hData_reco_SecInt_z","TrackerMatched",    sample.Data(),401,-200,200);
 
+   addHisto("TranseverseResolution","NoSel",  sample.Data(),    100 , -2 , 2);
+   addHisto("TranseverseDistance","NoSel",    sample.Data(),    100 , 0 , 100);
+   addHisto2D("TransverseResVsDistance","NoSel",sample.Data(),  100 , 0 , 100,100 , -2 , 2);
+
+   addHisto("LongitudinalResolution","NoSel", sample.Data(),    100 , -2 , 2);
+   addHisto("LongitudinalDistance","NoSel",   sample.Data(),    401 , -200 , 200);
+   addHisto2D("LongitudinalResVsDistance","NoSel",sample.Data(),   401 , -200 , 200,100 , -2 , 2);
+
+   addHisto("3DResolution","NoSel",           sample.Data(),    100 , 0 , 3);
+   addHisto("3DDistance","NoSel",             sample.Data(),    200 , 0 , 200);
+   addHisto2D("3DResVsDistance","NoSel",      sample.Data(),  100 , 0 , 3,200 , 0 , 200);
+
    // ------------------------ Jets   -------------------------------------------
 
    addHisto("hData_jet_pt","",            sample.Data(),  800,0,1600);
@@ -2121,7 +2440,10 @@ void TreeReader::initializeHisto(TString sample, bool isfirstset){
    // ------------------------ Axes --------------------------------------------
 
   addHisto("hData_dR_RecoReco","noSel",            sample.Data(),201,0,6);
-
+   addHisto("hSim_dR_GenGen","noSel",    sample.Data(), 201, 0,6);
+   addHisto("hSim_dPhi_GenGen","noSel",   sample.Data(), 201, 0,6);
+   addHisto("hSim_dEta_GenGen","noSel",   sample.Data(), 201, 0,6);
+   addHisto("hSim_dR_GenReco","noSel",    sample.Data(), 201, 0,6);
    //---------------------------Signal-Vertices---------------------------------------
 
    addHisto("hData_Hemi_Vtx_NChi2","noSel",        sample.Data(),70,-20.,50.);
@@ -2249,22 +2571,22 @@ void TreeReader::initializeHisto(TString sample, bool isfirstset){
    addHisto("hData_Hemi_Mass","TightWP",                   sample.Data(),140,0,1400);
    addHisto("hData_Vtx_DCA","NoSel",                       sample.Data(),100,0,100);
    addHisto("hData_Vtx_DCA","TightWP",                     sample.Data(),100,0,100);
-   addHisto("hData_Hemi_SmuonMass","NoSel",                sample.Data(),1400,0,14000);
-   addHisto("hData_HighSmuonMass","NoSel",                 sample.Data(),1400,0,14000);
+   addHisto("hData_Hemi_SmuonMass","NoSel",                sample.Data(),200,0,2000);
+   addHisto("hData_HighSmuonMass","NoSel",                 sample.Data(),200,0,2000);
 
    //----------Tracks Selection -------------//
 
    addHisto("hData_Trks_Selection","Step",                 sample.Data(),3,0,3);
 
     //----------Vtx Selection -------------//
-
+    addHisto("hData_EventYields","Step"   ,                sample.Data(),11,0,11);
     addHisto("hData_Vtx_Selection","Step",                 sample.Data(),11,0,11);
     addHisto("hData_Vtx_SelectionNXSNormalized","Step",    sample.Data(),11,0,11);
 
     addHisto("hData_Vtx_SelectionNNormalized","Step",       sample.Data(),11,0,11);
     addHisto("hData_Vtx_Total","Step",                      sample.Data(),11,0,11);
     addHisto("hData_Vtx_SelectionEff","Step",               sample.Data(),11,0,11);
-
+    addHisto("hData_Vtx_SelectionEff","Total",              sample.Data(),11,0,11);
 
     //-------------Gen Infos---------------//
 
@@ -2833,6 +3155,8 @@ void TreeReader::initializeHisto(TString sample, bool isfirstset){
     addHisto("hBDT_r","VTX_TightWP",                    sample.Data(),100,0,100);
     addHisto("hBDT_z","VTX_TightWP",                    sample.Data(),200,0,200);
     addHisto("hBDT_MWT","VTX_TightWP",                  sample.Data(),1001,1.5,2.5);
+    addHisto2D("MWTVsnTrks","VTX_TightWP",              sample.Data(),50,0,50,50,0,50);
+    addHisto2D("MWTVsnTrks","VTX",                      sample.Data(),50,0,50,50,0,50);
     addHisto("hBDT_Vtx_Mass","VTX_TightWP",             sample.Data(),1400,0,14000);
     addHisto("hBDT_Hemi_Mass","VTX_TightWP",            sample.Data(),140,0,1400);
     addHisto("hBDT_dist","VTX_TightWP",                 sample.Data(),200,0,200);
@@ -2856,7 +3180,7 @@ void TreeReader::initializeHisto(TString sample, bool isfirstset){
     addHisto("hBDT_MeanDCA","VTX_TightWP_dm20",              sample.Data(),100,0,1);
 
     
-        addHisto("hBDT_nTrks","VTX_TightWP_dm50",                sample.Data(),50,2,52);
+    addHisto("hBDT_nTrks","VTX_TightWP_dm50",                sample.Data(),50,2,52);
     addHisto("hBDT_NChi2","VTX_TightWP_dm50",                sample.Data(),40,0,10);
     addHisto("hBDT_step","VTX_TightWP_dm50",                 sample.Data(),5,0,5);
     addHisto("hBDT_r","VTX_TightWP_dm50",                    sample.Data(),100,0,100);
