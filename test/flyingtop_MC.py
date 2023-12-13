@@ -63,6 +63,19 @@ process.source = cms.Source("PoolSource",
     #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_9.root',
     #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_10.root'
 
+
+#        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_10.root'
+
                                 # # 50cm---------------------------------------------------
                                 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_1.root',
                                 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_2.root',
@@ -87,7 +100,7 @@ process.source = cms.Source("PoolSource",
     #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_9.root',
     #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau30_smu300_snu250/MINIAODSIM_v16_L1v1_10.root'
 
-# # 10cm-----------
+# 10cm-----------
     #     'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_1.root',
     #     'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_2.root',
     #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau10_smu250_snu200/MINIAODSIM_v16_L1v1_3.root',
@@ -722,10 +735,10 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
                                 #    Roccor = cms.FileInPath("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"),
                                     isMC =cms.bool(IsMC), 
                                     RochString = cms.string("FlyingTop/FlyingTop/data/RoccoR2018UL.txt"),
-                                   weightFileMVA = cms.untracked.string( "TMVAClassification_BDTG_TRKSEL_.weights.xml"),#track selection
-                                   weightFileMVA_EVTS = cms.untracked.string("TMVAClassification_BDTG_EVTSEL_.weights.xml"),#evts selection
-                                   weightFileMVA_VTX = cms.untracked.string("TMVAClassification_BDTG_VTXSEL_.weights.xml"),#vtx selection
-                                   weightFileMVA_VTX_step1 = cms.untracked.string("TMVAClassification_BDTG_VTXSel_TIGHTWP.weights.xml"),#vtx selection
+                                    weightFileMVA = cms.untracked.string( "BDT_TRK_ALLSignal.xml"),#track selection
+                                    weightFileMVA_EVTS = cms.untracked.string("BDT_EVT_ALLSignal.xml"),#evts selection
+                                    weightFileMVA_VTX = cms.untracked.string("BDT_VTX_ALLSTEPS_ALLSignal.xml"),#vtx selection
+                                    weightFileMVA_VTX_step1 = cms.untracked.string("BDT_VTX_STEPS12_ALLSignal.xml"),#vtx selection
                                    mcpufile = cms.string("Pileup_MC2018UL_bin100.root"),
                                    mcpupath = cms.string("pileup"),
                                    datapufile = cms.string("MyDataPileupHistogram_bin100.root"),
@@ -774,7 +787,7 @@ process.p = cms.Path(
 # getattr(process,'slimmedJets').addTagInfos = cms.bool(True)
 ########## output of ntuple
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string("Ntuple_50_test.root") )
+process.TFileService = cms.Service("TFileService", fileName = cms.string("50_test.root") )
 # Ntuple_LO_smu200to500_ctau20
 # process.TFileService = cms.Service("TFileService", fileName = cms.string("UDD_bgctau50_smu275_snu225.root") )
 # process.TFileService = cms.Service("TFileService", fileName = cms.string("TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8_10k_NOdrSigCut.root") )
