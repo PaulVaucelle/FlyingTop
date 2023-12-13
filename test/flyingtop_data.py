@@ -246,7 +246,7 @@ process.options = cms.untracked.PSet( )
 process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
 #$$
                                    isMC =cms.bool(IsMC),
-                                   weightFileMVA = cms.untracked.string( "BDTG_SIG50vsBKGtt_filter_veto_15var.xml"),#track selection
+                                   weightFileMVA = cms.untracked.string( "BDT_TRK_ALLSignal.xml"),#track selection
 
 # BDTG_SIG50vsBKGtt_filter_veto_15var.xml => Daniel => version sans Yc Veto bug
 
@@ -256,11 +256,12 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
 # (Daniel) Latest version Running witout xyzlost : BDTG_SIG50vsBKGtt_filter_veto_15var.xml : 
 #(Paul)   : Latest Version Running without xyzlost : TMVAClassification_BDTG50cm_05_05_23_noxyzlost_NoVeto.weights.xml (there is  a version with the Veto but not better)
                                    
+     
                                    #runOnData =cms.bool(True),
-                                   weightFileMVA_EVTS = cms.untracked.string("BDTG_EvtsSel_SIG50vsAll.xml"),#evts selection
+                                   weightFileMVA_EVTS = cms.untracked.string("BDT_EVT_ALLSignal.xml"),#evts selection
 
-                                   weightFileMVA_VTX = cms.untracked.string("BDTG_VtxSel_SIG50vsBKGtt.xml"),#vtx selection
-                                   weightFileMVA_VTX_step1 = cms.untracked.string("BDTG_VtxSel_SIG50vsBKGtt_step1.xml"),#vtx selection
+                                   weightFileMVA_VTX = cms.untracked.string("BDT_VTX_ALLSTEPS_ALLSignal.xml"),#vtx selection
+                                   weightFileMVA_VTX_step1 = cms.untracked.string("BDT_VTX_STEPS12_ALLSignal.xml"),#vtx selection
                                    genEventInfoInput        = cms.InputTag("generator"),
                                    LHEEventProductInput     = cms.InputTag("source"),
                                    genpruned   = cms.InputTag('prunedGenParticles'),
