@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon Oct 30 11:16:27 2023 by ROOT version 6.14/09
+// Wed Dec 13 08:47:52 2023 by ROOT version 6.14/09
 // from TTree ttree/ttree
-// found on file: Ntuple_50_test.root
+// found on file: 50_test.root
 //////////////////////////////////////////////////////////
 
 #ifndef TreeReader_h
@@ -13,10 +13,11 @@
 #include <TFile.h>
 
 // Header file for the classes stored in the TTree if any.
-#include "vector"
-#include "vector"
-#include "vector"
-#include "vector"
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TLorentzVector.h>
+
+// Header file for the classes stored in the TTree if any.
 #include "vector"
 
 class TreeReader {
@@ -31,13 +32,14 @@ public :
    Int_t           eventNumber;
    Int_t           lumiBlock;
    vector<float>   *tree_LHE_Weights;
-   Int_t           tree_MCEvt_weight;
+   Float_t         tree_MCEvt_weight;
    Float_t         PUweight;
    Double_t        Prefweight;
    Int_t           PU_events;
    Int_t           AllPU_events_weight;
    Bool_t          tree_Filter;
    Bool_t          tree_FilterSameSign;
+   Bool_t          tree_Good_PV;
    Float_t         tree_Evts_MVAval;
    Float_t         tree_bs_PosX;
    Float_t         tree_bs_PosY;
@@ -50,21 +52,18 @@ public :
    Float_t         tree_PV_NChi2;
    Int_t           tree_PV_ndf;
    Float_t         tree_PV_rho;
+   Int_t           tree_all_nmu;
    Int_t           tree_nmu;
    Float_t         tree_LT;
    Float_t         tree_Mmumu;
-   Float_t         tree_MmumuCorr;
+   Float_t         tree_MmumuSameSign;
+   vector<bool>    *tree_muon_isPrompt;
    vector<float>   *tree_muon_pt;
    vector<float>   *tree_muon_eta;
    vector<float>   *tree_muon_phi;
    vector<float>   *tree_muon_x;
    vector<float>   *tree_muon_y;
    vector<float>   *tree_muon_z;
-   vector<float>   *tree_muon_px;
-   vector<float>   *tree_muon_py;
-   vector<float>   *tree_muon_pz;
-   vector<float>   *tree_muon_energy;
-   vector<float>   *tree_muon_mass;
    vector<float>   *tree_muon_dxy;
    vector<float>   *tree_muon_dxyError;
    vector<float>   *tree_muon_dz;
@@ -86,15 +85,27 @@ public :
    vector<bool>    *tree_muon_MiniIsoTight;
    vector<bool>    *tree_muon_TkIsoLoose;
    vector<bool>    *tree_muon_TkIsoTight;
+   vector<float>   *tree_muon_trkLayers;
+   vector<float>   *tree_muon_miniIso;
    vector<float>   *tree_muon_correction;
    vector<int>     *tree_muon_gen;
+   vector<float>   *tree_reco_lepton_leadingpt;
+   vector<float>   *tree_reco_lepton_leadingpt2;
+   vector<float>   *tree_reco_lepton_leadingeta;
+   vector<float>   *tree_reco_lepton_leadingeta2;
+   vector<float>   *tree_reco_lepton_leadingphi;
+   vector<float>   *tree_reco_lepton_leadingphi2;
+   vector<float>   *tree_trig_lepton_leadingpt;
+   vector<float>   *tree_trig_lepton_leadingpt2;
+   vector<float>   *tree_trig_lepton_leadingeta;
+   vector<float>   *tree_trig_lepton_leadingeta2;
+   vector<float>   *tree_trig_lepton_leadingphi;
+   vector<float>   *tree_trig_lepton_leadingphi2;
    vector<float>   *tree_lepton_leadingpt;
    vector<float>   *tree_lepton_leadingpt2;
    vector<float>   *tree_lepton_lepton_dR;
    vector<float>   *tree_lepton_lepton_dPhi;
    vector<float>   *tree_lepton_lepton_dEta;
-   vector<float>   *tree_muon_trkLayers;
-   vector<float>   *tree_muon_miniIso;
    vector<float>   *tree_ll_pt;
    vector<float>   *tree_ll_eta;
    vector<float>   *tree_ll_phi;
@@ -103,16 +114,15 @@ public :
    vector<float>   *tree_ll_pz;
    vector<float>   *tree_ll_energy;
    vector<float>   *tree_ll_mass;
+   Int_t           tree_all_nel;
    Int_t           tree_electron_nEle;
+   vector<bool>    *tree_electron_isPrompt;
    vector<float>   *tree_electron_pt;
    vector<float>   *tree_electron_eta;
    vector<float>   *tree_electron_phi;
    vector<float>   *tree_electron_x;
    vector<float>   *tree_electron_y;
    vector<float>   *tree_electron_z;
-   vector<float>   *tree_electron_px;
-   vector<float>   *tree_electron_py;
-   vector<float>   *tree_electron_pz;
    vector<float>   *tree_electron_energy;
    vector<float>   *tree_electron_et;
    vector<float>   *tree_electron_ecal_trk_postcorr;
@@ -125,6 +135,7 @@ public :
    vector<bool>    *tree_electron_trigger_diEle;
    vector<float>   *tree_electron_dxy;
    vector<float>   *tree_electron_dz;
+   vector<int>     *tree_electron_gen;
    Float_t         tree_PFMet_et;
    Float_t         tree_PFMet_phi;
    Float_t         tree_PFMet_sig;
@@ -227,6 +238,8 @@ public :
    vector<float>   *tree_SecInt_LLP_dr;
    vector<float>   *tree_SecInt_LLP_dz;
    vector<float>   *tree_SecInt_LLP_dd;
+   vector<unsigned int> *tree_SecInt_tk1;
+   vector<unsigned int> *tree_SecInt_tk2;
    Int_t           tree_nYConv;
    vector<float>   *tree_Yc_x;
    vector<float>   *tree_Yc_y;
@@ -376,6 +389,15 @@ public :
    vector<int>     *tree_genFromLLP_mother_pdgId;
    vector<bool>    *tree_genFromLLP_isFromB;
    vector<bool>    *tree_genFromLLP_isFromC;
+   vector<float>   *tree_genAxis_dRneuneu;
+   vector<float>   *tree_genAxis_dPhineuneu;
+   vector<float>   *tree_genAxis_dEtaneuneu;
+   vector<float>   *tree_GenAxes_Mass;
+   vector<float>   *tree_GenAxes_CombinedHemiLeptonMass;
+   vector<float>   *tree_GenAxis_Neu_dRmin;
+   vector<float>   *tree_GenAxis_Neu_dRmax;
+   vector<float>   *tree_GenAxis_RecoAxis_dRmin;
+   vector<float>   *tree_GenAxis_RecoAxis_dRmax;
    Int_t           tree_nFromC;
    vector<float>   *tree_genFromC_pt;
    vector<float>   *tree_genFromC_eta;
@@ -427,15 +449,20 @@ public :
    vector<float>   *tree_LLP12_dphi;
    vector<float>   *tree_LLP_Mass;
    vector<int>     *tree_Hemi;
-   vector<float>   *tree_Hemi_Mass;
-   vector<float>   *tree_Hemi_CombinedHemiLeptonMass;
    vector<int>     *tree_Hemi_njet;
+   vector<int>     *tree_Hemi_njet_nomu;
    vector<float>   *tree_Hemi_eta;
    vector<float>   *tree_Hemi_phi;
-   vector<float>   *tree_Hemi_dR;
    vector<int>     *tree_Hemi_nTrks;
    vector<int>     *tree_Hemi_nTrks_sig;
    vector<int>     *tree_Hemi_nTrks_bad;
+   vector<float>   *tree_Hemi_mass;
+   vector<float>   *tree_HemiMu_mass;
+   vector<float>   *tree_HemiMu_pt;
+   vector<float>   *tree_HemiMu_dR;
+   vector<float>   *tree_HemiMuOp_mass;
+   vector<float>   *tree_HemiMuOp_pt;
+   vector<float>   *tree_HemiMuOp_dR;
    vector<int>     *tree_Hemi_LLP;
    vector<float>   *tree_Hemi_LLP_pt;
    vector<float>   *tree_Hemi_LLP_eta;
@@ -444,6 +471,23 @@ public :
    vector<float>   *tree_Hemi_LLP_x;
    vector<float>   *tree_Hemi_LLP_y;
    vector<float>   *tree_Hemi_LLP_z;
+   vector<float>   *tree_Hemi_LLP_dR;
+   vector<int>     *tree_Hemi_LLP_mother;
+   vector<float>   *tree_Hemi_LLP_Vtx_dx;
+   vector<float>   *tree_Hemi_LLP_Vtx_dy;
+   vector<float>   *tree_Hemi_LLP_Vtx_dz;
+   vector<float>   *tree_Hemi_LLP_Vtx_dr;
+   vector<float>   *tree_Hemi_LLP_Vtx_dd;
+   vector<float>   *tree_Hemi_LLP_Vtx_ddbad;
+   vector<float>   *tree_Hemi_LLP_muOK_dR;
+   vector<float>   *tree_Hemi_LLP_muOK_pt;
+   vector<float>   *tree_Hemi_LLP_muOK_mass;
+   vector<float>   *tree_Hemi_LLP_muNO_dR;
+   vector<float>   *tree_Hemi_LLP_muNO_pt;
+   vector<float>   *tree_Hemi_LLP_muNO_mass;
+   vector<float>   *tree_Hemi_LLP_dR12;
+   vector<bool>    *tree_Hemi_LLP_ping;
+   vector<int>     *tree_event_LLP_ping;
    vector<int>     *tree_Hemi_Vtx_step;
    vector<float>   *tree_Hemi_Vtx_NChi2;
    vector<int>     *tree_Hemi_Vtx_nTrks;
@@ -478,20 +522,10 @@ public :
    vector<float>   *tree_Hemi_Vtx_TVtx_dz;
    vector<float>   *tree_Hemi_Vtx_TVtx_NChi2;
    vector<float>   *tree_Hemi_Vtx_dist;
-   vector<float>   *tree_Hemi_Vtx_dx;
-   vector<float>   *tree_Hemi_Vtx_dy;
-   vector<float>   *tree_Hemi_Vtx_dz;
-   vector<float>   *tree_Hemi_Vtx_dr;
-   vector<float>   *tree_Hemi_Vtx_dd;
    vector<float>   *tree_Hemi_dR12;
-   vector<float>   *tree_Hemi_LLP_dR12;
-   vector<float>   *tree_Hemi_Vtx_ddbad;
    vector<int>     *tree_Hemi_Vtx_ntrk10;
    vector<int>     *tree_Hemi_Vtx_ntrk20;
    vector<int>     *tree_track_Hemi_isjet;
-   vector<float>   *tree_Hemi_Vtx_ddToBkg;
-   vector<bool>    *tree_Hemi_LLP_ping;
-   vector<int>     *tree_event_LLP_ping;
    vector<int>     *tree_Hemi_LooseBTag_axes;
    vector<int>     *tree_Hemi_MediumBTag_axes;
    vector<int>     *tree_Hemi_TightBTag_axes;
@@ -526,6 +560,7 @@ public :
    TBranch        *b_AllPU_events_weight;   //!
    TBranch        *b_tree_Filter;   //!
    TBranch        *b_tree_FilterSameSign;   //!
+   TBranch        *b_tree_Good_PV;   //!
    TBranch        *b_tree_Evts_MVAval;   //!
    TBranch        *b_tree_bs_PosX;   //!
    TBranch        *b_tree_bs_PosY;   //!
@@ -538,21 +573,18 @@ public :
    TBranch        *b_tree_PV_NChi2;   //!
    TBranch        *b_tree_PV_ndf;   //!
    TBranch        *b_tree_PV_rho;   //!
+   TBranch        *b_tree_all_nmu;   //!
    TBranch        *b_tree_nmu;   //!
    TBranch        *b_tree_LT;   //!
    TBranch        *b_tree_Mmumu;   //!
-   TBranch        *b_tree_MmumuCorr;   //!
+   TBranch        *b_tree_MmumuSameSign;   //!
+   TBranch        *b_tree_muon_isPrompt;   //!
    TBranch        *b_tree_muon_pt;   //!
    TBranch        *b_tree_muon_eta;   //!
    TBranch        *b_tree_muon_phi;   //!
    TBranch        *b_tree_muon_x;   //!
    TBranch        *b_tree_muon_y;   //!
    TBranch        *b_tree_muon_z;   //!
-   TBranch        *b_tree_muon_px;   //!
-   TBranch        *b_tree_muon_py;   //!
-   TBranch        *b_tree_muon_pz;   //!
-   TBranch        *b_tree_muon_energy;   //!
-   TBranch        *b_tree_muon_mass;   //!
    TBranch        *b_tree_muon_dxy;   //!
    TBranch        *b_tree_muon_dxyError;   //!
    TBranch        *b_tree_muon_dz;   //!
@@ -574,15 +606,27 @@ public :
    TBranch        *b_tree_muon_MiniIsoTight;   //!
    TBranch        *b_tree_muon_TkIsoLoose;   //!
    TBranch        *b_tree_muon_TkIsoTight;   //!
+   TBranch        *b_tree_muon_trkLayers;   //!
+   TBranch        *b_tree_muon_miniIso;   //!
    TBranch        *b_tree_muon_correction;   //!
    TBranch        *b_tree_muon_gen;   //!
+   TBranch        *b_tree_reco_lepton_leadingpt;   //!
+   TBranch        *b_tree_reco_lepton_leadingpt2;   //!
+   TBranch        *b_tree_reco_lepton_leadingeta;   //!
+   TBranch        *b_tree_reco_lepton_leadingeta2;   //!
+   TBranch        *b_tree_reco_lepton_leadingphi;   //!
+   TBranch        *b_tree_reco_lepton_leadingphi2;   //!
+   TBranch        *b_tree_trig_lepton_leadingpt;   //!
+   TBranch        *b_tree_trig_lepton_leadingpt2;   //!
+   TBranch        *b_tree_trig_lepton_leadingeta;   //!
+   TBranch        *b_tree_trig_lepton_leadingeta2;   //!
+   TBranch        *b_tree_trig_lepton_leadingphi;   //!
+   TBranch        *b_tree_trig_lepton_leadingphi2;   //!
    TBranch        *b_tree_lepton_leadingpt;   //!
    TBranch        *b_tree_lepton_leadingpt2;   //!
    TBranch        *b_tree_lepton_lepton_dR;   //!
    TBranch        *b_tree_lepton_lepton_dPhi;   //!
    TBranch        *b_tree_lepton_lepton_dEta;   //!
-   TBranch        *b_tree_muon_trkLayers;   //!
-   TBranch        *b_tree_muon_miniIso;   //!
    TBranch        *b_tree_ll_pt;   //!
    TBranch        *b_tree_ll_eta;   //!
    TBranch        *b_tree_ll_phi;   //!
@@ -591,16 +635,15 @@ public :
    TBranch        *b_tree_ll_pz;   //!
    TBranch        *b_tree_ll_energy;   //!
    TBranch        *b_tree_ll_mass;   //!
+   TBranch        *b_tree_all_nel;   //!
    TBranch        *b_tree_electron_nEle;   //!
+   TBranch        *b_tree_electron_isPrompt;   //!
    TBranch        *b_tree_electron_pt;   //!
    TBranch        *b_tree_electron_eta;   //!
    TBranch        *b_tree_electron_phi;   //!
    TBranch        *b_tree_electron_x;   //!
    TBranch        *b_tree_electron_y;   //!
    TBranch        *b_tree_electron_z;   //!
-   TBranch        *b_tree_electron_px;   //!
-   TBranch        *b_tree_electron_py;   //!
-   TBranch        *b_tree_electron_pz;   //!
    TBranch        *b_tree_electron_energy;   //!
    TBranch        *b_tree_electron_et;   //!
    TBranch        *b_tree_electron_ecal_trk_postcorr;   //!
@@ -613,6 +656,7 @@ public :
    TBranch        *b_tree_electron_trigger_diEle;   //!
    TBranch        *b_tree_electron_dxy;   //!
    TBranch        *b_tree_electron_dz;   //!
+   TBranch        *b_tree_electron_gen;   //!
    TBranch        *b_tree_PFMet_et;   //!
    TBranch        *b_tree_PFMet_phi;   //!
    TBranch        *b_tree_PFMet_sig;   //!
@@ -715,6 +759,8 @@ public :
    TBranch        *b_tree_SecInt_LLP_dr;   //!
    TBranch        *b_tree_SecInt_LLP_dz;   //!
    TBranch        *b_tree_SecInt_LLP_dd;   //!
+   TBranch        *b_tree_SecInt_tk1;   //!
+   TBranch        *b_tree_SecInt_tk2;   //!
    TBranch        *b_tree_nYConv;   //!
    TBranch        *b_tree_Yc_x;   //!
    TBranch        *b_tree_Yc_y;   //!
@@ -864,6 +910,15 @@ public :
    TBranch        *b_tree_genFromLLP_mother_pdgId;   //!
    TBranch        *b_tree_genFromLLP_isFromB;   //!
    TBranch        *b_tree_genFromLLP_isFromC;   //!
+   TBranch        *b_tree_genAxis_dRneuneu;   //!
+   TBranch        *b_tree_genAxis_dPhineuneu;   //!
+   TBranch        *b_tree_genAxis_dEtaneuneu;   //!
+   TBranch        *b_tree_GenAxes_Mass;   //!
+   TBranch        *b_tree_GenAxes_CombinedHemiLeptonMass;   //!
+   TBranch        *b_tree_GenAxis_Neu_dRmin;   //!
+   TBranch        *b_tree_GenAxis_Neu_dRmax;   //!
+   TBranch        *b_tree_GenAxis_RecoAxis_dRmin;   //!
+   TBranch        *b_tree_GenAxis_RecoAxis_dRmax;   //!
    TBranch        *b_tree_nFromC;   //!
    TBranch        *b_tree_genFromC_pt;   //!
    TBranch        *b_tree_genFromC_eta;   //!
@@ -915,15 +970,20 @@ public :
    TBranch        *b_tree_LLP12_dphi;   //!
    TBranch        *b_tree_LLP_Mass;   //!
    TBranch        *b_tree_Hemi;   //!
-   TBranch        *b_tree_Hemi_Mass;   //!
-   TBranch        *b_tree_Hemi_CombinedHemiLeptonMass;   //!
    TBranch        *b_tree_Hemi_njet;   //!
+   TBranch        *b_tree_Hemi_njet_nomu;   //!
    TBranch        *b_tree_Hemi_eta;   //!
    TBranch        *b_tree_Hemi_phi;   //!
-   TBranch        *b_tree_Hemi_dR;   //!
    TBranch        *b_tree_Hemi_nTrks;   //!
    TBranch        *b_tree_Hemi_nTrks_sig;   //!
    TBranch        *b_tree_Hemi_nTrks_bad;   //!
+   TBranch        *b_tree_Hemi_mass;   //!
+   TBranch        *b_tree_HemiMu_mass;   //!
+   TBranch        *b_tree_HemiMu_pt;   //!
+   TBranch        *b_tree_HemiMu_dR;   //!
+   TBranch        *b_tree_HemiMuOp_mass;   //!
+   TBranch        *b_tree_HemiMuOp_pt;   //!
+   TBranch        *b_tree_HemiMuOp_dR;   //!
    TBranch        *b_tree_Hemi_LLP;   //!
    TBranch        *b_tree_Hemi_LLP_pt;   //!
    TBranch        *b_tree_Hemi_LLP_eta;   //!
@@ -932,6 +992,23 @@ public :
    TBranch        *b_tree_Hemi_LLP_x;   //!
    TBranch        *b_tree_Hemi_LLP_y;   //!
    TBranch        *b_tree_Hemi_LLP_z;   //!
+   TBranch        *b_tree_Hemi_LLP_dR;   //!
+   TBranch        *b_tree_Hemi_LLP_mother;   //!
+   TBranch        *b_tree_Hemi_LLP_Vtx_dx;   //!
+   TBranch        *b_tree_Hemi_LLP_Vtx_dy;   //!
+   TBranch        *b_tree_Hemi_LLP_Vtx_dz;   //!
+   TBranch        *b_tree_Hemi_LLP_Vtx_dr;   //!
+   TBranch        *b_tree_Hemi_LLP_Vtx_dd;   //!
+   TBranch        *b_tree_Hemi_LLP_Vtx_ddbad;   //!
+   TBranch        *b_tree_Hemi_LLP_muOK_dR;   //!
+   TBranch        *b_tree_Hemi_LLP_muOK_pt;   //!
+   TBranch        *b_tree_Hemi_LLP_muOK_mass;   //!
+   TBranch        *b_tree_Hemi_LLP_muNO_dR;   //!
+   TBranch        *b_tree_Hemi_LLP_muNO_pt;   //!
+   TBranch        *b_tree_Hemi_LLP_muNO_mass;   //!
+   TBranch        *b_tree_Hemi_LLP_dR12;   //!
+   TBranch        *b_tree_Hemi_LLP_ping;   //!
+   TBranch        *b_tree_event_LLP_ping;   //!
    TBranch        *b_tree_Hemi_Vtx_step;   //!
    TBranch        *b_tree_Hemi_Vtx_NChi2;   //!
    TBranch        *b_tree_Hemi_Vtx_nTrks;   //!
@@ -966,20 +1043,10 @@ public :
    TBranch        *b_tree_Hemi_Vtx_TVtx_dz;   //!
    TBranch        *b_tree_Hemi_Vtx_TVtx_NChi2;   //!
    TBranch        *b_tree_Hemi_Vtx_dist;   //!
-   TBranch        *b_tree_Hemi_Vtx_dx;   //!
-   TBranch        *b_tree_Hemi_Vtx_dy;   //!
-   TBranch        *b_tree_Hemi_Vtx_dz;   //!
-   TBranch        *b_tree_Hemi_Vtx_dr;   //!
-   TBranch        *b_tree_Hemi_Vtx_dd;   //!
    TBranch        *b_tree_Hemi_dR12;   //!
-   TBranch        *b_tree_Hemi_LLP_dR12;   //!
-   TBranch        *b_tree_Hemi_Vtx_ddbad;   //!
    TBranch        *b_tree_Hemi_Vtx_ntrk10;   //!
    TBranch        *b_tree_Hemi_Vtx_ntrk20;   //!
    TBranch        *b_tree_track_Hemi_isjet;   //!
-   TBranch        *b_tree_Hemi_Vtx_ddToBkg;   //!
-   TBranch        *b_tree_Hemi_LLP_ping;   //!
-   TBranch        *b_tree_event_LLP_ping;   //!
    TBranch        *b_tree_Hemi_LooseBTag_axes;   //!
    TBranch        *b_tree_Hemi_MediumBTag_axes;   //!
    TBranch        *b_tree_Hemi_TightBTag_axes;   //!
@@ -1002,7 +1069,7 @@ public :
    TBranch        *b_HLT_IsoMu24_v;   //!
    TBranch        *b_HLT_IsoMu27_v;   //!
 
-         TreeReader(TTree *tree=0, TString sample="", std::vector<TString> thesystlist = std::vector<TString>());
+   TreeReader(TTree *tree=0, TString sample="", std::vector<TString> thesystlist = std::vector<TString>());
    virtual ~TreeReader();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -1011,7 +1078,8 @@ public :
    virtual void     Loop(TString sample, bool Signal);
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
-         //add functions to create and fill histograms
+
+      //add functions to create and fill histograms
  
    void initializeHisto(TString sample, bool isfirstset);
    void addHisto( TString var, TString selstep, TString sample, int nbins, float min, float max);
@@ -1038,18 +1106,17 @@ public :
 
 #ifdef TreeReader_cxx
 TreeReader::TreeReader(TTree *tree, TString sample, std::vector<TString> thesystlist) : fChain(0) 
-
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject(   ("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"+sample+".root").Data() );
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject(("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"+sample+".root").Data());
       if (!f || !f->IsOpen()) {
          f = new TFile(("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"+sample+".root").Data());
       }
       TDirectory * dir = (TDirectory*)f->Get("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"+sample+".root:/FlyingTop");
       dir->GetObject("ttree",tree);
-      systlist = thesystlist;
+      systlist = thesystlist; 
    }
    Init(tree);
 }
@@ -1091,17 +1158,13 @@ void TreeReader::Init(TTree *tree)
 
    // Set object pointer
    tree_LHE_Weights = 0;
+   tree_muon_isPrompt = 0;
    tree_muon_pt = 0;
    tree_muon_eta = 0;
    tree_muon_phi = 0;
    tree_muon_x = 0;
    tree_muon_y = 0;
    tree_muon_z = 0;
-   tree_muon_px = 0;
-   tree_muon_py = 0;
-   tree_muon_pz = 0;
-   tree_muon_energy = 0;
-   tree_muon_mass = 0;
    tree_muon_dxy = 0;
    tree_muon_dxyError = 0;
    tree_muon_dz = 0;
@@ -1123,15 +1186,27 @@ void TreeReader::Init(TTree *tree)
    tree_muon_MiniIsoTight = 0;
    tree_muon_TkIsoLoose = 0;
    tree_muon_TkIsoTight = 0;
+   tree_muon_trkLayers = 0;
+   tree_muon_miniIso = 0;
    tree_muon_correction = 0;
    tree_muon_gen = 0;
+   tree_reco_lepton_leadingpt = 0;
+   tree_reco_lepton_leadingpt2 = 0;
+   tree_reco_lepton_leadingeta = 0;
+   tree_reco_lepton_leadingeta2 = 0;
+   tree_reco_lepton_leadingphi = 0;
+   tree_reco_lepton_leadingphi2 = 0;
+   tree_trig_lepton_leadingpt = 0;
+   tree_trig_lepton_leadingpt2 = 0;
+   tree_trig_lepton_leadingeta = 0;
+   tree_trig_lepton_leadingeta2 = 0;
+   tree_trig_lepton_leadingphi = 0;
+   tree_trig_lepton_leadingphi2 = 0;
    tree_lepton_leadingpt = 0;
    tree_lepton_leadingpt2 = 0;
    tree_lepton_lepton_dR = 0;
    tree_lepton_lepton_dPhi = 0;
    tree_lepton_lepton_dEta = 0;
-   tree_muon_trkLayers = 0;
-   tree_muon_miniIso = 0;
    tree_ll_pt = 0;
    tree_ll_eta = 0;
    tree_ll_phi = 0;
@@ -1140,15 +1215,13 @@ void TreeReader::Init(TTree *tree)
    tree_ll_pz = 0;
    tree_ll_energy = 0;
    tree_ll_mass = 0;
+   tree_electron_isPrompt = 0;
    tree_electron_pt = 0;
    tree_electron_eta = 0;
    tree_electron_phi = 0;
    tree_electron_x = 0;
    tree_electron_y = 0;
    tree_electron_z = 0;
-   tree_electron_px = 0;
-   tree_electron_py = 0;
-   tree_electron_pz = 0;
    tree_electron_energy = 0;
    tree_electron_et = 0;
    tree_electron_ecal_trk_postcorr = 0;
@@ -1161,6 +1234,7 @@ void TreeReader::Init(TTree *tree)
    tree_electron_trigger_diEle = 0;
    tree_electron_dxy = 0;
    tree_electron_dz = 0;
+   tree_electron_gen = 0;
    tree_jet_pt = 0;
    tree_jet_eta = 0;
    tree_jet_phi = 0;
@@ -1252,6 +1326,8 @@ void TreeReader::Init(TTree *tree)
    tree_SecInt_LLP_dr = 0;
    tree_SecInt_LLP_dz = 0;
    tree_SecInt_LLP_dd = 0;
+   tree_SecInt_tk1 = 0;
+   tree_SecInt_tk2 = 0;
    tree_Yc_x = 0;
    tree_Yc_y = 0;
    tree_Yc_z = 0;
@@ -1388,6 +1464,15 @@ void TreeReader::Init(TTree *tree)
    tree_genFromLLP_mother_pdgId = 0;
    tree_genFromLLP_isFromB = 0;
    tree_genFromLLP_isFromC = 0;
+   tree_genAxis_dRneuneu = 0;
+   tree_genAxis_dPhineuneu = 0;
+   tree_genAxis_dEtaneuneu = 0;
+   tree_GenAxes_Mass = 0;
+   tree_GenAxes_CombinedHemiLeptonMass = 0;
+   tree_GenAxis_Neu_dRmin = 0;
+   tree_GenAxis_Neu_dRmax = 0;
+   tree_GenAxis_RecoAxis_dRmin = 0;
+   tree_GenAxis_RecoAxis_dRmax = 0;
    tree_genFromC_pt = 0;
    tree_genFromC_eta = 0;
    tree_genFromC_phi = 0;
@@ -1436,15 +1521,20 @@ void TreeReader::Init(TTree *tree)
    tree_LLP12_dphi = 0;
    tree_LLP_Mass = 0;
    tree_Hemi = 0;
-   tree_Hemi_Mass = 0;
-   tree_Hemi_CombinedHemiLeptonMass = 0;
    tree_Hemi_njet = 0;
+   tree_Hemi_njet_nomu = 0;
    tree_Hemi_eta = 0;
    tree_Hemi_phi = 0;
-   tree_Hemi_dR = 0;
    tree_Hemi_nTrks = 0;
    tree_Hemi_nTrks_sig = 0;
    tree_Hemi_nTrks_bad = 0;
+   tree_Hemi_mass = 0;
+   tree_HemiMu_mass = 0;
+   tree_HemiMu_pt = 0;
+   tree_HemiMu_dR = 0;
+   tree_HemiMuOp_mass = 0;
+   tree_HemiMuOp_pt = 0;
+   tree_HemiMuOp_dR = 0;
    tree_Hemi_LLP = 0;
    tree_Hemi_LLP_pt = 0;
    tree_Hemi_LLP_eta = 0;
@@ -1453,6 +1543,23 @@ void TreeReader::Init(TTree *tree)
    tree_Hemi_LLP_x = 0;
    tree_Hemi_LLP_y = 0;
    tree_Hemi_LLP_z = 0;
+   tree_Hemi_LLP_dR = 0;
+   tree_Hemi_LLP_mother = 0;
+   tree_Hemi_LLP_Vtx_dx = 0;
+   tree_Hemi_LLP_Vtx_dy = 0;
+   tree_Hemi_LLP_Vtx_dz = 0;
+   tree_Hemi_LLP_Vtx_dr = 0;
+   tree_Hemi_LLP_Vtx_dd = 0;
+   tree_Hemi_LLP_Vtx_ddbad = 0;
+   tree_Hemi_LLP_muOK_dR = 0;
+   tree_Hemi_LLP_muOK_pt = 0;
+   tree_Hemi_LLP_muOK_mass = 0;
+   tree_Hemi_LLP_muNO_dR = 0;
+   tree_Hemi_LLP_muNO_pt = 0;
+   tree_Hemi_LLP_muNO_mass = 0;
+   tree_Hemi_LLP_dR12 = 0;
+   tree_Hemi_LLP_ping = 0;
+   tree_event_LLP_ping = 0;
    tree_Hemi_Vtx_step = 0;
    tree_Hemi_Vtx_NChi2 = 0;
    tree_Hemi_Vtx_nTrks = 0;
@@ -1487,20 +1594,10 @@ void TreeReader::Init(TTree *tree)
    tree_Hemi_Vtx_TVtx_dz = 0;
    tree_Hemi_Vtx_TVtx_NChi2 = 0;
    tree_Hemi_Vtx_dist = 0;
-   tree_Hemi_Vtx_dx = 0;
-   tree_Hemi_Vtx_dy = 0;
-   tree_Hemi_Vtx_dz = 0;
-   tree_Hemi_Vtx_dr = 0;
-   tree_Hemi_Vtx_dd = 0;
    tree_Hemi_dR12 = 0;
-   tree_Hemi_LLP_dR12 = 0;
-   tree_Hemi_Vtx_ddbad = 0;
    tree_Hemi_Vtx_ntrk10 = 0;
    tree_Hemi_Vtx_ntrk20 = 0;
    tree_track_Hemi_isjet = 0;
-   tree_Hemi_Vtx_ddToBkg = 0;
-   tree_Hemi_LLP_ping = 0;
-   tree_event_LLP_ping = 0;
    tree_Hemi_LooseBTag_axes = 0;
    tree_Hemi_MediumBTag_axes = 0;
    tree_Hemi_TightBTag_axes = 0;
@@ -1521,6 +1618,7 @@ void TreeReader::Init(TTree *tree)
    fChain->SetBranchAddress("AllPU_events_weight", &AllPU_events_weight, &b_AllPU_events_weight);
    fChain->SetBranchAddress("tree_Filter", &tree_Filter, &b_tree_Filter);
    fChain->SetBranchAddress("tree_FilterSameSign", &tree_FilterSameSign, &b_tree_FilterSameSign);
+   fChain->SetBranchAddress("tree_Good_PV", &tree_Good_PV, &b_tree_Good_PV);
    fChain->SetBranchAddress("tree_Evts_MVAval", &tree_Evts_MVAval, &b_tree_Evts_MVAval);
    fChain->SetBranchAddress("tree_bs_PosX", &tree_bs_PosX, &b_tree_bs_PosX);
    fChain->SetBranchAddress("tree_bs_PosY", &tree_bs_PosY, &b_tree_bs_PosY);
@@ -1533,21 +1631,18 @@ void TreeReader::Init(TTree *tree)
    fChain->SetBranchAddress("tree_PV_NChi2", &tree_PV_NChi2, &b_tree_PV_NChi2);
    fChain->SetBranchAddress("tree_PV_ndf", &tree_PV_ndf, &b_tree_PV_ndf);
    fChain->SetBranchAddress("tree_PV_rho", &tree_PV_rho, &b_tree_PV_rho);
+   fChain->SetBranchAddress("tree_all_nmu", &tree_all_nmu, &b_tree_all_nmu);
    fChain->SetBranchAddress("tree_nmu", &tree_nmu, &b_tree_nmu);
    fChain->SetBranchAddress("tree_LT", &tree_LT, &b_tree_LT);
    fChain->SetBranchAddress("tree_Mmumu", &tree_Mmumu, &b_tree_Mmumu);
-   fChain->SetBranchAddress("tree_MmumuCorr", &tree_MmumuCorr, &b_tree_MmumuCorr);
+   fChain->SetBranchAddress("tree_MmumuSameSign", &tree_MmumuSameSign, &b_tree_MmumuSameSign);
+   fChain->SetBranchAddress("tree_muon_isPrompt", &tree_muon_isPrompt, &b_tree_muon_isPrompt);
    fChain->SetBranchAddress("tree_muon_pt", &tree_muon_pt, &b_tree_muon_pt);
    fChain->SetBranchAddress("tree_muon_eta", &tree_muon_eta, &b_tree_muon_eta);
    fChain->SetBranchAddress("tree_muon_phi", &tree_muon_phi, &b_tree_muon_phi);
    fChain->SetBranchAddress("tree_muon_x", &tree_muon_x, &b_tree_muon_x);
    fChain->SetBranchAddress("tree_muon_y", &tree_muon_y, &b_tree_muon_y);
    fChain->SetBranchAddress("tree_muon_z", &tree_muon_z, &b_tree_muon_z);
-   fChain->SetBranchAddress("tree_muon_px", &tree_muon_px, &b_tree_muon_px);
-   fChain->SetBranchAddress("tree_muon_py", &tree_muon_py, &b_tree_muon_py);
-   fChain->SetBranchAddress("tree_muon_pz", &tree_muon_pz, &b_tree_muon_pz);
-   fChain->SetBranchAddress("tree_muon_energy", &tree_muon_energy, &b_tree_muon_energy);
-   fChain->SetBranchAddress("tree_muon_mass", &tree_muon_mass, &b_tree_muon_mass);
    fChain->SetBranchAddress("tree_muon_dxy", &tree_muon_dxy, &b_tree_muon_dxy);
    fChain->SetBranchAddress("tree_muon_dxyError", &tree_muon_dxyError, &b_tree_muon_dxyError);
    fChain->SetBranchAddress("tree_muon_dz", &tree_muon_dz, &b_tree_muon_dz);
@@ -1569,15 +1664,27 @@ void TreeReader::Init(TTree *tree)
    fChain->SetBranchAddress("tree_muon_MiniIsoTight", &tree_muon_MiniIsoTight, &b_tree_muon_MiniIsoTight);
    fChain->SetBranchAddress("tree_muon_TkIsoLoose", &tree_muon_TkIsoLoose, &b_tree_muon_TkIsoLoose);
    fChain->SetBranchAddress("tree_muon_TkIsoTight", &tree_muon_TkIsoTight, &b_tree_muon_TkIsoTight);
+   fChain->SetBranchAddress("tree_muon_trkLayers", &tree_muon_trkLayers, &b_tree_muon_trkLayers);
+   fChain->SetBranchAddress("tree_muon_miniIso", &tree_muon_miniIso, &b_tree_muon_miniIso);
    fChain->SetBranchAddress("tree_muon_correction", &tree_muon_correction, &b_tree_muon_correction);
    fChain->SetBranchAddress("tree_muon_gen", &tree_muon_gen, &b_tree_muon_gen);
+   fChain->SetBranchAddress("tree_reco_lepton_leadingpt", &tree_reco_lepton_leadingpt, &b_tree_reco_lepton_leadingpt);
+   fChain->SetBranchAddress("tree_reco_lepton_leadingpt2", &tree_reco_lepton_leadingpt2, &b_tree_reco_lepton_leadingpt2);
+   fChain->SetBranchAddress("tree_reco_lepton_leadingeta", &tree_reco_lepton_leadingeta, &b_tree_reco_lepton_leadingeta);
+   fChain->SetBranchAddress("tree_reco_lepton_leadingeta2", &tree_reco_lepton_leadingeta2, &b_tree_reco_lepton_leadingeta2);
+   fChain->SetBranchAddress("tree_reco_lepton_leadingphi", &tree_reco_lepton_leadingphi, &b_tree_reco_lepton_leadingphi);
+   fChain->SetBranchAddress("tree_reco_lepton_leadingphi2", &tree_reco_lepton_leadingphi2, &b_tree_reco_lepton_leadingphi2);
+   fChain->SetBranchAddress("tree_trig_lepton_leadingpt", &tree_trig_lepton_leadingpt, &b_tree_trig_lepton_leadingpt);
+   fChain->SetBranchAddress("tree_trig_lepton_leadingpt2", &tree_trig_lepton_leadingpt2, &b_tree_trig_lepton_leadingpt2);
+   fChain->SetBranchAddress("tree_trig_lepton_leadingeta", &tree_trig_lepton_leadingeta, &b_tree_trig_lepton_leadingeta);
+   fChain->SetBranchAddress("tree_trig_lepton_leadingeta2", &tree_trig_lepton_leadingeta2, &b_tree_trig_lepton_leadingeta2);
+   fChain->SetBranchAddress("tree_trig_lepton_leadingphi", &tree_trig_lepton_leadingphi, &b_tree_trig_lepton_leadingphi);
+   fChain->SetBranchAddress("tree_trig_lepton_leadingphi2", &tree_trig_lepton_leadingphi2, &b_tree_trig_lepton_leadingphi2);
    fChain->SetBranchAddress("tree_lepton_leadingpt", &tree_lepton_leadingpt, &b_tree_lepton_leadingpt);
    fChain->SetBranchAddress("tree_lepton_leadingpt2", &tree_lepton_leadingpt2, &b_tree_lepton_leadingpt2);
    fChain->SetBranchAddress("tree_lepton_lepton_dR", &tree_lepton_lepton_dR, &b_tree_lepton_lepton_dR);
    fChain->SetBranchAddress("tree_lepton_lepton_dPhi", &tree_lepton_lepton_dPhi, &b_tree_lepton_lepton_dPhi);
    fChain->SetBranchAddress("tree_lepton_lepton_dEta", &tree_lepton_lepton_dEta, &b_tree_lepton_lepton_dEta);
-   fChain->SetBranchAddress("tree_muon_trkLayers", &tree_muon_trkLayers, &b_tree_muon_trkLayers);
-   fChain->SetBranchAddress("tree_muon_miniIso", &tree_muon_miniIso, &b_tree_muon_miniIso);
    fChain->SetBranchAddress("tree_ll_pt", &tree_ll_pt, &b_tree_ll_pt);
    fChain->SetBranchAddress("tree_ll_eta", &tree_ll_eta, &b_tree_ll_eta);
    fChain->SetBranchAddress("tree_ll_phi", &tree_ll_phi, &b_tree_ll_phi);
@@ -1586,16 +1693,15 @@ void TreeReader::Init(TTree *tree)
    fChain->SetBranchAddress("tree_ll_pz", &tree_ll_pz, &b_tree_ll_pz);
    fChain->SetBranchAddress("tree_ll_energy", &tree_ll_energy, &b_tree_ll_energy);
    fChain->SetBranchAddress("tree_ll_mass", &tree_ll_mass, &b_tree_ll_mass);
+   fChain->SetBranchAddress("tree_all_nel", &tree_all_nel, &b_tree_all_nel);
    fChain->SetBranchAddress("tree_electron_nEle", &tree_electron_nEle, &b_tree_electron_nEle);
+   fChain->SetBranchAddress("tree_electron_isPrompt", &tree_electron_isPrompt, &b_tree_electron_isPrompt);
    fChain->SetBranchAddress("tree_electron_pt", &tree_electron_pt, &b_tree_electron_pt);
    fChain->SetBranchAddress("tree_electron_eta", &tree_electron_eta, &b_tree_electron_eta);
    fChain->SetBranchAddress("tree_electron_phi", &tree_electron_phi, &b_tree_electron_phi);
    fChain->SetBranchAddress("tree_electron_x", &tree_electron_x, &b_tree_electron_x);
    fChain->SetBranchAddress("tree_electron_y", &tree_electron_y, &b_tree_electron_y);
    fChain->SetBranchAddress("tree_electron_z", &tree_electron_z, &b_tree_electron_z);
-   fChain->SetBranchAddress("tree_electron_px", &tree_electron_px, &b_tree_electron_px);
-   fChain->SetBranchAddress("tree_electron_py", &tree_electron_py, &b_tree_electron_py);
-   fChain->SetBranchAddress("tree_electron_pz", &tree_electron_pz, &b_tree_electron_pz);
    fChain->SetBranchAddress("tree_electron_energy", &tree_electron_energy, &b_tree_electron_energy);
    fChain->SetBranchAddress("tree_electron_et", &tree_electron_et, &b_tree_electron_et);
    fChain->SetBranchAddress("tree_electron_ecal_trk_postcorr", &tree_electron_ecal_trk_postcorr, &b_tree_electron_ecal_trk_postcorr);
@@ -1608,6 +1714,7 @@ void TreeReader::Init(TTree *tree)
    fChain->SetBranchAddress("tree_electron_trigger_diEle", &tree_electron_trigger_diEle, &b_tree_electron_trigger_diEle);
    fChain->SetBranchAddress("tree_electron_dxy", &tree_electron_dxy, &b_tree_electron_dxy);
    fChain->SetBranchAddress("tree_electron_dz", &tree_electron_dz, &b_tree_electron_dz);
+   fChain->SetBranchAddress("tree_electron_gen", &tree_electron_gen, &b_tree_electron_gen);
    fChain->SetBranchAddress("tree_PFMet_et", &tree_PFMet_et, &b_tree_PFMet_et);
    fChain->SetBranchAddress("tree_PFMet_phi", &tree_PFMet_phi, &b_tree_PFMet_phi);
    fChain->SetBranchAddress("tree_PFMet_sig", &tree_PFMet_sig, &b_tree_PFMet_sig);
@@ -1710,6 +1817,8 @@ void TreeReader::Init(TTree *tree)
    fChain->SetBranchAddress("tree_SecInt_LLP_dr", &tree_SecInt_LLP_dr, &b_tree_SecInt_LLP_dr);
    fChain->SetBranchAddress("tree_SecInt_LLP_dz", &tree_SecInt_LLP_dz, &b_tree_SecInt_LLP_dz);
    fChain->SetBranchAddress("tree_SecInt_LLP_dd", &tree_SecInt_LLP_dd, &b_tree_SecInt_LLP_dd);
+   fChain->SetBranchAddress("tree_SecInt_tk1", &tree_SecInt_tk1, &b_tree_SecInt_tk1);
+   fChain->SetBranchAddress("tree_SecInt_tk2", &tree_SecInt_tk2, &b_tree_SecInt_tk2);
    fChain->SetBranchAddress("tree_nYConv", &tree_nYConv, &b_tree_nYConv);
    fChain->SetBranchAddress("tree_Yc_x", &tree_Yc_x, &b_tree_Yc_x);
    fChain->SetBranchAddress("tree_Yc_y", &tree_Yc_y, &b_tree_Yc_y);
@@ -1859,6 +1968,15 @@ void TreeReader::Init(TTree *tree)
    fChain->SetBranchAddress("tree_genFromLLP_mother_pdgId", &tree_genFromLLP_mother_pdgId, &b_tree_genFromLLP_mother_pdgId);
    fChain->SetBranchAddress("tree_genFromLLP_isFromB", &tree_genFromLLP_isFromB, &b_tree_genFromLLP_isFromB);
    fChain->SetBranchAddress("tree_genFromLLP_isFromC", &tree_genFromLLP_isFromC, &b_tree_genFromLLP_isFromC);
+   fChain->SetBranchAddress("tree_genAxis_dRneuneu", &tree_genAxis_dRneuneu, &b_tree_genAxis_dRneuneu);
+   fChain->SetBranchAddress("tree_genAxis_dPhineuneu", &tree_genAxis_dPhineuneu, &b_tree_genAxis_dPhineuneu);
+   fChain->SetBranchAddress("tree_genAxis_dEtaneuneu", &tree_genAxis_dEtaneuneu, &b_tree_genAxis_dEtaneuneu);
+   fChain->SetBranchAddress("tree_GenAxes_Mass", &tree_GenAxes_Mass, &b_tree_GenAxes_Mass);
+   fChain->SetBranchAddress("tree_GenAxes_CombinedHemiLeptonMass", &tree_GenAxes_CombinedHemiLeptonMass, &b_tree_GenAxes_CombinedHemiLeptonMass);
+   fChain->SetBranchAddress("tree_GenAxis_Neu_dRmin", &tree_GenAxis_Neu_dRmin, &b_tree_GenAxis_Neu_dRmin);
+   fChain->SetBranchAddress("tree_GenAxis_Neu_dRmax", &tree_GenAxis_Neu_dRmax, &b_tree_GenAxis_Neu_dRmax);
+   fChain->SetBranchAddress("tree_GenAxis_RecoAxis_dRmin", &tree_GenAxis_RecoAxis_dRmin, &b_tree_GenAxis_RecoAxis_dRmin);
+   fChain->SetBranchAddress("tree_GenAxis_RecoAxis_dRmax", &tree_GenAxis_RecoAxis_dRmax, &b_tree_GenAxis_RecoAxis_dRmax);
    fChain->SetBranchAddress("tree_nFromC", &tree_nFromC, &b_tree_nFromC);
    fChain->SetBranchAddress("tree_genFromC_pt", &tree_genFromC_pt, &b_tree_genFromC_pt);
    fChain->SetBranchAddress("tree_genFromC_eta", &tree_genFromC_eta, &b_tree_genFromC_eta);
@@ -1910,15 +2028,20 @@ void TreeReader::Init(TTree *tree)
    fChain->SetBranchAddress("tree_LLP12_dphi", &tree_LLP12_dphi, &b_tree_LLP12_dphi);
    fChain->SetBranchAddress("tree_LLP_Mass", &tree_LLP_Mass, &b_tree_LLP_Mass);
    fChain->SetBranchAddress("tree_Hemi", &tree_Hemi, &b_tree_Hemi);
-   fChain->SetBranchAddress("tree_Hemi_Mass", &tree_Hemi_Mass, &b_tree_Hemi_Mass);
-   fChain->SetBranchAddress("tree_Hemi_CombinedHemiLeptonMass", &tree_Hemi_CombinedHemiLeptonMass, &b_tree_Hemi_CombinedHemiLeptonMass);
    fChain->SetBranchAddress("tree_Hemi_njet", &tree_Hemi_njet, &b_tree_Hemi_njet);
+   fChain->SetBranchAddress("tree_Hemi_njet_nomu", &tree_Hemi_njet_nomu, &b_tree_Hemi_njet_nomu);
    fChain->SetBranchAddress("tree_Hemi_eta", &tree_Hemi_eta, &b_tree_Hemi_eta);
    fChain->SetBranchAddress("tree_Hemi_phi", &tree_Hemi_phi, &b_tree_Hemi_phi);
-   fChain->SetBranchAddress("tree_Hemi_dR", &tree_Hemi_dR, &b_tree_Hemi_dR);
    fChain->SetBranchAddress("tree_Hemi_nTrks", &tree_Hemi_nTrks, &b_tree_Hemi_nTrks);
    fChain->SetBranchAddress("tree_Hemi_nTrks_sig", &tree_Hemi_nTrks_sig, &b_tree_Hemi_nTrks_sig);
    fChain->SetBranchAddress("tree_Hemi_nTrks_bad", &tree_Hemi_nTrks_bad, &b_tree_Hemi_nTrks_bad);
+   fChain->SetBranchAddress("tree_Hemi_mass", &tree_Hemi_mass, &b_tree_Hemi_mass);
+   fChain->SetBranchAddress("tree_HemiMu_mass", &tree_HemiMu_mass, &b_tree_HemiMu_mass);
+   fChain->SetBranchAddress("tree_HemiMu_pt", &tree_HemiMu_pt, &b_tree_HemiMu_pt);
+   fChain->SetBranchAddress("tree_HemiMu_dR", &tree_HemiMu_dR, &b_tree_HemiMu_dR);
+   fChain->SetBranchAddress("tree_HemiMuOp_mass", &tree_HemiMuOp_mass, &b_tree_HemiMuOp_mass);
+   fChain->SetBranchAddress("tree_HemiMuOp_pt", &tree_HemiMuOp_pt, &b_tree_HemiMuOp_pt);
+   fChain->SetBranchAddress("tree_HemiMuOp_dR", &tree_HemiMuOp_dR, &b_tree_HemiMuOp_dR);
    fChain->SetBranchAddress("tree_Hemi_LLP", &tree_Hemi_LLP, &b_tree_Hemi_LLP);
    fChain->SetBranchAddress("tree_Hemi_LLP_pt", &tree_Hemi_LLP_pt, &b_tree_Hemi_LLP_pt);
    fChain->SetBranchAddress("tree_Hemi_LLP_eta", &tree_Hemi_LLP_eta, &b_tree_Hemi_LLP_eta);
@@ -1927,6 +2050,23 @@ void TreeReader::Init(TTree *tree)
    fChain->SetBranchAddress("tree_Hemi_LLP_x", &tree_Hemi_LLP_x, &b_tree_Hemi_LLP_x);
    fChain->SetBranchAddress("tree_Hemi_LLP_y", &tree_Hemi_LLP_y, &b_tree_Hemi_LLP_y);
    fChain->SetBranchAddress("tree_Hemi_LLP_z", &tree_Hemi_LLP_z, &b_tree_Hemi_LLP_z);
+   fChain->SetBranchAddress("tree_Hemi_LLP_dR", &tree_Hemi_LLP_dR, &b_tree_Hemi_LLP_dR);
+   fChain->SetBranchAddress("tree_Hemi_LLP_mother", &tree_Hemi_LLP_mother, &b_tree_Hemi_LLP_mother);
+   fChain->SetBranchAddress("tree_Hemi_LLP_Vtx_dx", &tree_Hemi_LLP_Vtx_dx, &b_tree_Hemi_LLP_Vtx_dx);
+   fChain->SetBranchAddress("tree_Hemi_LLP_Vtx_dy", &tree_Hemi_LLP_Vtx_dy, &b_tree_Hemi_LLP_Vtx_dy);
+   fChain->SetBranchAddress("tree_Hemi_LLP_Vtx_dz", &tree_Hemi_LLP_Vtx_dz, &b_tree_Hemi_LLP_Vtx_dz);
+   fChain->SetBranchAddress("tree_Hemi_LLP_Vtx_dr", &tree_Hemi_LLP_Vtx_dr, &b_tree_Hemi_LLP_Vtx_dr);
+   fChain->SetBranchAddress("tree_Hemi_LLP_Vtx_dd", &tree_Hemi_LLP_Vtx_dd, &b_tree_Hemi_LLP_Vtx_dd);
+   fChain->SetBranchAddress("tree_Hemi_LLP_Vtx_ddbad", &tree_Hemi_LLP_Vtx_ddbad, &b_tree_Hemi_LLP_Vtx_ddbad);
+   fChain->SetBranchAddress("tree_Hemi_LLP_muOK_dR", &tree_Hemi_LLP_muOK_dR, &b_tree_Hemi_LLP_muOK_dR);
+   fChain->SetBranchAddress("tree_Hemi_LLP_muOK_pt", &tree_Hemi_LLP_muOK_pt, &b_tree_Hemi_LLP_muOK_pt);
+   fChain->SetBranchAddress("tree_Hemi_LLP_muOK_mass", &tree_Hemi_LLP_muOK_mass, &b_tree_Hemi_LLP_muOK_mass);
+   fChain->SetBranchAddress("tree_Hemi_LLP_muNO_dR", &tree_Hemi_LLP_muNO_dR, &b_tree_Hemi_LLP_muNO_dR);
+   fChain->SetBranchAddress("tree_Hemi_LLP_muNO_pt", &tree_Hemi_LLP_muNO_pt, &b_tree_Hemi_LLP_muNO_pt);
+   fChain->SetBranchAddress("tree_Hemi_LLP_muNO_mass", &tree_Hemi_LLP_muNO_mass, &b_tree_Hemi_LLP_muNO_mass);
+   fChain->SetBranchAddress("tree_Hemi_LLP_dR12", &tree_Hemi_LLP_dR12, &b_tree_Hemi_LLP_dR12);
+   fChain->SetBranchAddress("tree_Hemi_LLP_ping", &tree_Hemi_LLP_ping, &b_tree_Hemi_LLP_ping);
+   fChain->SetBranchAddress("tree_event_LLP_ping", &tree_event_LLP_ping, &b_tree_event_LLP_ping);
    fChain->SetBranchAddress("tree_Hemi_Vtx_step", &tree_Hemi_Vtx_step, &b_tree_Hemi_Vtx_step);
    fChain->SetBranchAddress("tree_Hemi_Vtx_NChi2", &tree_Hemi_Vtx_NChi2, &b_tree_Hemi_Vtx_NChi2);
    fChain->SetBranchAddress("tree_Hemi_Vtx_nTrks", &tree_Hemi_Vtx_nTrks, &b_tree_Hemi_Vtx_nTrks);
@@ -1961,20 +2101,10 @@ void TreeReader::Init(TTree *tree)
    fChain->SetBranchAddress("tree_Hemi_Vtx_TVtx_dz", &tree_Hemi_Vtx_TVtx_dz, &b_tree_Hemi_Vtx_TVtx_dz);
    fChain->SetBranchAddress("tree_Hemi_Vtx_TVtx_NChi2", &tree_Hemi_Vtx_TVtx_NChi2, &b_tree_Hemi_Vtx_TVtx_NChi2);
    fChain->SetBranchAddress("tree_Hemi_Vtx_dist", &tree_Hemi_Vtx_dist, &b_tree_Hemi_Vtx_dist);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_dx", &tree_Hemi_Vtx_dx, &b_tree_Hemi_Vtx_dx);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_dy", &tree_Hemi_Vtx_dy, &b_tree_Hemi_Vtx_dy);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_dz", &tree_Hemi_Vtx_dz, &b_tree_Hemi_Vtx_dz);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_dr", &tree_Hemi_Vtx_dr, &b_tree_Hemi_Vtx_dr);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_dd", &tree_Hemi_Vtx_dd, &b_tree_Hemi_Vtx_dd);
    fChain->SetBranchAddress("tree_Hemi_dR12", &tree_Hemi_dR12, &b_tree_Hemi_dR12);
-   fChain->SetBranchAddress("tree_Hemi_LLP_dR12", &tree_Hemi_LLP_dR12, &b_tree_Hemi_LLP_dR12);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_ddbad", &tree_Hemi_Vtx_ddbad, &b_tree_Hemi_Vtx_ddbad);
    fChain->SetBranchAddress("tree_Hemi_Vtx_ntrk10", &tree_Hemi_Vtx_ntrk10, &b_tree_Hemi_Vtx_ntrk10);
    fChain->SetBranchAddress("tree_Hemi_Vtx_ntrk20", &tree_Hemi_Vtx_ntrk20, &b_tree_Hemi_Vtx_ntrk20);
    fChain->SetBranchAddress("tree_track_Hemi_isjet", &tree_track_Hemi_isjet, &b_tree_track_Hemi_isjet);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_ddToBkg", &tree_Hemi_Vtx_ddToBkg, &b_tree_Hemi_Vtx_ddToBkg);
-   fChain->SetBranchAddress("tree_Hemi_LLP_ping", &tree_Hemi_LLP_ping, &b_tree_Hemi_LLP_ping);
-   fChain->SetBranchAddress("tree_event_LLP_ping", &tree_event_LLP_ping, &b_tree_event_LLP_ping);
    fChain->SetBranchAddress("tree_Hemi_LooseBTag_axes", &tree_Hemi_LooseBTag_axes, &b_tree_Hemi_LooseBTag_axes);
    fChain->SetBranchAddress("tree_Hemi_MediumBTag_axes", &tree_Hemi_MediumBTag_axes, &b_tree_Hemi_MediumBTag_axes);
    fChain->SetBranchAddress("tree_Hemi_TightBTag_axes", &tree_Hemi_TightBTag_axes, &b_tree_Hemi_TightBTag_axes);
