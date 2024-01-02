@@ -1,4 +1,35 @@
 // system include files
+
+///////////////////////////////////////////////////////////////////
+//---------------------------------------------------------------//
+//---------------  Displaced Top quark Analysis Code ------------//
+//---------------------------------------------------------------//
+///////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////
+// This code aims at reconstructing long-lived decays of new     //
+// massive particle decaying into a top and a stop quark         //
+// https://arxiv.org/pdf/2212.06678.pdf -> see production of     //
+// smuon decaying into muon and neutralino. The Neutralino       //
+// decaying to a top and a stop with the RPV coupling            //
+// lambda'' 312                                                  //
+///////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////
+//---------------------------------------------------------------//
+// The electron and tau channels could also be analyzed but      //
+// since their identification/isolation is way different from    //
+// the muons (and also harder), the muon channel is chosen even  //
+// though. We will use the prompt muons to trigger.              //
+//  For a signal event, we aim at reconstructing a maximum of 2  //
+// vertices but conveners ask for potentially 3 or more vertices //
+// so there are some tests performed to reconstruct other        //
+// vertices.                                                     //
+//---------------------------------------------------------------//
+///////////////////////////////////////////////////////////////////
+
+
+
 #include <memory>
 #include <cmath>
 #include <vector>
@@ -907,6 +938,7 @@ bool AllowDiLeptonSameSign = true;
     std::vector< int >   tree_Hemi;
     std::vector< int >   tree_Hemi_njet;
     std::vector< int >   tree_Hemi_njet_nomu;
+    std::vector< float > tree_Hemi_pt;
     std::vector< float > tree_Hemi_eta;
     std::vector< float > tree_Hemi_phi;
     std::vector< int >   tree_Hemi_nTrks;
@@ -1563,6 +1595,7 @@ smalltree->Branch("tree_electron_gen",      &tree_electron_gen);
     smalltree->Branch("tree_Hemi",       &tree_Hemi);
     smalltree->Branch("tree_Hemi_njet",  &tree_Hemi_njet);
     smalltree->Branch("tree_Hemi_njet_nomu",  &tree_Hemi_njet_nomu);
+    smalltree->Branch("tree_Hemi_pt",    &tree_Hemi_pt);
     smalltree->Branch("tree_Hemi_eta",   &tree_Hemi_eta);
     smalltree->Branch("tree_Hemi_phi",   &tree_Hemi_phi);
     smalltree->Branch("tree_Hemi_nTrks", &tree_Hemi_nTrks);
@@ -3844,7 +3877,7 @@ tree_electron_nEle = nEl;
   float dR1 = 10., dR2 = 10.;
   float dRcut_hemis  = 1.5; // subjective choice default is 1.5
   float dRcut_tracks = 10.; // no cut is better (could bias low track pT and high LLP ct) 
-   
+  int jet_noHemi = 0;
   if ( tree_njet > 1 ) {
     for (int ii=1; ii<tree_njet; ii++) // Loop on jet (but skip the seed)
   {
@@ -3855,6 +3888,16 @@ tree_electron_nEle = nEl;
     float jet_phi = vjet[i].Phi();
     if ( njet1 > 0 ) dR1 = Deltar( jet_eta, jet_phi, vaxis1.Eta(), vaxis1.Phi() );
     if ( njet2 > 0 ) dR2 = Deltar( jet_eta, jet_phi, vaxis2.Eta(), vaxis2.Phi() );
+    //$$$$ test Paul (in case the conveners ask for three vertices)
+    // In case Conveners ask for mroe than 2 vertices for BSM physics, one way we could expect other vertices could be jets not being part of the
+    // hemispheres => back to back in eta and phi jets from the jets from the signal. This really should have a minor impact if not null
+    // btu we never what BSM physics is made of :D .
+    if (dR1>dRcut_hemis && dR2>dRcut_hemis )
+      {
+        jet_noHemi++;
+      }
+
+    //$$$$ end of test Paul (in case the conveners ask for three vertices)
     float deltaR1 = Deltar( jet_eta, jet_phi, lep1_eta, lep1_phi );
     float deltaR2 = Deltar( jet_eta, jet_phi, lep2_eta, lep2_phi );
     // axis 1
@@ -3900,6 +3943,7 @@ tree_electron_nEle = nEl;
     vaxis2.SetPtEtaPhiM(10., axis2_eta, axis2_phi, 0.);
   }
  
+  std::cout<<"Number of jets not belonging to the two hemispheres : "<<jet_noHemi<<std::endl;
 //   // force the axes to the true LLP
 //   vaxis1.SetPtEtaPhiM(LLP1_pt, LLP1_eta, LLP1_phi, neumass);
 //   vaxis2.SetPtEtaPhiM(LLP2_pt, LLP2_eta, LLP2_phi, neumass);
@@ -6075,7 +6119,8 @@ if ( bdtval > bdtcut ) { // tight wp
       //-------------------------------------------------------------------------------------------//
      
     //  Warning :  Sorry for the people reading the vertexing code, it's not easy to read and understand. I hope that the comments will be enough :D
-
+    // If you want to complain about this code, please contact : "Paul Vaucelle" <paul.vaucelle@cern.ch>.
+    // If you come from Brittany (France), your remarks havehigher chances of being accepted, thanks!
 
     //--------------------------- FIRST HEMISPHERE WITH MVA -------------------------------------//
 
@@ -7239,6 +7284,9 @@ if ( bdtval > bdtcut ) { // tight wp
     tree_Hemi.push_back(1);
     tree_Hemi_njet.push_back(njet1);
     tree_Hemi_njet_nomu.push_back(njet1_nomu);
+    //$$
+    tree_Hemi_pt.push_back(vaxis1.Pt());
+    //$$
     tree_Hemi_eta.push_back(axis1_eta);
     tree_Hemi_phi.push_back(axis1_phi);
     tree_Hemi_nTrks.push_back(nTrks_axis1);
@@ -7286,7 +7334,7 @@ if ( bdtval > bdtcut ) { // tight wp
     float ping1 = 0;
 
   if ( isMC_ && tree_nLLP > 0 ) {
-tree_Hemi_LLP_dR.push_back(axis1_dR);
+    tree_Hemi_LLP_dR.push_back(axis1_dR);
     if ( iLLPrec1 == 1 ) {
       tree_Hemi_LLP_pt.push_back( LLP1_pt);
       tree_Hemi_LLP_eta.push_back(LLP1_eta);
@@ -8602,6 +8650,9 @@ if (showlog){ std::cout<<"success Hemi2 step 2 : "<<success<<std::endl; }
   tree_Hemi.push_back(2);
   tree_Hemi_njet.push_back(njet2);
   tree_Hemi_njet_nomu.push_back(njet2_nomu);
+  //$$
+  tree_Hemi_pt.push_back(vaxis2.Pt());
+  //$$
   tree_Hemi_eta.push_back(axis2_eta);
   tree_Hemi_phi.push_back(axis2_phi);
   tree_Hemi_nTrks.push_back(nTrks_axis2);
@@ -9448,6 +9499,7 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_Hemi.clear();
     tree_Hemi_njet.clear();
     tree_Hemi_njet_nomu.clear();
+    tree_Hemi_pt.clear();
     tree_Hemi_eta.clear();
     tree_Hemi_phi.clear();
     tree_Hemi_nTrks.clear();
