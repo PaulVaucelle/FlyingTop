@@ -20,10 +20,9 @@ For people @IPHC that want access to the code:
 
 git clone https://github.com/Threshic/FlyingTop.git will only give these files and not the CMSSW env
 
-Fro Run 2 Analyses, the release 10_6_30 is recommended. The analysis code is available for 10_6_20 (master branch)
-and 10_6_30 (10_6_30 branch)
+Fro Run 2 Analyses, the release 10_6_30 is recommended. The analysis code is available for 10_6_20 
+and 10_6_30 (10_6_30  is the default one)
 
-The following commands are for 10_6_20 but one can replace it by 10_6_30 as it is only installing the release.
 
 # Release 10_6_30_FLY : 
 
