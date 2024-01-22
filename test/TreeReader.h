@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Dec 13 08:47:52 2023 by ROOT version 6.14/09
+// Tue Jan  2 16:29:12 2024 by ROOT version 6.14/09
 // from TTree ttree/ttree
-// found on file: 50_test.root
+// found on file: Ntuple_50_test.root
 //////////////////////////////////////////////////////////
 
 #ifndef TreeReader_h
@@ -11,13 +11,15 @@
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
-
-// Header file for the classes stored in the TTree if any.
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TLorentzVector.h>
 
 // Header file for the classes stored in the TTree if any.
+#include "vector"
+#include "vector"
+#include "vector"
+#include "vector"
 #include "vector"
 
 class TreeReader {
@@ -451,6 +453,7 @@ public :
    vector<int>     *tree_Hemi;
    vector<int>     *tree_Hemi_njet;
    vector<int>     *tree_Hemi_njet_nomu;
+   vector<float>   *tree_Hemi_pt;
    vector<float>   *tree_Hemi_eta;
    vector<float>   *tree_Hemi_phi;
    vector<int>     *tree_Hemi_nTrks;
@@ -972,6 +975,7 @@ public :
    TBranch        *b_tree_Hemi;   //!
    TBranch        *b_tree_Hemi_njet;   //!
    TBranch        *b_tree_Hemi_njet_nomu;   //!
+   TBranch        *b_tree_Hemi_pt;   //!
    TBranch        *b_tree_Hemi_eta;   //!
    TBranch        *b_tree_Hemi_phi;   //!
    TBranch        *b_tree_Hemi_nTrks;   //!
@@ -1104,17 +1108,19 @@ public :
 
 #endif
 
-#ifdef TreeReader_cxx
+// #ifdef TreeReader_cxx
 TreeReader::TreeReader(TTree *tree, TString sample, std::vector<TString> thesystlist) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
+
+
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject(("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"+sample+".root").Data());
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject(("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/ProdTestBDT_05_01_2024/"+sample+".root").Data());
       if (!f || !f->IsOpen()) {
-         f = new TFile(("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"+sample+".root").Data());
+         f = new TFile(("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/ProdTestBDT_05_01_2024/"+sample+".root").Data());
       }
-      TDirectory * dir = (TDirectory*)f->Get("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"+sample+".root:/FlyingTop");
+      TDirectory * dir = (TDirectory*)f->Get("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/ProdTestBDT_05_01_2024/"+sample+".root:/FlyingTop");
       dir->GetObject("ttree",tree);
       systlist = thesystlist; 
    }
@@ -1523,6 +1529,7 @@ void TreeReader::Init(TTree *tree)
    tree_Hemi = 0;
    tree_Hemi_njet = 0;
    tree_Hemi_njet_nomu = 0;
+   tree_Hemi_pt = 0;
    tree_Hemi_eta = 0;
    tree_Hemi_phi = 0;
    tree_Hemi_nTrks = 0;
@@ -2030,6 +2037,7 @@ void TreeReader::Init(TTree *tree)
    fChain->SetBranchAddress("tree_Hemi", &tree_Hemi, &b_tree_Hemi);
    fChain->SetBranchAddress("tree_Hemi_njet", &tree_Hemi_njet, &b_tree_Hemi_njet);
    fChain->SetBranchAddress("tree_Hemi_njet_nomu", &tree_Hemi_njet_nomu, &b_tree_Hemi_njet_nomu);
+   fChain->SetBranchAddress("tree_Hemi_pt", &tree_Hemi_pt, &b_tree_Hemi_pt);
    fChain->SetBranchAddress("tree_Hemi_eta", &tree_Hemi_eta, &b_tree_Hemi_eta);
    fChain->SetBranchAddress("tree_Hemi_phi", &tree_Hemi_phi, &b_tree_Hemi_phi);
    fChain->SetBranchAddress("tree_Hemi_nTrks", &tree_Hemi_nTrks, &b_tree_Hemi_nTrks);
@@ -2154,4 +2162,3 @@ Int_t TreeReader::Cut(Long64_t entry)
 // returns -1 otherwise.
    return 1;
 }
-#endif // #ifdef TreeReader_cxx
