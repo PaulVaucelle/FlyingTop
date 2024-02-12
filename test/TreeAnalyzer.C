@@ -10,7 +10,7 @@
 #include <sstream>
 #include <chrono>
 #include <ctime> 
-
+#include "../interface/DeltaFunc.h"
 #include "TTree.h"
 
 void SetSebStyle()
@@ -89,70 +89,70 @@ void TreeAnalyzer::Loop(TString sample)
  TH1F*     hData_BDTHemi2TT   = new TH1F("hData_BDTHemi2TT","",40,-1.,1.);
 
 // ABCD
-   TH1F* hData_SR_1Vtx_MVtx               = new TH1F("hData_SR_1Vtx_MVtx","",25,0.,500.);
+   TH1F* hData_SR_1Vtx_MVtx               = new TH1F("hData_SR_1Vtx_MVtx","",25,0.,100.);
    TH1F* hData_SR_1Vtx_MHemi              = new TH1F("hData_SR_1Vtx_MHemi","",25,0.,500.);
-   TH1F* hData_SR_1Vtx_Mmumu              = new TH1F("hData_SR_1Vtx_Mmumu","",25,0.,500.);
+   TH1F* hData_SR_1Vtx_Mmumu              = new TH1F("hData_SR_1Vtx_Mmumu","",50,0.,200.);
 
-   TH1F* hData_CRNoEvt_1Vtx_MVtx          = new TH1F("hData_CRNoEvt_1Vtx_MVtx","",25,0.,500.);
+   TH1F* hData_CRNoEvt_1Vtx_MVtx          = new TH1F("hData_CRNoEvt_1Vtx_MVtx","",25,0.,100.);
    TH1F* hData_CRNoEvt_1Vtx_MHemi         = new TH1F("hData_CRNoEvt_1Vtx_MHemi","",25,0.,500.);
-   TH1F* hData_CRNoEvt_1Vtx_Mmumu         = new TH1F("hData_CRNoEvt_1Vtx_Mmumu","",25,0.,500.); 
+   TH1F* hData_CRNoEvt_1Vtx_Mmumu         = new TH1F("hData_CRNoEvt_1Vtx_Mmumu","",50,0.,200.); 
 
-   TH1F* hData_CRNoEvtNoVtx_1Vtx_MVtx     = new TH1F("hData_CRNoEvtNoVtx_1Vtx_MVtx","",25,0.,500.);
+   TH1F* hData_CRNoEvtNoVtx_1Vtx_MVtx     = new TH1F("hData_CRNoEvtNoVtx_1Vtx_MVtx","",25,0.,100.);
    TH1F* hData_CRNoEvtNoVtx_1Vtx_MHemi    = new TH1F("hData_CRNoEvtNoVtx_1Vtx_MHemi","",25,0.,500.);
-   TH1F* hData_CRNoEvtNoVtx_1Vtx_Mmumu    = new TH1F("hData_CRNoEvtNoVtx_1Vtx_Mmumu","",25,0.,500.); 
+   TH1F* hData_CRNoEvtNoVtx_1Vtx_Mmumu    = new TH1F("hData_CRNoEvtNoVtx_1Vtx_Mmumu","",50,0.,200.); 
 
-   TH1F* hData_CRNoVtx_1Vtx_MVtx          = new TH1F("hData_CRNoVtx_1Vtx_MVtx","",25,0.,500.);
+   TH1F* hData_CRNoVtx_1Vtx_MVtx          = new TH1F("hData_CRNoVtx_1Vtx_MVtx","",25,0.,100.);
    TH1F* hData_CRNoVtx_1Vtx_MHemi         = new TH1F("hData_CRNoVtx_1Vtx_MHemi","",25,0.,500.);
-   TH1F* hData_CRNoVtx_1Vtx_Mmumu         = new TH1F("hData_CRNoVtx_1Vtx_Mmumu","",25,0.,500.); 
+   TH1F* hData_CRNoVtx_1Vtx_Mmumu         = new TH1F("hData_CRNoVtx_1Vtx_Mmumu","",50,0.,200.); 
 
-   TH1F* hData_SR_2Vtx_MVtx               = new TH1F("hData_SR_2Vtx_MVtx","",25,0.,500.);
+   TH1F* hData_SR_2Vtx_MVtx               = new TH1F("hData_SR_2Vtx_MVtx","",25,0.,100.);
    TH1F* hData_SR_2Vtx_MHemi              = new TH1F("hData_SR_2Vtx_MHemi","",25,0.,500.);
-   TH1F* hData_SR_2Vtx_Mmumu              = new TH1F("hData_SR_2Vtx_Mmumu","",25,0.,500.);
+   TH1F* hData_SR_2Vtx_Mmumu              = new TH1F("hData_SR_2Vtx_Mmumu","",50,0.,200.);
 
-   TH1F* hData_CRNoEvt_2Vtx_MVtx          = new TH1F("hData_CRNoEvt_2Vtx_MVtx","",25,0.,500.);
+   TH1F* hData_CRNoEvt_2Vtx_MVtx          = new TH1F("hData_CRNoEvt_2Vtx_MVtx","",25,0.,100.);
    TH1F* hData_CRNoEvt_2Vtx_MHemi         = new TH1F("hData_CRNoEvt_2Vtx_MHemi","",25,0.,500.);
-   TH1F* hData_CRNoEvt_2Vtx_Mmumu         = new TH1F("hData_CRNoEvt_2Vtx_Mmumu","",25,0.,500.);
+   TH1F* hData_CRNoEvt_2Vtx_Mmumu         = new TH1F("hData_CRNoEvt_2Vtx_Mmumu","",50,0.,200.);
 
-   TH1F* hData_CRNoEvtNoVtx_2Vtx_MVtx     = new TH1F("hData_CRNoEvtNoVtx_2Vtx_MVtx","",25,0.,500.);
+   TH1F* hData_CRNoEvtNoVtx_2Vtx_MVtx     = new TH1F("hData_CRNoEvtNoVtx_2Vtx_MVtx","",25,0.,100.);
    TH1F* hData_CRNoEvtNoVtx_2Vtx_MHemi    = new TH1F("hData_CRNoEvtNoVtx_2Vtx_MHemi","",25,0.,500.);
-   TH1F* hData_CRNoEvtNoVtx_2Vtx_Mmumu    = new TH1F("hData_CRNoEvtNoVtx_2Vtx_Mmumu","",25,0.,500.); 
+   TH1F* hData_CRNoEvtNoVtx_2Vtx_Mmumu    = new TH1F("hData_CRNoEvtNoVtx_2Vtx_Mmumu","",50,0.,200.); 
 
-   TH1F* hData_CRNoVtx_2Vtx_MVtx          = new TH1F("hData_CRNoVtx_2Vtx_MVtx","",25,0.,500.);
+   TH1F* hData_CRNoVtx_2Vtx_MVtx          = new TH1F("hData_CRNoVtx_2Vtx_MVtx","",25,0.,100.);
    TH1F* hData_CRNoVtx_2Vtx_MHemi         = new TH1F("hData_CRNoVtx_2Vtx_MHemi","",25,0.,500.);
-   TH1F* hData_CRNoVtx_2Vtx_Mmumu         = new TH1F("hData_CRNoVtx_2Vtx_Mmumu","",25,0.,500.);
+   TH1F* hData_CRNoVtx_2Vtx_Mmumu         = new TH1F("hData_CRNoVtx_2Vtx_Mmumu","",50,0.,200.);
 
 
-   TH1F* hData2_SR_1Vtx_MVtx               = new TH1F("hData2_SR_1Vtx_MVtx","",25,0.,500.);
+   TH1F* hData2_SR_1Vtx_MVtx               = new TH1F("hData2_SR_1Vtx_MVtx","",25,0.,100.);
    TH1F* hData2_SR_1Vtx_MHemi              = new TH1F("hData2_SR_1Vtx_MHemi","",25,0.,500.);
-   TH1F* hData2_SR_1Vtx_Mmumu              = new TH1F("hData2_SR_1Vtx_Mmumu","",25,0.,500.);
+   TH1F* hData2_SR_1Vtx_Mmumu              = new TH1F("hData2_SR_1Vtx_Mmumu","",50,0.,200.);
 
-   TH1F* hData2_CRNoEvt_1Vtx_MVtx          = new TH1F("hData2_CRNoEvt_1Vtx_MVtx","",25,0.,500.);
+   TH1F* hData2_CRNoEvt_1Vtx_MVtx          = new TH1F("hData2_CRNoEvt_1Vtx_MVtx","",25,0.,100.);
    TH1F* hData2_CRNoEvt_1Vtx_MHemi         = new TH1F("hData2_CRNoEvt_1Vtx_MHemi","",25,0.,500.);
-   TH1F* hData2_CRNoEvt_1Vtx_Mmumu         = new TH1F("hData2_CRNoEvt_1Vtx_Mmumu","",25,0.,500.); 
+   TH1F* hData2_CRNoEvt_1Vtx_Mmumu         = new TH1F("hData2_CRNoEvt_1Vtx_Mmumu","",50,0.,200.); 
 
-   TH1F* hData2_CRNoEvtNoVtx_1Vtx_MVtx     = new TH1F("hData2_CRNoEvtNoVtx_1Vtx_MVtx","",25,0.,500.);
+   TH1F* hData2_CRNoEvtNoVtx_1Vtx_MVtx     = new TH1F("hData2_CRNoEvtNoVtx_1Vtx_MVtx","",25,0.,100.);
    TH1F* hData2_CRNoEvtNoVtx_1Vtx_MHemi    = new TH1F("hData2_CRNoEvtNoVtx_1Vtx_MHemi","",25,0.,500.);
-   TH1F* hData2_CRNoEvtNoVtx_1Vtx_Mmumu    = new TH1F("hData2_CRNoEvtNoVtx_1Vtx_Mmumu","",25,0.,500.); 
+   TH1F* hData2_CRNoEvtNoVtx_1Vtx_Mmumu    = new TH1F("hData2_CRNoEvtNoVtx_1Vtx_Mmumu","",50,0.,200.); 
 
-   TH1F* hData2_CRNoVtx_1Vtx_MVtx          = new TH1F("hData2_CRNoVtx_1Vtx_MVtx","",25,0.,500.);
+   TH1F* hData2_CRNoVtx_1Vtx_MVtx          = new TH1F("hData2_CRNoVtx_1Vtx_MVtx","",25,0.,100.);
    TH1F* hData2_CRNoVtx_1Vtx_MHemi         = new TH1F("hData2_CRNoVtx_1Vtx_MHemi","",25,0.,500.);
-   TH1F* hData2_CRNoVtx_1Vtx_Mmumu         = new TH1F("hData2_CRNoVtx_1Vtx_Mmumu","",25,0.,500.); 
+   TH1F* hData2_CRNoVtx_1Vtx_Mmumu         = new TH1F("hData2_CRNoVtx_1Vtx_Mmumu","",50,0.,200.); 
 
-   TH1F* hData2_SR_2Vtx_MVtx               = new TH1F("hData2_SR_2Vtx_MVtx","",25,0.,500.);
+   TH1F* hData2_SR_2Vtx_MVtx               = new TH1F("hData2_SR_2Vtx_MVtx","",25,0.,100.);
    TH1F* hData2_SR_2Vtx_MHemi              = new TH1F("hData2_SR_2Vtx_MHemi","",25,0.,500.);
-   TH1F* hData2_SR_2Vtx_Mmumu              = new TH1F("hData2_SR_2Vtx_Mmumu","",25,0.,500.);
+   TH1F* hData2_SR_2Vtx_Mmumu              = new TH1F("hData2_SR_2Vtx_Mmumu","",50,0.,200.);
 
-   TH1F* hData2_CRNoEvt_2Vtx_MVtx          = new TH1F("hData2_CRNoEvt_2Vtx_MVtx","",25,0.,500.);
+   TH1F* hData2_CRNoEvt_2Vtx_MVtx          = new TH1F("hData2_CRNoEvt_2Vtx_MVtx","",25,0.,100.);
    TH1F* hData2_CRNoEvt_2Vtx_MHemi         = new TH1F("hData2_CRNoEvt_2Vtx_MHemi","",25,0.,500.);
-   TH1F* hData2_CRNoEvt_2Vtx_Mmumu         = new TH1F("hData2_CRNoEvt_2Vtx_Mmumu","",25,0.,500.);
+   TH1F* hData2_CRNoEvt_2Vtx_Mmumu         = new TH1F("hData2_CRNoEvt_2Vtx_Mmumu","",50,0.,200.);
 
-   TH1F* hData2_CRNoEvtNoVtx_2Vtx_MVtx     = new TH1F("hData2_CRNoEvtNoVtx_2Vtx_MVtx","",25,0.,500.);
+   TH1F* hData2_CRNoEvtNoVtx_2Vtx_MVtx     = new TH1F("hData2_CRNoEvtNoVtx_2Vtx_MVtx","",25,0.,100.);
    TH1F* hData2_CRNoEvtNoVtx_2Vtx_MHemi    = new TH1F("hData2_CRNoEvtNoVtx_2Vtx_MHemi","",25,0.,500.);
-   TH1F* hData2_CRNoEvtNoVtx_2Vtx_Mmumu    = new TH1F("hData2_CRNoEvtNoVtx_2Vtx_Mmumu","",25,0.,500.); 
+   TH1F* hData2_CRNoEvtNoVtx_2Vtx_Mmumu    = new TH1F("hData2_CRNoEvtNoVtx_2Vtx_Mmumu","",50,0.,200.); 
 
-   TH1F* hData2_CRNoVtx_2Vtx_MVtx          = new TH1F("hData2_CRNoVtx_2Vtx_MVtx","",25,0.,500.);
+   TH1F* hData2_CRNoVtx_2Vtx_MVtx          = new TH1F("hData2_CRNoVtx_2Vtx_MVtx","",25,0.,100.);
    TH1F* hData2_CRNoVtx_2Vtx_MHemi         = new TH1F("hData2_CRNoVtx_2Vtx_MHemi","",25,0.,500.);
-   TH1F* hData2_CRNoVtx_2Vtx_Mmumu         = new TH1F("hData2_CRNoVtx_2Vtx_Mmumu","",25,0.,500.);
+   TH1F* hData2_CRNoVtx_2Vtx_Mmumu         = new TH1F("hData2_CRNoVtx_2Vtx_Mmumu","",50,0.,200.);
 // END OF ABCD
 
 
@@ -184,6 +184,13 @@ void TreeAnalyzer::Loop(TString sample)
  TH1F* hData_Hemi_0Vtx_njetNOmuAll= new TH1F("hData_Hemi_0Vtx_njetNOmuAll","",21,-0.5,20.5);
  TH1F* hData_Hemi_0Vtx_lead_ptmin = new TH1F("hData_Hemi_0Vtx_lead_ptmin","",25,0.,500.);
  TH1F* hData_Hemi_0Vtx_ptmin      = new TH1F("hData_Hemi_0Vtx_ptmin","",25,0.,1000.);
+
+ TH1F* hData_Hemi_0Vtx_CutEvt_nTrks       = new TH1F("hData_Hemi_0Vtx_CutEvt_nTrks","",25,0.,50.);
+ TH1F* hData_Hemi_0Vtx_CutEvt_mass        = new TH1F("hData_Hemi_0Vtx_CutEvt_mass","",25,0.,500.);
+ TH1F* hData_Hemi_0Vtx_CutEvt_Mmumu       = new TH1F("hData_Hemi_0Vtx_CutEvt_Mmumu","",25,0.,500.);
+ TH1F* hData_Hemi_0Vtx_CutEvt_njetNOmuAll = new TH1F("hData_Hemi_0Vtx_CutEvt_njetNOmuAll","",21,-0.5,20.5);
+ TH1F* hData_Hemi_0Vtx_CutEvt_lead_ptmin  = new TH1F("hData_Hemi_0Vtx_CutEvt_lead_ptmin","",25,0.,500.);
+ TH1F* hData_Hemi_0Vtx_CutEvt_ptmin       = new TH1F("hData_Hemi_0Vtx_CutEvt_ptmin","",25,0.,1000.);
 
  TH1F* hData_Hemi_1Vtx_BDTevt  = new TH1F("hData_Hemi_1Vtx_BDTevt","",40,-1.,1.);
  TH1F* hData_Hemi_1Vtx_BDTvtx  = new TH1F("hData_Hemi_1Vtx_BDTvtx","",40,-1.,1.);
@@ -333,6 +340,13 @@ void TreeAnalyzer::Loop(TString sample)
  TH1F* hData_Hemi_2VtxAll_CutVtx_CutEvt_ptMu    = new TH1F("hData_Hemi_2VtxAll_CutVtx_CutEvt_ptMu","",25,0.,1000.);
  TH1F* hData_Hemi_2VtxAll_CutVtx_CutEvt_dRMu    = new TH1F("hData_Hemi_2VtxAll_CutVtx_CutEvt_dRMu","",25,0.,7.5);
 
+ TH1F* hData_Hemi_2SecVtx_CutEvt_Mass  = new TH1F("hData_Hemi_2SecVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F* hData_Hemi_2SecVtx_CutVtx_CutEvt_Mass = new TH1F("hData_Hemi_2SecVtx_CutVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F* hData_Hemi_1SecVtx_CutEvt_Mass = new TH1F("hData_Hemi_1SecVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F* hData_Hemi_1SecVtx_CutEvt_Merge = new TH1F("hData_Hemi_1SecVtx_CutEvt_Merge","",3,-1,1);
+ TH1F* hData_Hemi_1SecVtx_CutVtx_CutEvt_Mass = new TH1F("hData_Hemi_1SecVtx_CutVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F* hData_Hemi_1SecVtx_CutVtx_CutEvt_Merge = new TH1F("hData_Hemi_1SecVtx_CutVtx_CutEvt_Merge","",3,-1,1);
+
  TH1F* hData_CRfwd_Mmumu        = new TH1F("hData_CRfwd_Mmumu","",25,0.,500.);
  TH1F* hData_CRfwd_BDTevt       = new TH1F("hData_CRfwd_BDTevt","",40,-1.,1.);
  TH1F* hData_CRfwd_Hemi_ptmin   = new TH1F("hData_CRfwd_Hemi_ptmin","",25,0.,1000.);
@@ -447,6 +461,13 @@ void TreeAnalyzer::Loop(TString sample)
  TH1F* hData_CRfwd_Hemi_2Vtx_CutVtx_CutEvt_Mmumu   = new TH1F("hData_CRfwd_Hemi_2Vtx_CutVtx_CutEvt_Mmumu","",25,0.,500.);
  TH1F* hData_CRfwd_Hemi_2Vtx_CutVtx_CutEvt_ptmin   = new TH1F("hData_CRfwd_Hemi_2Vtx_CutVtx_CutEvt_ptmin","",25,0.,1000.);
 
+ TH1F*                       hData_CRfwd_Hemi_2SecVtx_CutEvt_Mass = new TH1F("hData_CRfwd_Hemi_2SecVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*                       hData_CRfwd_Hemi_2SecVtx_CutVtx_CutEvt_Mass = new TH1F("hData_CRfwd_Hemi_2SecVtx_CutVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*                       hData_CRfwd_Hemi_1SecVtx_CutEvt_Mass = new TH1F("hData_CRfwd_Hemi_1SecVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*                       hData_CRfwd_Hemi_1SecVtx_CutEvt_Merge = new TH1F("hData_CRfwd_Hemi_1SecVtx_CutEvt_Merge","",3,-1,1);
+ TH1F*                       hData_CRfwd_Hemi_1SecVtx_CutVtx_CutEvt_Mass = new TH1F("hData_CRfwd_Hemi_1SecVtx_CutVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*                       hData_CRfwd_Hemi_1SecVtx_CutVtx_CutEvt_Merge = new TH1F("hData_CRfwd_Hemi_1SecVtx_CutVtx_CutEvt_Merge","",3,-1,1);
+
  TH1F* hData_CRlowpt_Mmumu        = new TH1F("hData_CRlowpt_Mmumu","",25,0.,500.);
  TH1F* hData_CRlowpt_BDTevt       = new TH1F("hData_CRlowpt_BDTevt","",40,-1.,1.);
  TH1F* hData_CRlowpt_Hemi_ptmin   = new TH1F("hData_CRlowpt_Hemi_ptmin","",25,0.,1000.);
@@ -504,6 +525,26 @@ void TreeAnalyzer::Loop(TString sample)
  TH1F* hData_CRlowpt_Hemi_2Vtx_CutVtx_dRMu    = new TH1F("hData_CRlowpt_Hemi_2Vtx_CutVtx_dRMu","",25,0.,7.5);
  TH1F* hData_CRlowpt_Hemi_2Vtx_CutVtx_Mmumu   = new TH1F("hData_CRlowpt_Hemi_2Vtx_CutVtx_Mmumu","",25,0.,500.);
  TH1F* hData_CRlowpt_Hemi_2Vtx_CutVtx_ptmin   = new TH1F("hData_CRlowpt_Hemi_2Vtx_CutVtx_ptmin","",25,0.,1000.);
+ TH1F*                        hData_CRlowpt_Hemi_2SecVtx_CutEvt_Mass = new TH1F("hData_CRlowpt_Hemi_2SecVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*                       hData_CRlowpt_Hemi_2SecVtx_CutVtx_CutEvt_Mass = new TH1F("hData_CRlowpt_Hemi_2SecVtx_CutVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*                       hData_CRlowpt_Hemi_1SecVtx_CutEvt_Mass = new TH1F("hData_CRlowpt_Hemi_1SecVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*                       hData_CRlowpt_Hemi_1SecVtx_CutEvt_Merge = new TH1F("hData_CRlowpt_Hemi_1SecVtx_CutEvt_Merge","",3,-1,1);
+ TH1F*                       hData_CRlowpt_Hemi_1SecVtx_CutVtx_CutEvt_Mass = new TH1F("hData_CRlowpt_Hemi_1SecVtx_CutVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*                       hData_CRlowpt_Hemi_1SecVtx_CutVtx_CutEvt_Merge = new TH1F("hData_CRlowpt_Hemi_1SecVtx_CutVtx_CutEvt_Merge","",3,-1,1);
+
+
+ TH1F* hData_CRloose_Hemi_0Vtx_BDTevt           = new TH1F("hData_CRloose_Hemi_0Vtx_BDTevt","",40,-1.,1.);
+ TH1F* hData_CRloose_Hemi_0Vtx_nTrks            = new TH1F("hData_CRloose_Hemi_0Vtx_nTrks","",25,0.,50.);
+ TH1F* hData_CRloose_Hemi_0Vtx_mass             = new TH1F("hData_CRloose_Hemi_0Vtx_mass","",25,0.,500.);
+ TH1F* hData_CRloose_Hemi_0Vtx_Mmumu            = new TH1F("hData_CRloose_Hemi_0Vtx_Mmumu","",25,0.,500.);
+ TH1F* hData_CRloose_Hemi_0Vtx_njetNOmuAll      = new TH1F("hData_CRloose_Hemi_0Vtx_njetNOmuAll","",12,-0.5,11.5);
+ TH1F* hData_CRloose_Hemi_0Vtx_ptmin            = new TH1F("hData_CRloose_Hemi_0Vtx_ptmin","",25,0.,1000.);
+
+ TH1F* hData_CRloose_Hemi_0Vtx_CutEvt_nTrks        = new TH1F("hData_CRloose_Hemi_0Vtx_CutEvt_nTrks","",25,0.,50.);
+ TH1F* hData_CRloose_Hemi_0Vtx_CutEvt_mass         = new TH1F("hData_CRloose_Hemi_0Vtx_CutEvt_mass","",25,0.,500.);
+ TH1F* hData_CRloose_Hemi_0Vtx_CutEvt_Mmumu        = new TH1F("hData_CRloose_Hemi_0Vtx_CutEvt_Mmumu","",25,0.,500.);
+ TH1F* hData_CRloose_Hemi_0Vtx_CutEvt_njetNOmuAll  = new TH1F("hData_CRloose_Hemi_0Vtx_CutEvt_njetNOmuAll","",12,-0.5,11.5);
+ TH1F* hData_CRloose_Hemi_0Vtx_CutEvt_ptmin        = new TH1F("hData_CRloose_Hemi_0Vtx_CutEvt_ptmin","",25,0.,1000.);
 
  TH1F* hData_CRloose_Hemi_1Vtx_BDTevt  = new TH1F("hData_CRloose_Hemi_1Vtx_BDTevt","",40,-1.,1.);
  TH1F* hData_CRloose_Hemi_1Vtx_BDTvtx  = new TH1F("hData_CRloose_Hemi_1Vtx_BDTvtx","",40,-1.,1.);
@@ -600,6 +641,72 @@ void TreeAnalyzer::Loop(TString sample)
  TH1F* hData_CRloose_Hemi_2Vtx_CutVtx_CutEvt_dRMu    = new TH1F("hData_CRloose_Hemi_2Vtx_CutVtx_CutEvt_dRMu","",25,0.,7.5);
  TH1F* hData_CRloose_Hemi_2Vtx_CutVtx_CutEvt_Mmumu   = new TH1F("hData_CRloose_Hemi_2Vtx_CutVtx_CutEvt_Mmumu","",25,0.,500.);
  TH1F* hData_CRloose_Hemi_2Vtx_CutVtx_CutEvt_ptmin   = new TH1F("hData_CRloose_Hemi_2Vtx_CutVtx_CutEvt_ptmin","",25,0.,1000.);
+
+ TH1F*                      hData_CRloose_Hemi_2SecVtx_CutEvt_Mass = new TH1F("hData_CRloose_Hemi_2SecVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*                       hData_CRloose_Hemi_2SecVtx_CutVtx_CutEvt_Mass = new TH1F("hData_CRloose_Hemi_2SecVtx_CutVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*                       hData_CRloose_Hemi_1SecVtx_CutEvt_Mass = new TH1F("hData_CRloose_Hemi_1SecVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*                       hData_CRloose_Hemi_1SecVtx_CutEvt_Merge = new TH1F("hData_CRloose_Hemi_1SecVtx_CutEvt_Merge","",3,-1,1);
+ TH1F*                       hData_CRloose_Hemi_1SecVtx_CutVtx_CutEvt_Mass = new TH1F("hData_CRloose_Hemi_1SecVtx_CutVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*                       hData_CRloose_Hemi_1SecVtx_CutVtx_CutEvt_Merge = new TH1F("hData_CRloose_Hemi_1SecVtx_CutVtx_CutEvt_Merge","",3,-1,1);
+
+
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutEvt_BDTevt  = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutEvt_BDTevt","",40,-1.,1.);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutEvt_BDTvtx  = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutEvt_BDTvtx","",40,-1.,1.);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutEvt_njetNOmu= new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutEvt_njetNOmu","",12,-0.5,11.5);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutEvt_mass    = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutEvt_mass","",25,0.,500.);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutEvt_nTrks   = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutEvt_nTrks","",25,0.,50.);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutEvt_Mass    = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutEvt_Mass","",25,0.,100.);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutEvt_massMu  = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutEvt_massMu","",25,0.,750.);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutEvt_ptMu    = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutEvt_ptMu","",25,0.,1000.);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutEvt_dRMu    = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutEvt_dRMu","",25,0.,7.5);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutEvt_Mmumu   = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutEvt_Mmumu","",25,0.,500.);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutEvt_ptmin   = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutEvt_ptmin","",25,0.,1000.);
+
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutEvt_BDTevt  = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutEvt_BDTevt","",40,-1.,1.);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutEvt_BDTvtx  = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutEvt_BDTvtx","",40,-1.,1.);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutEvt_njetNOmu= new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutEvt_njetNOmu","",12,-0.5,11.5);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutEvt_mass    = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutEvt_mass","",25,0.,500.);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutEvt_nTrks   = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutEvt_nTrks","",25,0.,50.);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutEvt_Mass    = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutEvt_Mass","",25,0.,100.);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutEvt_massMu  = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutEvt_massMu","",25,0.,750.);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutEvt_ptMu    = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutEvt_ptMu","",25,0.,1000.);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutEvt_dRMu    = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutEvt_dRMu","",25,0.,7.5);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutEvt_Mmumu   = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutEvt_Mmumu","",25,0.,500.);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutEvt_ptmin   = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutEvt_ptmin","",25,0.,1000.);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutEvt_dRvtx   = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutEvt_dRvtx","",25,0.,5.);
+
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_BDTevt  = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_BDTevt","",40,-1.,1.);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_BDTvtx  = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_BDTvtx","",40,-1.,1.);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_njetNOmu= new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_njetNOmu","",12,-0.5,11.5);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_mass    = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_mass","",25,0.,500.);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_nTrks   = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_nTrks","",25,0.,50.);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_Mass    = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_massMu  = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_massMu","",25,0.,750.);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_ptMu    = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_ptMu","",25,0.,1000.);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_dRMu    = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_dRMu","",25,0.,7.5);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_Mmumu   = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_Mmumu","",25,0.,500.);
+ TH1F* hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_ptmin   = new TH1F("hData_CRlooselowpt_Hemi_1Vtx_CutVtx_CutEvt_ptmin","",25,0.,1000.);
+
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_BDTevt  = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_BDTevt","",40,-1.,1.);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_BDTvtx  = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_BDTvtx","",40,-1.,1.);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_njetNOmu= new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_njetNOmu","",12,-0.5,11.5);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_mass    = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_mass","",25,0.,500.);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_nTrks   = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_nTrks","",25,0.,50.);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_Mass    = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_massMu  = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_massMu","",25,0.,750.);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_ptMu    = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_ptMu","",25,0.,1000.);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_dRMu    = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_dRMu","",25,0.,7.5);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_Mmumu   = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_Mmumu","",25,0.,500.);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_ptmin   = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_ptmin","",25,0.,1000.);
+ TH1F* hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_dRvtx   = new TH1F("hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_dRvtx","",25,0.,5.);
+
+ TH1F*   hData_CRlooselowpt_Hemi_2SecVtx_CutEvt_Mass         = new TH1F("hData_CRlooselowpt_Hemi_2SecVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*   hData_CRlooselowpt_Hemi_2SecVtx_CutVtx_CutEvt_Mass  = new TH1F("hData_CRlooselowpt_Hemi_2SecVtx_CutVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*   hData_CRlooselowpt_Hemi_1SecVtx_CutEvt_Mass         = new TH1F("hData_CRlooselowpt_Hemi_1SecVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*   hData_CRlooselowpt_Hemi_1SecVtx_CutEvt_Merge        = new TH1F("hData_CRlooselowpt_Hemi_1SecVtx_CutEvt_Merge","",3,-1,1);
+ TH1F*   hData_CRlooselowpt_Hemi_1SecVtx_CutVtx_CutEvt_Mass  = new TH1F("hData_CRlooselowpt_Hemi_1SecVtx_CutVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*   hData_CRlooselowpt_Hemi_1SecVtx_CutVtx_CutEvt_Merge = new TH1F("hData_CRlooselowpt_Hemi_1SecVtx_CutVtx_CutEvt_Merge","",3,-1,1);
+
 
  TH1F* hData_SameSign_Filter     = new TH1F("hData_SameSign_Filter","",2,-0.5,1.5);
  TH1F* hData_SameSign_njetNOmuAll  = new TH1F("hData_SameSign_njetNOmuAll","",21,-0.5,20.5);
@@ -720,6 +827,12 @@ void TreeAnalyzer::Loop(TString sample)
  TH1F* hData_SameSign_Hemi_2Vtx_CutVtx_CutEvt_Mmumu   = new TH1F("hData_SameSign_Hemi_2Vtx_CutVtx_CutEvt_Mmumu","",25,0.,500.);
  TH1F* hData_SameSign_Hemi_2Vtx_CutVtx_CutEvt_ptmin   = new TH1F("hData_SameSign_Hemi_2Vtx_CutVtx_CutEvt_ptmin","",25,0.,1000.);
 
+ TH1F*   hData_SameSign_Hemi_2SecVtx_CutEvt_Mass             = new TH1F("hData_SameSign_Hemi_2SecVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*   hData_SameSign_Hemi_2SecVtx_CutVtx_CutEvt_Mass      = new TH1F("hData_SameSign_Hemi_2SecVtx_CutVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*   hData_SameSign_Hemi_1SecVtx_CutEvt_Mass             = new TH1F("hData_SameSign_Hemi_1SecVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*   hData_SameSign_Hemi_1SecVtx_CutEvt_Merge            = new TH1F("hData_SameSign_Hemi_1SecVtx_CutEvt_Merge","",3,-1,1);
+ TH1F*   hData_SameSign_Hemi_1SecVtx_CutVtx_CutEvt_Mass      = new TH1F("hData_SameSign_Hemi_1SecVtx_CutVtx_CutEvt_Mass","",25,0.,100.);
+ TH1F*   hData_SameSign_Hemi_1SecVtx_CutVtx_CutEvt_Merge     = new TH1F("hData_SameSign_Hemi_1SecVtx_CutVtx_CutEvt_Merge","",3,-1,1);
 ///////////////////////////////////////////////////////////////////
 
    if (fChain == 0) return;
@@ -747,7 +860,7 @@ if (thesample.Contains("ttWJetsToLNu_5f_EWK"))                    { XS = 0.290; 
 if (thesample.Contains("TTZToLL_5f"))                             { XS = 0.05188;   }//Not found on XSDB => used ana.py macro : 5.188e-02 +- 2.437e-04 pb
 if (thesample.Contains("TTToHadronic"))                           { XS = 378.9;     }
 if (thesample.Contains("TTWW"))                                   { XS = 0.006992;  }//found on XSDB
-if (thesample == "TTToSemiLeptonic")                              { XS = 365.34;    }
+if (thesample.Contains("TTToSemiLeptonic") )                      { XS = 365.34;    }
 
 //Signal
 if (thesample.Contains("smu200")) { XS = 0.01;   }
@@ -852,16 +965,16 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
       // ABCD //
       hData_MmumuABCD->Fill(tree_Mmumu);
       hData_BDTevtABCD->Fill(tree_Evts_MVAval);
-      hData_BDTevtDY->Fill(tree_Evts_MVAvalDY);
-      hData_BDTevtTT->Fill(tree_Evts_MVAvalTT);
+      // hData_BDTevtDY->Fill(tree_Evts_MVAvalDY);
+      // hData_BDTevtTT->Fill(tree_Evts_MVAvalTT);
 
-      hData_BDTHemi1->Fill(tree_Hemi1_MVAval);
-      hData_BDTHemi1DY->Fill(tree_Hemi1_MVAvalDY);
-      hData_BDTHemi1TT->Fill(tree_Hemi1_MVAvalTT);
+      // hData_BDTHemi1->Fill(tree_Hemi1_MVAval);
+      // hData_BDTHemi1DY->Fill(tree_Hemi1_MVAvalDY);
+      // hData_BDTHemi1TT->Fill(tree_Hemi1_MVAvalTT);
 
-      hData_BDTHemi2->Fill(tree_Hemi2_MVAval);
-      hData_BDTHemi2DY->Fill(tree_Hemi2_MVAvalDY);
-      hData_BDTHemi2TT->Fill(tree_Hemi2_MVAvalTT);
+      // hData_BDTHemi2->Fill(tree_Hemi2_MVAval);
+      // hData_BDTHemi2DY->Fill(tree_Hemi2_MVAvalDY);
+      // hData_BDTHemi2TT->Fill(tree_Hemi2_MVAvalTT);
 
       // ABCD - 1  Using Event BDT and the Steps of reconstruction of the BDT 1+2 or 3+4 //
       // ABCD - 2  Using Both Event and Vtx BDT //
@@ -1081,7 +1194,7 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
       if(!BlindSR)
          {
             if ( tree_Filter &&
-            abs(tree_Hemi_eta->at(0)) < 2.0 && abs(tree_Hemi_eta->at(1)) < 2.0 ) 
+            abs(tree_Hemi_eta->at(0)) < 2.4 && abs(tree_Hemi_eta->at(1)) < 2.4 ) 
                {
 
                   hData_Mmumu->Fill( tree_Mmumu );
@@ -1136,7 +1249,7 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
                   // hData_Hemi_CutEvt_lead_ptmin->Fill( hemi_lead_ptmin );
                   hData_Hemi_CutEvt_ptmin->Fill( hemi_ptmin );
                   }
-
+                  
                   if ( nVtx == 0 ) {
                   hData_Hemi_0Vtx_BDTevt->Fill( tree_Evts_MVAval );
                   hData_Hemi_0Vtx_nTrks->Fill(  nTrks );
@@ -1147,14 +1260,14 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
                   // hData_Hemi_0Vtx_lead_ptmin->Fill( hemi_lead_ptmin );
                   hData_Hemi_0Vtx_ptmin->Fill( hemi_ptmin );
                   }
-if ( nVtx == 0 && isCutEvt ) {
-     hData_Hemi_0Vtx_CutEvt_nTrks->Fill(  nTrks );
-     hData_Hemi_0Vtx_CutEvt_mass->Fill(   mass );
-     hData_Hemi_0Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
-     hData_Hemi_0Vtx_CutEvt_njetNOmuAll->Fill(   tree_njetNOmu );
-     hData_Hemi_0Vtx_CutEvt_lead_ptmin->Fill( hemi_lead_ptmin );
-     hData_Hemi_0Vtx_CutEvt_ptmin->Fill( hemi_ptmin );
-   }
+                  if ( nVtx == 0 && isCutEvt ) {
+                     hData_Hemi_0Vtx_CutEvt_nTrks->Fill(  nTrks );
+                     hData_Hemi_0Vtx_CutEvt_mass->Fill(   mass );
+                     hData_Hemi_0Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
+                     hData_Hemi_0Vtx_CutEvt_njetNOmuAll->Fill(   tree_njetNOmu );
+                     // hData_Hemi_0Vtx_CutEvt_lead_ptmin->Fill( hemi_lead_ptmin );
+                     hData_Hemi_0Vtx_CutEvt_ptmin->Fill( hemi_ptmin );
+                     }
 
                   if ( nVtx == 1 ) {
                   hData_Hemi_1Vtx_BDTevt->Fill( tree_Evts_MVAval );
@@ -1172,7 +1285,7 @@ if ( nVtx == 0 && isCutEvt ) {
                   // hData_Hemi_1Vtx_lead_ptmin->Fill(  hemi_lead_ptmin );
                   hData_Hemi_1Vtx_ptmin->Fill(  hemi_ptmin );
                   }
-
+                  
                   if ( nVtx == 2 ) {
                   hData_Hemi_2Vtx_BDTevt->Fill( tree_Evts_MVAval );
                   hData_Hemi_2Vtx_BDTvtx->Fill( BDTvtx );
@@ -1203,6 +1316,52 @@ if ( nVtx == 0 && isCutEvt ) {
                   hData_Hemi_2VtxAll_ptMu->Fill(     tree_HemiMu_pt->at(1) );
                   hData_Hemi_2VtxAll_dRMu->Fill(     tree_HemiMu_dR->at(0) );
                   hData_Hemi_2VtxAll_dRMu->Fill(     tree_HemiMu_dR->at(1) );
+
+                                          //------------------------
+            int NewnVtx = -1;
+            if (tree_Hemi_Merging->at(0) && tree_Hemi_Merging->at(1)) {NewnVtx = 2;}
+            else if (tree_Hemi_Merging->at(0)==0 && tree_Hemi_Merging->at(1) == 0){NewnVtx = 0;}
+            else {NewnVtx = 1;}
+            float NewVtxMass = -10;
+             bool SecTight = false;
+            if (NewnVtx == 2)
+               {
+                  if (tree_Hemi_SecVtx_Mass->at(0)<tree_Hemi_SecVtx_Mass->at(1)) NewVtxMass = tree_Hemi_SecVtx_Mass->at(1);
+                  bool NewisCutVtx = false;
+                  if (tree_Hemi_SecVtx_isTight->at(0) == true && tree_Hemi_SecVtx_isTight->at(1) == true) SecTight = true;
+                  if (NewVtxMass > 8) NewisCutVtx = true;
+                  if (  isCutEvt && SecTight ) 
+                     {
+                        hData_Hemi_2SecVtx_CutEvt_Mass->Fill(   NewVtxMass );
+                     }
+                  if (NewisCutVtx && isCutEvt)
+                     {
+                        hData_Hemi_2SecVtx_CutVtx_CutEvt_Mass->Fill(   NewVtxMass );
+                     }
+               }
+            if (NewnVtx == 1)
+               {  
+                  bool Merge = false ;
+                  SecTight = tree_Hemi_SecVtx_isTight->at(1);
+                  if (tree_Hemi_Merging->at(0)) Merge = true;
+                  
+                  if (Merge) {NewVtxMass = tree_Hemi_SecVtx_Mass->at(0);SecTight = tree_Hemi_SecVtx_isTight->at(0);}
+                  else NewVtxMass = tree_Hemi_SecVtx_Mass->at(1);
+                  bool NewisCutVtx = false;
+                  if (NewVtxMass > 8) NewisCutVtx = true;
+                  if (  isCutEvt && SecTight ) 
+                     {
+                        hData_Hemi_1SecVtx_CutEvt_Mass->Fill(   NewVtxMass );
+                        hData_Hemi_1SecVtx_CutEvt_Merge->Fill(Merge);
+                     }
+                  if (NewisCutVtx && isCutEvt && SecTight)
+                     {
+                        hData_Hemi_1SecVtx_CutVtx_CutEvt_Mass->Fill(  NewVtxMass );
+                        hData_Hemi_1SecVtx_CutVtx_CutEvt_Merge->Fill(Merge);
+                     }
+               }
+
+            //--------------------------------------
                   }
 
                   if ( nVtx == 1 && isCutEvt ) {
@@ -1217,7 +1376,7 @@ if ( nVtx == 0 && isCutEvt ) {
                   hData_Hemi_1Vtx_CutEvt_dRMu->Fill(   dRMu );
                   hData_Hemi_1Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
                   hData_Hemi_1Vtx_CutEvt_njetNOmuAll->Fill( tree_njetNOmu );
-                  hData_Hemi_1Vtx_CutEvt_lead_ptmin->Fill(  hemi_lead_ptmin );
+                  // hData_Hemi_1Vtx_CutEvt_lead_ptmin->Fill(  hemi_lead_ptmin );
                   hData_Hemi_1Vtx_CutEvt_ptmin->Fill(  hemi_ptmin );
                   }
 
@@ -1233,7 +1392,7 @@ if ( nVtx == 0 && isCutEvt ) {
                   hData_Hemi_2Vtx_CutEvt_dRMu->Fill(   dRMu );
                   hData_Hemi_2Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
                   hData_Hemi_2Vtx_CutEvt_njetNOmuAll->Fill( tree_njetNOmu );
-                  hData_Hemi_2Vtx_CutEvt_lead_ptmin->Fill(  hemi_lead_ptmin );
+                  // hData_Hemi_2Vtx_CutEvt_lead_ptmin->Fill(  hemi_lead_ptmin );
                   hData_Hemi_2Vtx_CutEvt_ptmin->Fill(  hemi_ptmin );
                   hData_Hemi_2VtxAll_CutEvt_BDTvtx->Fill(   tree_Hemi_Vtx_MVAval_Step1->at(0) );
                   hData_Hemi_2VtxAll_CutEvt_BDTvtx->Fill(   tree_Hemi_Vtx_MVAval_Step1->at(1) );
@@ -1266,7 +1425,7 @@ if ( nVtx == 0 && isCutEvt ) {
                   hData_Hemi_1Vtx_CutVtx_Mmumu->Fill(  tree_Mmumu );
                   hData_Hemi_1Vtx_CutVtx_PFMet->Fill(  tree_PFMet_et );
                   hData_Hemi_1Vtx_CutVtx_njetNOmuAll->Fill( tree_njetNOmu );
-                  hData_Hemi_1Vtx_CutVtx_lead_ptmin->Fill(  hemi_lead_ptmin );
+                  // hData_Hemi_1Vtx_CutVtx_lead_ptmin->Fill(  hemi_lead_ptmin );
                   hData_Hemi_1Vtx_CutVtx_ptmin->Fill(  hemi_ptmin );
                   }
 
@@ -1283,7 +1442,7 @@ if ( nVtx == 0 && isCutEvt ) {
                   hData_Hemi_2Vtx_CutVtx_Mmumu->Fill(  tree_Mmumu );
                   hData_Hemi_2Vtx_CutVtx_PFMet->Fill(  tree_PFMet_et );
                   hData_Hemi_2Vtx_CutVtx_njetNOmuAll->Fill( tree_njetNOmu );
-                  hData_Hemi_2Vtx_CutVtx_lead_ptmin->Fill(  hemi_lead_ptmin );
+                  // hData_Hemi_2Vtx_CutVtx_lead_ptmin->Fill(  hemi_lead_ptmin );
                   hData_Hemi_2Vtx_CutVtx_ptmin->Fill(  hemi_ptmin );
                   hData_Hemi_2VtxAll_CutVtx_BDTvtx->Fill(   tree_Hemi_Vtx_MVAval_Step1->at(0) );
                   hData_Hemi_2VtxAll_CutVtx_BDTvtx->Fill(   tree_Hemi_Vtx_MVAval_Step1->at(1) );
@@ -1315,7 +1474,7 @@ if ( nVtx == 0 && isCutEvt ) {
                   hData_Hemi_1Vtx_CutVtx_CutEvt_dRMu->Fill(   dRMu );
                   hData_Hemi_1Vtx_CutVtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
                   hData_Hemi_1Vtx_CutVtx_CutEvt_njetNOmuAll->Fill( tree_njetNOmu );
-                  hData_Hemi_1Vtx_CutVtx_CutEvt_lead_ptmin->Fill(  hemi_lead_ptmin );
+                  // hData_Hemi_1Vtx_CutVtx_CutEvt_lead_ptmin->Fill(  hemi_lead_ptmin );
                   hData_Hemi_1Vtx_CutVtx_CutEvt_ptmin->Fill(  hemi_ptmin );
                   }
 
@@ -1331,7 +1490,7 @@ if ( nVtx == 0 && isCutEvt ) {
                   hData_Hemi_2Vtx_CutVtx_CutEvt_dRMu->Fill(   dRMu );
                   hData_Hemi_2Vtx_CutVtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
                   hData_Hemi_2Vtx_CutVtx_CutEvt_njetNOmuAll->Fill( tree_njetNOmu );
-                  hData_Hemi_2Vtx_CutVtx_CutEvt_lead_ptmin->Fill(  hemi_lead_ptmin );
+                  // hData_Hemi_2Vtx_CutVtx_CutEvt_lead_ptmin->Fill(  hemi_lead_ptmin );
                   hData_Hemi_2Vtx_CutVtx_CutEvt_ptmin->Fill(  hemi_ptmin );
                   hData_Hemi_2VtxAll_CutVtx_CutEvt_BDTvtx->Fill(   tree_Hemi_Vtx_MVAval_Step1->at(0) );
                   hData_Hemi_2VtxAll_CutVtx_CutEvt_BDTvtx->Fill(   tree_Hemi_Vtx_MVAval_Step1->at(1) );
@@ -1365,8 +1524,8 @@ if ( nVtx == 0 && isCutEvt ) {
       VtxMass = -1.;
       
       if ( tree_Filter &&
-         ((abs(tree_Hemi_eta->at(0)) > 2.0 && abs(tree_Hemi_eta->at(0)) < 2.5) ||
-         (abs(tree_Hemi_eta->at(1)) > 2.0 && abs(tree_Hemi_eta->at(1)) < 2.5)) ) {
+         ((abs(tree_Hemi_eta->at(0)) > 2.4 && abs(tree_Hemi_eta->at(0)) < 3.0) ||
+         (abs(tree_Hemi_eta->at(1)) > 2.4 && abs(tree_Hemi_eta->at(1)) < 3.0)) ) {
 
             hData_CRfwd_Mmumu->Fill( tree_Mmumu );
             hData_CRfwd_BDTevt->Fill( tree_Evts_MVAval );
@@ -1445,6 +1604,54 @@ if ( nVtx == 0 && isCutEvt ) {
          hData_CRfwd_Hemi_2Vtx_dRMu->Fill(   dRMu );
          hData_CRfwd_Hemi_2Vtx_Mmumu->Fill(  tree_Mmumu );
          hData_CRfwd_Hemi_2Vtx_ptmin->Fill(  hemi_ptmin );
+
+
+                        //------------------------
+            int NewnVtx = -1;
+            if (tree_Hemi_Merging->at(0) && tree_Hemi_Merging->at(1)) {NewnVtx = 2;}
+            else if (tree_Hemi_Merging->at(0)==0 && tree_Hemi_Merging->at(1) == 0){NewnVtx = 0;}
+            else {NewnVtx = 1;}
+            float NewVtxMass = -10;
+            bool SecTight = false;
+ 
+            if (NewnVtx == 2)
+               {
+                  if (tree_Hemi_SecVtx_Mass->at(0)<tree_Hemi_SecVtx_Mass->at(1)) NewVtxMass = tree_Hemi_SecVtx_Mass->at(1);
+                  bool NewisCutVtx = false;
+                  if (tree_Hemi_SecVtx_isTight->at(0) == true && tree_Hemi_SecVtx_isTight->at(1) == true) SecTight = true;
+                  if (NewVtxMass > 8) NewisCutVtx = true;
+                  if (  isCutEvt  && SecTight ) 
+                     {
+                        hData_CRfwd_Hemi_2SecVtx_CutEvt_Mass->Fill(   NewVtxMass );
+                     }
+                  if (NewisCutVtx && isCutEvt  && SecTight)
+                     {
+                        hData_CRfwd_Hemi_2SecVtx_CutVtx_CutEvt_Mass->Fill(   NewVtxMass );
+                     }
+               }
+            if (NewnVtx == 1)
+               {  
+                  bool Merge = false ;
+                  if (tree_Hemi_Merging->at(0)) Merge = true;
+                  SecTight = tree_Hemi_SecVtx_isTight->at(1);
+                  if (Merge) {NewVtxMass = tree_Hemi_SecVtx_Mass->at(0);SecTight = tree_Hemi_SecVtx_isTight->at(0);}
+
+                  else NewVtxMass = tree_Hemi_SecVtx_Mass->at(1);
+                  bool NewisCutVtx = false;
+                  if (NewVtxMass > 8) NewisCutVtx = true;
+                  if (  isCutEvt  && SecTight ) 
+                     {
+                        hData_CRfwd_Hemi_1SecVtx_CutEvt_Mass->Fill(   NewVtxMass );
+                        hData_CRfwd_Hemi_1SecVtx_CutEvt_Merge->Fill(Merge);
+                     }
+                  if (NewisCutVtx && isCutEvt  && SecTight)
+                     {
+                        hData_CRfwd_Hemi_1SecVtx_CutVtx_CutEvt_Mass->Fill(  NewVtxMass );
+                        hData_CRfwd_Hemi_1SecVtx_CutVtx_CutEvt_Merge->Fill(Merge);
+                     }
+               }
+
+            //--------------------------------------
          }
 
          if ( nVtx == 1 && isCutEvt ) {
@@ -1544,7 +1751,7 @@ if ( nVtx == 0 && isCutEvt ) {
    
       //$$
       if ( tree_Filter &&
-            abs(tree_Hemi_eta->at(0)) < 2.0 && abs(tree_Hemi_eta->at(1)) < 2.0
+            abs(tree_Hemi_eta->at(0)) < 2.4 && abs(tree_Hemi_eta->at(1)) < 2.4
             && hemi_ptmin > 40. && hemi_ptmin < 80. ) {
       //$$
 
@@ -1610,6 +1817,52 @@ if ( nVtx == 0 && isCutEvt ) {
             hData_CRlowpt_Hemi_2Vtx_dRMu->Fill(   dRMu );
             hData_CRlowpt_Hemi_2Vtx_Mmumu->Fill(  tree_Mmumu );
             hData_CRlowpt_Hemi_2Vtx_ptmin->Fill(  hemi_ptmin );
+
+                        //------------------------
+            int NewnVtx = -1;
+            if (tree_Hemi_Merging->at(0) && tree_Hemi_Merging->at(1)) {NewnVtx = 2;}
+            else if (tree_Hemi_Merging->at(0)==0 && tree_Hemi_Merging->at(1) == 0){NewnVtx = 0;}
+            else {NewnVtx = 1;}
+            float NewVtxMass = -10;
+            bool SecTight = false;
+            
+            if (NewnVtx == 2)
+               {
+                  if (tree_Hemi_SecVtx_Mass->at(0)<tree_Hemi_SecVtx_Mass->at(1)) NewVtxMass = tree_Hemi_SecVtx_Mass->at(1);
+                  if (tree_Hemi_SecVtx_isTight->at(0) == true && tree_Hemi_SecVtx_isTight->at(1) == true) SecTight = true;
+                  bool NewisCutVtx = false;
+                  if (NewVtxMass > 8) NewisCutVtx = true;
+                  if (  isCutEvt  &&  SecTight ) 
+                     {
+                        hData_CRlowpt_Hemi_2SecVtx_CutEvt_Mass->Fill(   NewVtxMass );
+                     }
+                  if (NewisCutVtx && isCutEvt &&  SecTight)
+                     {
+                        hData_CRlowpt_Hemi_2SecVtx_CutVtx_CutEvt_Mass->Fill(   NewVtxMass );
+                     }
+               }
+            if (NewnVtx == 1)
+               {  
+                  bool Merge = false ;
+                  if (tree_Hemi_Merging->at(0)) Merge = true;
+                  SecTight = tree_Hemi_SecVtx_isTight->at(1);
+                  if (Merge) {NewVtxMass = tree_Hemi_SecVtx_Mass->at(0);SecTight = tree_Hemi_SecVtx_isTight->at(0);}
+                  else NewVtxMass = tree_Hemi_SecVtx_Mass->at(1);
+                  bool NewisCutVtx = false;
+                  if (NewVtxMass > 8) NewisCutVtx = true;
+                  if (  isCutEvt && SecTight) 
+                     {
+                        hData_CRlowpt_Hemi_1SecVtx_CutEvt_Mass->Fill(   NewVtxMass );
+                        hData_CRlowpt_Hemi_1SecVtx_CutEvt_Merge->Fill(Merge);
+                     }
+                  if (NewisCutVtx && isCutEvt && SecTight)
+                     {
+                        hData_CRlowpt_Hemi_1SecVtx_CutVtx_CutEvt_Mass->Fill(  NewVtxMass );
+                        hData_CRlowpt_Hemi_1SecVtx_CutVtx_CutEvt_Merge->Fill(Merge);
+                     }
+               }
+
+            //--------------------------------------
             }
 
             if ( nVtx == 1 && isCutVtx ) {
@@ -1654,7 +1907,7 @@ if ( nVtx == 0 && isCutEvt ) {
       VtxMass = -1.;
    
       if ( tree_Filter &&
-            abs(tree_Hemi_eta->at(0)) < 2.0 && abs(tree_Hemi_eta->at(1)) < 2.0 ) {
+            abs(tree_Hemi_eta->at(0)) < 2.4 && abs(tree_Hemi_eta->at(1)) < 2.4 ) {
 
       //$$
       //    bool isHemiVtx1Tight = false, isHemiVtx2Tight = false;
@@ -1663,7 +1916,7 @@ if ( nVtx == 0 && isCutEvt ) {
                && tree_Hemi_Vtx_step->at(0) >= 3 && tree_Hemi_Vtx_step->at(0) <= 4 
             ) {
                   isHemiVtx1 = true;
-                  BDTvtx1 = tree_Hemi_Vtx_MVAval_Step1->at(0);
+                  BDTvtx1 = tree_Hemi_Vtx_MVAval->at(0);
                   BDTvtx  = BDTvtx1;
                   VtxMass = tree_Hemi_Vtx_Mass->at(0);
                   //      if ( tree_Hemi_Vtx_step->at(0) >= 1 && tree_Hemi_Vtx_step->at(0) <= 2 ) isHemiVtx1Tight = true;
@@ -1674,7 +1927,7 @@ if ( nVtx == 0 && isCutEvt ) {
             && tree_Hemi_Vtx_step->at(1) >= 3 && tree_Hemi_Vtx_step->at(1) <= 4 
             ) { 
                   isHemiVtx2 = true;
-                  BDTvtx2 = tree_Hemi_Vtx_MVAval_Step1->at(1);
+                  BDTvtx2 = tree_Hemi_Vtx_MVAval->at(1);
                   if ( BDTvtx2 > BDTvtx ) BDTvtx = BDTvtx2;
                   if ( tree_Hemi_Vtx_Mass->at(1)  > VtxMass )   VtxMass = tree_Hemi_Vtx_Mass->at(1);
                   //      if ( tree_Hemi_Vtx_step->at(1) >= 1 && tree_Hemi_Vtx_step->at(1) <= 2 ) isHemiVtx2Tight = true;
@@ -1692,23 +1945,23 @@ if ( nVtx == 0 && isCutEvt ) {
             if ( hemi_ptmin > 80. ) isCutEvt = true;   
          //$$
 
-            if ( nVtx == 0 ) {
-     hData_CRloose_Hemi_0Vtx_BDTevt->Fill( tree_Evts_MVAval );
-     hData_CRloose_Hemi_0Vtx_nTrks->Fill(  nTrks );
-     hData_CRloose_Hemi_0Vtx_mass->Fill(   mass );
-     hData_CRloose_Hemi_0Vtx_Mmumu->Fill(  tree_Mmumu );
-     hData_CRloose_Hemi_0Vtx_njetNOmuAll->Fill(   tree_njetNOmu );
-     hData_CRloose_Hemi_0Vtx_lead_ptmin->Fill( hemi_lead_ptmin );
-     hData_CRloose_Hemi_0Vtx_ptmin->Fill( hemi_ptmin );
-   }
-   if ( nVtx == 0 && isCutEvt ) {
-     hData_CRloose_Hemi_0Vtx_CutEvt_nTrks->Fill(  nTrks );
-     hData_CRloose_Hemi_0Vtx_CutEvt_mass->Fill(   mass );
-     hData_CRloose_Hemi_0Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
-     hData_CRloose_Hemi_0Vtx_CutEvt_njetNOmuAll->Fill(   tree_njetNOmu );
-     hData_CRloose_Hemi_0Vtx_CutEvt_lead_ptmin->Fill( hemi_lead_ptmin );
-     hData_CRloose_Hemi_0Vtx_CutEvt_ptmin->Fill( hemi_ptmin );
-   }
+         if ( nVtx == 0 ) {
+         hData_CRloose_Hemi_0Vtx_BDTevt->Fill( tree_Evts_MVAval );
+         hData_CRloose_Hemi_0Vtx_nTrks->Fill(  nTrks );
+         hData_CRloose_Hemi_0Vtx_mass->Fill(   mass );
+         hData_CRloose_Hemi_0Vtx_Mmumu->Fill(  tree_Mmumu );
+         hData_CRloose_Hemi_0Vtx_njetNOmuAll->Fill(   tree_njetNOmu );
+         //   hData_CRloose_Hemi_0Vtx_lead_ptmin->Fill( hemi_lead_ptmin );
+         hData_CRloose_Hemi_0Vtx_ptmin->Fill( hemi_ptmin );
+         }
+         if ( nVtx == 0 && isCutEvt ) {
+         hData_CRloose_Hemi_0Vtx_CutEvt_nTrks->Fill(  nTrks );
+         hData_CRloose_Hemi_0Vtx_CutEvt_mass->Fill(   mass );
+         hData_CRloose_Hemi_0Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
+         hData_CRloose_Hemi_0Vtx_CutEvt_njetNOmuAll->Fill(   tree_njetNOmu );
+         //   hData_CRloose_Hemi_0Vtx_CutEvt_lead_ptmin->Fill( hemi_lead_ptmin );
+         hData_CRloose_Hemi_0Vtx_CutEvt_ptmin->Fill( hemi_ptmin );
+         }
 
          if ( nVtx == 1 ) {
          hData_CRloose_Hemi_1Vtx_BDTevt->Fill( tree_Evts_MVAval );
@@ -1736,6 +1989,51 @@ if ( nVtx == 0 && isCutEvt ) {
          hData_CRloose_Hemi_2Vtx_dRMu->Fill(   dRMu );
          hData_CRloose_Hemi_2Vtx_Mmumu->Fill(  tree_Mmumu );
          hData_CRloose_Hemi_2Vtx_ptmin->Fill(  hemi_ptmin );
+                     //------------------------
+            int NewnVtx = -1;
+            if (tree_Hemi_Merging->at(0) && tree_Hemi_Merging->at(1)) {NewnVtx = 2;}
+            else if (tree_Hemi_Merging->at(0)==0 && tree_Hemi_Merging->at(1) == 0){NewnVtx = 0;}
+            else {NewnVtx = 1;}
+            float NewVtxMass = -10;
+            bool SecTight = false;
+            
+            if (NewnVtx == 2)
+               {
+                  if (tree_Hemi_SecVtx_Mass->at(0)<tree_Hemi_SecVtx_Mass->at(1)) NewVtxMass = tree_Hemi_SecVtx_Mass->at(1);
+                  bool NewisCutVtx = false;
+                  if (tree_Hemi_SecVtx_isTight->at(0) ==false && tree_Hemi_SecVtx_isTight->at(1) == false) SecTight = false;
+                  if (NewVtxMass > 8) NewisCutVtx = true;
+                  if (  isCutEvt && !SecTight ) 
+                     {
+                        hData_CRloose_Hemi_2SecVtx_CutEvt_Mass->Fill(   NewVtxMass );
+                     }
+                  if (NewisCutVtx && isCutEvt && !SecTight)
+                     {
+                        hData_CRloose_Hemi_2SecVtx_CutVtx_CutEvt_Mass->Fill(   NewVtxMass );
+                     }
+               }
+            if (NewnVtx == 1)
+               {  
+                  bool Merge = false ;
+                  if (tree_Hemi_Merging->at(0)) Merge = true;
+                  SecTight = tree_Hemi_SecVtx_isTight->at(1);
+                  if (Merge) {NewVtxMass = tree_Hemi_SecVtx_Mass->at(0);SecTight = tree_Hemi_SecVtx_isTight->at(0);}
+                  else NewVtxMass = tree_Hemi_SecVtx_Mass->at(1);
+                  bool NewisCutVtx = false;
+                  if (NewVtxMass > 8) NewisCutVtx = true;
+                  if (  isCutEvt && !SecTight) 
+                     {
+                        hData_CRloose_Hemi_1SecVtx_CutEvt_Mass->Fill(   NewVtxMass );
+                        hData_CRloose_Hemi_1SecVtx_CutEvt_Merge->Fill(Merge);
+                     }
+                  if (NewisCutVtx && isCutEvt && !SecTight)
+                     {
+                        hData_CRloose_Hemi_1SecVtx_CutVtx_CutEvt_Mass->Fill(  NewVtxMass );
+                        hData_CRloose_Hemi_1SecVtx_CutVtx_CutEvt_Merge->Fill(Merge);
+                     }
+               }
+
+            //--------------------------------------
          }
 
          if ( nVtx == 1 && isCutEvt ) {
@@ -1825,6 +2123,8 @@ if ( nVtx == 0 && isCutEvt ) {
          } // endif Loose Vertex Control Region
       //$$$$
 
+//$$$$
+// Loose Vertex Low Pt Control Region
 
    isHemiVtx1 = false; isHemiVtx2 = false;
    isCutVtx = false; isCutVtx1 = false; isCutVtx2 = false;
@@ -1877,7 +2177,7 @@ if ( nVtx == 0 && isCutEvt ) {
      float eta_vtx2 = tree_Hemi_Vtx_eta->at(1);
      float phi_vtx1 = TMath::ATan2( tree_Hemi_Vtx_y->at(0), tree_Hemi_Vtx_x->at(0) );
      float phi_vtx2 = TMath::ATan2( tree_Hemi_Vtx_y->at(1), tree_Hemi_Vtx_x->at(1) );
-     dRvtx = DeltaR( eta_vtx1, phi_vtx1, eta_vtx2, phi_vtx2 );
+     dRvtx = Deltar( eta_vtx1, phi_vtx1, eta_vtx2, phi_vtx2 );
      if ( dRvtx < 1.5 ) {
        nVtx = 1;
        if ( tree_Hemi_Vtx_Mass->at(0) > tree_Hemi_Vtx_Mass->at(1) ) {
@@ -1891,6 +2191,54 @@ if ( nVtx == 0 && isCutEvt ) {
      }
      if ( isCutEvt ) hData_CRlooselowpt_Hemi_2Vtx_CutEvt_dRvtx->Fill( dRvtx );
      if ( isCutVtx && isCutEvt ) hData_CRlooselowpt_Hemi_2Vtx_CutVtx_CutEvt_dRvtx->Fill( dRvtx );
+
+      
+      
+      //------------------------
+      int NewnVtx = -1;
+      if (tree_Hemi_Merging->at(0) && tree_Hemi_Merging->at(1)) {NewnVtx = 2;}
+      else if (tree_Hemi_Merging->at(0)==0 && tree_Hemi_Merging->at(1) == 0){NewnVtx = 0;}
+      else {NewnVtx = 1;}
+      float NewVtxMass = -10;
+      bool SecTight = false;
+      if (NewnVtx == 2)
+         {
+            if (tree_Hemi_SecVtx_Mass->at(0)<tree_Hemi_SecVtx_Mass->at(1)) NewVtxMass = tree_Hemi_SecVtx_Mass->at(1);
+            bool NewisCutVtx = false;
+            if (tree_Hemi_SecVtx_isTight->at(0) ==false && tree_Hemi_SecVtx_isTight->at(1) == false) SecTight = false;
+            if (NewVtxMass > 8) NewisCutVtx = true;
+            if (  isCutEvt && !SecTight) 
+               {
+                  hData_CRlooselowpt_Hemi_2SecVtx_CutEvt_Mass->Fill(   NewVtxMass );
+               }
+            if (NewisCutVtx && isCutEvt && !SecTight)
+               {
+                  hData_CRlooselowpt_Hemi_2SecVtx_CutVtx_CutEvt_Mass->Fill(   NewVtxMass );
+               }
+         }
+      if (NewnVtx == 1)
+         {  
+            bool Merge = false ;
+            if (tree_Hemi_Merging->at(0)) Merge = true;
+            SecTight = tree_Hemi_SecVtx_isTight->at(1);
+            if (Merge) {NewVtxMass = tree_Hemi_SecVtx_Mass->at(0);SecTight = tree_Hemi_SecVtx_isTight->at(0);}
+            else NewVtxMass = tree_Hemi_SecVtx_Mass->at(1);
+            bool NewisCutVtx = false;
+            if (NewVtxMass > 8) NewisCutVtx = true;
+            if (  isCutEvt && !SecTight ) 
+               {
+                  hData_CRlooselowpt_Hemi_1SecVtx_CutEvt_Mass->Fill(   NewVtxMass );
+                  hData_CRlooselowpt_Hemi_1SecVtx_CutEvt_Merge->Fill(Merge);
+               }
+            if (NewisCutVtx && isCutEvt && !SecTight)
+               {
+                  hData_CRlooselowpt_Hemi_1SecVtx_CutVtx_CutEvt_Mass->Fill(  NewVtxMass );
+                  hData_CRlooselowpt_Hemi_1SecVtx_CutVtx_CutEvt_Merge->Fill(Merge);
+               }
+         }
+
+      //--------------------------------------
+
    }
 
    if ( nVtx == 1 && isCutEvt ) {
@@ -1964,7 +2312,7 @@ if ( nVtx == 0 && isCutEvt ) {
       VtxMass = -1.;
    
       if ( tree_FilterSameSign && !tree_Filter &&
-            abs(tree_Hemi_eta->at(0)) < 2.0 && abs(tree_Hemi_eta->at(1)) < 2.0 ) {
+            abs(tree_Hemi_eta->at(0)) < 2.4 && abs(tree_Hemi_eta->at(1)) < 2.4 ) {
 
             hData_SameSign_Mmumu->Fill( tree_MmumuSameSign );
             hData_SameSign_BDTevt->Fill( tree_Evts_MVAval );
@@ -2043,6 +2391,53 @@ if ( nVtx == 0 && isCutEvt ) {
             hData_SameSign_Hemi_2Vtx_dRMu->Fill(   dRMu );
             hData_SameSign_Hemi_2Vtx_Mmumu->Fill(  tree_MmumuSameSign );
             hData_SameSign_Hemi_2Vtx_ptmin->Fill(  hemi_ptmin );
+                           //------------------------
+               int NewnVtx = -1;
+               if (tree_Hemi_Merging->at(0) && tree_Hemi_Merging->at(1)) {NewnVtx = 2;}
+               else if (tree_Hemi_Merging->at(0)==0 && tree_Hemi_Merging->at(1) == 0){NewnVtx = 0;}
+               else {NewnVtx = 1;}
+               bool SecTight = false;
+               
+               float NewVtxMass = -10;
+
+               if (NewnVtx == 2)
+                  {
+                     if (tree_Hemi_SecVtx_Mass->at(0)<tree_Hemi_SecVtx_Mass->at(1)) NewVtxMass = tree_Hemi_SecVtx_Mass->at(1);
+                     bool NewisCutVtx = false;
+                     if (tree_Hemi_SecVtx_isTight->at(0) ==true && tree_Hemi_SecVtx_isTight->at(1) == true) SecTight = true;
+
+                     if (NewVtxMass > 8) NewisCutVtx = true;
+                     if (  isCutEvt && SecTight) 
+                        {
+                           hData_SameSign_Hemi_2SecVtx_CutEvt_Mass->Fill(   NewVtxMass );
+                        }
+                     if (NewisCutVtx && isCutEvt && SecTight)
+                        {
+                           hData_SameSign_Hemi_2SecVtx_CutVtx_CutEvt_Mass->Fill(   NewVtxMass );
+                        }
+                  }
+               if (NewnVtx == 1)
+                  {  
+                     bool Merge = false ;
+                     if (tree_Hemi_Merging->at(0)) Merge = true;
+                     SecTight = tree_Hemi_SecVtx_isTight->at(1);
+                     if (Merge) {NewVtxMass = tree_Hemi_SecVtx_Mass->at(0);SecTight = tree_Hemi_SecVtx_isTight->at(0);}
+                     else NewVtxMass = tree_Hemi_SecVtx_Mass->at(1);
+                     bool NewisCutVtx = false;
+                     if (NewVtxMass > 8) NewisCutVtx = true;
+                     if (  isCutEvt && SecTight) 
+                        {
+                           hData_SameSign_Hemi_1SecVtx_CutEvt_Mass->Fill(   NewVtxMass );
+                           hData_SameSign_Hemi_1SecVtx_CutEvt_Merge->Fill(Merge);
+                        }
+                     if (NewisCutVtx && isCutEvt && SecTight)
+                        {
+                           hData_SameSign_Hemi_1SecVtx_CutVtx_CutEvt_Mass->Fill(  NewVtxMass );
+                           hData_SameSign_Hemi_1SecVtx_CutVtx_CutEvt_Merge->Fill(Merge);
+                        }
+                  }
+
+               //--------------------------------------
             }
 
             if ( nVtx == 1 && isCutEvt ) {
