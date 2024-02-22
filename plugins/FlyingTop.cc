@@ -137,6 +137,7 @@
 #include "MagneticField/VolumeBasedEngine/interface/VolumeBasedMagneticField.h"
               //----------------New interface----------------------//
 #include "../interface/PropaHitPattern.h"
+#include "../interface/Vtx.h"
               //----------------Trigger---------------------------//
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "FWCore/Common/interface/TriggerNames.h"
@@ -6591,7 +6592,6 @@ else if ( !( tk_pt > pt_Cut && tk_NChi2 < NChi2_Cut && tk_drSig > drSig_Cut ) ) 
     Vtx_step = 0;
     GlobalError posError;
     float MeanWeight =0;
-    TransientVertex displacedVertex_Hemi1_mva;
     std::vector<float> Vtx1_Weights;
     std::vector<unsigned int> Vtx1_index;
     float DCA_VTX_Meand = 0;
@@ -7111,9 +7111,6 @@ else if ( !( tk_pt > pt_Cut && tk_NChi2 < NChi2_Cut && tk_drSig > drSig_Cut ) ) 
               DCA_VTX_Meand = 0;
               for (int k = 0; k< Vtx_ntk; k++)
                 {
-                  // MeanWeight+=displacedVertex_Hemi1_mva.trackWeight(displacedTracks_Hemi1_mva[p]);
-                  // Vtx1_Weights.push_back(displacedVertex_Hemi1_mva.trackWeight(displacedTracks_Hemi1_mva[p]));
-                  // tree_Hemi_Vtx_trackWeight.push_back(displacedVertex_Hemi1_mva.trackWeight(displacedTracks_Hemi1_mva[p]));
                   TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
                   if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
                   //but one should look of the wieghts of the track at the same time
@@ -7668,17 +7665,9 @@ else if ( !( tk_pt > pt_Cut && tk_NChi2 < NChi2_Cut && tk_drSig > drSig_Cut ) ) 
               Vtx_y = tempy;
               Vtx_z = tempz;
               Vtx_step = 4;
-               GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
-              //  float DCA_VTX_Meand = 0;
-              // float totalpx = 0 ;
-              // float totalpy = 0 ;
-              // float totalpz = 0 ;
-              // float totale = 0 ;
+              GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
               for (int k = 0; k< Vtx_ntk; k++)
                 {
-                  // MeanWeight+=displacedVertex_Hemi1_mva.trackWeight(displacedTracks_step2_Hemi1[p]);
-                  // Vtx1_Weights.push_back(displacedVertex_Hemi1_mva.trackWeight(displacedTracks_step2_Hemi1[p]));
-                  // tree_Hemi_Vtx_trackWeight.push_back(displacedVertex_Hemi1_mva.trackWeight(displacedTracks_step2_Hemi1[p]));
                   TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
                   if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
                   //but one should look of the wieghts of the track at the same time
@@ -9242,21 +9231,10 @@ if ( LLP2_mother * lep1_Q < 0 ) {
   tree_Hemi_Vtx_phi.push_back(phi2);
 
   int SecStep = -1;
-  int Merging1 = 0;
-  int Merging2 = 0;
 
   if(nVertex==2)
     {
-
         //Trying to deal with the two reconstructed vertices being really close <1mm
-    static AdaptiveVertexFitter 
-    theFitter_vertex_Merger(
-                 GeometricAnnealing ( sigmacut, Tini, ratio ), 
-                 DefaultLinearizationPointFinder(),
-                 KalmanVertexUpdator<5>(), 
-                 KalmanVertexTrackCompatibilityEstimator<5>(), 
-                 KalmanVertexSmoother() );
-    theFitter_vertex_Merger.setParameters ( maxshift, maxlpshift, maxstep, weightThreshold );
       dr_2V = sqrt((posx2-posx1)*(posx2-posx1)+(posy2-posy1)*(posy2-posy1));
       dz_2V = sqrt((posz2-posz1)*(posz2-posz1));
       dd_2V = sqrt((posx2-posx1)*(posx2-posx1)+(posy2-posy1)*(posy2-posy1)+(posz2-posz1)*(posz2-posz1));
@@ -9359,7 +9337,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
             tree_Hemi_SecVtx_nTrks.push_back(MergeVtx_ntk);
             tree_Hemi_SecVtx_NChi2.push_back(MergeVtx_chi);
             tree_Hemi_SecVtx_step.push_back(SecStep);
-                        tree_Hemi_SecVtx_dist.push_back( recD );
+            tree_Hemi_SecVtx_dist.push_back( recD );
             tree_Hemi_SecVtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
             tree_Hemi_SecVtx_SumtrackWeight.push_back(MeanWeight);         
             tree_Hemi_SecVtx_isTight.push_back(isTightNewVtx);
@@ -9371,9 +9349,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
             float dR_axis1 = Deltar(MergedEta, MergedPhi, axis1_eta, axis1_phi);
             float dR_axis2 = Deltar(MergedEta, MergedPhi, axis2_eta, axis2_phi);
             bool isAxis1 = true;
-            Merging1 = 1;
-            Merging2 =-1;
-            if (dR_axis2 < dR_axis1) {isAxis1 = false; Merging1 = -1; Merging2 =1;}
+            if (dR_axis2 < dR_axis1) {isAxis1 = false;}
 
                 //----------------------------------------------------
                 // -- Use the whole set of tracks available from the hemisphere + remove the ones used in the previous vertex 
@@ -9477,10 +9453,27 @@ if ( LLP2_mother * lep1_Q < 0 ) {
 
                 }
 
-                // then steps 3 and 4 =< Loose 
-                if (!NewTightVertex || NewTTracks.size()<2)
+                GlobalPoint PVPos(PV.x(),PV.y(),PV.z());
+                Vtx* VtxSec = new Vtx();
+                // void Vertexing(std::vector<reco::TransientTrack> VertexTracks, vector<std::pair<bool,TLorentzVector>> Track_FirstHit, bool ActivateStep = true, bool RequireGoodChi2Seed,bool RequireGoodChi2VertexIter = false, float Chi2down = 0., float Chi2up = 10.)
+                VtxSec->Vertexing(NewTTracks,FHNewTTrack,true,false,false,0.,10.,&PVPos);
+                SecStep = 1; // 1 here
+                isTightNewVtx = true;
+                badVtx = false;
+                if ( (VtxSec->chi() < 0. || VtxSec->chi() > 10.)  ) badVtx = true;
+                if ( badVtx  && NewTTracks.size() > 1 && (ActivateStep2 || IterAVF))
                   {
-                    isTightNewVtx= false;
+                    VtxSec->Vertexing(NewTTracks,FHNewTTrack,true,true,false,0.,10.,&PVPos);
+                    SecStep = 2; // 1 here
+                    isTightNewVtx = true;       
+                  }
+
+                // then steps 3 and 4 =< Loose 
+                NewTTracks.clear();
+                FHNewTTrack.clear();
+                if ((VtxSec->chi() < 0. || VtxSec->chi() > 10.) || NewTTracks.size()<2)//|| NewTTracks.size()<2
+                  {
+                    // isTightNewVtx= false;
                     count_trk = 0;
                     if (Vtx1_step == 3 || Vtx1_step == 4)
                       {
@@ -9555,293 +9548,36 @@ if ( LLP2_mother * lep1_Q < 0 ) {
 
                   }
 
-                // ------------- Start of IAVF ---------------//
-             
-                  ntracks   = -2;
-                  tempchi2  = -10.;
-                  tempx = -100.;
-                  tempy = -100.;
-                  tempz = -100.;
-                  float SecVtx_x = -1000;
-                  float SecVtx_y = -1000;
-                  float SecVtx_z = -1000;
-                  float SecVtx_ntk = 0;
-                  float SecVtx_chi = -100;
-                  std::vector<float>  NewVtx_Weights;
-                  std::vector<unsigned int>  NewVtx_index;
-                  SecStep = -10;
-                  if (NewTTracks.size() > 1  ) 
-                    {
-                      MeanWeight=0;
-                      bool success = false;
-                      std::vector<TransientTrack> vTT;
-                      tempchi2 = -10.;
-                      DCA_VTX_Meand = 0;
-                      tempMeanWeight=0;
-                      SecVtx_ntk = NewTTracks.size();
-                      for ( int p = 1; p < SecVtx_ntk; p++ )
-                        {
-                          for  ( int k = 0; k < p; k++ ) // take any pair of track
-                              // details : Two collections of tracks are merged together. Each collection has its tracks orederd by decreasing value of BDT
-                              // Therefore, we look for a seed in the first hemisphere first with tracks ordered y decreasing value of BDT
-                              // Then it can look for a seed using tracks from both hemisphere or it can even look for a seed in the other hemisphere
-                              // depending on the validation of the criteria
-                            {
-                              vTT.push_back(NewTTracks[p]);
-                              vTT.push_back(NewTTracks[k]);
-                              ntracks = 2;
-                              
-                              TransientVertex TV = theFitter_vertex_Merger.vertex(vTT); // We take the first "good-looking" seed to start
-                              if ( TV.isValid() && TV.normalisedChiSquared()>0 && TV.normalisedChiSquared()<10 ) 
-                                {
-                                  tempchi2 = TV.normalisedChiSquared();
-                                  tempx = TV.position().x();
-                                  tempy = TV.position().y();
-                                  tempz = TV.position().z();
-                                  float temp_dr = sqrt((tempx-Mergedx)*(tempx-Mergedx)+(tempy-Mergedy)*(tempy-Mergedy));
-                                  float temp_dz = sqrt((tempz-Mergedz)*(tempz-Mergedz));
-                                  // float temp_dd = sqrt((tempx-Mergedx)*(tempx-Mergedx)+(tempy-Mergedy)*(tempy-Mergedy)+(tempz-Mergedz)*(tempz-Mergedz));
-                                  // if (temp_dr < 0.1 && temp_dz <0.1){success = false;}
-                                  // else {success = true;}
-                                  success = true;
-                                  for (int m = 0; m < ntracks; m++) // we check that the firsthit of the two selected tracks is after the vertex position
-                                    {
-                                      if(FHNewTTrack[m].first == true) continue; //first hit of lost track is biaised
-                                      float PosFH = sqrt((FHNewTTrack[m].second.X()-PV.x())*(FHNewTTrack[m].second.X()-PV.x())+(FHNewTTrack[m].second.Y()-PV.y())*(FHNewTTrack[m].second.Y()-PV.y())+(FHNewTTrack[m].second.Z()-PV.z())*(FHNewTTrack[m].second.Z()-PV.z()));
-                                      float PosVtx1 = sqrt((TV.position().x()-PV.x())*(TV.position().x()-PV.x())+(TV.position().y()-PV.y())*(TV.position().y()-PV.y())+(TV.position().z()-PV.z())*(TV.position().z()-PV.z()));
-                                      if (PosFH>PosVtx1) 
-                                        {
-                                          success = true; 
-                                          tempchi2 = TV.normalisedChiSquared();
-                    	                    tempx=TV.position().x();
-                    	                    tempy=TV.position().y();
-                    	                    tempz=TV.position().z();
-                                          continue;
-                                        }//continue not useful
-                                      else{badtkhit_index = m;}
-                                    }
+                badVtx = false;
+                if ( (VtxSec->chi() < 0. || VtxSec->chi() > 10.)  ) badVtx = true;
+                NewTightVertex = false;
+                if ( badVtx  && NewTTracks.size() > 1 && ActivateStep3 && !NewTightVertex)
+                  {
+                    VtxSec->Vertexing(NewTTracks,FHNewTTrack,true,false,false,0.,10.,&PVPos);
+                    SecStep = 3; // 1 here
+                    isTightNewVtx= false;
+                  }
+                badVtx = false;
+                if ( (VtxSec->chi() < 0. || VtxSec->chi() > 10.)  ) badVtx = true;
+                if ( badVtx  && NewTTracks.size() > 1 && (ActivateStep4 || IterAVF) && !NewTightVertex)
+                  {
+                    VtxSec->Vertexing(NewTTracks,FHNewTTrack,true,true,false,0.,10.,&PVPos);
+                    SecStep = 4; // 1 here
+                    isTightNewVtx = false;
+                  }
 
-                                if (SecVtx_ntk == 2 && !success){break;}// removing 1 track gives no other option
-                                else if (success)
-                                {
-                                  NewVtx_index.clear();
-                                  NewVtx_index.push_back(k);
-                                  NewVtx_index.push_back(p);
-                                  for (int m = 0; m < SecVtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                                    {
-                                      if (m == k || m == p) continue;
-                                      ntracks++;
-                                      tempMeanWeight=0;
-                                      
-                                      vTT.push_back(NewTTracks[m]);
-                                      TransientVertex updatedTV = theFitter_vertex_Merger.vertex(vTT);
-                                      if ( !updatedTV.isValid() ) 
-                                        {  
-                    	                    vTT.pop_back();
-                    	                    ntracks--;
-                    	                    updatedTV = theFitter_vertex_Merger.vertex(vTT);
-                    	                    tempchi2 = updatedTV.normalisedChiSquared();
-                    	                    tempx=updatedTV.position().x();
-                    	                    tempy=updatedTV.position().y();
-                      	                  tempz=updatedTV.position().z();
-                                          NewVtx_Weights.clear();
-                                          tempMeanWeight=0;
-                                          
-                                         for(int i = 0; i<ntracks;i++)
-                                            {
-                                              tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                              NewVtx_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                              if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                            }
-                    	                    continue;
-                                        } 
-                                      if ( updatedTV.isValid() ) 
-                                        {
-                                          tempchi2 = updatedTV.normalisedChiSquared();
-                    	                    tempx=updatedTV.position().x();
-                    	                    tempy=updatedTV.position().y();
-                    	                    tempz=updatedTV.position().z();
-                                          temp_dr = sqrt((tempx-Mergedx)*(tempx-Mergedx)+(tempy-Mergedy)*(tempy-Mergedy));
-                                          temp_dz = sqrt((tempz-Mergedz)*(tempz-Mergedz));
-                                          // temp_dd = sqrt((tempx-Mergedx)*(tempx-Mergedx)+(tempy-Mergedy)*(tempy-Mergedy)+(tempz-Mergedz)*(tempz-Mergedz));
-                                          float TPosFH = sqrt((FHNewTTrack[m].second.X()-PV.x())*(FHNewTTrack[m].second.X()-PV.x())+(FHNewTTrack[m].second.Y()-PV.y())*(FHNewTTrack[m].second.Y()-PV.y())+(FHNewTTrack[m].second.Z()-PV.z())*(FHNewTTrack[m].second.Z()-PV.z()));
-                                          float TPosVtx1 = sqrt((tempx-PV.x())*(tempx-PV.x())+(tempy-PV.y())*(tempy-PV.y())+(tempz-PV.z())*(tempz-PV.z()));
-                                          if (TPosFH>TPosVtx1 || FHNewTTrack[m].first == true || temp_dr > 0.1 || temp_dz > 0.1 ) {success = true;}//continue not useful
-                                          else  
-                                          {
-                                            vTT.pop_back();
-                                            ntracks--;
-                    	                       updatedTV = theFitter_vertex_Merger.vertex(vTT);
-                                            tempchi2 = updatedTV.normalisedChiSquared();
-                    	                       tempx=updatedTV.position().x();
-                    	                       tempy=updatedTV.position().y();
-                    	                       tempz=updatedTV.position().z();
-                                            NewVtx_Weights.clear();
-                                            tempMeanWeight=0;
-                                            if (ntracks<2){success = false;}
-                                            if (ntracks>=2){success = true;}
-                                            for(int i = 0; i<ntracks;i++)
-                                              {
-                                                    tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                                    NewVtx_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                                    if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                              }
-                                      	    continue;
-                                          }
-                                        NewVtx_Weights.clear();
-                                        NewVtx_index.push_back(m);
-                                          for(int i = 0; i<ntracks;i++)
-                                            {
-                                              tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                              NewVtx_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                              if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                            }
-                                        }
-                                    } // end loop on the other tracks
-                                }
+                  float SecVtx_x = VtxSec->x();
+                  float SecVtx_y = VtxSec->y();
+                  float SecVtx_z = VtxSec->z();
+                  float SecVtx_ntk = VtxSec->nTrk();
+                  float SecVtx_chi = VtxSec->chi();
+                  std::vector<TransientTrack> SecVtx_Trks = VtxSec->GetTTracks();
+                  std::vector<float>  NewVtx_Weights = VtxSec->Vtx_TrkWeights();
+                  std::vector<unsigned int>  NewVtx_index = VtxSec->Vtx_TrkIndex();
 
-
-                                else if (SecVtx_ntk > 2 && !success)
-                                {
-                                  NewVtx_index.clear();
-                                  if (badtkhit_index == k) {vTT.erase(vTT.begin());ntracks--;NewVtx_index.push_back(p);}
-                                  else if (badtkhit_index == p) {vTT.erase(vTT.end());ntracks--;NewVtx_index.push_back(k);}
-                                   else {NewVtx_index.push_back(k);NewVtx_index.push_back(p);}
-                                for (int m = 0; m < SecVtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                                  {
-                                    if (m == k || m == p || m == badtkhit_index) continue;
-                                    ntracks++;
-                                    tempMeanWeight=0;
-                                    vTT.push_back(NewTTracks[m]);
-                                    TransientVertex updatedTV = theFitter_vertex_Merger.vertex(vTT);
-                                    if ( !updatedTV.isValid() ) 
-                                      {  
-                    	                  vTT.pop_back();
-                                        ntracks--;
-                                        if (vTT.size()<2) continue;
-                    	                  updatedTV = theFitter_vertex_Merger.vertex(vTT);
-                                                tempchi2 = updatedTV.normalisedChiSquared();
-                    	                          tempx=updatedTV.position().x();
-                    	                          tempy=updatedTV.position().y();
-                    	                          tempz=updatedTV.position().z();
-                                                NewVtx_Weights.clear();
-                                                tempMeanWeight=0;
-                                                if (ntracks<2){success = false;}
-                                                if (ntracks>=2){success = true;}
-                                                for(int i = 0; i<ntracks;i++)
-                                                  {
-                                                    tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                                    NewVtx_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                                    if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                                  }
-                                        continue;
-                                      }
-                                    if ( updatedTV.isValid() ) 
-                                      {
-                                        tempchi2 = updatedTV.normalisedChiSquared();
-                    	                  tempx=updatedTV.position().x();
-                    	                  tempy=updatedTV.position().y();
-                    	                  tempz=updatedTV.position().z(); 
-                                        temp_dr = sqrt((tempx-Mergedx)*(tempx-Mergedx)+(tempy-Mergedy)*(tempy-Mergedy));
-                                        temp_dz = sqrt((tempz-Mergedz)*(tempz-Mergedz));
-                                        // temp_dd = sqrt((tempx-Mergedx)*(tempx-Mergedx)+(tempy-Mergedy)*(tempy-Mergedy)+(tempz-Mergedz)*(tempz-Mergedz));                         
-                                        float TPosFH = sqrt((FHNewTTrack[m].second.X()-PV.x())*(FHNewTTrack[m].second.X()-PV.x())+(FHNewTTrack[m].second.Y()-PV.y())*(FHNewTTrack[m].second.Y()-PV.y())+(FHNewTTrack[m].second.Z()-PV.z())*(FHNewTTrack[m].second.Z()-PV.z()));
-                                        float TPosVtx1 = sqrt((tempx-PV.x())*(tempx-PV.x())+(tempy-PV.y())*(tempy-PV.y())+(tempz-PV.z())*(tempz-PV.z()));
-                                        if (TPosFH>TPosVtx1 || FHNewTTrack[m].first == true || temp_dr > 0.1 || temp_dz >0.1) {success = true;}//continue not useful
-                                        else  
-                                          {
-                                            vTT.pop_back();
-                                            ntracks--;
-                                            if (vTT.size()<2) continue;
-                    	                      updatedTV = theFitter_vertex_Merger.vertex(vTT);
-                                            tempchi2 = updatedTV.normalisedChiSquared();
-                    	                      tempx=updatedTV.position().x();
-                    	                      tempy=updatedTV.position().y();
-                    	                      tempz=updatedTV.position().z();
-                                            NewVtx_Weights.clear();
-                                            tempMeanWeight=0;                                                
-                                            if (ntracks<2){success = false;}
-                                            if (ntracks>=2){success = true;}
-                                            for(int i = 0; i<ntracks;i++)
-                                              {
-                                                tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                                NewVtx_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                                if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                              }
-                                      	    continue;
-                                          }
-                                        NewVtx_Weights.clear();
-                                        NewVtx_index.push_back(m);
-                                        success = true;
-                                        for(int i = 0; i<ntracks;i++)
-                                          {
-                                            tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                            NewVtx_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                            if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                          }
-                                      }
-                                  }
-                                }
-
-                                  SecVtx_ntk = ntracks;
-                                  SecVtx_chi = tempchi2;
-                                  SecVtx_x = tempx;
-                                  SecVtx_y = tempy;
-                                  SecVtx_z = tempz;
-                                  SecStep  = 1;
-                                  NewTightVertex = true;
-                                  GlobalPoint RECOvtxPos(SecVtx_x, SecVtx_y, SecVtx_z);
-                                  DCA_VTX_Meand = 0;
-                                  for (int k = 0; k< SecVtx_ntk; k++)
-                                    {
-                                      TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
-                                      if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
-                                      //but one should look of the wieghts of the track at the same time
-                                        {// The positions are given in the Global frame
-                                          float pca_Vtx_x = DCA_Vtx.position().x();
-                                          float pca_Vtx_y = DCA_Vtx.position().y();
-                                          float pca_Vtx_z = DCA_Vtx.position().z();
-                                          float refPoint_x = DCA_Vtx.referencePoint().x();
-                                          float refPoint_y = DCA_Vtx.referencePoint().y();
-                                          float refPoint_z = DCA_Vtx.referencePoint().z();
-                                          float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
-                                          float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
-                                          float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
-                                          float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
-                                          float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
-                                          DCA_VTX_Meand+=DCA_VTX_d;
-                                          tree_Hemi_SecVtx_track_DCA_x.push_back(DCA_Vtx_x);
-                                          tree_Hemi_SecVtx_track_DCA_y.push_back(DCA_Vtx_y);
-                                          tree_Hemi_SecVtx_track_DCA_z.push_back(DCA_Vtx_z);
-                                          tree_Hemi_SecVtx_track_DCA_r.push_back(DCA_VTX_r);
-                                          tree_Hemi_SecVtx_track_DCA_d.push_back(DCA_VTX_d);
-                                        }
-                                    }
-                                  if (MeanWeight==0)//<=>only two tracks in the valid vertex
-                                    {
-                                      NewVtx_Weights.clear();
-                                      for(unsigned int i = 0; i<vTT.size();i++)
-                                        {
-                                          MeanWeight+=TV.trackWeight(vTT[i]);
-                                          NewVtx_Weights.push_back(TV.trackWeight(vTT[i]));
-                                        }
-                                    }
-                                  DCA_VTX_Meand = DCA_VTX_Meand/(float)(SecVtx_ntk);
-                                  TempTT = vTT;
-                              }
-                              else
-                                { // If not valid : we build a new seed
-                                  ntracks = 0;
-                                  vTT.clear();
-                                }
-                              if ( success ) break;
-                            }
-                          if ( success ) break;
-                        }
-                      if (showlog){std::cout<<"New Second Vtx : "<<success<<std::endl;}
-                    }
-
-                    // if(SecVtx_chi>0 && SecVtx_chi<10)
+                  DCA_VTX_Meand = VtxSec->MeanDCA();
+                  MeanWeight    = VtxSec->SumWeight();
+                  // if(SecVtx_chi>0 && SecVtx_chi<10)
                     //   {
                         tree_Hemi_SecVtx_x.push_back(SecVtx_x);
                         tree_Hemi_SecVtx_y.push_back(SecVtx_y);
@@ -9882,14 +9618,12 @@ if ( LLP2_mother * lep1_Q < 0 ) {
 
 
                         TLorentzVector NewVtxVector(0,0,0,0);
-                        // std::cout<<"TempTT.size() : "<<TempTT.size()<<std::endl;
-                        // std::cout<<"NewVtx_Weights.size() : "<<NewVtx_Weights.size()<<std::endl;
-                        for (unsigned int i = 0 ; i <TempTT.size(); i++)
+                        for (unsigned int i = 0 ; i <SecVtx_Trks.size(); i++)
                           {
                             tree_Hemi_SecVtx_trackWeight.push_back(NewVtx_Weights[i]);
                             if (NewVtx_Weights[i]>0.5)
                               {
-                                const Track &tkm = TempTT[i].track();            
+                                const Track &tkm = SecVtx_Trks[i].track();            
                                 float tkpx = tkm.px();
                                 float tkpy = tkm.py();
                                 float tkpz = tkm.pz();
@@ -9904,23 +9638,10 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                         float NewVtxMass = TMath::Max(sqrt(NewVtxVector.Mag2()),0.);
                         tree_Hemi_SecVtx_Mass.push_back(NewVtxMass);
 
-                        if (isAxis1 && SecVtx_chi<10 && SecVtx_chi>0) { Merging2 = -1;}
-                        else if (isAxis1 && MergeVtx_chi<10 && MergeVtx_chi>0) { Merging1 = 1;}
+
                         
-                        else if (isAxis1 && !(SecVtx_chi<10 && SecVtx_chi>0)){ Merging2 = 0;}
-                        else if (isAxis1 && !(MergeVtx_chi<10 && MergeVtx_chi>0)){ Merging1 = 0;}
-
-                        else if (!isAxis1 && SecVtx_chi<10 && SecVtx_chi>0) { Merging1 = -1;}
-                        else if (!isAxis1 && MergeVtx_chi<10 && MergeVtx_chi>0){ Merging2 = 1;}
-
-                        else if (!isAxis1 && !(SecVtx_chi<10 && SecVtx_chi>0)){ Merging1 = 0;}
-                        else if (!isAxis1 && !(MergeVtx_chi<10 && MergeVtx_chi>0)){ Merging2 = 0;}
-                        
-
-
                       // }// SecVtx is Valid
-                      tree_Hemi_Merging.push_back(Merging1);
-                      tree_Hemi_Merging.push_back(Merging2);
+
                         float Newping1 = 0;
                         float Newping2 = 0;
                         bool Newping_Hemi1 = false, Newping_Hemi2 = false;
