@@ -1038,6 +1038,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector< float > tree_Hemi_SecLLP_ping;
 
     std::vector< int >   tree_Hemi_Vtx_step;
+    std::vector< bool >  tree_Hemi_Vtx_isTight;
     std::vector< float > tree_Hemi_Vtx_NChi2;
     std::vector< int >   tree_Hemi_Vtx_nTrks;
     std::vector< int >   tree_Hemi_Vtx_nTrks_sig;
@@ -1060,11 +1061,11 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
 
     std::vector< float > tree_Hemi_MergedVtx_NChi2;
     std::vector< float > tree_Hemi_MergedVtx_Mass;
-    std::vector< float > tree_Hemi_SecVtx_track_DCA_x;
-    std::vector< float > tree_Hemi_SecVtx_track_DCA_y;
-    std::vector< float > tree_Hemi_SecVtx_track_DCA_z;
-    std::vector< float > tree_Hemi_SecVtx_track_DCA_r;
-    std::vector< float > tree_Hemi_SecVtx_track_DCA_d;
+    // std::vector< float > tree_Hemi_SecVtx_track_DCA_x;
+    // std::vector< float > tree_Hemi_SecVtx_track_DCA_y;
+    // std::vector< float > tree_Hemi_SecVtx_track_DCA_z;
+    // std::vector< float > tree_Hemi_SecVtx_track_DCA_r;
+    // std::vector< float > tree_Hemi_SecVtx_track_DCA_d;
     std::vector< float > tree_Hemi_SecVtx_x;
     std::vector< float > tree_Hemi_SecVtx_y;
     std::vector< float > tree_Hemi_SecVtx_z;
@@ -1091,11 +1092,11 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector< float > tree_Hemi_Vtx_MVAval;
     std::vector< float > tree_Hemi_Vtx_MVAval_Step1;//TIght WP
 
-    std::vector< float > tree_Hemi_Vtx_track_DCA_x;
-    std::vector< float > tree_Hemi_Vtx_track_DCA_y;
-    std::vector< float > tree_Hemi_Vtx_track_DCA_z;
-    std::vector< float > tree_Hemi_Vtx_track_DCA_r;
-    std::vector< float > tree_Hemi_Vtx_track_DCA_d;
+    // std::vector< float > tree_Hemi_Vtx_track_DCA_x;
+    // std::vector< float > tree_Hemi_Vtx_track_DCA_y;
+    // std::vector< float > tree_Hemi_Vtx_track_DCA_z;
+    // std::vector< float > tree_Hemi_Vtx_track_DCA_r;
+    // std::vector< float > tree_Hemi_Vtx_track_DCA_d;
     std::vector< float > tree_Hemi_Vtx_track_MeanDCA_d;//Veertex selection BDT
 
     std::vector< float > tree_Hemi_Vtx_TVtx_dx;
@@ -1766,6 +1767,7 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_Hemi_SecLLP_ping",&tree_Hemi_SecLLP_ping);
 
     smalltree->Branch("tree_Hemi_Vtx_step",  &tree_Hemi_Vtx_step);
+    smalltree->Branch("tree_Hemi_Vtx_isTight",&tree_Hemi_Vtx_isTight);
     smalltree->Branch("tree_Hemi_Vtx_NChi2", &tree_Hemi_Vtx_NChi2);
     smalltree->Branch("tree_Hemi_Vtx_nTrks", &tree_Hemi_Vtx_nTrks);
     smalltree->Branch("tree_Hemi_Vtx_nTrks_sig", &tree_Hemi_Vtx_nTrks_sig);
@@ -1786,11 +1788,11 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_Hemi_Vtx_BTag",  &tree_Hemi_Vtx_BTag);
     smalltree->Branch("tree_Hemi_Vtx_nVtx",  &tree_Hemi_Vtx_nVtx);
 
-    smalltree->Branch("tree_Hemi_SecVtx_track_DCA_x",&tree_Hemi_SecVtx_track_DCA_x);
-    smalltree->Branch("tree_Hemi_SecVtx_track_DCA_y",&tree_Hemi_SecVtx_track_DCA_y);
-    smalltree->Branch("tree_Hemi_SecVtx_track_DCA_z",&tree_Hemi_SecVtx_track_DCA_z);
-    smalltree->Branch("tree_Hemi_SecVtx_track_DCA_r",&tree_Hemi_SecVtx_track_DCA_r);
-    smalltree->Branch("tree_Hemi_SecVtx_track_DCA_d",&tree_Hemi_SecVtx_track_DCA_d);
+    // smalltree->Branch("tree_Hemi_SecVtx_track_DCA_x",&tree_Hemi_SecVtx_track_DCA_x);
+    // smalltree->Branch("tree_Hemi_SecVtx_track_DCA_y",&tree_Hemi_SecVtx_track_DCA_y);
+    // smalltree->Branch("tree_Hemi_SecVtx_track_DCA_z",&tree_Hemi_SecVtx_track_DCA_z);
+    // smalltree->Branch("tree_Hemi_SecVtx_track_DCA_r",&tree_Hemi_SecVtx_track_DCA_r);
+    // smalltree->Branch("tree_Hemi_SecVtx_track_DCA_d",&tree_Hemi_SecVtx_track_DCA_d);
     smalltree->Branch("tree_Hemi_SecVtx_NChi2", &tree_Hemi_SecVtx_NChi2);
     smalltree->Branch("tree_Hemi_SecVtx_x",&tree_Hemi_SecVtx_x);
     smalltree->Branch("tree_Hemi_SecVtx_y",&tree_Hemi_SecVtx_y);
@@ -1813,11 +1815,11 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_Hemi_MergedVtx_Vtx_dR",&tree_Hemi_MergedVtx_Vtx_dR);
     smalltree->Branch("tree_Hemi_Vtx_trackWeight",&tree_Hemi_Vtx_trackWeight);
     smalltree->Branch("tree_Hemi_Vtx_MeantrackWeight",&tree_Hemi_Vtx_MeantrackWeight);
-    smalltree->Branch("tree_Hemi_Vtx_track_DCA_x",&tree_Hemi_Vtx_track_DCA_x);
-    smalltree->Branch("tree_Hemi_Vtx_track_DCA_y",&tree_Hemi_Vtx_track_DCA_y);
-    smalltree->Branch("tree_Hemi_Vtx_track_DCA_z",&tree_Hemi_Vtx_track_DCA_z);
-    smalltree->Branch("tree_Hemi_Vtx_track_DCA_r",&tree_Hemi_Vtx_track_DCA_r);
-    smalltree->Branch("tree_Hemi_Vtx_track_DCA_d",&tree_Hemi_Vtx_track_DCA_d);
+    // smalltree->Branch("tree_Hemi_Vtx_track_DCA_x",&tree_Hemi_Vtx_track_DCA_x);
+    // smalltree->Branch("tree_Hemi_Vtx_track_DCA_y",&tree_Hemi_Vtx_track_DCA_y);
+    // smalltree->Branch("tree_Hemi_Vtx_track_DCA_z",&tree_Hemi_Vtx_track_DCA_z);
+    // smalltree->Branch("tree_Hemi_Vtx_track_DCA_r",&tree_Hemi_Vtx_track_DCA_r);
+    // smalltree->Branch("tree_Hemi_Vtx_track_DCA_d",&tree_Hemi_Vtx_track_DCA_d);
     smalltree->Branch("tree_Hemi_Vtx_track_MeanDCA_d",&tree_Hemi_Vtx_track_MeanDCA_d);
     smalltree->Branch("tree_Hemi_Vtx_Mass", &tree_Hemi_Vtx_Mass);
     smalltree->Branch("tree_Hemi_Vtx_MVAval", &tree_Hemi_Vtx_MVAval);
@@ -6565,1155 +6567,105 @@ else if ( !( tk_pt > pt_Cut && tk_NChi2 < NChi2_Cut && tk_drSig > drSig_Cut ) ) 
       //                                                                                           //
       //-------------------------------------------------------------------------------------------//
      
-    //  Warning :  Sorry for the people reading the vertexing code, it's not easy to read and understand. I hope that the comments will be enough :D
+    //  Warning :  Sorry for the people reading the vertexing code (Vtx.h), it's not easy to read and to understand. I hope that the comments will be good enough :D
     // If you want to complain about this code, please contact : "Paul Vaucelle" <paul.vaucelle@cern.ch>.
     // If you come from Brittany (West of France), your remarks have higher chances of being accepted, thanks!
 
     //--------------------------- FIRST HEMISPHERE WITH MVA -------------------------------------//
 
-    static AdaptiveVertexFitter 
-    theFitter_Vertex_Hemi1_mva(
-                 GeometricAnnealing ( sigmacut, Tini, ratio ), 
-                 DefaultLinearizationPointFinder(),
-                 KalmanVertexUpdator<5>(), 
-                 KalmanVertexTrackCompatibilityEstimator<5>(), 
-                 KalmanVertexSmoother() );
-    theFitter_Vertex_Hemi1_mva.setParameters ( maxshift, maxlpshift, maxstep, weightThreshold );
-
     //------------------------------------------------------------------------------------------------//
     //------------------------------------------Hemi 1 step 1-----------------------------------------//
     //------------------------------------------------------------------------------------------------//
-    
+
     Vtx_ntk = displacedTracks_Hemi1_mva.size();
     Vtx_x = -100.;
     Vtx_y = -100.;
     Vtx_z = -100.;
     Vtx_chi = -10.;
     Vtx_step = 0;
-    GlobalError posError;
-    float MeanWeight =0;
-    std::vector<float> Vtx1_Weights;
-    std::vector<unsigned int> Vtx1_index;
+    float MeanWeight = 0;
     float DCA_VTX_Meand = 0;
-    int badtkhit_index = -1;
-    float tempMeanWeight=0;
-    int ntracks = 0;
-    float tempchi2 = -10.;
-    float tempx = -100.;
-    float tempy = -100.;
-    float tempz = -100.;
-
-    if ( Vtx_ntk > 1 && ActivateStep1 )
-    {
-      DCA_VTX_Meand = 0;
-      badtkhit_index = -1;
-      bool success = false;
-      MeanWeight=0;
-      tempMeanWeight=0;
-      std::vector<TransientTrack> vTT;
-          for (int k = 0 ; k < Vtx_ntk-1; k++)
-            {
-              for (int p = k+1 ; p < Vtx_ntk ; p++)
-                {
-                  vTT.push_back(displacedTracks_Hemi1_mva[p]);
-                  vTT.push_back(displacedTracks_Hemi1_mva[k]);  
-                  ntracks = 2;
-                  TransientVertex TV = theFitter_Vertex_Hemi1_mva.vertex(vTT); // We take the first "good-looking" seed to start
-                  if ( TV.isValid() )
-                    {
-                      for (int m = 0; m < ntracks; m++) // we check that both tracks have their first hit "after" the vertex
-                        {
-                          if ( Track_FirstHit_Hemi1_mva[m].first == true ) continue; //first hit of lost track is biaised
-                          float PosFH = sqrt((Track_FirstHit_Hemi1_mva[m].second.X()-PV.x())*(Track_FirstHit_Hemi1_mva[m].second.X()-PV.x())+(Track_FirstHit_Hemi1_mva[m].second.Y()-PV.y())*(Track_FirstHit_Hemi1_mva[m].second.Y()-PV.y())+(Track_FirstHit_Hemi1_mva[m].second.Z()-PV.z())*(Track_FirstHit_Hemi1_mva[m].second.Z()-PV.z()));
-                          float PosVtx1 = sqrt((TV.position().x()-PV.x())*(TV.position().x()-PV.x())+(TV.position().y()-PV.y())*(TV.position().y()-PV.y())+(TV.position().z()-PV.z())*(TV.position().z()-PV.z()));
-                          if ( PosFH>PosVtx1 ) 
-                            {
-                              success = true; 
-                              tempchi2 = TV.normalisedChiSquared();
-	    	                      tempx=TV.position().x();
-	    	                      tempy=TV.position().y();
-	    	                      tempz=TV.position().z();
-                              posError = TV.positionError();
-                              continue; //continue not useful
-                            }
-                          else badtkhit_index = m; // we keep in memory the index of the track that does not have a godd first hit
-                        }
-                      if (Vtx_ntk == 2 && !success ) break; // removing 1 track gives no other option than break
-                      else if ( success )
-                        {
-                          Vtx1_index.clear();
-                          Vtx1_index.push_back(k);
-                          Vtx1_index.push_back(p);
-                          for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                            {
-                              if (m == k || m == p) continue;
-                              ntracks++;
-                              vTT.push_back(displacedTracks_Hemi1_mva[m]);
-                              TransientVertex updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
-                              if ( !updatedTV.isValid() ) 
-	                              {  
-	    	                          vTT.pop_back();
-                                  ntracks--;
-	    	                          updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
-                                  tempchi2 = updatedTV.normalisedChiSquared();
-	    	                          tempx=updatedTV.position().x();
-	    	                          tempy=updatedTV.position().y();
-	    	                          tempz=updatedTV.position().z();
-                                  posError = updatedTV.positionError();
-                                  tempMeanWeight=0;
-                                  Vtx1_Weights.clear();
-                                  for (int i = 0; i < ntracks; i++)
-                                    {
-                                      tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                      Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                      if (i == ntracks-1) MeanWeight = tempMeanWeight; 
-                                    }
-                        	        continue;//not needed
-	                              }
-                              if ( updatedTV.isValid() ) 
-	                              {
-                                  tempchi2 = updatedTV.normalisedChiSquared();
-	    	                          tempx=updatedTV.position().x();
-	    	                          tempy=updatedTV.position().y();
-	    	                          tempz=updatedTV.position().z();
-                                  posError = updatedTV.positionError();
-                                  float TPosFH = sqrt((Track_FirstHit_Hemi1_mva[m].second.X()-PV.x())*(Track_FirstHit_Hemi1_mva[m].second.X()-PV.x())+(Track_FirstHit_Hemi1_mva[m].second.Y()-PV.y())*(Track_FirstHit_Hemi1_mva[m].second.Y()-PV.y())+(Track_FirstHit_Hemi1_mva[m].second.Z()-PV.z())*(Track_FirstHit_Hemi1_mva[m].second.Z()-PV.z()));
-                                  float TPosVtx1 = sqrt((tempx-PV.x())*(tempx-PV.x())+(tempy-PV.y())*(tempy-PV.y())+(tempz-PV.z())*(tempz-PV.z()));
-                                  if (TPosFH>TPosVtx1 || Track_FirstHit_Hemi1_mva[m].first == true) success = true; // continue not useful
-                                  else  
-                                    {
-                                      vTT.pop_back();
-                                      ntracks--;
-	    	                              updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
-                                      tempchi2 = updatedTV.normalisedChiSquared();
-	    	                              tempx=updatedTV.position().x();
-	    	                              tempy=updatedTV.position().y();
-	    	                              tempz=updatedTV.position().z();
-                                      posError = updatedTV.positionError();
-                                      tempMeanWeight=0;
-                                      Vtx1_Weights.clear();
-                                      for(int i = 0; i < ntracks; i++)
-                                        {
-                                          tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                          Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                          if (i == ntracks-1) MeanWeight = tempMeanWeight; 
-                                        }
-                        	            continue;
-                                    }
-                                  tempMeanWeight=0;
-                                  Vtx1_Weights.clear();
-                                  Vtx1_index.push_back(m);
-                                  for (int i = 0; i < ntracks; i++)
-                                    {
-                                      tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                      Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                      if (i == ntracks-1) MeanWeight = tempMeanWeight; 
-                                    }
-	                              }
-                            }
-                        }
-                        //----------------------------//
-                      else if (Vtx_ntk > 2 && !success)
-                        {
-                          Vtx1_index.clear();
-                          if (badtkhit_index == k) {
-	                            vTT.erase(vTT.begin());
-	                            ntracks--;
-	                            Vtx1_index.push_back(p);
-	                        }
-                          else if (badtkhit_index == p) {
-	                            vTT.erase(vTT.end());
-	                            ntracks--;
-	                            Vtx1_index.push_back(k);
-	                        }
-                          else {
-	                            Vtx1_index.push_back(k);
-	                            Vtx1_index.push_back(p);
-	                        }
-                          for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                            {
-                              if (m == k || m == p || m == badtkhit_index) continue; // we take care to not take into account the track with a wrong first hit
-                              ntracks++;//++
-                              tempMeanWeight=0;
-                                                           vTT.push_back(displacedTracks_Hemi1_mva[m]);
-                                                           TransientVertex updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
-                              if ( !updatedTV.isValid() ) 
-	                              {  
-	    	                          vTT.pop_back();
-                                  ntracks--;
-                                  if ( vTT.size() < 2 ) continue;
-	    	                          updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
-                                  tempchi2 = updatedTV.normalisedChiSquared();
-	    	                          tempx=updatedTV.position().x();
-	    	                          tempy=updatedTV.position().y();
-	    	                          tempz=updatedTV.position().z();
-                                  posError = updatedTV.positionError();
-                                  Vtx1_Weights.clear();
-                                  tempMeanWeight=0;
-                                  if ( ntracks < 2 )  success = false;
-                                  if ( ntracks >= 2 ) success = true;
-                                  for (int i=0; i<ntracks; i++)
-                                    {
-                                      tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                      Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                      if (i == ntracks-1) MeanWeight = tempMeanWeight; 
-                                    }
-                        	        continue;
-	                              }
-                              if ( updatedTV.isValid() ) 
-	                              {
-                                  tempchi2 = updatedTV.normalisedChiSquared();
-	    	                          tempx=updatedTV.position().x();
-	    	                          tempy=updatedTV.position().y();
-	    	                          tempz=updatedTV.position().z();
-                                  posError = updatedTV.positionError();
-                                  float TPosFH = sqrt((Track_FirstHit_Hemi1_mva[m].second.X()-PV.x())*(Track_FirstHit_Hemi1_mva[m].second.X()-PV.x())+(Track_FirstHit_Hemi1_mva[m].second.Y()-PV.y())*(Track_FirstHit_Hemi1_mva[m].second.Y()-PV.y())+(Track_FirstHit_Hemi1_mva[m].second.Z()-PV.z())*(Track_FirstHit_Hemi1_mva[m].second.Z()-PV.z()));
-                                  float TPosVtx1 = sqrt((tempx-PV.x())*(tempx-PV.x())+(tempy-PV.y())*(tempy-PV.y())+(tempz-PV.z())*(tempz-PV.z()));
-                                  if (TPosFH>TPosVtx1 || Track_FirstHit_Hemi1_mva[m].first == true ) success = true; //continue not useful
-                                  else  
-                                    {
-                                      vTT.pop_back();
-                                      ntracks--;
-                                      if (vTT.size() < 2) continue;
-	    	                              updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
-                                      tempchi2 = updatedTV.normalisedChiSquared();
-	    	                              tempx=updatedTV.position().x();
-	    	                              tempy=updatedTV.position().y();
-	    	                              tempz=updatedTV.position().z();
-                                      posError = updatedTV.positionError();
-                                      Vtx1_Weights.clear();
-                                      tempMeanWeight=0;
-                                      if ( ntracks < 2 ) success = false;
-                                      else	       success = true;
-                                      for (int i=0; i<ntracks; i++)
-                                        {
-                                          tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                          Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                          if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                        }
-                        	            continue;
-                                    }
-                                   Vtx1_Weights.clear();
-                                   tempMeanWeight=0;
-                                  Vtx1_index.push_back(m);
-                                  success = true;
-                                for (int i=0; i<ntracks; i++)
-                                  {
-                                    tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                    Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                    if (i == ntracks-1) MeanWeight = tempMeanWeight; 
-                                  }
-	                              }
-                            }
-                        }
-
-                        // We should have a Vertex after these conditions
-                        Vtx_ntk = ntracks;
-                        Vtx_chi = tempchi2;
-                        Vtx_x = tempx;
-                        Vtx_y = tempy;
-                        Vtx_z = tempz;
-                        Vtx_step = 1;
-                        GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
-                        DCA_VTX_Meand = 0;
-                        for (int k = 0; k< Vtx_ntk; k++)
-                          {
-                            TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
-                            if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
-                            //but one could look of the wieghts of the track at the same time
-                              { // The positions are given in the Global frame
-                                float pca_Vtx_x = DCA_Vtx.position().x();
-                                float pca_Vtx_y = DCA_Vtx.position().y();
-                                float pca_Vtx_z = DCA_Vtx.position().z();
-                                float refPoint_x = DCA_Vtx.referencePoint().x();
-                                float refPoint_y = DCA_Vtx.referencePoint().y();
-                                float refPoint_z = DCA_Vtx.referencePoint().z();
-                                float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
-                                float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
-                                float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
-                                float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
-                                float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
-                                DCA_VTX_Meand+=DCA_VTX_d;
-                                tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
-                                tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
-                                tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
-                                tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
-                                tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
-                                                    }
-                          }
-                        DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-                        if ( MeanWeight == 0 ) //<=>only two tracks in the valid vertex
-                          {
-                            Vtx1_Weights.clear();
-                            for(int i = 0; i < ntracks; i++)
-                              {
-                                MeanWeight+=TV.trackWeight(vTT[i]);
-                                Vtx1_Weights.push_back(TV.trackWeight(vTT[i]));
-                              }
-                          }
-                    }
-                    else
-                      {
-                        ntracks=0;
-                        vTT.clear();
-                      }
-                    if ( success ) break;
-                } // end loop on 2nd tracks
-              if ( success ) break;
-
-    } // end loop on tracks
-                if (showlog) std::cout<<"success Hemi1 step 1 : "<<success<<std::endl;
-  
-  } // end of hemi1 step1
-
-      //----------------------------------------IAVF-----------------------------------------------//
-      //                           Iterative Adaptive Vertex Fitter                                //
-      //Input : Collections od displaced Tracks ordered by decreasing values of BDT => to have the //
-      //        the best tracks at the beginning of the collection                                 //
-      //                                                                                           //
-      //Process : Within the collection of tracks, look for the first good seed made of 2 tracks,  //
-      //          (good seed : vertex valid with a chi2 within a certain range (LowerLimit and     //
-      //          UpperLimit)). From this seed, tracks are added one by one, and a vertex is built //
-      //          at each step. The vertex is either valid or not. If valid in a certain range of  //
-      //          Chi2, we keep going until there are no more tracks left                          //
-      //                                                                                           //
-      //Degrees of freedom: -LowerLimit (Chi2 restriction)                                         //
-      //                    -UpperLimit (Chi2 restriction)                                         //
-      //                    -BDtValue (Restriction on the BDT value of the tracks that formed  //
-      //                     the vertex)                                                           //
-      //                                                                                           //
-      //Why? : Address the drop in efficiency due to MiniAOD datatier, turns out it improves the   //
-      //       basic AVF implementation (even in RECO/AOD)                                         //
-      //                                                                                           //
-      //PS: Maximum efficiency is reached for MiniAOD when using the covariance matrix correction  //
-      //-------------------------------------------------------------------------------------------//
-
+    std::vector<float>  Vtx1_Weights;
+    std::vector<unsigned int> Vtx1_index;
+    int TightVertex = true;
+    // void Vertexing(std::vector<reco::TransientTrack> VertexTracks, vector<std::pair<bool,TLorentzVector>> Track_FirstHit, bool ActivateStep = true, bool RequireGoodChi2Seed = false,bool RequireGoodChi2VertexIter = false, float Chi2down = 0., float Chi2up = 10., GlobalPoint *PV = nullptr )//return type to be chnged
+                
+    GlobalPoint PVPos(PV.x(),PV.y(),PV.z());
+    Vtx* VtxHemi1 = new Vtx();
+    VtxHemi1->Vertexing(displacedTracks_Hemi1_mva,Track_FirstHit_Hemi1_mva,ActivateStep1,false,false,0.,10.,&PVPos);
+    if (VtxHemi1->chi2()>0 && VtxHemi1->chi2()<10)
+      {
+        Vtx_step = 1; // 1 here
+        TightVertex = true; 
+      }
     //------------------------------------------------------------------------------------------------//
     //------------------------------------------Hemi 1 step 2-----------------------------------------//
-    //------------------------------------------------------------------------------------------------// 
-    ntracks    = -2;
-    tempchi2 = -10.;
-    tempx = -100.;
-    tempy = -100.;
-    tempz = -100.;
+    //------------------------------------------------------------------------------------------------//
     bool badVtx = false;
-    
-    tempMeanWeight=0;
-    if ( (Vtx_chi < 0. || Vtx_chi > 10.) ) badVtx = true;
-    if ( badVtx  && displacedTracks_Hemi1_mva.size() > 1 && (IterAVF || ActivateStep2) ) 
-    {
-      MeanWeight=0;
-      DCA_VTX_Meand = 0;
-      bool success = false;
-      std::vector<TransientTrack> vTT;
-      tempchi2 = -10.;
-      tempMeanWeight=0;
-      Vtx_ntk = displacedTracks_Hemi1_mva.size();
-      for ( int p = 1; p < Vtx_ntk; p++ )
+    if ( !(VtxHemi1->chi2()>0 && VtxHemi1->chi2()<10)  ) badVtx = true;
+    if ( badVtx  && displacedTracks_Hemi1_mva.size() > 1 && (ActivateStep2 || IterAVF))
       {
-        for  ( int k = 0; k < p; k++ ) // take pairs of tracks of highest BDT value
-        {
-          vTT.push_back(displacedTracks_Hemi1_mva[p]);
-          vTT.push_back(displacedTracks_Hemi1_mva[k]);
-          ntracks = 2;
-          TransientVertex TV = theFitter_Vertex_Hemi1_mva.vertex(vTT); // We take the first "good-looking" seed to start
-                    if ( TV.isValid() && TV.normalisedChiSquared()>0 && TV.normalisedChiSquared()<10 ) 
-            {
-	            tempchi2 = TV.normalisedChiSquared();
-	            tempx = TV.position().x();
-	            tempy = TV.position().y();
-	            tempz = TV.position().z();
-              posError = TV.positionError();
-	            success = true;
-              for (int m = 0; m < ntracks; m++) // We then add track by track to the vertex and check the validity of the vertex
-                {
-                  if (Track_FirstHit_Hemi1_mva[m].first == true) continue; //first hit of lost track is biaised
-                  float PosFH = sqrt((Track_FirstHit_Hemi1_mva[m].second.X()-PV.x())*(Track_FirstHit_Hemi1_mva[m].second.X()-PV.x())+(Track_FirstHit_Hemi1_mva[m].second.Y()-PV.y())*(Track_FirstHit_Hemi1_mva[m].second.Y()-PV.y())+(Track_FirstHit_Hemi1_mva[m].second.Z()-PV.z())*(Track_FirstHit_Hemi1_mva[m].second.Z()-PV.z()));
-                  float PosVtx1 = sqrt((TV.position().x()-PV.x())*(TV.position().x()-PV.x())+(TV.position().y()-PV.y())*(TV.position().y()-PV.y())+(TV.position().z()-PV.z())*(TV.position().z()-PV.z()));
-                  if ( PosFH>PosVtx1 ) 
-                    {
-                      success = true; 
-                      tempchi2 = TV.normalisedChiSquared();
-	    	              tempx=TV.position().x();
-	    	              tempy=TV.position().y();
-	    	              tempz=TV.position().z();
-                      posError = TV.positionError();
-                      continue;
-                    } //continue not useful
-                  else{badtkhit_index = m;}
-                }
-                if (Vtx_ntk == 2 && !success) break; // removing 1 track gives no other option
-              // end construction seed 
-              else if ( success )
-                {
-                  Vtx1_index.clear();
-                  Vtx1_index.push_back(k);
-                  Vtx1_index.push_back(p);
-                  for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                    {
-                      if (m == k || m == p) continue;
-                      ntracks++;
-                      tempMeanWeight=0;
-                      vTT.push_back(displacedTracks_Hemi1_mva[m]);
-                      TransientVertex updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
-                      if ( !updatedTV.isValid() ) 
-	                      {  
-	    	                  vTT.pop_back();
-	    	                  ntracks--;
-	    	                  updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
-	    	                  tempchi2 = updatedTV.normalisedChiSquared();
-	    	                  tempx=updatedTV.position().x();
-	    	                  tempy=updatedTV.position().y();
-        	                tempz=updatedTV.position().z();
-                          posError = updatedTV.positionError();
-                          tempMeanWeight=0;
-                          Vtx1_Weights.clear();
-                                                              for(int i = 0; i<ntracks;i++)
-                            {
-                              tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                              Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                              if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                            }
-	    	                  continue;
-	                      } 
-                      if ( updatedTV.isValid() ) 
-	                      {
-                          tempchi2 = updatedTV.normalisedChiSquared();
-	    	                  tempx=updatedTV.position().x();
-	    	                  tempy=updatedTV.position().y();
-	    	                  tempz=updatedTV.position().z();
-                          posError = updatedTV.positionError();
-                          float TPosFH = sqrt((Track_FirstHit_Hemi1_mva[m].second.X()-PV.x())*(Track_FirstHit_Hemi1_mva[m].second.X()-PV.x())+(Track_FirstHit_Hemi1_mva[m].second.Y()-PV.y())*(Track_FirstHit_Hemi1_mva[m].second.Y()-PV.y())+(Track_FirstHit_Hemi1_mva[m].second.Z()-PV.z())*(Track_FirstHit_Hemi1_mva[m].second.Z()-PV.z()));
-                          float TPosVtx1 = sqrt((tempx-PV.x())*(tempx-PV.x())+(tempy-PV.y())*(tempy-PV.y())+(tempz-PV.z())*(tempz-PV.z()));
-                          if (TPosFH>TPosVtx1 || Track_FirstHit_Hemi1_mva[m].first == true) success = true; //continue not useful
-                          else  
-                            {
-                              vTT.pop_back();
-                              ntracks--;
-	    	                      updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
-                              tempchi2 = updatedTV.normalisedChiSquared();
-	    	                      tempx=updatedTV.position().x();
-	    	                      tempy=updatedTV.position().y();
-	    	                      tempz=updatedTV.position().z();
-                              posError = updatedTV.positionError();
-                              Vtx1_Weights.clear();
-                              tempMeanWeight=0;
-                              for (int i = 0; i < ntracks; i++)
-                                {
-                                  tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                  Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                  if (i == ntracks-1) MeanWeight = tempMeanWeight; 
-                                }
-                        	    continue;
-                            }
-                          Vtx1_Weights.clear();
-                          Vtx1_index.push_back(m);
-                          tempMeanWeight=0;
-                          for(int i = 0; i<ntracks;i++)
-                            {
-                              tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                              Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                              if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                            }
-	                      }
-                    } // end loop on the other tracks
-                } // end of success
-              else if (Vtx_ntk > 2 && !success)
-                {
-                  Vtx1_index.clear();
-                  if (badtkhit_index == k) {vTT.erase(vTT.begin());ntracks--;Vtx1_index.push_back(p);}
-                  else if (badtkhit_index == p) {vTT.erase(vTT.end());ntracks--;Vtx1_index.push_back(k);}
-                  else {Vtx1_index.push_back(k);Vtx1_index.push_back(p);}
-                  for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                    {
-                      if (m == k || m == p || m == badtkhit_index) continue;
-                      ntracks++;
-                      tempMeanWeight=0;
-                                            vTT.push_back(displacedTracks_Hemi1_mva[m]);
-                      if (vTT.size()<2) continue;//should not hapen
-                      TransientVertex updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
-                      if ( !updatedTV.isValid() ) 
-	                      {  
-	    	                  vTT.pop_back();
-                          ntracks--;
-                           if (vTT.size()<2) continue;
-	    	                  updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
-                          tempchi2 = updatedTV.normalisedChiSquared();
-	    	                  tempx=updatedTV.position().x();
-	    	                  tempy=updatedTV.position().y();
-	    	                  tempz=updatedTV.position().z();
-                          posError = updatedTV.positionError();
-                          Vtx1_Weights.clear();
-                          tempMeanWeight=0;
-                          if ( ntracks < 2 ) success = false;
-  	                      else	       success = true;
-                          for(int i = 0; i < ntracks; i++)
-                            {
-                              tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                              Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                              if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                            }
-                          continue;
-	                      }
-                      if ( updatedTV.isValid() ) 
-	                      {
-                          tempchi2 = updatedTV.normalisedChiSquared();
-	    	                  tempx=updatedTV.position().x();
-	    	                  tempy=updatedTV.position().y();
-	    	                  tempz=updatedTV.position().z();
-                          posError = updatedTV.positionError();
-                          float TPosFH = sqrt((Track_FirstHit_Hemi1_mva[m].second.X()-PV.x())*(Track_FirstHit_Hemi1_mva[m].second.X()-PV.x())+(Track_FirstHit_Hemi1_mva[m].second.Y()-PV.y())*(Track_FirstHit_Hemi1_mva[m].second.Y()-PV.y())+(Track_FirstHit_Hemi1_mva[m].second.Z()-PV.z())*(Track_FirstHit_Hemi1_mva[m].second.Z()-PV.z()));
-                          float TPosVtx1 = sqrt((tempx-PV.x())*(tempx-PV.x())+(tempy-PV.y())*(tempy-PV.y())+(tempz-PV.z())*(tempz-PV.z()));
-                          if (TPosFH>TPosVtx1 || Track_FirstHit_Hemi1_mva[m].first == true ) {success = true;}//continue not useful
-                          else  
-                            {
-                              vTT.pop_back();
-                              ntracks--;
-                              if (vTT.size()<2) continue;
-	    	                      updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
-                              tempchi2 = updatedTV.normalisedChiSquared();
-	    	                      tempx=updatedTV.position().x();
-	    	                      tempy=updatedTV.position().y();
-	    	                      tempz=updatedTV.position().z();
-                              posError = updatedTV.positionError();
-                              Vtx1_Weights.clear();
-                              tempMeanWeight=0;
-                              if ( ntracks < 2 ) success = false; 
-  	                          else		   success = true;
-                              for(int i = 0; i<ntracks;i++)
-                                {
-                                  tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                  Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                  if (i == ntracks-1) MeanWeight = tempMeanWeight; 
-                                }
-                        	    continue;
-                            }
-                          Vtx1_Weights.clear();
-                          Vtx1_index.push_back(m);
-                          tempMeanWeight = 0;
-                          success = true;
-                          for(int i = 0; i<ntracks;i++)
-                            {
-                              tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                              Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                              if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                            }
-	                      }
-                    }
-                }
-              Vtx_ntk = ntracks;
-              Vtx_chi = tempchi2;
-              Vtx_x = tempx;
-              Vtx_y = tempy;
-              Vtx_z = tempz;
-              Vtx_step = 2;
-              GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
-              DCA_VTX_Meand = 0;
-              for (int k = 0; k< Vtx_ntk; k++)
-                {
-                  TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
-                  if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
-                  //but one should look of the wieghts of the track at the same time
-                    { // The positions are given in the Global frame
-                      float pca_Vtx_x = DCA_Vtx.position().x();
-                      float pca_Vtx_y = DCA_Vtx.position().y();
-                      float pca_Vtx_z = DCA_Vtx.position().z();
-                      // to check 
-                      float refPoint_x = DCA_Vtx.referencePoint().x();
-                      float refPoint_y = DCA_Vtx.referencePoint().y();
-                      float refPoint_z = DCA_Vtx.referencePoint().z();
-                      float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
-                      float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
-                      float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
-                      float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
-                      float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
-                      DCA_VTX_Meand+=DCA_VTX_d;
-                      tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
-                      tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
-                      tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
-                      tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
-                      tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
-                    }
-                }
-              DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-              // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
-              if (MeanWeight==0)//<=>only two tracks in the valid vertex
-                  {
-                    Vtx1_Weights.clear();
-                    for (int i = 0; i < ntracks; i++)
-                      {
-                        MeanWeight+=TV.trackWeight(vTT[i]);
-                        Vtx1_Weights.push_back(TV.trackWeight(vTT[i]));
-                      }
-                  }
-            }
-          else
-            { // If not valid : we build a new seed
-              ntracks = 0;
-              vTT.clear();
-            }
-          if ( success ) break;
-        }
-        if ( success ) break;
+        VtxHemi1->Vertexing(displacedTracks_Hemi1_mva,Track_FirstHit_Hemi1_mva,ActivateStep2,true,false,0.,10.,&PVPos);
+        Vtx_step = 2; 
+        TightVertex = true;       
       }
-            if (showlog){std::cout<<"success Hemi1 step 2 : "<<success<<std::endl;}
- 
-    }
-
     //------------------------------------------------------------------------------------------------//
     //------------------------------------------Hemi 1 step 3-----------------------------------------//
-    //------------------------------------------------------------------------------------------------// 
-
-    TransientVertex displacedVertex_step2_Hemi1;
-    static AdaptiveVertexFitter theFitter_Vertex_step2_Hemi1(
-    	       GeometricAnnealing ( sigmacut, Tini, ratio ), 
-    	       DefaultLinearizationPointFinder(),
-    	       KalmanVertexUpdator<5>(), 
-    	       KalmanVertexTrackCompatibilityEstimator<5>(), 
-    	       KalmanVertexSmoother() );
-    theFitter_Vertex_step2_Hemi1.setParameters ( maxshift, maxlpshift, maxstep, weightThreshold );
+    //------------------------------------------------------------------------------------------------//
     badVtx = false;
-
-    if ( (Vtx_chi < 0. || Vtx_chi > 10.) && ActivateStep3 ) badVtx = true;
-    if ( badVtx && displacedTracks_step2_Hemi1.size() > 1)
-    {
-      DCA_VTX_Meand = 0;
-      badtkhit_index = -1;
-      bool success = false;
-      MeanWeight=0;
-      tempMeanWeight=0;
-      std::vector<TransientTrack> vTT;
-      Vtx_ntk = displacedTracks_step2_Hemi1.size();
-      Vtx_chi = -10.;
-      // displacedVertex_step2_Hemi1 = theFitter_Vertex_step2_Hemi1.vertex(displacedTracks_step2_Hemi1);
-          for (int k = 0 ; k <Vtx_ntk-1;k++)
-            {
-              for (int p = k+1 ; p < Vtx_ntk ; p++)
-                {
-                  vTT.push_back(displacedTracks_step2_Hemi1[p]);
-                  vTT.push_back(displacedTracks_step2_Hemi1[k]);
-                  ntracks = 2;
-                  TransientVertex TV = theFitter_Vertex_step2_Hemi1.vertex(vTT); // We take the first "good-looking" seed to start
-                  if ( TV.isValid())
-                    {
-                      for (int m = 0; m < ntracks; m++) // We then add track by track to the vertex and check the validity of the vertex
-                        {
-                          if(Track_FirstHit_step2_Hemi1[m].first == true) continue; //first hit of lost track is biaised
-                          float PosFH = sqrt((Track_FirstHit_step2_Hemi1[m].second.X()-PV.x())*(Track_FirstHit_step2_Hemi1[m].second.X()-PV.x())+(Track_FirstHit_step2_Hemi1[m].second.Y()-PV.y())*(Track_FirstHit_step2_Hemi1[m].second.Y()-PV.y())+(Track_FirstHit_step2_Hemi1[m].second.Z()-PV.z())*(Track_FirstHit_step2_Hemi1[m].second.Z()-PV.z()));
-                          float PosVtx1 = sqrt((TV.position().x()-PV.x())*(TV.position().x()-PV.x())+(TV.position().y()-PV.y())*(TV.position().y()-PV.y())+(TV.position().z()-PV.z())*(TV.position().z()-PV.z()));
-                          if (PosFH>PosVtx1) 
-                            {
-                              success = true; 
-                              tempchi2 = TV.normalisedChiSquared();
-	    	                      tempx=TV.position().x();
-	    	                      tempy=TV.position().y();
-	    	                      tempz=TV.position().z();
-                              posError = TV.positionError();
-                              continue;
-                            }//continue not useful
-                          else{badtkhit_index = m;}
-                        }
-
-                      if (Vtx_ntk == 2 && !success){break;}// removing 1 track gives no other option
-                      else if (success)
-                        {
-                          Vtx1_index.clear();
-                          Vtx1_index.push_back(k);
-                          Vtx1_index.push_back(p);
-                          for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                            {
-                              if (m == k || m == p) continue;
-                              ntracks++;
-                              vTT.push_back(displacedTracks_step2_Hemi1[m]);
-                              TransientVertex updatedTV = theFitter_Vertex_step2_Hemi1.vertex(vTT);
-                              if ( !updatedTV.isValid() ) 
-	                              {  
-	    	                          vTT.pop_back();
-                                  ntracks--;
-	    	                          updatedTV = theFitter_Vertex_step2_Hemi1.vertex(vTT);
-                                  tempchi2 = updatedTV.normalisedChiSquared();
-	    	                          tempx=updatedTV.position().x();
-	    	                          tempy=updatedTV.position().y();
-	    	                          tempz=updatedTV.position().z();
-                                  posError = updatedTV.positionError();
-                                  Vtx1_Weights.clear();
-                                  tempMeanWeight=0;
-                                  
-                                  for(int i = 0; i<ntracks;i++)
-                                    {
-                                      tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                      Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                      if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                    }
-                        	        continue;
-	                              }
-                              if ( updatedTV.isValid() ) 
-	                              {
-                                  tempchi2 = updatedTV.normalisedChiSquared();
-	    	                          tempx=updatedTV.position().x();
-	    	                          tempy=updatedTV.position().y();
-	    	                          tempz=updatedTV.position().z();
-                                  posError = updatedTV.positionError();
-                                  float TPosFH = sqrt((Track_FirstHit_step2_Hemi1[m].second.X()-PV.x())*(Track_FirstHit_step2_Hemi1[m].second.X()-PV.x())+(Track_FirstHit_step2_Hemi1[m].second.Y()-PV.y())*(Track_FirstHit_step2_Hemi1[m].second.Y()-PV.y())+(Track_FirstHit_step2_Hemi1[m].second.Z()-PV.z())*(Track_FirstHit_step2_Hemi1[m].second.Z()-PV.z()));
-                                  float TPosVtx1 = sqrt((tempx-PV.x())*(tempx-PV.x())+(tempy-PV.y())*(tempy-PV.y())+(tempz-PV.z())*(tempz-PV.z()));
-                                  if (TPosFH>TPosVtx1 || Track_FirstHit_step2_Hemi1[m].first == true) {success = true;}//continue not useful
-                                  else  
-                                    {
-                                      vTT.pop_back();
-                                      ntracks--;
-	    	                              updatedTV = theFitter_Vertex_step2_Hemi1.vertex(vTT);
-                                      tempchi2 = updatedTV.normalisedChiSquared();
-	    	                              tempx=updatedTV.position().x();
-	    	                              tempy=updatedTV.position().y();
-	    	                              tempz=updatedTV.position().z();
-                                      posError = updatedTV.positionError();
-                                      Vtx1_Weights.clear();
-                                      tempMeanWeight=0;
-                                      
-                                      for(int i = 0; i<ntracks;i++)
-                                        {
-                                          tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                          Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                          if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                        }
-                        	            continue;
-                                    }
-                                  tempMeanWeight=0;
-                                  Vtx1_Weights.clear();
-                                  Vtx1_index.push_back(m);
-                                  for(int i = 0; i<ntracks;i++)
-                                    {
-                                      tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                      Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                      if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                    }
-	                              }
-                            }
-                        }
-                      else if (Vtx_ntk > 2 && !success)
-                        {
-                          Vtx1_index.clear();
-                          if (badtkhit_index == k) {vTT.erase(vTT.begin());ntracks--;Vtx1_index.push_back(p);}
-                          else if (badtkhit_index == p) {vTT.erase(vTT.end());ntracks--;Vtx1_index.push_back(k);}
-                          else {Vtx1_index.push_back(k);Vtx1_index.push_back(p);}
-                          for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                            {
-                              if (m == k || m == p || m == badtkhit_index) continue;
-                              ntracks++;
-                              tempMeanWeight=0;
-                              
-                              vTT.push_back(displacedTracks_step2_Hemi1[m]);
-                              TransientVertex updatedTV = theFitter_Vertex_step2_Hemi1.vertex(vTT);
-                              if ( !updatedTV.isValid() ) 
-	                              {  
-	    	                          vTT.pop_back();
-                                  ntracks--;
-                                   if (vTT.size()<2) continue;
-	    	                          updatedTV = theFitter_Vertex_step2_Hemi1.vertex(vTT);
-                                  tempchi2 = updatedTV.normalisedChiSquared();
-	    	                          tempx=updatedTV.position().x();
-	    	                          tempy=updatedTV.position().y();
-	    	                          tempz=updatedTV.position().z();
-                                  posError = updatedTV.positionError();
-                                  Vtx1_Weights.clear();
-                                  tempMeanWeight=0;
-                                  
-                                  if (ntracks<2){success = false;}
-                                  if (ntracks>=2){success = true;}
-                                  for(int i = 0; i<ntracks;i++)
-                                    {
-                                      tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                      Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                      if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                    }
-                        	        continue;
-	                              }
-                              if ( updatedTV.isValid() ) 
-	                              {
-                                  tempchi2 = updatedTV.normalisedChiSquared();
-	    	                          tempx=updatedTV.position().x();
-	    	                          tempy=updatedTV.position().y();
-	    	                          tempz=updatedTV.position().z();
-                                  posError = updatedTV.positionError();
-                                  float TPosFH = sqrt((Track_FirstHit_step2_Hemi1[m].second.X()-PV.x())*(Track_FirstHit_step2_Hemi1[m].second.X()-PV.x())+(Track_FirstHit_step2_Hemi1[m].second.Y()-PV.y())*(Track_FirstHit_step2_Hemi1[m].second.Y()-PV.y())+(Track_FirstHit_step2_Hemi1[m].second.Z()-PV.z())*(Track_FirstHit_step2_Hemi1[m].second.Z()-PV.z()));
-                                  float TPosVtx1 = sqrt((tempx-PV.x())*(tempx-PV.x())+(tempy-PV.y())*(tempy-PV.y())+(tempz-PV.z())*(tempz-PV.z()));
-                                  if (TPosFH>TPosVtx1 || Track_FirstHit_step2_Hemi1[m].first == true ) {success = true;}//continue not useful
-                                  else  
-                                    {
-                                      vTT.pop_back();
-                                      ntracks--;
-                                       if (vTT.size()<2) continue;
-	    	                              updatedTV = theFitter_Vertex_step2_Hemi1.vertex(vTT);
-                                      tempchi2 = updatedTV.normalisedChiSquared();
-	    	                              tempx=updatedTV.position().x();
-	    	                              tempy=updatedTV.position().y();
-	    	                              tempz=updatedTV.position().z();
-                                      posError = updatedTV.positionError();
-                                      Vtx1_Weights.clear();
-                                      tempMeanWeight=0;
-                                      
-                                      if (ntracks<2){success = false;}
-                                      if (ntracks>=2){success = true;}
-                                      for(int i = 0; i<ntracks;i++)
-                                        {
-                                          tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                          Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                          if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                        }
-                        	            continue;
-                                    }
-                                  Vtx1_Weights.clear();
-                                  Vtx1_index.push_back(m);
-                                  success = true;
-                                for(int i = 0; i<ntracks;i++)
-                                  {
-                                    tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                    Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                    if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                  }
-	                              }
-                            }
-                        }
-
-                        // We should have a Vertex after these conditions
-                        Vtx_ntk = ntracks;
-                        Vtx_chi = tempchi2;
-                        Vtx_x = tempx;
-                        Vtx_y = tempy;
-                        Vtx_z = tempz;
-                        Vtx_step = 3;
-                        GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
-                        DCA_VTX_Meand = 0;
-                        for (int k = 0; k< Vtx_ntk; k++)
-                          {
-                            // MeanWeight+=displacedVertex_step2_Hemi1.trackWeight(displacedTracks_step2_Hemi1[p]);
-                            // Vtx1_Weights.push_back(displacedVertex_step2_Hemi1.trackWeight(displacedTracks_step2_Hemi1[p]));
-                            // tree_Hemi_Vtx_trackWeight.push_back(displacedVertex_step2_Hemi1.trackWeight(displacedTracks_step2_Hemi1[p]));
-                            TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
-                            if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
-                            //but one could look of the wieghts of the track at the same time
-                              {// The positions are given in the Global frame
-                                float pca_Vtx_x = DCA_Vtx.position().x();
-                                float pca_Vtx_y = DCA_Vtx.position().y();
-                                float pca_Vtx_z = DCA_Vtx.position().z();
-                                float refPoint_x = DCA_Vtx.referencePoint().x();
-                                float refPoint_y = DCA_Vtx.referencePoint().y();
-                                float refPoint_z = DCA_Vtx.referencePoint().z();
-                                float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
-                                float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
-                                float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
-                                float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
-                                float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
-                                DCA_VTX_Meand+=DCA_VTX_d;
-                                tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
-                                tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
-                                tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
-                                tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
-                                tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
-                      
-                              }
-                          }
-                        DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-                        if (MeanWeight==0)//<=>only two tracks in the valid vertex
-                          {
-                            Vtx1_Weights.clear();
-                            for(int i = 0; i<ntracks;i++)
-                              {
-                                MeanWeight+=TV.trackWeight(vTT[i]);
-                                Vtx1_Weights.push_back(TV.trackWeight(vTT[i]));
-                              }
-                          }
-                    }
-                    else
-                      {
-                        ntracks=0;
-                        vTT.clear();
-                      }
-                      if ( success ) break;
-                }
-              if(success){break;}
-            }
-                if (showlog){std::cout<<"success Hemi1 step 3 : "<<success<<std::endl;}
-
-
-    }
-
+    if ( !(VtxHemi1->chi2()>0 && VtxHemi1->chi2()<10) ) badVtx = true;
+    if ( badVtx  && displacedTracks_step2_Hemi1.size() > 1 && ActivateStep3)
+      {
+        VtxHemi1->Vertexing(displacedTracks_step2_Hemi1,Track_FirstHit_step2_Hemi1,ActivateStep3,false,false,0.,10.,&PVPos);
+        Vtx_step = 3; 
+        TightVertex = false;
+      }
     //------------------------------------------------------------------------------------------------//
     //------------------------------------------Hemi 1 step 4-----------------------------------------//
     //------------------------------------------------------------------------------------------------//
-
-    ntracks    = -2;
-    tempchi2 = -10.;
-    tempx = -100.;
-    tempy = -100.;
-    tempz = -100.;
     badVtx = false;
-    
-    if ( (Vtx_chi < 0. || Vtx_chi > 10.)  ) badVtx = true;
-    if ( badVtx  && displacedTracks_step2_Hemi1.size() > 1 && (ActivateStep4 || IterAVF) ) //IterAVF est redondant avec AcitvateStep3
-    {
-      MeanWeight=0;
-      bool success = false;
-      std::vector<TransientTrack> vTT;
-      tempchi2 = -10.;
-      tempMeanWeight=0;
-      DCA_VTX_Meand = 0;
-      Vtx_ntk = displacedTracks_step2_Hemi1.size();
-      for ( int p = 1; p < Vtx_ntk; p++ )
+    if ( !(VtxHemi1->chi2()>0 && VtxHemi1->chi2()<10)  ) badVtx = true;
+    if ( badVtx  && displacedTracks_step2_Hemi1.size() > 1 && (ActivateStep4 || IterAVF) )
       {
-        for  ( int k = 0; k < p; k++ ) // take pairs of tracks of highest BDT value
-        {
-          vTT.push_back(displacedTracks_step2_Hemi1[p]);
-          vTT.push_back(displacedTracks_step2_Hemi1[k]);
-          ntracks = 2;
-          TransientVertex TV = theFitter_Vertex_step2_Hemi1.vertex(vTT); // We take the first "good-looking" seed to start
-          
-          if ( TV.isValid() && TV.normalisedChiSquared()>0 && TV.normalisedChiSquared()<10 ) 
-            {
-	            tempchi2 = TV.normalisedChiSquared();
-	            tempx = TV.position().x();
-	            tempy = TV.position().y();
-	            tempz = TV.position().z();
-              posError = TV.positionError();
-	            success = true; 
-
-              for (int m = 0; m < ntracks; m++) // We then add track by track to the vertex and check the validity of the vertex
-                {
-                  if(Track_FirstHit_step2_Hemi1[m].first == true) continue; //first hit of lost track is biaised
-                  float PosFH = sqrt((Track_FirstHit_step2_Hemi1[m].second.X()-PV.x())*(Track_FirstHit_step2_Hemi1[m].second.X()-PV.x())+(Track_FirstHit_step2_Hemi1[m].second.Y()-PV.y())*(Track_FirstHit_step2_Hemi1[m].second.Y()-PV.y())+(Track_FirstHit_step2_Hemi1[m].second.Z()-PV.z())*(Track_FirstHit_step2_Hemi1[m].second.Z()-PV.z()));
-                  float PosVtx1 = sqrt((TV.position().x()-PV.x())*(TV.position().x()-PV.x())+(TV.position().y()-PV.y())*(TV.position().y()-PV.y())+(TV.position().z()-PV.z())*(TV.position().z()-PV.z()));
-                  if (PosFH>PosVtx1) 
-                    {
-                      success = true; 
-                      tempchi2 = TV.normalisedChiSquared();
-	    	              tempx=TV.position().x();
-	    	              tempy=TV.position().y();
-	    	              tempz=TV.position().z();
-                      posError = TV.positionError();
-                      continue;
-                    }//continue not useful
-                  else{badtkhit_index = m;}
-                }
-            if (Vtx_ntk == 2 && !success){break;}// removing 1 track gives no other option
-              //fin construction seed 
-            else if (success)
-              {
-                Vtx1_index.clear();
-                Vtx1_index.push_back(k);
-                Vtx1_index.push_back(p);
-                for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                  {
-                    if (m == k || m == p) continue;
-                    ntracks++;
-                    tempMeanWeight=0;
-                    
-                    vTT.push_back(displacedTracks_step2_Hemi1[m]);
-                    TransientVertex updatedTV = theFitter_Vertex_step2_Hemi1.vertex(vTT);
-                    if ( !updatedTV.isValid() ) 
-	                    {  
-	    	                vTT.pop_back();
-	    	                ntracks--;
-	    	                updatedTV = theFitter_Vertex_step2_Hemi1.vertex(vTT);
-	    	                tempchi2 = updatedTV.normalisedChiSquared();
-	    	                tempx=updatedTV.position().x();
-	    	                tempy=updatedTV.position().y();
-        	              tempz=updatedTV.position().z();
-                        posError = updatedTV.positionError();
-                        Vtx1_Weights.clear();
-                        tempMeanWeight=0;
-                        
-                        for(int i = 0; i<ntracks;i++)
-                          {
-                            tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                            Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                            if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                          }
-	    	                continue;
-	                    } 
-                    if ( updatedTV.isValid() ) 
-	                    {
-                        tempchi2 = updatedTV.normalisedChiSquared();
-	    	                tempx=updatedTV.position().x();
-	    	                tempy=updatedTV.position().y();
-	    	                tempz=updatedTV.position().z();
-                        posError = updatedTV.positionError();
-                        float TPosFH = sqrt(( Track_FirstHit_step2_Hemi1[m].second.X()-PV.x())*( Track_FirstHit_step2_Hemi1[m].second.X()-PV.x())+( Track_FirstHit_step2_Hemi1[m].second.Y()-PV.y())*( Track_FirstHit_step2_Hemi1[m].second.Y()-PV.y())+(Track_FirstHit_step2_Hemi1[m].second.Z()-PV.z())*( Track_FirstHit_step2_Hemi1[m].second.Z()-PV.z()));
-                        float TPosVtx1 = sqrt((tempx-PV.x())*(tempx-PV.x())+(tempy-PV.y())*(tempy-PV.y())+(tempz-PV.z())*(tempz-PV.z()));
-                        if (TPosFH>TPosVtx1 ||  Track_FirstHit_step2_Hemi1[m].first == true) {success = true;}//continue not useful
-                          else  
-                            {
-                              vTT.pop_back();
-                              ntracks--;
-	    	                      updatedTV = theFitter_Vertex_Hemi1_mva.vertex(vTT);
-                                   tempchi2 = updatedTV.normalisedChiSquared();
-	    	                          tempx=updatedTV.position().x();
-	    	                          tempy=updatedTV.position().y();
-	    	                          tempz=updatedTV.position().z();
-                                  posError = updatedTV.positionError();
-                                  Vtx1_Weights.clear();
-                                  tempMeanWeight=0;
-                                  
-                                  for(int i = 0; i<ntracks;i++)
-                                    {
-                                      tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                      Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                      if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                    }
-                        	    continue;
-                            }
-                        Vtx1_Weights.clear();
-                        Vtx1_index.push_back(m);
-                        
-                        for(int i = 0; i<ntracks;i++)
-                          {
-                            tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                            Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                            if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                          }
-	                    }
-                  } // end loop on the other tracks
-              }
-
-            else if (Vtx_ntk > 2 && !success)
-                {
-                  Vtx1_index.clear();
-                  if (badtkhit_index == k) {vTT.erase(vTT.begin());ntracks--;Vtx1_index.push_back(p);}
-                  else if (badtkhit_index == p) {vTT.erase(vTT.end());ntracks--;Vtx1_index.push_back(k);}
-                  else {Vtx1_index.push_back(k);Vtx1_index.push_back(p);}
-                  for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                    {
-                      if (m == k || m == p || m == badtkhit_index) continue;
-                      ntracks++;
-                      tempMeanWeight=0;
-                      
-                      vTT.push_back(displacedTracks_step2_Hemi1[m]);
-                      
-                      TransientVertex updatedTV = theFitter_Vertex_step2_Hemi1.vertex(vTT);
-                      if ( !updatedTV.isValid() ) 
-	                      {  
-	    	                  vTT.pop_back();
-                          ntracks--;
-                          if (vTT.size()<2) continue;
-                          updatedTV = theFitter_Vertex_step2_Hemi1.vertex(vTT);
-                          tempchi2 = updatedTV.normalisedChiSquared();
-	    	                  tempx=updatedTV.position().x();
-	    	                  tempy=updatedTV.position().y();
-	    	                  tempz=updatedTV.position().z();
-                          posError = updatedTV.positionError();
-                          Vtx1_Weights.clear();
-                          tempMeanWeight=0;
-                          
-                          if (ntracks<2){success = false;}
-                          if (ntracks>=2){success = true;}
-                          for(int i = 0; i<ntracks;i++)
-                            {
-                              tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                              Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                              if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                            }
-                          continue;
-	                      }
-                      if ( updatedTV.isValid() ) 
-	                      {
-                          tempchi2 = updatedTV.normalisedChiSquared();
-	    	                  tempx=updatedTV.position().x();
-	    	                  tempy=updatedTV.position().y();
-	    	                  tempz=updatedTV.position().z();
-                          posError = updatedTV.positionError();
-                          float TPosFH = sqrt((Track_FirstHit_step2_Hemi1[m].second.X()-PV.x())*(Track_FirstHit_step2_Hemi1[m].second.X()-PV.x())+(Track_FirstHit_step2_Hemi1[m].second.Y()-PV.y())*(Track_FirstHit_step2_Hemi1[m].second.Y()-PV.y())+(Track_FirstHit_step2_Hemi1[m].second.Z()-PV.z())*(Track_FirstHit_step2_Hemi1[m].second.Z()-PV.z()));
-                          float TPosVtx1 = sqrt((tempx-PV.x())*(tempx-PV.x())+(tempy-PV.y())*(tempy-PV.y())+(tempz-PV.z())*(tempz-PV.z()));
-                          if (TPosFH>TPosVtx1 || Track_FirstHit_step2_Hemi1[m].first == true ) {success = true;}//c
-                          else  
-                            {
-                              vTT.pop_back();
-                              ntracks--;
-                              if (vTT.size()<2) continue;
-	    	                      updatedTV = theFitter_Vertex_step2_Hemi1.vertex(vTT);
-                              tempchi2 = updatedTV.normalisedChiSquared();
-	    	                      tempx=updatedTV.position().x();
-	    	                      tempy=updatedTV.position().y();
-	    	                      tempz=updatedTV.position().z();
-                              posError = updatedTV.positionError();
-                              Vtx1_Weights.clear();
-                              tempMeanWeight=0;
-                              
-                              if (ntracks<2){success = false;}
-                              if (ntracks>=2){success = true;}
-                              for(int i = 0; i<ntracks;i++)
-                                {
-                                  tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                  Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                  if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                }
-                        	    continue;
-                            }
-                          Vtx1_Weights.clear();
-                          Vtx1_index.push_back(m);
-                          success = true;
-                          for(int i = 0; i<ntracks;i++)
-                            {
-                              tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                              Vtx1_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                              if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                            }
-	                      }
-                    }
-                }
-              Vtx_ntk = ntracks;
-              Vtx_chi = tempchi2;
-              Vtx_x = tempx;
-              Vtx_y = tempy;
-              Vtx_z = tempz;
-              Vtx_step = 4;
-              GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
-              for (int k = 0; k< Vtx_ntk; k++)
-                {
-                  TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
-                  if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
-                  //but one should look of the wieghts of the track at the same time
-                    {// The positions are given in the Global frame
-                      float pca_Vtx_x = DCA_Vtx.position().x();
-                      float pca_Vtx_y = DCA_Vtx.position().y();
-                      float pca_Vtx_z = DCA_Vtx.position().z();
-                      // to check 
-                      float refPoint_x = DCA_Vtx.referencePoint().x();
-                      float refPoint_y = DCA_Vtx.referencePoint().y();
-                      float refPoint_z = DCA_Vtx.referencePoint().z();
-                      float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
-                      float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
-                      float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
-                      float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
-                      float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
-                      DCA_VTX_Meand+=DCA_VTX_d;
-                      tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
-                      tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
-                      tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
-                      tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
-                      tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
-                    }
-                }
-              DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-              if (MeanWeight==0)//<=>only two tracks in the valid vertex
-                  {
-                    Vtx1_Weights.clear();
-                    for(int i = 0; i<ntracks;i++)
-                      {
-                        MeanWeight+=TV.trackWeight(vTT[i]);
-                        Vtx1_Weights.push_back(TV.trackWeight(vTT[i]));
-                      }
-                  }
-            }
-          else
-            { // If not valid : we build a new seed
-              ntracks = 0;
-              vTT.clear();
-            }
-          if ( success ) break;
-        }
-        if ( success ) break;
+        VtxHemi1->Vertexing(displacedTracks_step2_Hemi1,Track_FirstHit_step2_Hemi1,ActivateStep4,true,false,0.,10.,&PVPos);
+        Vtx_step = 4; 
+        TightVertex = false;
       }
-      if (showlog){std::cout<<"success Hemi1 step 4 : "<<success<<std::endl;}
-    }
+
+
+    Vtx_ntk = VtxHemi1->nTrk();
+    Vtx_x = VtxHemi1->x();
+    Vtx_y = VtxHemi1->y();
+    Vtx_z = VtxHemi1->z();
+    Vtx_chi = VtxHemi1->chi2();
+    MeanWeight = VtxHemi1->SumWeight();
+    DCA_VTX_Meand = VtxHemi1->MeanDCA();
+    Vtx1_Weights =  VtxHemi1->Vtx_TrkWeights();
+    Vtx1_index = VtxHemi1->Vtx_TrkIndex();
+    std::vector<TransientTrack> Vtx1_Trks = VtxHemi1->GetTTracks();
+    GlobalError Vtx1posError = VtxHemi1->Vtx_PosErr();
+
+    if (VtxHemi1->chi2() == -10 && Vtx_step == 4)Vtx1_Trks.clear();
+    TLorentzVector Vtx1Vector(0,0,0,0);
+    for (unsigned int i = 0 ; i <Vtx1_Weights.size(); i++)
+      {
+        tree_Hemi_Vtx_trackWeight.push_back(Vtx1_Weights[i]);
+        if (Vtx1_Weights[i]>0.5)
+          {
+            const Track &tkm = Vtx1_Trks[i].track();            
+            float tkpx = tkm.px();
+            float tkpy = tkm.py();
+            float tkpz = tkm.pz();
+            float track_p = sqrt(tkpx*tkpx+tkpy*tkpy+tkpz*tkpz);
+            float tke  = sqrt(track_p*track_p + 0.01948); // pi+ mass
+            TLorentzVector TLorentzTrack(tkpx,tkpy,tkpz,tke);
+            Vtx1Vector += TLorentzTrack;
+          }
+
+      }
+
+    float Vtx1Mass = TMath::Max(sqrt(Vtx1Vector.Mag2()),0.);
+    tree_Hemi_Vtx_Mass.push_back(Vtx1Mass);
 
   //------------------------------------------------------------------------------------------------//
   //------------------------------------------------------------------------------------------------//
@@ -7738,6 +6690,7 @@ else if ( !( tk_pt > pt_Cut && tk_NChi2 < NChi2_Cut && tk_drSig > drSig_Cut ) ) 
     tree_HemiMuOp_dR.push_back( dRobsOp1 );
 
     tree_Hemi_Vtx_step.push_back(Vtx_step);
+    tree_Hemi_Vtx_isTight.push_back(TightVertex);
     tree_Hemi_Vtx_NChi2.push_back(Vtx_chi);
     tree_Hemi_Vtx_nTrks.push_back(Vtx_ntk);
     tree_Hemi_Vtx_nTrks_sig.push_back(nTrks_axis1_sig_mva);
@@ -7746,15 +6699,11 @@ else if ( !( tk_pt > pt_Cut && tk_NChi2 < NChi2_Cut && tk_drSig > drSig_Cut ) ) 
     tree_Hemi_Vtx_y.push_back(Vtx_y);
     tree_Hemi_Vtx_r.push_back(sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y));
     tree_Hemi_Vtx_z.push_back(Vtx_z);
-    tree_Hemi_Vtx_xError.push_back(posError.cxx());
-    tree_Hemi_Vtx_yError.push_back(posError.cyy());
-    tree_Hemi_Vtx_zError.push_back(posError.czz());
-    for (unsigned int i = 0 ; i < Vtx1_Weights.size(); i++)
-      {
-        tree_Hemi_Vtx_trackWeight.push_back(Vtx1_Weights[i]);
+    tree_Hemi_Vtx_xError.push_back(Vtx1posError.cxx());
+    tree_Hemi_Vtx_yError.push_back(Vtx1posError.cyy());
+    tree_Hemi_Vtx_zError.push_back(Vtx1posError.czz());
 
-      }
-        recX = Vtx_x - tree_PV_x;
+    recX = Vtx_x - tree_PV_x;
     recY = Vtx_y - tree_PV_y;
     recZ = Vtx_z - tree_PV_z;
     recD = TMath::Sqrt(recX*recX + recY*recY + recZ*recZ);
@@ -7870,74 +6819,6 @@ if ( LLP2_mother * lep1_Q < 0 ) {
     tree_Hemi_LLP_muOK_mass.push_back( muOK_mass );
     tree_Hemi_LLP_muNO_mass.push_back( muNO_mass );
   }  
-     
-    // Vertex Analysis Step
-    // float LooseWP  = 0.0494;
-    // float MediumWP = 0.2770;
-    // float TightWP  = 0.7264;
-    int BtagGood_Hemi1 = 0; // Number of b-tagged hets over Medium WP in the Hemi1
-    float temp_px = 0;
-    float temp_py = 0;
-    float temp_pz = 0 ;
-    float temp_e = 0 ;
-
-//OOT::Math::PxPyPzEVector
-    TLorentzVector Total4Vector1(0,0,0,0);
-      //--------------- B-tagging-----------------------//
-      //Vtx1_weights Vtx1_index TrackInfo_Hemi1_mva
-    if(Vtx_step==1 || Vtx_step==2)
-      {
-        // if(Vtx_chi>0 && Vtx_chi<10)
-        //   {
-            for (unsigned int i = 0 ; i <TrackInfo_Hemi1_mva.size(); i++)
-              {
-                for (unsigned int j = 0 ; j < Vtx1_index.size(); j++)
-                  {
-                    if (i == Vtx1_index[j])
-                      {
-                        if (Vtx1_Weights[j]>0.5)
-                          {
-                            temp_px = TrackInfo_Hemi1_mva[i].second.Px();
-                            temp_py = TrackInfo_Hemi1_mva[i].second.Py();
-                            temp_pz = TrackInfo_Hemi1_mva[i].second.Pz();
-                            temp_e  = TrackInfo_Hemi1_mva[i].second.E();
-                            TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
-                            Total4Vector1 +=TLorentzTrack;
-                          }
-                      }
-                  }
-              }
-          // }
-      }
-
-    else if (Vtx_step == 3 || Vtx_step==4)
-      {
-
-            for (unsigned int i = 0 ; i <TrackInfo_Hemi1_mva.size(); i++)
-              {
-                for (unsigned int j = 0 ; j < Vtx1_index.size(); j++)
-                  {
-                    if (i == Vtx1_index[j])
-                      {
-                        if (Vtx1_Weights[j]>0.5)
-                          {
-                            temp_px = TrackInfo_step2_Hemi1[i].second.Px();
-                            temp_py = TrackInfo_step2_Hemi1[i].second.Py();
-                            temp_pz = TrackInfo_step2_Hemi1[i].second.Pz();
-                            temp_e  = TrackInfo_step2_Hemi1[i].second.E();
-                            TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
-                            Total4Vector1 +=TLorentzTrack;
-                          }
-                      }
-                  }
-              }
-      }
-
-
-    tree_Hemi_Vtx_BTag.push_back(BtagGood_Hemi1);
-      // -------------------- End  of  B-Tagging --------------------//
-    // ROOT::Math::PxPyPzEVector for later version of root (later than 6.14 at least)
-    tree_Hemi_Vtx_Mass.push_back(sqrt(Total4Vector1.Mag2()));
 
     // -------------------- End Of Invariant Mass ------------------------//
 
@@ -7947,26 +6828,17 @@ if ( LLP2_mother * lep1_Q < 0 ) {
     // float Vtx1_r = sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y);
     // float Vtx1_z = Vtx_z;
     float Vtx1_MTW = MeanWeight;
-    float Vtx1_Mass = sqrt(Total4Vector1.Mag2());
+    float Vtx1_Mass = Vtx1Mass ;
     float H1_Mass = Vobs1.Mag();
     // float Vtx1_dist = recD;
 
     float Vtx1_MeanDCA = DCA_VTX_Meand;
     if (Vtx1_Weights.size() != Vtx1_index.size()){ std::cout<<"size Vtx1_weights and Vtx1_index and  ntracks and chi and step: "<<Vtx1_Weights.size()<<" and "<<Vtx1_index.size()<<" and "<<Vtx_ntk<<" and "<<Vtx_chi<<" and "<<Vtx_step<<std::endl;}
     
-    
+
     //--------------------------------------------------------------------------------------------//
     //--------------------------- SECOND HEMISPHERE WITH MVA -------------------------------------//
     //--------------------------------------------------------------------------------------------//
-
-    static AdaptiveVertexFitter 
-    theFitter_Vertex_Hemi2_mva(
-                 GeometricAnnealing ( sigmacut, Tini, ratio ), 
-                 DefaultLinearizationPointFinder(),
-                 KalmanVertexUpdator<5>(), 
-                 KalmanVertexTrackCompatibilityEstimator<5>(), 
-                 KalmanVertexSmoother() );
-    theFitter_Vertex_Hemi2_mva.setParameters ( maxshift, maxlpshift, maxstep, weightThreshold );
 
     //------------------------------------------------------------------------------------------------//
     //------------------------------------------Hemi 2 step 1-----------------------------------------//
@@ -7980,1115 +6852,87 @@ if ( LLP2_mother * lep1_Q < 0 ) {
     Vtx_step = 0;
     MeanWeight = 0;
     DCA_VTX_Meand = 0;
-    TransientVertex displacedVertex_Hemi2_mva;
     std::vector<float>  Vtx2_Weights;
     std::vector<unsigned int>    Vtx2_index;
-    ntracks = 0;
-    tempchi2 = -10.;
-    tempx = -100.;
-    tempy = -100.;
-    tempz = -100.;    
-//-----------test Paul----------------//
-    if ( displacedTracks_Hemi2_mva.size() > 1 && ActivateStep1)
-    {
-      DCA_VTX_Meand = 0;
-      badtkhit_index = -1;
-      bool success = false;
-      MeanWeight=0;
-      tempMeanWeight=0;
-      std::vector<TransientTrack> vTT;
-          for (int k = 0 ; k <Vtx_ntk-1;k++)
-            {
-              for (int p = k+1 ; p < Vtx_ntk ; p++)
-                {
-                  vTT.push_back(displacedTracks_Hemi2_mva[p]);
-                  vTT.push_back(displacedTracks_Hemi2_mva[k]);
-                  ntracks = 2;
-                  
-                  TransientVertex TV = theFitter_Vertex_Hemi2_mva.vertex(vTT); // We take the first "good-looking" seed to start
-                  if ( TV.isValid())
-                    {
-                      for (int m = 0; m < ntracks; m++) // We then add track by track to the vertex and check the validity of the vertex
-                        {
-                          if(Track_FirstHit_Hemi2_mva[m].first == true) continue; //first hit of lost track is biaised
-                          float PosFH = sqrt((Track_FirstHit_Hemi2_mva[m].second.X()-PV.x())*(Track_FirstHit_Hemi2_mva[m].second.X()-PV.x())+(Track_FirstHit_Hemi2_mva[m].second.Y()-PV.y())*(Track_FirstHit_Hemi2_mva[m].second.Y()-PV.y())+(Track_FirstHit_Hemi2_mva[m].second.Z()-PV.z())*(Track_FirstHit_Hemi2_mva[m].second.Z()-PV.z()));
-                          float PosVtx1 = sqrt((TV.position().x()-PV.x())*(TV.position().x()-PV.x())+(TV.position().y()-PV.y())*(TV.position().y()-PV.y())+(TV.position().z()-PV.z())*(TV.position().z()-PV.z()));
-                          if (PosFH>PosVtx1) 
-                            {
-                              success = true; 
-                              tempchi2 = TV.normalisedChiSquared();
-	    	                      tempx=TV.position().x();
-	    	                      tempy=TV.position().y();
-	    	                      tempz=TV.position().z();
-                              posError = TV.positionError();
-                              continue;
-                            }//continue not useful
-                          else{badtkhit_index = m;}
-                        }
-                      // std::cout<<"success "<<success<<std::endl; //bug when success is false
-                      if (Vtx_ntk == 2 && !success){break;}// removing 1 track gives no other option
-                      else if (success)
-                        {
-                          Vtx2_index.clear();
-                          Vtx2_index.push_back(k);
-                          Vtx2_index.push_back(p);
-                          for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                            {
-                              if (m == k || m == p) continue;
-                              ntracks++;
-                              vTT.push_back(displacedTracks_Hemi2_mva[m]);
-                              TransientVertex updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
-                              if ( !updatedTV.isValid() ) 
-	                              {  
-	    	                          vTT.pop_back();
-                                  ntracks--;
-	    	                          updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
-                                  tempchi2 = updatedTV.normalisedChiSquared();
-	    	                          tempx=updatedTV.position().x();
-	    	                          tempy=updatedTV.position().y();
-	    	                          tempz=updatedTV.position().z();
-                                  posError = updatedTV.positionError();
-                                  Vtx2_Weights.clear();
-                                  tempMeanWeight=0;
-                                  
-                                  for(int i = 0; i<ntracks;i++)
-                                    {
-                                      tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                      Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                      if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                    }
-                        	        continue;
-	                              }
-                              if ( updatedTV.isValid() ) 
-	                              {
-                                  tempchi2 = updatedTV.normalisedChiSquared();
-	    	                          tempx=updatedTV.position().x();
-	    	                          tempy=updatedTV.position().y();
-	    	                          tempz=updatedTV.position().z();
-                                  posError = updatedTV.positionError();
-                                  float TPosFH = sqrt((Track_FirstHit_Hemi2_mva[m].second.X()-PV.x())*(Track_FirstHit_Hemi2_mva[m].second.X()-PV.x())+(Track_FirstHit_Hemi2_mva[m].second.Y()-PV.y())*(Track_FirstHit_Hemi2_mva[m].second.Y()-PV.y())+(Track_FirstHit_Hemi2_mva[m].second.Z()-PV.z())*(Track_FirstHit_Hemi2_mva[m].second.Z()-PV.z()));
-                                  float TPosVtx1 = sqrt((tempx-PV.x())*(tempx-PV.x())+(tempy-PV.y())*(tempy-PV.y())+(tempz-PV.z())*(tempz-PV.z()));
-                                  if (TPosFH>TPosVtx1 || Track_FirstHit_Hemi2_mva[m].first == true  ) {success = true;}//continue not useful
-                                  else  
-                                    {
-                                      vTT.pop_back();
-                                      ntracks--;
-                                      updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
-                                      tempchi2 = updatedTV.normalisedChiSquared();
-	    	                              tempx=updatedTV.position().x();
-	    	                              tempy=updatedTV.position().y();
-	    	                              tempz=updatedTV.position().z();
-                                      posError = updatedTV.positionError(); 
-                                      Vtx2_Weights.clear();
-                                      tempMeanWeight=0;
-                                      
-                                      for(int i = 0; i<ntracks;i++)
-                                        {
-                                          tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                          Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                          if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                        }
-                        	            continue;
-                                    }
-                                  tempMeanWeight=0;
-                                  Vtx2_Weights.clear();
-                                  Vtx2_index.push_back(m);
-                                  for(int i = 0; i<ntracks;i++)
-                                    {
-                                      tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                      Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                      if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                    }
-	                              }
-                            }
-                        }
-                      else if (Vtx_ntk > 2 && !success)
-                        {
-                          Vtx2_index.clear();
-                          if (badtkhit_index == k) {vTT.erase(vTT.begin());ntracks--;Vtx2_index.push_back(p);}
-                          else if (badtkhit_index == p) {vTT.erase(vTT.end());ntracks--;Vtx2_index.push_back(k);}
-                          else {Vtx2_index.push_back(k);Vtx2_index.push_back(p);}
-                          for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                            {
-                              if (m == k || m == p || m == badtkhit_index) continue;
-                              ntracks++;
-                              tempMeanWeight=0;
-                              
-                              vTT.push_back(displacedTracks_Hemi2_mva[m]);
-                              TransientVertex updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
-                              if ( !updatedTV.isValid() ) 
-	                              {  
-	    	                          vTT.pop_back();
-                                  ntracks--;
-                                  if (vTT.size()<2) continue;
-	    	                          updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
-                                  tempchi2 = updatedTV.normalisedChiSquared();
-	    	                          tempx=updatedTV.position().x();
-	    	                          tempy=updatedTV.position().y();
-	    	                          tempz=updatedTV.position().z();
-                                  posError = updatedTV.positionError();
-                                  Vtx2_Weights.clear();
-                                  tempMeanWeight=0;
-                                  
-                                  if (ntracks<2){success = false;}
-                                  if (ntracks>=2){success = true;}
-                                  for(int i = 0; i<ntracks;i++)
-                                    {
-                                      tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                      Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                      if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                    }
-                        	        continue;
-	                              }
-                              if ( updatedTV.isValid() ) 
-	                              {
-                                  tempchi2 = updatedTV.normalisedChiSquared();
-	    	                          tempx=updatedTV.position().x();
-	    	                          tempy=updatedTV.position().y();
-	    	                          tempz=updatedTV.position().z();
-                                  posError = updatedTV.positionError();
-                                  float TPosFH = sqrt((Track_FirstHit_Hemi2_mva[m].second.X()-PV.x())*(Track_FirstHit_Hemi2_mva[m].second.X()-PV.x())+(Track_FirstHit_Hemi2_mva[m].second.Y()-PV.y())*(Track_FirstHit_Hemi2_mva[m].second.Y()-PV.y())+(Track_FirstHit_Hemi2_mva[m].second.Z()-PV.z())*(Track_FirstHit_Hemi2_mva[m].second.Z()-PV.z()));
-                                  float TPosVtx1 = sqrt((tempx-PV.x())*(tempx-PV.x())+(tempy-PV.y())*(tempy-PV.y())+(tempz-PV.z())*(tempz-PV.z()));
-                                  if (TPosFH>TPosVtx1 || Track_FirstHit_Hemi2_mva[m].first == true ) {success = true;}//continue not useful
-                                  else  
-                                    {
-                                      vTT.pop_back();
-                                      ntracks--;
-                                      if (vTT.size()<2) continue;
-	    	                              updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
-                                      tempchi2 = updatedTV.normalisedChiSquared();
-	    	                              tempx=updatedTV.position().x();
-	    	                              tempy=updatedTV.position().y();
-	    	                              tempz=updatedTV.position().z();
-                                      posError = updatedTV.positionError();
-                                      Vtx2_Weights.clear();
-                                      tempMeanWeight=0;
-                                      
-                                      if (ntracks<2){success = false;}
-                                      if (ntracks>=2){success = true;}
-                                      for(int i = 0; i<ntracks;i++)
-                                        {
-                                          tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                          Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                          if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                        }
-                        	            continue;
-                                    }
-                                    Vtx2_Weights.clear();
-                                  Vtx2_index.push_back(m);
-                                  tempMeanWeight=0;
-                                  success = true;
-                                for(int i = 0; i<ntracks;i++)
-                                  {
-                                    tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                    Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                    if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                  }
-	                              }
-                            }
-                        }
-
-                        // We should have a Vertex after these conditions
-                        Vtx_ntk = ntracks;
-                        Vtx_chi = tempchi2;
-                        Vtx_x = tempx;
-                        Vtx_y = tempy;
-                        Vtx_z = tempz;
-                        Vtx_step = 1;
-                        GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
-                        DCA_VTX_Meand = 0;
-                        for (int k = 0; k< Vtx_ntk; k++)
-                          {
-                            // MeanWeight+=displacedVertex_Hemi2_mva.trackWeight(displacedTracks_Hemi2_mva[p]);
-                            // Vtx2_Weights.push_back(displacedVertex_Hemi2_mva.trackWeight(displacedTracks_Hemi2_mva[p]));
-                            // tree_Hemi_Vtx_trackWeight.push_back(displacedVertex_Hemi2_mva.trackWeight(displacedTracks_Hemi2_mva[p]));
-                            TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
-                            if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
-                            //but one could look of the wieghts of the track at the same time
-                              {// The positions are given in the Global frame
-                                float pca_Vtx_x = DCA_Vtx.position().x();
-                                float pca_Vtx_y = DCA_Vtx.position().y();
-                                float pca_Vtx_z = DCA_Vtx.position().z();
-                                float refPoint_x = DCA_Vtx.referencePoint().x();
-                                float refPoint_y = DCA_Vtx.referencePoint().y();
-                                float refPoint_z = DCA_Vtx.referencePoint().z();
-                                float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
-                                float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
-                                float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
-                                float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
-                                float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
-                                DCA_VTX_Meand+=DCA_VTX_d;
-                                tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
-                                tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
-                                tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
-                                tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
-                                tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
-                      
-                              }
-                          }
-                        DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-                        if (MeanWeight==0)//<=>only two tracks in the valid vertex
-                          {
-                            Vtx2_Weights.clear();
-                            for(int i = 0; i<ntracks;i++)
-                              {
-                                MeanWeight+=TV.trackWeight(vTT[i]);
-                                Vtx2_Weights.push_back(TV.trackWeight(vTT[i]));
-                              }
-                          }
-                    }
-                    else
-                      {
-                        ntracks=0;
-                        vTT.clear();
-                      }
-                      if ( success ) break;
-                }
-              if(success){break;}
-            }
-            if (showlog){std::cout<<"success Hemi2 step 1 : "<<success<<std::endl;}
- 
-    }
-    
+    TightVertex = true;
+    // void Vertexing(std::vector<reco::TransientTrack> VertexTracks, vector<std::pair<bool,TLorentzVector>> Track_FirstHit, bool ActivateStep = true, bool RequireGoodChi2Seed = false,bool RequireGoodChi2VertexIter = false, float Chi2down = 0., float Chi2up = 10., GlobalPoint *PV = nullptr )//return type to be chnged
+                
+    // GlobalPoint PVPos(PV.x(),PV.y(),PV.z());
+    Vtx* VtxHemi2 = new Vtx();
+    VtxHemi2->Vertexing(displacedTracks_Hemi2_mva,Track_FirstHit_Hemi2_mva,ActivateStep1,false,false,0.,10.,&PVPos);
+    if (VtxHemi2->chi2()>0 && VtxHemi2->chi2()<10)
+      {
+        Vtx_step = 1; // 1 here
+        TightVertex = true; 
+      }
     //------------------------------------------------------------------------------------------------//
     //------------------------------------------Hemi 2 step 2-----------------------------------------//
     //------------------------------------------------------------------------------------------------//
-
-    ntracks   = -2;
-    tempchi2  = -10.;
-    tempx = -100.;
-    tempy = -100.;
-    tempz = -100.;
     badVtx = false;
-    //---------------------//
-    if ( (Vtx_chi < 0. || Vtx_chi > 10.)  ) badVtx = true;
-    if ( badVtx  && displacedTracks_Hemi2_mva.size() > 1 && (ActivateStep2 || IterAVF)) 
+    if ( !(VtxHemi2->chi2()>0 && VtxHemi2->chi2()<10)  ) badVtx = true;
+    if ( badVtx  && displacedTracks_Hemi2_mva.size() > 1 && (ActivateStep2 || IterAVF))
       {
-        MeanWeight=0;
-        tempMeanWeight=0;
-        DCA_VTX_Meand = 0;
-        bool success = false;
-        std::vector<TransientTrack> vTT;
-        tempchi2 = -10.;
-        Vtx_ntk = displacedTracks_Hemi2_mva.size();
-        for ( int p = 1; p < Vtx_ntk; p++ )
-          {
-            for  ( int k = 0; k < p; k++ ) // take pairs of tracks of highest BDT value
-              {
-                vTT.push_back(displacedTracks_Hemi2_mva[p]);
-                vTT.push_back(displacedTracks_Hemi2_mva[k]);
-                ntracks = 2;
-                
-                TransientVertex TV = theFitter_Vertex_Hemi2_mva.vertex(vTT); // We take the first "good-looking" seed to start
-                if ( TV.isValid() && TV.normalisedChiSquared()>0 && TV.normalisedChiSquared()<10 ) 
-                  {
-	                  tempchi2 = TV.normalisedChiSquared();
-	                  tempx = TV.position().x();
-	                  tempy = TV.position().y();
-	                  tempz = TV.position().z();
-                    posError =TV.positionError();
-                    success = true;
-                    for (int m = 0; m < ntracks; m++) // We then add track by track to the vertex and check the validity of the vertex
-                      {
-                        if(Track_FirstHit_Hemi2_mva[m].first == true) continue; //first hit of lost track is biaised
-                        float PosFH = sqrt((Track_FirstHit_Hemi2_mva[m].second.X()-PV.x())*(Track_FirstHit_Hemi2_mva[m].second.X()-PV.x())+(Track_FirstHit_Hemi2_mva[m].second.Y()-PV.y())*(Track_FirstHit_Hemi2_mva[m].second.Y()-PV.y())+(Track_FirstHit_Hemi2_mva[m].second.Z()-PV.z())*(Track_FirstHit_Hemi2_mva[m].second.Z()-PV.z()));
-                        float PosVtx1 = sqrt((TV.position().x()-PV.x())*(TV.position().x()-PV.x())+(TV.position().y()-PV.y())*(TV.position().y()-PV.y())+(TV.position().z()-PV.z())*(TV.position().z()-PV.z()));
-                        if (PosFH>PosVtx1) 
-                          {
-                            success = true; 
-                            tempchi2 = TV.normalisedChiSquared();
-	    	                    tempx=TV.position().x();
-	    	                    tempy=TV.position().y();
-	    	                    tempz=TV.position().z();
-                            posError = TV.positionError();
-                            continue;
-                          }//continue not useful
-                        else{badtkhit_index = m;}
-                      }
-                if (Vtx_ntk == 2 && !success){break;}// removing 1 track gives no other option
-                else if (success)
-                  {
-                    Vtx2_index.clear();
-                    Vtx2_index.push_back(k);
-                    Vtx2_index.push_back(p);
-                    for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                      {
-                        if (m == k || m == p) continue;
-                        ntracks++;
-                        tempMeanWeight=0;
-                        
-                        vTT.push_back(displacedTracks_Hemi2_mva[m]);
-                        TransientVertex updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
-                        if ( !updatedTV.isValid() ) 
-	                        {  
-	    	                    vTT.pop_back();
-	    	                    ntracks--;
-	    	                    updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
-	    	                    tempchi2 = updatedTV.normalisedChiSquared();
-	    	                    tempx=updatedTV.position().x();
-	    	                    tempy=updatedTV.position().y();
-        	                  tempz=updatedTV.position().z();
-                            posError = updatedTV.positionError();
-                            Vtx2_Weights.clear();
-                            tempMeanWeight=0;
-                            
-                            for(int i = 0; i<ntracks;i++)
-                              {
-                                tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                              }
-	    	                    continue;
-	                        } 
-                        if ( updatedTV.isValid() ) 
-	                        {
-                            tempchi2 = updatedTV.normalisedChiSquared();
-	    	                    tempx=updatedTV.position().x();
-	    	                    tempy=updatedTV.position().y();
-	    	                    tempz=updatedTV.position().z();
-                            posError = updatedTV.positionError();
-                            float TPosFH = sqrt((Track_FirstHit_Hemi2_mva[m].second.X()-PV.x())*(Track_FirstHit_Hemi2_mva[m].second.X()-PV.x())+(Track_FirstHit_Hemi2_mva[m].second.Y()-PV.y())*(Track_FirstHit_Hemi2_mva[m].second.Y()-PV.y())+(Track_FirstHit_Hemi2_mva[m].second.Z()-PV.z())*(Track_FirstHit_Hemi2_mva[m].second.Z()-PV.z()));
-                          float TPosVtx1 = sqrt((tempx-PV.x())*(tempx-PV.x())+(tempy-PV.y())*(tempy-PV.y())+(tempz-PV.z())*(tempz-PV.z()));
-                          if (TPosFH>TPosVtx1 || Track_FirstHit_Hemi2_mva[m].first == true) {success = true;}//continue not useful
-                          else  
-                            {
-                              vTT.pop_back();
-                              ntracks--;
-	    	                      updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
-                                                                tempchi2 = updatedTV.normalisedChiSquared();
-	    	                          tempx=updatedTV.position().x();
-	    	                          tempy=updatedTV.position().y();
-	    	                          tempz=updatedTV.position().z();
-                                  posError = updatedTV.positionError();
-                                  Vtx2_Weights.clear();
-                                  tempMeanWeight=0;
-                                  
-                                  if (ntracks<2){success = false;}
-                                  if (ntracks>=2){success = true;}
-                                  for(int i = 0; i<ntracks;i++)
-                                    {
-                                      tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                      Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                      if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                    }
-                        	    continue;
-                            }
-                            Vtx2_Weights.clear();
-                            Vtx2_index.push_back(m);
-                            for(int i = 0; i<ntracks;i++)
-                              {
-                                tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                              }
-	                        }
-                      } // end loop on the other tracks
-                  }
-                else if (Vtx_ntk > 2 && !success)
-                  {
-                    Vtx2_index.clear();
-                  if (badtkhit_index == k) {vTT.erase(vTT.begin());ntracks--;Vtx2_index.push_back(p);}
-                  else if (badtkhit_index == p) {vTT.erase(vTT.end());ntracks--;Vtx2_index.push_back(k);}
-                  else {Vtx2_index.push_back(k);Vtx2_index.push_back(p);}
-                  for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                    {
-                      if (m == k || m == p || m == badtkhit_index) continue;
-                      ntracks++;
-                      tempMeanWeight=0;
-                      
-                      vTT.push_back(displacedTracks_Hemi2_mva[m]);
-                      
-                      TransientVertex updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
-                      if ( !updatedTV.isValid() ) 
-	                      {  
-	    	                  vTT.pop_back();
-                          ntracks--;
-                          if (vTT.size()<2) continue;
-	    	                  updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
-                                                            tempchi2 = updatedTV.normalisedChiSquared();
-	    	                          tempx=updatedTV.position().x();
-	    	                          tempy=updatedTV.position().y();
-	    	                          tempz=updatedTV.position().z();
-                                  posError = updatedTV.positionError();
-                                  Vtx2_Weights.clear();
-                                  tempMeanWeight=0;
-                                  
-                                  if (ntracks<2){success = false;}
-                                  if (ntracks>=2){success = true;}
-                                  for(int i = 0; i<ntracks;i++)
-                                    {
-                                      tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                      Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                      if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                    }
-                          continue;
-	                      }
-                      if ( updatedTV.isValid() ) 
-	                      {
-                          tempchi2 = updatedTV.normalisedChiSquared();
-	    	                  tempx=updatedTV.position().x();
-	    	                  tempy=updatedTV.position().y();
-	    	                  tempz=updatedTV.position().z();
-                          posError = updatedTV.positionError();
-                          float TPosFH = sqrt((Track_FirstHit_Hemi2_mva[m].second.X()-PV.x())*(Track_FirstHit_Hemi2_mva[m].second.X()-PV.x())+(Track_FirstHit_Hemi2_mva[m].second.Y()-PV.y())*(Track_FirstHit_Hemi2_mva[m].second.Y()-PV.y())+(Track_FirstHit_Hemi2_mva[m].second.Z()-PV.z())*(Track_FirstHit_Hemi2_mva[m].second.Z()-PV.z()));
-                          float TPosVtx1 = sqrt((tempx-PV.x())*(tempx-PV.x())+(tempy-PV.y())*(tempy-PV.y())+(tempz-PV.z())*(tempz-PV.z()));
-                          if (TPosFH>TPosVtx1 || Track_FirstHit_Hemi2_mva[m].first == true) {success = true;}//continue not useful
-                          else  
-                            {
-                              vTT.pop_back();
-                              ntracks--;
-                              if (vTT.size()<2) continue;
-	    	                      updatedTV = theFitter_Vertex_Hemi2_mva.vertex(vTT);
-                                                                tempchi2 = updatedTV.normalisedChiSquared();
-	    	                          tempx=updatedTV.position().x();
-	    	                          tempy=updatedTV.position().y();
-	    	                          tempz=updatedTV.position().z();
-                                  posError = updatedTV.positionError();
-                                  Vtx2_Weights.clear();
-                                  tempMeanWeight=0;
-                                  
-                                  if (ntracks<2){success = false;}
-                                  if (ntracks>=2){success = true;}
-                                  for(int i = 0; i<ntracks;i++)
-                                    {
-                                      tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                      Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                      if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                    }
-                        	    continue;
-                            }
-                            Vtx2_Weights.clear();
-                          Vtx2_index.push_back(m);
-                          success = true;
-                          for(int i = 0; i<ntracks;i++)
-                            {
-                              tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                              Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                              if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                            }
-	                      }
-                    }
-                }
-
-                    Vtx_ntk = ntracks;
-                    Vtx_chi = tempchi2;
-                    Vtx_x = tempx;
-                    Vtx_y = tempy;
-                    Vtx_z = tempz;
-                    Vtx_step = 2;
-                    GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
-                    DCA_VTX_Meand = 0;
-                    for (int k = 0; k< Vtx_ntk; k++)
-                      {
-                        TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
-                        if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
-                        //but one should look of the wieghts of the track at the same time
-                          {// The positions are given in the Global frame
-                            float pca_Vtx_x = DCA_Vtx.position().x();
-                            float pca_Vtx_y = DCA_Vtx.position().y();
-                            float pca_Vtx_z = DCA_Vtx.position().z();
-                            float refPoint_x = DCA_Vtx.referencePoint().x();
-                            float refPoint_y = DCA_Vtx.referencePoint().y();
-                            float refPoint_z = DCA_Vtx.referencePoint().z();
-                            float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
-                            float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
-                            float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
-                            float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
-                            float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
-                            DCA_VTX_Meand+=DCA_VTX_d;
-                            tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
-                            tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
-                            tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
-                            tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
-                            tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
-                          }
-                      }
-                    if (MeanWeight==0)//<=>only two tracks in the valid vertex
-                      {
-                        Vtx2_Weights.clear();
-                        for(int i = 0; i<ntracks;i++)
-                          {
-                            MeanWeight+=TV.trackWeight(vTT[i]);
-                            Vtx2_Weights.push_back(TV.trackWeight(vTT[i]));
-                          }
-                      }
-                    DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-                    // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
-                  }
-                else
-                  { // If not valid : we build a new seed
-                    ntracks = 0;
-                    vTT.clear();
-                  }
-                if ( success ) break;
-              }
-            if ( success ) break;
-          }
-          if (showlog){ std::cout<<"success Hemi2 step 2 : "<<success<<std::endl; }
-
+        VtxHemi2->Vertexing(displacedTracks_Hemi2_mva,Track_FirstHit_Hemi2_mva,ActivateStep2,true,false,0.,10.,&PVPos);
+        Vtx_step = 2; // 1 here
+        TightVertex = true;       
       }
-    
-    TransientVertex displacedVertex_step2_Hemi2;
-    static AdaptiveVertexFitter theFitter_Vertex_step2_Hemi2(
-    	       GeometricAnnealing ( sigmacut, Tini, ratio ), 
-    	       DefaultLinearizationPointFinder(),
-    	       KalmanVertexUpdator<5>(), 
-    	       KalmanVertexTrackCompatibilityEstimator<5>(), 
-    	       KalmanVertexSmoother() );
-    theFitter_Vertex_step2_Hemi2.setParameters ( maxshift, maxlpshift, maxstep, weightThreshold );
-    badVtx = false;
-
     //------------------------------------------------------------------------------------------------//
     //------------------------------------------Hemi 2 step 3-----------------------------------------//
     //------------------------------------------------------------------------------------------------//
-
-  if ( (Vtx_chi < 0. || Vtx_chi > 10.) && ActivateStep2 ) badVtx = true;
-  if ( badVtx && displacedTracks_step2_Hemi2.size() > 1)
-    {
-      DCA_VTX_Meand = 0;
-      badtkhit_index = -1;
-      bool success = false;
-      MeanWeight=0;
-      tempMeanWeight=0;
-      std::vector<TransientTrack> vTT;
-      Vtx_ntk = displacedTracks_step2_Hemi2.size();
-      Vtx_chi = -10.;
-      for (int k = 0 ; k <Vtx_ntk-1;k++)
-        {
-          for (int p = k+1 ; p < Vtx_ntk ; p++)
-            {
-              vTT.push_back(displacedTracks_step2_Hemi2[p]);
-              vTT.push_back(displacedTracks_step2_Hemi2[k]);
-              
-              ntracks = 2;
-              TransientVertex TV = theFitter_Vertex_step2_Hemi2.vertex(vTT); // We take the first "good-looking" seed to start
-              if ( TV.isValid())
-                {
-                  for (int m = 0; m < ntracks; m++) // We then add track by track to the vertex and check the validity of the vertex
-                    {
-                      if(Track_FirstHit_step2_Hemi2[m].first == true) continue; //first hit of lost track is biaised
-                      float PosFH = sqrt((Track_FirstHit_step2_Hemi2[m].second.X()-PV.x())*(Track_FirstHit_step2_Hemi2[m].second.X()-PV.x())+(Track_FirstHit_step2_Hemi2[m].second.Y()-PV.y())*(Track_FirstHit_step2_Hemi2[m].second.Y()-PV.y())+(Track_FirstHit_step2_Hemi2[m].second.Z()-PV.z())*(Track_FirstHit_step2_Hemi2[m].second.Z()-PV.z()));
-                      float PosVtx1 = sqrt((TV.position().x()-PV.x())*(TV.position().x()-PV.x())+(TV.position().y()-PV.y())*(TV.position().y()-PV.y())+(TV.position().z()-PV.z())*(TV.position().z()-PV.z()));
-                      if (PosFH>PosVtx1) 
-                        {
-                          success = true; 
-                          tempchi2 = TV.normalisedChiSquared();
-	    	                  tempx=TV.position().x();
-	    	                  tempy=TV.position().y();
-	    	                  tempz=TV.position().z();
-                          posError = TV.positionError();
-                          continue;
-                        }//continue not useful
-                      else{badtkhit_index = m;}
-                    }
-
-                    if (Vtx_ntk == 2 && !success){break;}// removing 1 track gives no other option
-                    else if (success)
-                      {
-                        Vtx2_index.clear();
-                          Vtx2_index.push_back(k);
-                          Vtx2_index.push_back(p);
-                        for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                          {
-                            if (m == k || m == p) continue;
-                            ntracks++;
-                            vTT.push_back(displacedTracks_step2_Hemi2[m]);
-                            TransientVertex updatedTV = theFitter_Vertex_step2_Hemi2.vertex(vTT);
-                            if ( !updatedTV.isValid() ) 
-	                            {  
-	    	                        vTT.pop_back();
-                                ntracks--;
-	    	                        updatedTV = theFitter_Vertex_step2_Hemi2.vertex(vTT);
-                                tempchi2 = updatedTV.normalisedChiSquared();
-	    	                        tempx=updatedTV.position().x();
-	    	                        tempy=updatedTV.position().y();
-	    	                        tempz=updatedTV.position().z();
-                                posError = updatedTV.positionError();
-                                Vtx2_Weights.clear();
-                                tempMeanWeight=0;
-                                
-                                for(int i = 0; i<ntracks;i++)
-                                  {
-                                    tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                    Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                    if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                  }
-                        	      continue;
-	                            }
-                            if ( updatedTV.isValid() ) 
-	                            {
-                                tempchi2 = updatedTV.normalisedChiSquared();
-	    	                        tempx=updatedTV.position().x();
-	    	                        tempy=updatedTV.position().y();
-	    	                        tempz=updatedTV.position().z();
-                                posError = updatedTV.positionError();
-                                float TPosFH = sqrt((Track_FirstHit_step2_Hemi2[m].second.X()-PV.x())*(Track_FirstHit_step2_Hemi2[m].second.X()-PV.x())+(Track_FirstHit_step2_Hemi2[m].second.Y()-PV.y())*(Track_FirstHit_step2_Hemi2[m].second.Y()-PV.y())+(Track_FirstHit_step2_Hemi2[m].second.Z()-PV.z())*(Track_FirstHit_step2_Hemi2[m].second.Z()-PV.z()));
-                                float TPosVtx1 = sqrt((tempx-PV.x())*(tempx-PV.x())+(tempy-PV.y())*(tempy-PV.y())+(tempz-PV.z())*(tempz-PV.z()));
-                                if (TPosFH>TPosVtx1 || Track_FirstHit_step2_Hemi2[m].first == true) {success = true;}//continue not useful
-                                else  
-                                  {
-                                    vTT.pop_back();
-                                    ntracks--;
-	    	                            updatedTV = theFitter_Vertex_step2_Hemi2.vertex(vTT);
-                                    tempchi2 = updatedTV.normalisedChiSquared();
-	    	                            tempx=updatedTV.position().x();
-	    	                            tempy=updatedTV.position().y();
-	    	                            tempz=updatedTV.position().z();
-                                    posError = updatedTV.positionError();
-                                    Vtx2_Weights.clear();
-                                    tempMeanWeight=0;
-                                    
-                                    if (ntracks<2){success = false;}
-                                    if (ntracks>=2){success = true;}
-                                    for(int i = 0; i<ntracks;i++)
-                                      {
-                                        tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                        Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                        if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                      }
-                        	          continue;
-                                  }
-                                tempMeanWeight=0;
-                                Vtx2_Weights.clear();
-                                Vtx2_index.push_back(m);
-                                for(int i = 0; i<ntracks;i++)
-                                    {
-                                      tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                      Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                      if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                    }
-	                            }
-                          }
-                      }
-                    else if (Vtx_ntk > 2 && !success)
-                      {
-                        Vtx2_index.clear();
-                        if (badtkhit_index == k) {vTT.erase(vTT.begin());ntracks--;Vtx2_index.push_back(p);}
-                        else if (badtkhit_index == p) {vTT.erase(vTT.end());ntracks--;Vtx2_index.push_back(k);}
-                        else {Vtx2_index.push_back(k);Vtx2_index.push_back(p);}
-                        for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                          {
-                            if (m == k || m == p || m == badtkhit_index) continue;
-                            ntracks++;
-                            tempMeanWeight=0;
-                            
-                            vTT.push_back(displacedTracks_step2_Hemi2[m]);
-                            
-                            TransientVertex updatedTV = theFitter_Vertex_step2_Hemi2.vertex(vTT);
-                            if ( !updatedTV.isValid() ) 
-	                            {  
-	    	                        vTT.pop_back();
-                                ntracks--;
-                                if (vTT.size()<2) continue;
-	    	                        updatedTV = theFitter_Vertex_step2_Hemi2.vertex(vTT);
-                                tempchi2 = updatedTV.normalisedChiSquared();
-	    	                        tempx=updatedTV.position().x();
-	    	                        tempy=updatedTV.position().y();
-	    	                        tempz=updatedTV.position().z();
-                                posError = updatedTV.positionError();
-                                Vtx2_Weights.clear();
-                                tempMeanWeight=0;
-                                
-                                if (ntracks<2){success = false;}
-                                if (ntracks>=2){success = true;}
-                                for(int i = 0; i<ntracks;i++)
-                                  {
-                                    tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                    Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                    if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                  }
-                        	      continue;
-	                            }
-                            if ( updatedTV.isValid() ) 
-	                            {
-                                tempchi2 = updatedTV.normalisedChiSquared();
-	    	                        tempx=updatedTV.position().x();
-	    	                        tempy=updatedTV.position().y();
-	    	                        tempz=updatedTV.position().z();
-                                posError = updatedTV.positionError();
-                                float TPosFH = sqrt((Track_FirstHit_step2_Hemi2[m].second.X()-PV.x())*(Track_FirstHit_step2_Hemi2[m].second.X()-PV.x())+(Track_FirstHit_step2_Hemi2[m].second.Y()-PV.y())*(Track_FirstHit_step2_Hemi2[m].second.Y()-PV.y())+(Track_FirstHit_step2_Hemi2[m].second.Z()-PV.z())*(Track_FirstHit_step2_Hemi2[m].second.Z()-PV.z()));
-                                float TPosVtx1 = sqrt((tempx-PV.x())*(tempx-PV.x())+(tempy-PV.y())*(tempy-PV.y())+(tempz-PV.z())*(tempz-PV.z()));
-                                if (TPosFH>TPosVtx1 || Track_FirstHit_step2_Hemi2[m].first == true) {success = true;}//continue not useful
-                                else  
-                                  {
-                                    vTT.pop_back();
-                                    ntracks--;
-                                    if (vTT.size()<2) continue;
-	    	                            updatedTV = theFitter_Vertex_step2_Hemi2.vertex(vTT);
-                                    tempchi2 = updatedTV.normalisedChiSquared();
-	    	                            tempx=updatedTV.position().x();
-	    	                            tempy=updatedTV.position().y();
-	    	                            tempz=updatedTV.position().z();
-                                    posError = updatedTV.positionError();
-                                    Vtx2_Weights.clear();
-                                    tempMeanWeight=0;
-                                    
-                                    if (ntracks<2){success = false;}
-                                    if (ntracks>=2){success = true;}
-                                    for(int i = 0; i<ntracks;i++)
-                                      {
-                                        tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                        Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                        if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                      }
-                        	          continue;
-                                  }
-                                  Vtx2_Weights.clear();
-                                  Vtx2_index.push_back(m);
-                                  success = true;
-                                for(int i = 0; i<ntracks;i++)
-                                  {
-                                    tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                    Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                    if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                  }
-	                            }
-                          }
-                      }
-
-                        // We should have a Vertex after these conditions
-                        Vtx_ntk = ntracks;
-                        Vtx_chi = tempchi2;
-                        Vtx_x = tempx;
-                        Vtx_y = tempy;
-                        Vtx_z = tempz;
-                        Vtx_step = 3;
-                        GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
-                        DCA_VTX_Meand = 0;
-                        for (int k = 0; k< Vtx_ntk; k++)
-                          {
-                            // MeanWeight+=displacedVertex_step2_Hemi2.trackWeight(displacedTracks_step2_Hemi2[p]);
-                            // Vtx1_Weights.push_back(displacedVertex_step2_Hemi2.trackWeight(displacedTracks_step2_Hemi2[p]));
-                            // tree_Hemi_Vtx_trackWeight.push_back(displacedVertex_step2_Hemi2.trackWeight(displacedTracks_step2_Hemi2[p]));
-                            TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
-                            if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
-                            //but one could look of the wieghts of the track at the same time
-                              {// The positions are given in the Global frame
-                                float pca_Vtx_x = DCA_Vtx.position().x();
-                                float pca_Vtx_y = DCA_Vtx.position().y();
-                                float pca_Vtx_z = DCA_Vtx.position().z();
-                                float refPoint_x = DCA_Vtx.referencePoint().x();
-                                float refPoint_y = DCA_Vtx.referencePoint().y();
-                                float refPoint_z = DCA_Vtx.referencePoint().z();
-                                float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
-                                float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
-                                float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
-                                float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
-                                float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
-                                DCA_VTX_Meand+=DCA_VTX_d;
-                                tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
-                                tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
-                                tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
-                                tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
-                                tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
-                      
-                              }
-                          }
-                        DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-                        if (MeanWeight==0)//<=>only two tracks in the valid vertex
-                          {
-                            Vtx2_Weights.clear();
-                            for(int i = 0; i<ntracks;i++)
-                              {
-                                MeanWeight+=TV.trackWeight(vTT[i]);
-                                Vtx2_Weights.push_back(TV.trackWeight(vTT[i]));
-                              }
-                          }
-                }
-              else
-                {
-                  ntracks=0;
-                  vTT.clear();
-                }
-              if ( success ) break;
-            }
-          if(success){break;}
-        }
-        if (showlog){std::cout<<"success Hemi2 step 3 : "<<success<<std::endl;}
-
-    }
-
+    badVtx = false;
+    if ( !(VtxHemi2->chi2()>0 && VtxHemi2->chi2()<10) ) badVtx = true;
+    if ( badVtx  && displacedTracks_step2_Hemi2.size() > 1 && ActivateStep3)
+      {
+        VtxHemi2->Vertexing(displacedTracks_step2_Hemi2,Track_FirstHit_step2_Hemi2,ActivateStep3,false,false,0.,10.,&PVPos);
+        Vtx_step = 3; // 1 here
+        TightVertex = false;
+      }
     //------------------------------------------------------------------------------------------------//
     //------------------------------------------Hemi 2 step 4-----------------------------------------//
     //------------------------------------------------------------------------------------------------//
-
-    ntracks   = -2;
-    tempchi2  = -10.;
-    tempx = -100.;
-    tempy = -100.;
-    tempz = -100.;
     badVtx = false;
-    if ( (Vtx_chi < 0. || Vtx_chi > 10.)  ) badVtx = true;
-    if ( badVtx && IterAVF && displacedTracks_step2_Hemi2.size() > 1 && (ActivateStep4 || IterAVF) ) 
+    if ( !(VtxHemi2->chi2()>0 && VtxHemi2->chi2()<10)  ) badVtx = true;
+    if ( badVtx  && displacedTracks_step2_Hemi2.size() > 1 && (ActivateStep4 || IterAVF) )
       {
-        MeanWeight=0;
-        bool success = false;
-        std::vector<TransientTrack> vTT;
-        tempchi2 = -10.;
-        DCA_VTX_Meand = 0;
-        tempMeanWeight=0;
-        Vtx_ntk = displacedTracks_step2_Hemi2.size();
-        for ( int p = 1; p < Vtx_ntk; p++ )
+        VtxHemi2->Vertexing(displacedTracks_step2_Hemi2,Track_FirstHit_step2_Hemi2,ActivateStep4,true,false,0.,10.,&PVPos);
+        Vtx_step = 4; // 1 here
+        TightVertex = false;
+      }
+
+
+    Vtx_ntk = VtxHemi2->nTrk();
+    Vtx_x = VtxHemi2->x();
+    Vtx_y = VtxHemi2->y();
+    Vtx_z = VtxHemi2->z();
+    Vtx_chi = VtxHemi2->chi2();
+    MeanWeight = VtxHemi2->SumWeight();
+    DCA_VTX_Meand = VtxHemi2->MeanDCA();
+    Vtx2_Weights =  VtxHemi2->Vtx_TrkWeights();
+    Vtx2_index = VtxHemi2->Vtx_TrkIndex();
+    std::vector<TransientTrack> Vtx2_Trks = VtxHemi2->GetTTracks();
+    GlobalError Vtx2posError = VtxHemi2->Vtx_PosErr();
+
+    if (VtxHemi2->chi2() == -10 && Vtx_step == 4)Vtx2_Trks.clear();
+    TLorentzVector Vtx2Vector(0,0,0,0);
+    for (unsigned int i = 0 ; i <Vtx2_Weights.size(); i++)
+      {
+        tree_Hemi_Vtx_trackWeight.push_back(Vtx2_Weights[i]);
+        if (Vtx2_Weights[i]>0.5)
           {
-            for  ( int k = 0; k < p; k++ ) // take pairs of tracks of highest BDT value
-              {
-                vTT.push_back(displacedTracks_step2_Hemi2[p]);
-                vTT.push_back(displacedTracks_step2_Hemi2[k]);
-                ntracks = 2;
-                
-                TransientVertex TV = theFitter_Vertex_step2_Hemi2.vertex(vTT); // We take the first "good-looking" seed to start
-                if ( TV.isValid() && TV.normalisedChiSquared()>0 && TV.normalisedChiSquared()<10 ) 
-                  {
-	                  tempchi2 = TV.normalisedChiSquared();
-	                  tempx = TV.position().x();
-	                  tempy = TV.position().y();
-	                  tempz = TV.position().z();
-                    posError =TV.positionError();
-                    success = true;
-
-                    for (int m = 0; m < ntracks; m++) // We then add track by track to the vertex and check the validity of the vertex
-                      {
-                        if(Track_FirstHit_step2_Hemi2[m].first == true) continue; //first hit of lost track is biaised
-                        float PosFH = sqrt((Track_FirstHit_step2_Hemi2[m].second.X()-PV.x())*(Track_FirstHit_step2_Hemi2[m].second.X()-PV.x())+(Track_FirstHit_step2_Hemi2[m].second.Y()-PV.y())*(Track_FirstHit_step2_Hemi2[m].second.Y()-PV.y())+(Track_FirstHit_step2_Hemi2[m].second.Z()-PV.z())*(Track_FirstHit_step2_Hemi2[m].second.Z()-PV.z()));
-                        float PosVtx1 = sqrt((TV.position().x()-PV.x())*(TV.position().x()-PV.x())+(TV.position().y()-PV.y())*(TV.position().y()-PV.y())+(TV.position().z()-PV.z())*(TV.position().z()-PV.z()));
-                        if (PosFH>PosVtx1) 
-                          {
-                            success = true; 
-                            tempchi2 = TV.normalisedChiSquared();
-	    	                    tempx=TV.position().x();
-	    	                    tempy=TV.position().y();
-	    	                    tempz=TV.position().z();
-                            posError = TV.positionError();
-                            continue;
-                          }//continue not useful
-                        else{badtkhit_index = m;}
-                      }
-
-                if (Vtx_ntk == 2 && !success){break;}// removing 1 track gives no other option
-                else if (success)
-                  {
-                    Vtx2_index.clear();
-                    Vtx2_index.push_back(k);
-                    Vtx2_index.push_back(p);
-                    for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                      {
-                        if (m == k || m == p) continue;
-                        ntracks++;
-                        tempMeanWeight=0;
-                        
-                        vTT.push_back(displacedTracks_step2_Hemi2[m]);
-                        TransientVertex updatedTV = theFitter_Vertex_step2_Hemi2.vertex(vTT);
-                        if ( !updatedTV.isValid() || updatedTV.normalisedChiSquared()<0 || updatedTV.normalisedChiSquared()>10 ) 
-	                        {  
-	    	                    vTT.pop_back();
-	    	                    ntracks--;
-	    	                    updatedTV = theFitter_Vertex_step2_Hemi2.vertex(vTT);
-	    	                    tempchi2 = updatedTV.normalisedChiSquared();
-	    	                    tempx=updatedTV.position().x();
-	    	                    tempy=updatedTV.position().y();
-        	                  tempz=updatedTV.position().z();
-                            posError = updatedTV.positionError();
-                            Vtx2_Weights.clear();
-                            tempMeanWeight=0;
-                            
-                           for(int i = 0; i<ntracks;i++)
-                              {
-                                tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                              }
-	    	                    continue;
-	                        } 
-                        if ( updatedTV.isValid() && updatedTV.normalisedChiSquared()>0 && updatedTV.normalisedChiSquared()<10) 
-	                        {
-                            tempchi2 = updatedTV.normalisedChiSquared();
-	    	                    tempx=updatedTV.position().x();
-	    	                    tempy=updatedTV.position().y();
-	    	                    tempz=updatedTV.position().z();
-                            posError = updatedTV.positionError();
-                            float TPosFH = sqrt((Track_FirstHit_step2_Hemi2[m].second.X()-PV.x())*(Track_FirstHit_step2_Hemi2[m].second.X()-PV.x())+(Track_FirstHit_step2_Hemi2[m].second.Y()-PV.y())*(Track_FirstHit_step2_Hemi2[m].second.Y()-PV.y())+(Track_FirstHit_step2_Hemi2[m].second.Z()-PV.z())*(Track_FirstHit_step2_Hemi2[m].second.Z()-PV.z()));
-                          float TPosVtx1 = sqrt((tempx-PV.x())*(tempx-PV.x())+(tempy-PV.y())*(tempy-PV.y())+(tempz-PV.z())*(tempz-PV.z()));
-                          if (TPosFH>TPosVtx1 || Track_FirstHit_step2_Hemi2[m].first == true) {success = true;}//continue not useful
-                          else  
-                            {
-                              vTT.pop_back();
-                              ntracks--;
-	    	                      updatedTV = theFitter_Vertex_step2_Hemi2.vertex(vTT);
-                                                                tempchi2 = updatedTV.normalisedChiSquared();
-	    	                          tempx=updatedTV.position().x();
-	    	                          tempy=updatedTV.position().y();
-	    	                          tempz=updatedTV.position().z();
-                                  posError = updatedTV.positionError();
-                                  Vtx2_Weights.clear();
-                                  tempMeanWeight=0;
-                                  
-                                  if (ntracks<2){success = false;}
-                                  if (ntracks>=2){success = true;}
-                                  for(int i = 0; i<ntracks;i++)
-                                    {
-                                      tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                      Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                      if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                    }
-                        	    continue;
-                            }
-                          Vtx2_Weights.clear();
-                          Vtx2_index.push_back(m);
-                            for(int i = 0; i<ntracks;i++)
-                              {
-                                tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                              }
-	                        }
-                      } // end loop on the other tracks
-                  }
-
-
-                else if (Vtx_ntk > 2 && !success)
-                  {
-                    Vtx2_index.clear();
-                    if (badtkhit_index == k) {vTT.erase(vTT.begin());ntracks--;Vtx2_index.push_back(p);}
-                    else if (badtkhit_index == p) {vTT.erase(vTT.end());ntracks--;Vtx2_index.push_back(k);}
-                    else {Vtx2_index.push_back(k);Vtx2_index.push_back(p);}
-                  for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
-                    {
-                      if (m == k || m == p || m == badtkhit_index) continue;
-                      ntracks++;
-                      tempMeanWeight=0;
-                      
-                      vTT.push_back(displacedTracks_step2_Hemi2[m]);
-                      TransientVertex updatedTV = theFitter_Vertex_step2_Hemi2.vertex(vTT);
-                      if ( !updatedTV.isValid() || updatedTV.normalisedChiSquared()<0 || updatedTV.normalisedChiSquared()>10) 
-	                      {  
-	    	                  vTT.pop_back();
-                          ntracks--;
-                          if (vTT.size()<2) continue;
-	    	                  updatedTV = theFitter_Vertex_step2_Hemi2.vertex(vTT);
-                                  tempchi2 = updatedTV.normalisedChiSquared();
-	    	                          tempx=updatedTV.position().x();
-	    	                          tempy=updatedTV.position().y();
-	    	                          tempz=updatedTV.position().z();
-                                  posError = updatedTV.positionError();
-                                  Vtx2_Weights.clear();
-                                  tempMeanWeight=0;
-                                  
-                                  if (ntracks<2){success = false;}
-                                  if (ntracks>=2){success = true;}
-                                  for(int i = 0; i<ntracks;i++)
-                                    {
-                                      tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                      Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                      if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                    }
-                          continue;
-	                      }
-                      if ( updatedTV.isValid() && updatedTV.normalisedChiSquared()>0 && updatedTV.normalisedChiSquared()<10 ) 
-	                      {
-                          tempchi2 = updatedTV.normalisedChiSquared();
-	    	                  tempx=updatedTV.position().x();
-	    	                  tempy=updatedTV.position().y();
-	    	                  tempz=updatedTV.position().z();
-                          posError = updatedTV.positionError();
-                          
-                          float TPosFH = sqrt((Track_FirstHit_step2_Hemi2[m].second.X()-PV.x())*(Track_FirstHit_step2_Hemi2[m].second.X()-PV.x())+(Track_FirstHit_step2_Hemi2[m].second.Y()-PV.y())*(Track_FirstHit_step2_Hemi2[m].second.Y()-PV.y())+(Track_FirstHit_step2_Hemi2[m].second.Z()-PV.z())*(Track_FirstHit_step2_Hemi2[m].second.Z()-PV.z()));
-                          float TPosVtx1 = sqrt((tempx-PV.x())*(tempx-PV.x())+(tempy-PV.y())*(tempy-PV.y())+(tempz-PV.z())*(tempz-PV.z()));
-                          if (TPosFH>TPosVtx1 || Track_FirstHit_step2_Hemi2[m].first == true) {success = true;}//continue not useful
-                          else  
-                            {
-                              vTT.pop_back();
-                              ntracks--;
-                              if (vTT.size()<2) continue;
-	    	                      updatedTV = theFitter_Vertex_step2_Hemi2.vertex(vTT);
-                                  tempchi2 = updatedTV.normalisedChiSquared();
-	    	                          tempx=updatedTV.position().x();
-	    	                          tempy=updatedTV.position().y();
-	    	                          tempz=updatedTV.position().z();
-                                  posError = updatedTV.positionError();
-                                  Vtx2_Weights.clear();
-                                  tempMeanWeight=0;
-                                  
-                                  if (ntracks<2){success = false;}
-                                  if (ntracks>=2){success = true;}
-                                  for(int i = 0; i<ntracks;i++)
-                                    {
-                                      tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                                      Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                      if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                                    }
-                        	    continue;
-                            }
-                            Vtx2_Weights.clear();
-                          Vtx2_index.push_back(m);
-                          success = true;
-                          for(int i = 0; i<ntracks;i++)
-                            {
-                              tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
-                              Vtx2_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                              if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
-                            }
-	                      }
-                    }
-                  }
-
-                    Vtx_ntk = ntracks;
-                    Vtx_chi = tempchi2;
-                    Vtx_x = tempx;
-                    Vtx_y = tempy;
-                    Vtx_z = tempz;
-                    Vtx_step = 4;
-                    GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
-                    DCA_VTX_Meand = 0;
-                    for (int k = 0; k< Vtx_ntk; k++)
-                      {
-                        TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
-                        if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
-                        //but one should look of the wieghts of the track at the same time
-                          {// The positions are given in the Global frame
-                            float pca_Vtx_x = DCA_Vtx.position().x();
-                            float pca_Vtx_y = DCA_Vtx.position().y();
-                            float pca_Vtx_z = DCA_Vtx.position().z();
-                            float refPoint_x = DCA_Vtx.referencePoint().x();
-                            float refPoint_y = DCA_Vtx.referencePoint().y();
-                            float refPoint_z = DCA_Vtx.referencePoint().z();
-                            float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
-                            float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
-                            float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
-                            float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
-                            float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
-                            DCA_VTX_Meand+=DCA_VTX_d;
-                            tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
-                            tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
-                            tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
-                            tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
-                            tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
-                          }
-                      }
-                    if (MeanWeight==0)//<=>only two tracks in the valid vertex
-                      {
-                        Vtx2_Weights.clear();
-                        for(int i = 0; i<ntracks;i++)
-                          {
-                            MeanWeight+=TV.trackWeight(vTT[i]);
-                            Vtx2_Weights.push_back(TV.trackWeight(vTT[i]));
-                          }
-                      }
-                    DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
-                }
-                else
-                  { // If not valid : we build a new seed
-                    ntracks = 0;
-                    vTT.clear();
-                  }
-                  
-                if ( success ) break;
-              }
-            
-            if ( success ) break;
+            const Track &tkm = Vtx2_Trks[i].track();            
+            float tkpx = tkm.px();
+            float tkpy = tkm.py();
+            float tkpz = tkm.pz();
+            float track_p = sqrt(tkpx*tkpx+tkpy*tkpy+tkpz*tkpz);
+            float tke  = sqrt(track_p*track_p + 0.01948); // pi+ mass
+            TLorentzVector TLorentzTrack(tkpx,tkpy,tkpz,tke);
+            Vtx2Vector += TLorentzTrack;
           }
-        if (showlog){std::cout<<"success Hemi2 step 4 : "<<success<<std::endl;}
 
       }
+
+    float Vtx2Mass = TMath::Max(sqrt(Vtx2Vector.Mag2()),0.);
+    tree_Hemi_Vtx_Mass.push_back(Vtx2Mass);
 
 //------------------------------------------------------------------------------------------------//
   //------------------------------------------------------------------------------------------------//
@@ -9105,11 +6949,6 @@ if ( LLP2_mother * lep1_Q < 0 ) {
   tree_Hemi_nTrks_sig.push_back(nTrks_axis2_sig);
   tree_Hemi_nTrks_bad.push_back(nTrks_axis2_bad);
   tree_Hemi_mass.push_back(  TMath::Max(vaxis2.Mag(),0.) );
-  for (unsigned int i = 0 ; i < Vtx2_Weights.size(); i++)
-    {
-        tree_Hemi_Vtx_trackWeight.push_back(Vtx2_Weights[i]);
-
-    }
   tree_HemiMu_mass.push_back( TMath::Max(Vobs2.Mag(),0.) );
   tree_HemiMu_pt.push_back( Vobs2.Pt() );
   tree_HemiMu_dR.push_back( dRobs2 );
@@ -9118,6 +6957,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
   tree_HemiMuOp_dR.push_back( dRobsOp2 );
 
   tree_Hemi_Vtx_step.push_back(Vtx_step);
+  tree_Hemi_Vtx_isTight.push_back(TightVertex);
   tree_Hemi_Vtx_NChi2.push_back(Vtx_chi);
   tree_Hemi_Vtx_nTrks.push_back(Vtx_ntk);
   tree_Hemi_Vtx_nTrks_sig.push_back(nTrks_axis2_sig_mva);
@@ -9126,9 +6966,9 @@ if ( LLP2_mother * lep1_Q < 0 ) {
   tree_Hemi_Vtx_y.push_back(Vtx_y);
   tree_Hemi_Vtx_r.push_back(sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y));
   tree_Hemi_Vtx_z.push_back(Vtx_z);
-  tree_Hemi_Vtx_xError.push_back(posError.cxx());
-  tree_Hemi_Vtx_yError.push_back(posError.cyy());
-  tree_Hemi_Vtx_zError.push_back(posError.czz());
+  tree_Hemi_Vtx_xError.push_back(Vtx2posError.cxx());
+  tree_Hemi_Vtx_yError.push_back(Vtx2posError.cyy());
+  tree_Hemi_Vtx_zError.push_back(Vtx2posError.czz());
   
   recX = Vtx_x - tree_PV_x;
   recY = Vtx_y - tree_PV_y;
@@ -9138,68 +6978,6 @@ if ( LLP2_mother * lep1_Q < 0 ) {
   tree_Hemi_Vtx_MeantrackWeight.push_back(MeanWeight);
   tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
 
-    // Vertex Analysis Step
-
-      // 0.7264 : Tight
-      // 0.2770 : Medium 
-      // 0.0494 : loose
-  // pass BtagGood_Hemi1 
-  int BtagGood_Hemi2 = 0 ;
-  temp_px = 0;
-  temp_py = 0;
-  temp_pz = 0 ;
-  temp_e = 0 ;
-  TLorentzVector Total4Vector2(0,0,0,0);
-  if (Vtx2_index.size() != Vtx2_Weights.size()) {std::cout<<"size Vtx2_weights and Vtx2_index and ntracks and  chi and step : "<<Vtx2_Weights.size()<<" and "<<Vtx2_index.size()<<" and "<<Vtx_ntk<<" and "<<Vtx_chi<<" and "<<Vtx_step<<std::endl;}
-
-    if (Vtx_step==1 || Vtx_step==2)
-      {
-        // if(Vtx_chi>0 && Vtx_chi<10)
-        //   {
-            for (unsigned int i = 0 ; i <TrackInfo_Hemi2_mva.size(); i++)
-              {
-                for (unsigned int j = 0 ; j < Vtx2_index.size(); j++)
-                  {
-                    if (i == Vtx2_index[j])
-                      {
-                        if (Vtx2_Weights[j]>0.5)
-                          {
-                            temp_px = TrackInfo_Hemi2_mva[i].second.Px();
-                            temp_py = TrackInfo_Hemi2_mva[i].second.Py();
-                            temp_pz = TrackInfo_Hemi2_mva[i].second.Pz();
-                            temp_e  = TrackInfo_Hemi2_mva[i].second.E();
-                            TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
-                            Total4Vector2 +=TLorentzTrack;
-                          }
-                      }
-                  }
-              }
-          // }
-      }
-
-    else if (Vtx_step == 3 || Vtx_step==4)
-      {
-            for (unsigned int i = 0 ; i <TrackInfo_Hemi2_mva.size(); i++)
-              {
-                for (unsigned int j = 0 ; j < Vtx2_index.size(); j++)
-                  {
-                    if (i == Vtx2_index[j])
-                      {
-                        if (Vtx2_Weights[j]>0.5)
-                          {
-                            temp_px = TrackInfo_step2_Hemi2[i].second.Px();
-                            temp_py = TrackInfo_step2_Hemi2[i].second.Py();
-                            temp_pz = TrackInfo_step2_Hemi2[i].second.Pz();
-                            temp_e  = TrackInfo_step2_Hemi2[i].second.E();
-                            TLorentzVector TLorentzTrack(temp_px,temp_py,temp_pz,temp_e);
-                            Total4Vector2 +=TLorentzTrack;
-                          }
-                      }
-                  }
-              }
-      }
-    tree_Hemi_Vtx_BTag.push_back(BtagGood_Hemi2 );
-    tree_Hemi_Vtx_Mass.push_back(sqrt(Total4Vector2.Mag2()));
 
   //------------------------------------------------//
   float Vtx2_ntk = Vtx_ntk;
@@ -9208,7 +6986,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
   // float Vtx2_r = sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y);
   // float Vtx2_z = Vtx_z;
   float Vtx2_MTW = MeanWeight;
-  float Vtx2_Mass = sqrt(Total4Vector2.Mag2());
+  float Vtx2_Mass = Vtx2Mass;
   float H2_Mass = Vobs2.Mag();
   // float Vtx2_dist = recD;
   float Vtx2_MeanDCA = DCA_VTX_Meand;
@@ -9276,7 +7054,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
               SecStep = -4;
               MeanWeight = (Vtx1_MTW+Vtx2_MTW)/2;
               DCA_VTX_Meand = (Vtx1_MeanDCA+Vtx2_MeanDCA)/2;
-              MergedVtxMass = TMath::Sqrt((Total4Vector1+Total4Vector2).Mag2());
+              MergedVtxMass = TMath::Sqrt((Vtx1Vector+Vtx2Vector).Mag2());
             }
           else if ((Vtx1_step > 2 && Vtx2_step <= 2) || (Vtx1_step <= 2 && Vtx2_step > 2)) //mix of tight and loose, we keep the tight vtx
             {
@@ -9317,7 +7095,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
               SecStep = -1;
               MeanWeight = (Vtx1_MTW+Vtx2_MTW)/2;
               DCA_VTX_Meand =  (Vtx1_MeanDCA+Vtx2_MeanDCA)/2;
-              MergedVtxMass = TMath::Sqrt((Total4Vector1+Total4Vector2).Mag2());
+              MergedVtxMass = TMath::Sqrt((Vtx1Vector+Vtx2Vector).Mag2());
             }
             // std::cout<<"vtx1_chi: "<<Vtx1_chi<<std::endl;
             // std::cout<<"vtx2_chi: "<<Vtx2_chi<<std::endl;
@@ -9453,14 +7231,19 @@ if ( LLP2_mother * lep1_Q < 0 ) {
 
                 }
 
-                GlobalPoint PVPos(PV.x(),PV.y(),PV.z());
+                // GlobalPoint PVPos(PV.x(),PV.y(),PV.z());
+                SecStep = 0;
                 Vtx* VtxSec = new Vtx();
                 // void Vertexing(std::vector<reco::TransientTrack> VertexTracks, vector<std::pair<bool,TLorentzVector>> Track_FirstHit, bool ActivateStep = true, bool RequireGoodChi2Seed,bool RequireGoodChi2VertexIter = false, float Chi2down = 0., float Chi2up = 10.)
                 VtxSec->Vertexing(NewTTracks,FHNewTTrack,true,false,false,0.,10.,&PVPos);
-                SecStep = 1; // 1 here
-                isTightNewVtx = true;
+                if (VtxSec->chi2() > 0. && VtxSec->chi2() < 10.) 
+                  {
+                    SecStep = 1; // 1 here
+                    isTightNewVtx = true;
+                  }
+
                 badVtx = false;
-                if ( (VtxSec->chi() < 0. || VtxSec->chi() > 10.)  ) badVtx = true;
+                if ( (VtxSec->chi2() < 0. || VtxSec->chi2() > 10.)  ) badVtx = true;
                 if ( badVtx  && NewTTracks.size() > 1 && (ActivateStep2 || IterAVF))
                   {
                     VtxSec->Vertexing(NewTTracks,FHNewTTrack,true,true,false,0.,10.,&PVPos);
@@ -9471,7 +7254,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                 // then steps 3 and 4 =< Loose 
                 NewTTracks.clear();
                 FHNewTTrack.clear();
-                if ((VtxSec->chi() < 0. || VtxSec->chi() > 10.) || NewTTracks.size()<2)//|| NewTTracks.size()<2
+                if ((VtxSec->chi2() < 0. || VtxSec->chi2() > 10.) || NewTTracks.size()<2)//|| NewTTracks.size()<2
                   {
                     // isTightNewVtx= false;
                     count_trk = 0;
@@ -9549,7 +7332,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                   }
 
                 badVtx = false;
-                if ( (VtxSec->chi() < 0. || VtxSec->chi() > 10.)  ) badVtx = true;
+                if ( (VtxSec->chi2() < 0. || VtxSec->chi2() > 10.)  ) badVtx = true;
                 NewTightVertex = false;
                 if ( badVtx  && NewTTracks.size() > 1 && ActivateStep3 && !NewTightVertex)
                   {
@@ -9558,23 +7341,24 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                     isTightNewVtx= false;
                   }
                 badVtx = false;
-                if ( (VtxSec->chi() < 0. || VtxSec->chi() > 10.)  ) badVtx = true;
+                if ( (VtxSec->chi2() < 0. || VtxSec->chi2() > 10.)  ) badVtx = true;
                 if ( badVtx  && NewTTracks.size() > 1 && (ActivateStep4 || IterAVF) && !NewTightVertex)
                   {
                     VtxSec->Vertexing(NewTTracks,FHNewTTrack,true,true,false,0.,10.,&PVPos);
                     SecStep = 4; // 1 here
                     isTightNewVtx = false;
+                    
+
                   }
 
                   float SecVtx_x = VtxSec->x();
                   float SecVtx_y = VtxSec->y();
                   float SecVtx_z = VtxSec->z();
                   float SecVtx_ntk = VtxSec->nTrk();
-                  float SecVtx_chi = VtxSec->chi();
+                  float SecVtx_chi = VtxSec->chi2();
                   std::vector<TransientTrack> SecVtx_Trks = VtxSec->GetTTracks();
                   std::vector<float>  NewVtx_Weights = VtxSec->Vtx_TrkWeights();
                   std::vector<unsigned int>  NewVtx_index = VtxSec->Vtx_TrkIndex();
-
                   DCA_VTX_Meand = VtxSec->MeanDCA();
                   MeanWeight    = VtxSec->SumWeight();
                   // if(SecVtx_chi>0 && SecVtx_chi<10)
@@ -9618,6 +7402,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
 
 
                         TLorentzVector NewVtxVector(0,0,0,0);
+                        if (SecVtx_chi== -10 && SecStep == 4)SecVtx_Trks.clear();
                         for (unsigned int i = 0 ; i <SecVtx_Trks.size(); i++)
                           {
                             tree_Hemi_SecVtx_trackWeight.push_back(NewVtx_Weights[i]);
@@ -10541,6 +8326,7 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_Hemi_SecLLP.clear();
     tree_Hemi_SecLLP_ping.clear();
     tree_Hemi_Vtx_step.clear();
+    tree_Hemi_Vtx_isTight.clear();
     tree_Hemi_Vtx_NChi2.clear();
     tree_Hemi_Vtx_nTrks.clear();
     tree_Hemi_Vtx_nTrks_sig.clear();
@@ -10560,11 +8346,11 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_Hemi_Vtx_dRvtx.clear();
     tree_Hemi_Vtx_nVtx.clear();
 
-    tree_Hemi_SecVtx_track_DCA_x.clear();
-    tree_Hemi_SecVtx_track_DCA_y.clear();
-    tree_Hemi_SecVtx_track_DCA_z.clear();
-    tree_Hemi_SecVtx_track_DCA_r.clear();
-    tree_Hemi_SecVtx_track_DCA_d.clear();
+    // tree_Hemi_SecVtx_track_DCA_x.clear();
+    // tree_Hemi_SecVtx_track_DCA_y.clear();
+    // tree_Hemi_SecVtx_track_DCA_z.clear();
+    // tree_Hemi_SecVtx_track_DCA_r.clear();
+    // tree_Hemi_SecVtx_track_DCA_d.clear();
     tree_Hemi_SecVtx_x.clear();
     tree_Hemi_SecVtx_y.clear();
     tree_Hemi_SecVtx_z.clear();
@@ -10586,11 +8372,11 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_Hemi_SecVtx_NChi2.clear();
     tree_Hemi_Vtx_trackWeight.clear();
     tree_Hemi_Vtx_MeantrackWeight.clear();
-    tree_Hemi_Vtx_track_DCA_x.clear();
-    tree_Hemi_Vtx_track_DCA_y.clear();
-    tree_Hemi_Vtx_track_DCA_z.clear();
-    tree_Hemi_Vtx_track_DCA_r.clear();
-    tree_Hemi_Vtx_track_DCA_d.clear();
+    // tree_Hemi_Vtx_track_DCA_x.clear();
+    // tree_Hemi_Vtx_track_DCA_y.clear();
+    // tree_Hemi_Vtx_track_DCA_z.clear();
+    // tree_Hemi_Vtx_track_DCA_r.clear();
+    // tree_Hemi_Vtx_track_DCA_d.clear();
     tree_Hemi_Vtx_track_MeanDCA_d.clear();
     tree_Hemi_Vtx_BTag.clear();
     tree_Hemi_Vtx_Mass.clear();
