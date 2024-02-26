@@ -33,7 +33,7 @@ void SaveInFile(TH1* ahisto, TFile* afile)
 }
 
 
-void TreeAnalyzer::Loop(TString sample)
+void TreeAnalyzer::Loop(TString sample, TString Production)
 {
 //   In a ROOT session, you can do:
 //      root> .L TreeAnalyzer.C
@@ -61,8 +61,8 @@ void TreeAnalyzer::Loop(TString sample)
 
   TString thesample  = sample;
 //   TString filename  =  "BKGEstimation_"+thesample+".root";
-  TFile * theoutputfile = new TFile( ("outputroot/BKGEstimation_"+thesample+".root").Data() , "recreate");
-  std::ofstream ofs ("outputroot/BKGEstimation_"+thesample+".txt", std::ofstream::out);
+  TFile * theoutputfile = new TFile( (Production+"/BKGEstimation_"+thesample+".root").Data() , "recreate");
+  std::ofstream ofs (Production+"/BKGEstimation_"+thesample+".txt", std::ofstream::out);
 
 //**********************************
 // Histograms
@@ -878,7 +878,7 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
 
   float lumiRun2 = 136000 ; //pb-1
   float Nevent = 0;
-//   if (nentries>10000000){nentries = 10000000;}
+//   if (nentries>760000){nentries =760000;}
    // NormFactor =  XS/nentries;
 
    cout<< "Line : "  << __LINE__ << " " << nentries << endl; 
@@ -1163,7 +1163,7 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
       float BDTvtx = -2., BDTvtx1 = -2., BDTvtx2 = -2.;
       float mass = -1., VtxMass = -1.;
       float massMu = -1., ptMu = -1., dRMu = 10.;
-
+      bool MergingInfo = false;
       nTrks  = tree_Hemi_nTrks->at(0);
       mass   = tree_Hemi_mass->at(0);
       massMu = tree_HemiMu_mass->at(0);
@@ -1190,6 +1190,7 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
       if ( hemi2_pt > hemi1_pt ) hemi_ptmin = hemi1_pt;
 
       //$$$$
+
       // Signal Region
       if(!BlindSR)
          {
@@ -1199,7 +1200,6 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
 
                   hData_Mmumu->Fill( tree_Mmumu );
                   hData_BDTevt->Fill( tree_Evts_MVAval );
-   
                   if ( tree_Hemi_Vtx_NChi2->at(0) > 0 && tree_Hemi_Vtx_NChi2->at(0) < 10
                   && tree_Hemi_Vtx_step->at(0) >= 1 && tree_Hemi_Vtx_step->at(0) <= 2 
                   )  {
@@ -1285,7 +1285,7 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
                   // hData_Hemi_1Vtx_lead_ptmin->Fill(  hemi_lead_ptmin );
                   hData_Hemi_1Vtx_ptmin->Fill(  hemi_ptmin );
                   }
-                  
+
                   if ( nVtx == 2 ) {
                   hData_Hemi_2Vtx_BDTevt->Fill( tree_Evts_MVAval );
                   hData_Hemi_2Vtx_BDTvtx->Fill( BDTvtx );
@@ -1316,16 +1316,21 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
                   hData_Hemi_2VtxAll_ptMu->Fill(     tree_HemiMu_pt->at(1) );
                   hData_Hemi_2VtxAll_dRMu->Fill(     tree_HemiMu_dR->at(0) );
                   hData_Hemi_2VtxAll_dRMu->Fill(     tree_HemiMu_dR->at(1) );
-
                                           //------------------------
+            if (tree_Hemi_Vtx_Vtx_dr->at(0) < 0.1 && tree_Hemi_Vtx_Vtx_dz->at(0)<0.1 && MergingInfo)
+               {
+
+               std::cout<<"here a"<<std::endl;
             int NewnVtx = -1;
             if (tree_Hemi_Merging->at(0) && tree_Hemi_Merging->at(1)) {NewnVtx = 2;}
             else if (tree_Hemi_Merging->at(0)==0 && tree_Hemi_Merging->at(1) == 0){NewnVtx = 0;}
             else {NewnVtx = 1;}
             float NewVtxMass = -10;
              bool SecTight = false;
+std::cout<<"here b"<<std::endl;
             if (NewnVtx == 2)
                {
+                  std::cout<<"here cprime"<<std::endl;
                   if (tree_Hemi_SecVtx_Mass->at(0)<tree_Hemi_SecVtx_Mass->at(1)) NewVtxMass = tree_Hemi_SecVtx_Mass->at(1);
                   bool NewisCutVtx = false;
                   if (tree_Hemi_SecVtx_isTight->at(0) == true && tree_Hemi_SecVtx_isTight->at(1) == true) SecTight = true;
@@ -1338,13 +1343,14 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
                      {
                         hData_Hemi_2SecVtx_CutVtx_CutEvt_Mass->Fill(   NewVtxMass );
                      }
+                     std::cout<<"here c"<<std::endl;
                }
             if (NewnVtx == 1)
                {  
                   bool Merge = false ;
                   SecTight = tree_Hemi_SecVtx_isTight->at(1);
                   if (tree_Hemi_Merging->at(0)) Merge = true;
-                  
+                  std::cout<<"here dprime"<<std::endl;
                   if (Merge) {NewVtxMass = tree_Hemi_SecVtx_Mass->at(0);SecTight = tree_Hemi_SecVtx_isTight->at(0);}
                   else NewVtxMass = tree_Hemi_SecVtx_Mass->at(1);
                   bool NewisCutVtx = false;
@@ -1359,6 +1365,8 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
                         hData_Hemi_1SecVtx_CutVtx_CutEvt_Mass->Fill(  NewVtxMass );
                         hData_Hemi_1SecVtx_CutVtx_CutEvt_Merge->Fill(Merge);
                      }
+                  std::cout<<"here d"<<std::endl;
+               }
                }
 
             //--------------------------------------
@@ -1512,10 +1520,9 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
                }
          } // End of Signal Region of Daniel'sMethod
 
-
          //$$$$
          // Forward Control Region
-
+// std::cout<<"here"<<std::endl;
       isHemiVtx1 = false; isHemiVtx2 = false;
       isCutVtx = false; isCutVtx1 = false; isCutVtx2 = false;
       isCutEvt = false;
@@ -1607,6 +1614,8 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
 
 
                         //------------------------
+            if (tree_Hemi_Vtx_Vtx_dr->at(0) < 0.1 && tree_Hemi_Vtx_Vtx_dz->at(0)<0.1 && MergingInfo)
+               {
             int NewnVtx = -1;
             if (tree_Hemi_Merging->at(0) && tree_Hemi_Merging->at(1)) {NewnVtx = 2;}
             else if (tree_Hemi_Merging->at(0)==0 && tree_Hemi_Merging->at(1) == 0){NewnVtx = 0;}
@@ -1650,7 +1659,7 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
                         hData_CRfwd_Hemi_1SecVtx_CutVtx_CutEvt_Merge->Fill(Merge);
                      }
                }
-
+               }
             //--------------------------------------
          }
 
@@ -1819,6 +1828,8 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
             hData_CRlowpt_Hemi_2Vtx_ptmin->Fill(  hemi_ptmin );
 
                         //------------------------
+                                    if (tree_Hemi_Vtx_Vtx_dr->at(0) < 0.1 && tree_Hemi_Vtx_Vtx_dz->at(0)<0.1 && MergingInfo)
+               {
             int NewnVtx = -1;
             if (tree_Hemi_Merging->at(0) && tree_Hemi_Merging->at(1)) {NewnVtx = 2;}
             else if (tree_Hemi_Merging->at(0)==0 && tree_Hemi_Merging->at(1) == 0){NewnVtx = 0;}
@@ -1861,7 +1872,7 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
                         hData_CRlowpt_Hemi_1SecVtx_CutVtx_CutEvt_Merge->Fill(Merge);
                      }
                }
-
+               }
             //--------------------------------------
             }
 
@@ -1990,6 +2001,8 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
          hData_CRloose_Hemi_2Vtx_Mmumu->Fill(  tree_Mmumu );
          hData_CRloose_Hemi_2Vtx_ptmin->Fill(  hemi_ptmin );
                      //------------------------
+                                 if (tree_Hemi_Vtx_Vtx_dr->at(0) < 0.1 && tree_Hemi_Vtx_Vtx_dz->at(0)<0.1 && MergingInfo)
+               {
             int NewnVtx = -1;
             if (tree_Hemi_Merging->at(0) && tree_Hemi_Merging->at(1)) {NewnVtx = 2;}
             else if (tree_Hemi_Merging->at(0)==0 && tree_Hemi_Merging->at(1) == 0){NewnVtx = 0;}
@@ -2032,7 +2045,7 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
                         hData_CRloose_Hemi_1SecVtx_CutVtx_CutEvt_Merge->Fill(Merge);
                      }
                }
-
+               }
             //--------------------------------------
          }
 
@@ -2195,6 +2208,8 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
       
       
       //------------------------
+                  if (tree_Hemi_Vtx_Vtx_dr->at(0) < 0.1 && tree_Hemi_Vtx_Vtx_dz->at(0)<0.1 && MergingInfo)
+               {
       int NewnVtx = -1;
       if (tree_Hemi_Merging->at(0) && tree_Hemi_Merging->at(1)) {NewnVtx = 2;}
       else if (tree_Hemi_Merging->at(0)==0 && tree_Hemi_Merging->at(1) == 0){NewnVtx = 0;}
@@ -2238,7 +2253,7 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
          }
 
       //--------------------------------------
-
+               }
    }
 
    if ( nVtx == 1 && isCutEvt ) {
@@ -2392,6 +2407,8 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
             hData_SameSign_Hemi_2Vtx_Mmumu->Fill(  tree_MmumuSameSign );
             hData_SameSign_Hemi_2Vtx_ptmin->Fill(  hemi_ptmin );
                            //------------------------
+            if (tree_Hemi_Vtx_Vtx_dr->at(0) < 0.1 && tree_Hemi_Vtx_Vtx_dz->at(0)<0.1 && MergingInfo)
+               {
                int NewnVtx = -1;
                if (tree_Hemi_Merging->at(0) && tree_Hemi_Merging->at(1)) {NewnVtx = 2;}
                else if (tree_Hemi_Merging->at(0)==0 && tree_Hemi_Merging->at(1) == 0){NewnVtx = 0;}
@@ -2436,7 +2453,7 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
                            hData_SameSign_Hemi_1SecVtx_CutVtx_CutEvt_Merge->Fill(Merge);
                         }
                   }
-
+               }
                //--------------------------------------
             }
 
@@ -2527,7 +2544,7 @@ if (thesample.Contains("10_test")){ XS = 0.0035; } //this is for 14tev
          } // endif tree_FilterSameSign 
          //$$$$
 
-
+// std::cout<<"here2"<<std::endl;
 
    }// End of loop on Events
 
