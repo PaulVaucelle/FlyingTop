@@ -303,91 +303,26 @@ float nEvts_Hemi_CombinedHemiLeptonMass[200] = {0};
 // Normalisation factor (XS)
   float NormFactor = 1. ;
   float XS = 1;
-if (thesample == "70_test")
-    {        
-      XS = 0.0035;//this is for 14tev
-    }
-if (thesample == "50_test")
-    {        
-      XS = 0.0025;//this is for 14tev
-    }
-if (thesample == "30_test")
-    {        
-      XS = 0.002;//this is for 14tev
-    }
-if (thesample == "10_test")
-    {        
-      XS = 0.0035;//this is for 14tev
-    }
-if (thesample == "DYJetsToLL_M10to50")
-    {        
-      XS = 15910.0;
-    }
-if (thesample == "ST_tW_antitop_5f_NoFullyHadronicDecays")
-    {        
-      XS = 10.8707;
-    }
-if (thesample == "ST_tW_top_5f_NoFullyHadronicDecays")
-    {        
-      XS = 10.8908;
-    }
-if (thesample == "TTJets_DiLept")
-    {        
-      XS = 53.07;
-    }
-if (thesample == "WWTo2L2Nu_MLL_200To600")
-    {        
-      XS = 11.09;
-    }
-if (thesample == "WWTo2L2Nu_MLL_600To1200")
-    {        
-      XS = 11.09;
-    }
-if (thesample == "WWTo2L2Nu")
-    {        
-      XS = 11.09;
-    }
-if (thesample == "WZTo2Q2L_mllmin4p0")
-    {        
-      XS = 6.535;
-    }
-if (thesample == "ZZTo2Q2L_mllmin4p0")
-    {        
-      XS = 3.676;
-    }
-if (thesample == "TTTo2L2Nu")
-    {        
-      // XS = 687.1;
-      XS = 88.3;
-    }
-if (thesample == "DYJetsToLL_M50")
-    {        
-      XS = 5379;
-    }
-if (thesample == "ttWJetsToLNu_5f_EWK")
-    {        
-      XS = 0.290;// not found on XSDB, no file on tier2...approximation
+
+if (thesample.Contains("DYJetsToLL_M10to50"))                     { XS = 15910.0;   }
+if (thesample.Contains("ST_tW_antitop_5f_NoFullyHadronicDecays")) { XS = 10.8707;   }
+if (thesample.Contains("ST_tW_top_5f_NoFullyHadronicDecays"))     { XS = 10.8908;   }
+if (thesample.Contains("TTJets_DiLept"))                          { XS = 53.07;     }
+if (thesample.Contains("WWTo2L2Nu_MLL_200To600"))                 { XS = 11.09;     }
+if (thesample.Contains("WWTo2L2Nu_MLL_600To1200"))                { XS = 11.09;     }
+if (thesample.Contains("WWTo2L2Nu"))                              { XS = 11.09;     }
+if (thesample.Contains("WZTo2Q2L_mllmin4p0"))                     { XS = 6.535;     }
+if (thesample.Contains("ZZTo2Q2L_mllmin4p0"))                     { XS = 3.676;     }
+if (thesample.Contains("TTTo2L2Nu"))                              { XS = 88.3;      }
+if (thesample.Contains("DYJetsToLL_M50"))                         { XS = 5379;      }
+if (thesample.Contains("ttWJetsToLNu_5f_EWK"))                    { XS = 0.290;     } // not found on XSDB, no file on tier2...approximation
       //Took 0.868 pb (CMS-TOP-21-011)
      // as a starting point and then divided by 3 (lepton universality)
-    }
+if (thesample.Contains("TTZToLL_5f"))                             { XS = 0.05188;   }//Not found on XSDB => used ana.py macro : 5.188e-02 +- 2.437e-04 pb
+if (thesample.Contains("TTToHadronic"))                           { XS = 378.9;     }
+if (thesample.Contains("TTWW"))                                   { XS = 0.006992;  }//found on XSDB
+if (thesample.Contains("TTToSemiLeptonic")  )                      { XS = 365.34;    }
 
-if (thesample == "TTZToLL_5f")
-    {        
-      XS = 0.05188;//Not found on XSDB => used ana.py macro : 5.188e-02 +- 2.437e-04 pb
-    }
-
-if (thesample == "TTToHadronic")
-    {        
-      XS = 378.9;
-    }
-if (thesample == "TTWW")
-    {        
-      XS = 0.006992;//found on XSDB
-    }
-if (thesample == "TTToSemiLeptonic")
-    {        
-      XS = 365.34;
-    }
 
 if (thesample.Contains("smu200"))
     {        
@@ -428,7 +363,7 @@ if (thesample.Contains("smu200"))
 
   float lumiRun2 = 136000 ; //pb-1
   float Nevent = nentries;
-  if (nentries>1000000){nentries = 1000000;}
+  // if (nentries>1000000){nentries = 1000000;}
   
   NormFactor =  XS/nentries;
 
@@ -683,7 +618,7 @@ if (thesample.Contains("smu200"))
                }
 
          }
-   
+  //  std::cout<<"here"<<std::endl;
       //*******************************
       //loop on Sec. Interactions
       //*******************************
@@ -726,11 +661,11 @@ if (thesample.Contains("smu200"))
                   // to get a nice view of the tracker in the r vs z plane
                   if (tree_SecInt_selec->at(iSecInt) && tree_SecInt_layer->at(iSecInt)!=0 && abs(tree_SecInt_r->at(iSecInt))<70 && abs(tree_SecInt_z->at(iSecInt))<120)
                     {
-                      fillHisto2D("hData_reco_SecInt_rz","TrackerMatched", thesample, tree_SecInt_r->at(iSecInt),abs(tree_SecInt_z->at(iSecInt)),1.);
+                      fillHisto2D("hData_reco_SecInt_rz","TrackerMatched", thesample, abs(tree_SecInt_z->at(iSecInt)),tree_SecInt_r->at(iSecInt),1.);
                     }
                   if (tree_SecInt_selec->at(iSecInt) && tree_SecInt_layer->at(iSecInt)!=0 && abs(tree_SecInt_r->at(iSecInt))<70 && abs(tree_SecInt_z->at(iSecInt))<120)
                     {
-                      fillHisto2D("hData_reco_SecInt_rz","Selec", thesample, tree_SecInt_r->at(iSecInt),abs(tree_SecInt_z->at(iSecInt)),1.);
+                      fillHisto2D("hData_reco_SecInt_rz","Selec", thesample,abs(tree_SecInt_z->at(iSecInt)), tree_SecInt_r->at(iSecInt),1.);
                     }
                }
          }
@@ -758,6 +693,7 @@ if (thesample.Contains("smu200"))
         
         
       }
+    // std::cout<<"here2"<<std::endl;
       //*******************************
       //loop on tracks
       //*******************************
@@ -1155,7 +1091,7 @@ if (thesample.Contains("smu200"))
         if (countRecoTight12 >0 ){fillHisto("DiMuon_Mass","RecoVtx_TightWP", thesample,  tree_Mmumu, XS/(nentries)); }
         if (countRecoTight12_BDT3>0){fillHisto("DiMuon_Mass","RecoVtx_TightWP_BDT3", thesample,  tree_Mmumu, XS/(nentries));}//!!!!
         if (countRecoTight12_BDT3bis>0){fillHisto("DiMuon_Mass","RecoVtx_TightWP_BDT3bis", thesample,  tree_Mmumu, XS/(nentries)); }//!!!!
-
+        // std::cout<<"here3"<<std::endl;
       //*****************************************
       // Resolution on the reconstructed vertices
       //*****************************************
@@ -1250,20 +1186,20 @@ if (thesample.Contains("smu200"))
 // std::cout<<"debug 2"<<std::endl;
 // --------Vtx_dd------
 
-  for (int i =0 ;i<nStep_dd;i++)
-    {
-      for (unsigned int j = 0 ; j< tree_Hemi->size();j++)
-        {
-          if (tree_Hemi_Vtx_NChi2->at(j)>0 && tree_Hemi_Vtx_NChi2->at(j)<10 && tree_Hemi_Vtx_Vtx_dd->at(j)>=(VtxddCut+i*ddd))
-            {
-              nEvts_Vtx_dd[i]++;
-              if (tree_Hemi_Vtx_step->at(j)==1 || tree_Hemi_Vtx_step->at(j)==2 )
-                {
-                  nEvts_Vtx_dd_step1[i]++;
-                }
-            }
-        }
-    }
+  // for (int i =0 ;i<nStep_dd;i++)
+  //   {
+  //     for (unsigned int j = 0 ; j< tree_Hemi->size();j++)
+  //       {
+  //         if (tree_Hemi_Vtx_NChi2->at(j)>0 && tree_Hemi_Vtx_NChi2->at(j)<10 && tree_Hemi_Vtx_Vtx_dd->at(j)>=(VtxddCut+i*ddd))
+  //           {
+  //             nEvts_Vtx_dd[i]++;
+  //             if (tree_Hemi_Vtx_step->at(j)==1 || tree_Hemi_Vtx_step->at(j)==2 )
+  //               {
+  //                 nEvts_Vtx_dd_step1[i]++;
+  //               }
+  //           }
+  //       }
+  //   }
 // std::cout<<"debug 3"<<std::endl;
     //--------Vtx_nTrks------
 //-----------------------------
@@ -1914,7 +1850,7 @@ for (int i = 0 ; i < nStep_MuonJetdRmin ; i++)
   }// End of Tree_FIlter
 }// End Global Loop
 
-
+// std::cout<<"here5"<<std::endl;
     //-----------------------------------//
 //------------Evts Bdt selection
   for (int i =0 ;i<nSteps_BDT;i++)
@@ -2163,7 +2099,7 @@ for(int h =0 ; h < nStep_nJet;h++)
    ofs<<"NormFactor : "<<NormFactor<<std::endl;
    ofs<<" "<<std::endl;
    ofs.close();
-
+std::cout<<"here6"<<std::endl;
     fillHisto("hData_Trks_Selection","Step",thesample,0,LooseTrks_Eff);
     fillHisto("hData_Trks_Selection","Step",thesample,1,TightTrks_Eff);
 
@@ -2446,8 +2382,8 @@ void TreeReader::initializeHisto(TString sample, bool isfirstset){
    addHisto("hData_reco_SecInt_r","TrackerMatched",    sample.Data(),200,0,100);
    addHisto("hData_reco_SecInt_z","TrackerMatched",    sample.Data(),401,-200,200);
 
-   addHisto2D("hData_reco_SecInt_xy","TrackerMatched",  sample.Data(), 100,-25,25, 100,-25,25);
-   addHisto2D("hData_reco_SecInt_xy","Selec",           sample.Data(), 100,-25,25, 100,-25,25);
+   addHisto2D("hData_reco_SecInt_xy","TrackerMatched",  sample.Data(), 1000,-25,25, 1000,-25,25);
+   addHisto2D("hData_reco_SecInt_xy","Selec",           sample.Data(), 1000,-25,25, 1000,-25,25);
    addHisto2D("hData_reco_SecInt_rz","TrackerMatched",  sample.Data(), 140,0,70, 240,0,120);
    addHisto2D("hData_reco_SecInt_rz","Selec",           sample.Data(), 140,0,70, 240,0,120);
 
