@@ -843,7 +843,7 @@ if (thesample.Contains("smu200"))
                   fillHisto("hData_Hemi_Vtx_nTrks","RecoVtx",   thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);
                   fillHisto("hData_Hemi_Vtx_dist","RecoVtx",    thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);
                   fillHisto("hData_Hemi_Vtx_step","RecoVtx",    thesample,tree_Hemi_Vtx_step->at(iVtx),1.);
-                  fillHisto("hData_Hemi_Vtx_eta","RecoVtx",     thesample,tree_Hemi_Vtx_eta->at(iVtx),1.);
+                  // fillHisto("hData_Hemi_Vtx_eta","RecoVtx",     thesample,tree_Hemi_Vtx_eta->at(iVtx),1.);
                   fillHisto("hData_Hemi_Vtx_r","RecoVtx",       thesample,tree_Hemi_Vtx_r->at(iVtx),1.);
                   fillHisto("hData_Hemi_Vtx_z","RecoVtx",       thesample,tree_Hemi_Vtx_z->at(iVtx),1.);
                   fillHisto("hData_Hemi_Vtx_MVAval","RecoVtx",  thesample,tree_Hemi_Vtx_MVAval->at(iVtx),1.);
@@ -855,7 +855,7 @@ if (thesample.Contains("smu200"))
                         fillHisto("hData_Hemi_Vtx_nTrks","GoodRecoVtx",   thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);
                         fillHisto("hData_Hemi_Vtx_dist","GoodRecoVtx",    thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);
                         fillHisto("hData_Hemi_Vtx_step","GoodRecoVtx",    thesample,tree_Hemi_Vtx_step->at(iVtx),1.);
-                        fillHisto("hData_Hemi_Vtx_eta","GoodRecoVtx",     thesample,tree_Hemi_Vtx_eta->at(iVtx),1.);
+                        // fillHisto("hData_Hemi_Vtx_eta","GoodRecoVtx",     thesample,tree_Hemi_Vtx_eta->at(iVtx),1.);
                         fillHisto("hData_Hemi_Vtx_r","GoodRecoVtx",       thesample,tree_Hemi_Vtx_r->at(iVtx),1.);
                         fillHisto("hData_Hemi_Vtx_z","GoodRecoVtx",       thesample,tree_Hemi_Vtx_z->at(iVtx),1.);
                         fillHisto("hData_Hemi_Vtx_MVAval","GoodRecoVtx",  thesample,tree_Hemi_Vtx_MVAval->at(iVtx),1.);
@@ -888,7 +888,7 @@ if (thesample.Contains("smu200"))
                             if (tree_Hemi_LLP_ping->at(iVtx))
                               {
                                 fillHisto("hData_Hemi_Vtx_r","Ping",      thesample,tree_Hemi_Vtx_r->at(iVtx),1.); 
-                                fillHisto("hData_Hemi_Vtx_eta","Ping",    thesample,tree_Hemi_Vtx_eta->at(iVtx),1.); 
+                                // fillHisto("hData_Hemi_Vtx_eta","Ping",    thesample,tree_Hemi_Vtx_eta->at(iVtx),1.); 
                                 fillHisto("hData_Hemi_Vtx_dist","Ping",   thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);                   
                                 float r = sqrt((tree_Hemi_LLP_x->at(iVtx)*tree_Hemi_LLP_x->at(iVtx))+(tree_Hemi_LLP_y->at(iVtx)*tree_Hemi_LLP_y->at(iVtx)));              
                                 fillHisto("hSim_Hemi_Vtx_r","Ping",      thesample,r,1); 
@@ -912,7 +912,7 @@ if (thesample.Contains("smu200"))
                         fillHisto("hData_Hemi_Vtx_nTrks","RecoVtx_TightWP",   thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);
                         fillHisto("hData_Hemi_Vtx_NChi2","RecoVtx_TightWP",   thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);
                         fillHisto("hData_Hemi_Vtx_dist","RecoVtx_TightWP",    thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);
-                        fillHisto("hData_Hemi_Vtx_eta","RecoVtx_TightWP",     thesample,tree_Hemi_Vtx_eta->at(iVtx),1.);
+                        // fillHisto("hData_Hemi_Vtx_eta","RecoVtx_TightWP",     thesample,tree_Hemi_Vtx_eta->at(iVtx),1.);
                         fillHisto("hData_Hemi_Vtx_r","RecoVtx_TightWP",       thesample,tree_Hemi_Vtx_r->at(iVtx),1.);
                         fillHisto("hData_Hemi_Vtx_z","RecoVtx_TightWP",       thesample,tree_Hemi_Vtx_z->at(iVtx),1.);
                         fillHisto("hData_Hemi_Vtx_MVAval","RecoVtx_TightWP",  thesample,tree_Hemi_Vtx_MVAval->at(iVtx),1.);
@@ -923,7 +923,7 @@ if (thesample.Contains("smu200"))
                               fillHisto("hData_Hemi_Vtx_NChi2","GoodRecoVtx_TightWP",   thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);
                               fillHisto("hData_Hemi_Vtx_nTrks","GoodRecoVtx_TightWP",   thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);
                               fillHisto("hData_Hemi_Vtx_dist","GoodRecoVtx_TightWP",    thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);
-                              fillHisto("hData_Hemi_Vtx_eta","GoodRecoVtx_TightWP",     thesample,tree_Hemi_Vtx_eta->at(iVtx),1.);
+                              // fillHisto("hData_Hemi_Vtx_eta","GoodRecoVtx_TightWP",     thesample,tree_Hemi_Vtx_eta->at(iVtx),1.);
                               fillHisto("hData_Hemi_Vtx_r","GoodRecoVtx_TightWP",       thesample,tree_Hemi_Vtx_r->at(iVtx),1.);
                               fillHisto("hData_Hemi_Vtx_z","GoodRecoVtx_TightWP",       thesample,tree_Hemi_Vtx_z->at(iVtx),1.);
                               fillHisto("hData_Hemi_Vtx_MVAval","GoodRecoVtx_TightWP",  thesample,tree_Hemi_Vtx_MVAval->at(iVtx),1.);
@@ -952,7 +952,7 @@ if (thesample.Contains("smu200"))
                                   if (tree_Hemi_LLP_ping->at(iVtx))
                                     {
                                       fillHisto("hData_Hemi_Vtx_r","Ping_TightWP",      thesample,tree_Hemi_Vtx_r->at(iVtx),1.); 
-                                      fillHisto("hData_Hemi_Vtx_eta","Ping_TightWP",    thesample,tree_Hemi_Vtx_eta->at(iVtx),1.); 
+                                      // fillHisto("hData_Hemi_Vtx_eta","Ping_TightWP",    thesample,tree_Hemi_Vtx_eta->at(iVtx),1.); 
                                       fillHisto("hData_Hemi_Vtx_dist","Ping_TightWP",   thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);                   
                                       float r = sqrt((tree_Hemi_LLP_x->at(iVtx)*tree_Hemi_LLP_x->at(iVtx))+(tree_Hemi_LLP_y->at(iVtx)*tree_Hemi_LLP_y->at(iVtx)));               
                                       fillHisto("hSim_Hemi_Vtx_r","Ping_TightWP",      thesample,r,1); 
@@ -1041,7 +1041,7 @@ if (thesample.Contains("smu200"))
                         fillHisto("hData_Hemi_Vtx_nTrks","RecoVtx_LooseWP",   thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);
                         fillHisto("hData_Hemi_Vtx_NChi2","RecoVtx_LooseWP",   thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);
                         fillHisto("hData_Hemi_Vtx_dist","RecoVtx_LooseWP",    thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);
-                        fillHisto("hData_Hemi_Vtx_eta","RecoVtx_LooseWP",     thesample,tree_Hemi_Vtx_eta->at(iVtx),1.);
+                        // fillHisto("hData_Hemi_Vtx_eta","RecoVtx_LooseWP",     thesample,tree_Hemi_Vtx_eta->at(iVtx),1.);
                         fillHisto("hData_Hemi_Vtx_r","RecoVtx_LooseWP",       thesample,tree_Hemi_Vtx_r->at(iVtx),1.);
                         fillHisto("hData_Hemi_Vtx_z","RecoVtx_LooseWP",       thesample,tree_Hemi_Vtx_z->at(iVtx),1.);
                         fillHisto("hData_Hemi_Vtx_MVAval","RecoVtx_LooseWP",  thesample,tree_Hemi_Vtx_MVAval->at(iVtx),1.);
@@ -1052,7 +1052,7 @@ if (thesample.Contains("smu200"))
                               fillHisto("hData_Hemi_Vtx_NChi2","GoodRecoVtx_LooseWP",   thesample,tree_Hemi_Vtx_NChi2->at(iVtx),1.);
                               fillHisto("hData_Hemi_Vtx_nTrks","GoodRecoVtx_LooseWP",   thesample,tree_Hemi_Vtx_nTrks->at(iVtx),1.);
                               fillHisto("hData_Hemi_Vtx_dist","GoodRecoVtx_LooseWP",    thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);
-                              fillHisto("hData_Hemi_Vtx_eta","GoodRecoVtx_LooseWP",     thesample,tree_Hemi_Vtx_eta->at(iVtx),1.);
+                              // fillHisto("hData_Hemi_Vtx_eta","GoodRecoVtx_LooseWP",     thesample,tree_Hemi_Vtx_eta->at(iVtx),1.);
                               fillHisto("hData_Hemi_Vtx_r","GoodRecoVtx_LooseWP",       thesample,tree_Hemi_Vtx_r->at(iVtx),1.);
                               fillHisto("hData_Hemi_Vtx_z","GoodRecoVtx_LooseWP",       thesample,tree_Hemi_Vtx_z->at(iVtx),1.);
                               fillHisto("hData_Hemi_Vtx_MVAval","GoodRecoVtx_LooseWP",  thesample,tree_Hemi_Vtx_MVAval->at(iVtx),1.);
@@ -1061,7 +1061,7 @@ if (thesample.Contains("smu200"))
                                   if (tree_Hemi_LLP_ping->at(iVtx))
                                     {
                                       fillHisto("hData_Hemi_Vtx_r","Ping_LooseWP",      thesample,tree_Hemi_Vtx_r->at(iVtx),1.); 
-                                      fillHisto("hData_Hemi_Vtx_eta","Ping_LooseWP",    thesample,tree_Hemi_Vtx_eta->at(iVtx),1.); 
+                                      // fillHisto("hData_Hemi_Vtx_eta","Ping_LooseWP",    thesample,tree_Hemi_Vtx_eta->at(iVtx),1.); 
                                       fillHisto("hData_Hemi_Vtx_dist","Ping_LooseWP",   thesample,tree_Hemi_Vtx_dist->at(iVtx),1.);                   
                                       float r = sqrt((tree_Hemi_LLP_x->at(iVtx)*tree_Hemi_LLP_x->at(iVtx))+(tree_Hemi_LLP_y->at(iVtx)*tree_Hemi_LLP_y->at(iVtx)));               
                                       fillHisto("hSim_Hemi_Vtx_r","Ping_LooseWP",      thesample,r,1); 
@@ -1222,9 +1222,9 @@ if (thesample.Contains("smu200"))
 //--------Vtx_nVtx------
   for (int i =0 ;i<nStep_nVtx;i++)
     {
-      for (unsigned int j = 0 ; j< tree_Hemi_Vtx_nVtx->size();j++)
+      for (unsigned int j = 0 ; j< tree_event_nVtx->size();j++)
         {
-          if (tree_Hemi_Vtx_NChi2->at(j)>0 && tree_Hemi_Vtx_NChi2->at(j)<10 && tree_Hemi_Vtx_nVtx->at(j)==(VtxnVtxCut+i*dnVtx))
+          if (tree_Hemi_Vtx_NChi2->at(j)>0 && tree_Hemi_Vtx_NChi2->at(j)<10 && tree_event_nVtx->at(j)==(VtxnVtxCut+i*dnVtx))
             {
               nEvts_Vtx_nVtx[i]++;
               if (tree_Hemi_Vtx_step->at(j)==1 || tree_Hemi_Vtx_step->at(j)==2 )
@@ -1235,9 +1235,9 @@ if (thesample.Contains("smu200"))
         }
     }
 
-      for (unsigned int j = 0 ; j< tree_Hemi_Vtx_nVtx->size();j++)
+      for (unsigned int j = 0 ; j< tree_event_nVtx->size();j++)
         {
-          if (tree_Hemi_Vtx_nVtx->at(j)==2)
+          if (tree_event_nVtx->at(j)==2)
             {
               nEvts_w2Vtx++;
             }
