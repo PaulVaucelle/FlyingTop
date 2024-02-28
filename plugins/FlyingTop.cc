@@ -20,10 +20,11 @@
 // The electron and tau channels could also be analyzed but      //
 // since their identification/isolation is way different from    //
 // the muons (and also harder), the muon channel is chosen even  //
-// though. We will use the prompt muons to trigger.              //
+// though the code is also ready for the electron channel.       //
+// We will use the prompt muons to trigger.                      //
 //  For a signal event, we aim at reconstructing a maximum of 2  //
 // vertices but conveners ask for potentially 3 or more vertices //
-// so there are some tests performed to reconstruct other        //
+// so there could be some tests performed to reconstruct other   //
 // vertices.                                                     //
 //---------------------------------------------------------------//
 ///////////////////////////////////////////////////////////////////
@@ -1016,9 +1017,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector< float > tree_Hemi_LLP_Vtx_dy;
     std::vector< float > tree_Hemi_LLP_Vtx_dz;
     std::vector< float > tree_Hemi_LLP_Vtx_dr;
-    std::vector< float > tree_Hemi_LLP_Vtx_dd;
-    std::vector< float > tree_Hemi_LLP_Vtx_ddbad;
-    std::vector< float > tree_Hemi_LLP_muOK_dR;
+        std::vector< float > tree_Hemi_LLP_muOK_dR;
     std::vector< float > tree_Hemi_LLP_muOK_pt;
     std::vector< float > tree_Hemi_LLP_muOK_mass;
     std::vector< float > tree_Hemi_LLP_muNO_dR;
@@ -1027,16 +1026,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector< float > tree_Hemi_LLP_dR12;
     std::vector< bool >  tree_Hemi_LLP_ping; 
     std::vector< int >   tree_event_LLP_ping;
-    std::vector< int >   tree_event_SecLLP_ping;
-    std::vector< float > tree_Hemi_LLP_SecVtx_dx;
-    std::vector< float > tree_Hemi_LLP_SecVtx_dy;
-    std::vector< float > tree_Hemi_LLP_SecVtx_dz;
-    std::vector< float > tree_Hemi_LLP_SecVtx_dr;
-    std::vector< float > tree_Hemi_LLP_SecVtx_dd;
-    std::vector< float > tree_Hemi_LLP_SecVtx_ddbad;
-    std::vector< float > tree_Hemi_SecLLP;
-    std::vector< float > tree_Hemi_SecLLP_ping;
-
+    
     std::vector< int >   tree_Hemi_Vtx_step;
     std::vector< bool >  tree_Hemi_Vtx_isTight;
     std::vector< float > tree_Hemi_Vtx_NChi2;
@@ -1045,47 +1035,53 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector< int >   tree_Hemi_Vtx_nTrks_bad;
     std::vector< float > tree_Hemi_Vtx_x;
     std::vector< float > tree_Hemi_Vtx_y;
-    std::vector< float > tree_Hemi_Vtx_r;
     std::vector< float > tree_Hemi_Vtx_z;
+    std::vector< float > tree_Hemi_Vtx_r;
+    std::vector< float > tree_Hemi_Vtx_dR;
     std::vector< float > tree_Hemi_Vtx_xError;
     std::vector< float > tree_Hemi_Vtx_yError;
     std::vector< float > tree_Hemi_Vtx_zError;
-    std::vector< float > tree_Hemi_Vtx_eta;
-    std::vector< float > tree_Hemi_Vtx_Vtx_dr;
-    std::vector< float > tree_Hemi_Vtx_Vtx_dz;
-    std::vector< float > tree_Hemi_Vtx_Vtx_dd;
-    std::vector< float > tree_Hemi_Vtx_phi;
-    std::vector< float > tree_Hemi_Vtx_dRvtx;
-    std::vector< float > tree_Hemi_Vtx_BTag;
-    std::vector< int >   tree_Hemi_Vtx_nVtx;
+        std::vector< float > tree_Hemi_Vtx_BTag;
+    std::vector< int >   tree_event_nVtx;
+    std::vector< float > tree_event_Vtx_Vtx_dr;
+    std::vector< float > tree_event_Vtx_Vtx_dz;
+    std::vector< float > tree_event_Vtx_Vtx_dd;
+    std::vector< float > tree_event_Vtx_Vtx_dR;
+    std::vector< int >   tree_event_Vtx_Vtx_step;
 
-    std::vector< float > tree_Hemi_MergedVtx_NChi2;
-    std::vector< float > tree_Hemi_MergedVtx_Mass;
+    std::vector< float > tree_Hemi_SecLLP;
+    std::vector< float > tree_Hemi_LLP_SecVtx_dx;
+    std::vector< float > tree_Hemi_LLP_SecVtx_dy;
+    std::vector< float > tree_Hemi_LLP_SecVtx_dz;
+    std::vector< float > tree_Hemi_LLP_SecVtx_dr;
+    std::vector< bool >  tree_Hemi_SecLLP_ping;
+    std::vector< int >   tree_event_SecLLP_ping;
+
     // std::vector< float > tree_Hemi_SecVtx_track_DCA_x;
     // std::vector< float > tree_Hemi_SecVtx_track_DCA_y;
     // std::vector< float > tree_Hemi_SecVtx_track_DCA_z;
     // std::vector< float > tree_Hemi_SecVtx_track_DCA_r;
     // std::vector< float > tree_Hemi_SecVtx_track_DCA_d;
+    std::vector< int > tree_Hemi_SecVtx;      // Hemi (1 or 2) if merging
+    std::vector< int > tree_Hemi_SecVtx_step; // vertex step for this Hemi if merging
     std::vector< float > tree_Hemi_SecVtx_x;
     std::vector< float > tree_Hemi_SecVtx_y;
     std::vector< float > tree_Hemi_SecVtx_z;
     std::vector< float > tree_Hemi_SecVtx_r;
+    std::vector< float > tree_Hemi_SecVtx_dR;
     std::vector< float > tree_Hemi_SecVtx_nTrks;
-    std::vector< float > tree_Hemi_SecVtx_step;
-    std::vector< float > tree_Hemi_SecVtx_eta;
-    std::vector< float > tree_Hemi_SecVtx_phi;
+    std::vector< float > tree_Hemi_SecVtx_NChi2;
     std::vector< float > tree_Hemi_SecVtx_dist;
     std::vector< float > tree_Hemi_SecVtx_track_MeanDCA_d;
     std::vector< float > tree_Hemi_SecVtx_SumtrackWeight;
     std::vector< float > tree_Hemi_SecVtx_trackWeight;
     std::vector< float > tree_Hemi_SecVtx_Mass;
-    std::vector< float > tree_Hemi_SecVtx_isTight;
-
-    std::vector< float > tree_Hemi_MergedVtx_Vtx_dr;
-    std::vector< float > tree_Hemi_MergedVtx_Vtx_dz;
-    std::vector< float > tree_Hemi_MergedVtx_Vtx_dd;
-    std::vector< float > tree_Hemi_MergedVtx_Vtx_dR;
-    std::vector< float > tree_Hemi_SecVtx_NChi2;
+    
+    std::vector< float > tree_event_MergedVtx_Vtx_dr;
+    std::vector< float > tree_event_MergedVtx_Vtx_dz;
+    std::vector< float > tree_event_MergedVtx_Vtx_dd;
+    std::vector< float > tree_event_MergedVtx_Vtx_dR;
+    std::vector< int >   tree_event_MergedVtx_Vtx_step;
     std::vector< float > tree_Hemi_Vtx_trackWeight;
     std::vector< float > tree_Hemi_Vtx_MeantrackWeight;//Vertx selection variable for the BDT
     std::vector< float > tree_Hemi_Vtx_Mass;
@@ -1715,6 +1711,7 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_LLP_Mass",      &tree_LLP_Mass);
 
     smalltree->Branch("tree_Hemi",       &tree_Hemi);
+    smalltree->Branch("tree_Hemi_Merging",&tree_Hemi_Merging);
     smalltree->Branch("tree_Hemi_njet",  &tree_Hemi_njet);
     smalltree->Branch("tree_Hemi_njet_nomu",  &tree_Hemi_njet_nomu);
     smalltree->Branch("tree_Hemi_pt",    &tree_Hemi_pt);
@@ -1745,8 +1742,6 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_Hemi_LLP_Vtx_dy",     &tree_Hemi_LLP_Vtx_dy);
     smalltree->Branch("tree_Hemi_LLP_Vtx_dz",     &tree_Hemi_LLP_Vtx_dz);
     smalltree->Branch("tree_Hemi_LLP_Vtx_dr",     &tree_Hemi_LLP_Vtx_dr);
-    smalltree->Branch("tree_Hemi_LLP_Vtx_dd",     &tree_Hemi_LLP_Vtx_dd);
-    smalltree->Branch("tree_Hemi_LLP_Vtx_ddbad",  &tree_Hemi_LLP_Vtx_ddbad);
     smalltree->Branch("tree_Hemi_LLP_muOK_dR",    &tree_Hemi_LLP_muOK_dR);
     smalltree->Branch("tree_Hemi_LLP_muOK_pt",    &tree_Hemi_LLP_muOK_pt);
     smalltree->Branch("tree_Hemi_LLP_muOK_mass",  &tree_Hemi_LLP_muOK_mass);
@@ -1756,16 +1751,7 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_Hemi_LLP_dR12",  &tree_Hemi_LLP_dR12);
     smalltree->Branch("tree_Hemi_LLP_ping",  &tree_Hemi_LLP_ping);
     smalltree->Branch("tree_event_LLP_ping", &tree_event_LLP_ping);
-    smalltree->Branch("tree_event_SecLLP_ping",&tree_event_SecLLP_ping);
-    smalltree->Branch("tree_Hemi_LLP_SecVtx_dx",&tree_Hemi_LLP_SecVtx_dx);
-    smalltree->Branch("tree_Hemi_LLP_SecVtx_dy",&tree_Hemi_LLP_SecVtx_dy);
-    smalltree->Branch("tree_Hemi_LLP_SecVtx_dz",&tree_Hemi_LLP_SecVtx_dz);
-    smalltree->Branch("tree_Hemi_LLP_SecVtx_dr",&tree_Hemi_LLP_SecVtx_dr);
-    smalltree->Branch("tree_Hemi_LLP_SecVtx_dd",&tree_Hemi_LLP_SecVtx_dd);
-    smalltree->Branch("tree_Hemi_LLP_SecVtx_ddbad",&tree_Hemi_LLP_SecVtx_ddbad);
-    smalltree->Branch("tree_Hemi_SecLLP",&tree_Hemi_SecLLP);
-    smalltree->Branch("tree_Hemi_SecLLP_ping",&tree_Hemi_SecLLP_ping);
-
+    
     smalltree->Branch("tree_Hemi_Vtx_step",  &tree_Hemi_Vtx_step);
     smalltree->Branch("tree_Hemi_Vtx_isTight",&tree_Hemi_Vtx_isTight);
     smalltree->Branch("tree_Hemi_Vtx_NChi2", &tree_Hemi_Vtx_NChi2);
@@ -1774,45 +1760,53 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_Hemi_Vtx_nTrks_bad", &tree_Hemi_Vtx_nTrks_bad);
     smalltree->Branch("tree_Hemi_Vtx_x",     &tree_Hemi_Vtx_x);
     smalltree->Branch("tree_Hemi_Vtx_y",     &tree_Hemi_Vtx_y);
-    smalltree->Branch("tree_Hemi_Vtx_r",     &tree_Hemi_Vtx_r);
     smalltree->Branch("tree_Hemi_Vtx_z",     &tree_Hemi_Vtx_z);
+    smalltree->Branch("tree_Hemi_Vtx_r",     &tree_Hemi_Vtx_r);
+    smalltree->Branch("tree_Hemi_Vtx_dR",    &tree_Hemi_Vtx_dR);
     smalltree->Branch("tree_Hemi_Vtx_xError",&tree_Hemi_Vtx_xError);
     smalltree->Branch("tree_Hemi_Vtx_yError",&tree_Hemi_Vtx_yError);
     smalltree->Branch("tree_Hemi_Vtx_zError",&tree_Hemi_Vtx_zError);
-    smalltree->Branch("tree_Hemi_Vtx_eta",   &tree_Hemi_Vtx_eta);
-    smalltree->Branch("tree_Hemi_Vtx_Vtx_dr",&tree_Hemi_Vtx_Vtx_dr);
-    smalltree->Branch("tree_Hemi_Vtx_Vtx_dz",&tree_Hemi_Vtx_Vtx_dz);
-    smalltree->Branch("tree_Hemi_Vtx_Vtx_dd",&tree_Hemi_Vtx_Vtx_dd);
-    smalltree->Branch("tree_Hemi_Vtx_phi",   &tree_Hemi_Vtx_phi);
-    smalltree->Branch("tree_Hemi_Vtx_dRvtx", &tree_Hemi_Vtx_dRvtx);
     smalltree->Branch("tree_Hemi_Vtx_BTag",  &tree_Hemi_Vtx_BTag);
-    smalltree->Branch("tree_Hemi_Vtx_nVtx",  &tree_Hemi_Vtx_nVtx);
+    smalltree->Branch("tree_event_nVtx",      &tree_event_nVtx);
+    smalltree->Branch("tree_event_Vtx_Vtx_dr",&tree_event_Vtx_Vtx_dr);
+    smalltree->Branch("tree_event_Vtx_Vtx_dz",&tree_event_Vtx_Vtx_dz);
+    smalltree->Branch("tree_event_Vtx_Vtx_dd",&tree_event_Vtx_Vtx_dd);
+    smalltree->Branch("tree_event_Vtx_Vtx_dR",&tree_event_Vtx_Vtx_dR);
+    smalltree->Branch("tree_event_Vtx_Vtx_step",&tree_event_Vtx_Vtx_step);
+
+    smalltree->Branch("tree_Hemi_SecLLP",&tree_Hemi_SecLLP);
+    smalltree->Branch("tree_Hemi_LLP_SecVtx_dx",&tree_Hemi_LLP_SecVtx_dx);
+    smalltree->Branch("tree_Hemi_LLP_SecVtx_dy",&tree_Hemi_LLP_SecVtx_dy);
+    smalltree->Branch("tree_Hemi_LLP_SecVtx_dz",&tree_Hemi_LLP_SecVtx_dz);
+    smalltree->Branch("tree_Hemi_LLP_SecVtx_dr",&tree_Hemi_LLP_SecVtx_dr);
+    smalltree->Branch("tree_Hemi_SecLLP_ping",&tree_Hemi_SecLLP_ping);
+    smalltree->Branch("tree_event_SecLLP_ping",&tree_event_SecLLP_ping);
 
     // smalltree->Branch("tree_Hemi_SecVtx_track_DCA_x",&tree_Hemi_SecVtx_track_DCA_x);
     // smalltree->Branch("tree_Hemi_SecVtx_track_DCA_y",&tree_Hemi_SecVtx_track_DCA_y);
     // smalltree->Branch("tree_Hemi_SecVtx_track_DCA_z",&tree_Hemi_SecVtx_track_DCA_z);
     // smalltree->Branch("tree_Hemi_SecVtx_track_DCA_r",&tree_Hemi_SecVtx_track_DCA_r);
     // smalltree->Branch("tree_Hemi_SecVtx_track_DCA_d",&tree_Hemi_SecVtx_track_DCA_d);
-    smalltree->Branch("tree_Hemi_SecVtx_NChi2", &tree_Hemi_SecVtx_NChi2);
+    smalltree->Branch("tree_Hemi_SecVtx",     &tree_Hemi_SecVtx);
+    smalltree->Branch("tree_Hemi_SecVtx_step",&tree_Hemi_SecVtx_step);
     smalltree->Branch("tree_Hemi_SecVtx_x",&tree_Hemi_SecVtx_x);
     smalltree->Branch("tree_Hemi_SecVtx_y",&tree_Hemi_SecVtx_y);
     smalltree->Branch("tree_Hemi_SecVtx_z",&tree_Hemi_SecVtx_z);
     smalltree->Branch("tree_Hemi_SecVtx_r",&tree_Hemi_SecVtx_r);
+    smalltree->Branch("tree_Hemi_SecVtx_dR",&tree_Hemi_SecVtx_dR);
     smalltree->Branch("tree_Hemi_SecVtx_nTrks",&tree_Hemi_SecVtx_nTrks);
-    smalltree->Branch("tree_Hemi_SecVtx_step",&tree_Hemi_SecVtx_step);
-    smalltree->Branch("tree_Hemi_SecVtx_eta",&tree_Hemi_SecVtx_eta);
-    smalltree->Branch("tree_Hemi_SecVtx_phi",&tree_Hemi_SecVtx_phi);
+    smalltree->Branch("tree_Hemi_SecVtx_NChi2", &tree_Hemi_SecVtx_NChi2);
     smalltree->Branch("tree_Hemi_SecVtx_dist",&tree_Hemi_SecVtx_dist);
     smalltree->Branch("tree_Hemi_SecVtx_track_MeanDCA_d",&tree_Hemi_SecVtx_track_MeanDCA_d);
     smalltree->Branch("tree_Hemi_SecVtx_SumtrackWeight",&tree_Hemi_SecVtx_SumtrackWeight);
     smalltree->Branch("tree_Hemi_SecVtx_trackWeight",&tree_Hemi_SecVtx_trackWeight);
     smalltree->Branch("tree_Hemi_SecVtx_Mass",&tree_Hemi_SecVtx_Mass);
-    smalltree->Branch("tree_Hemi_SecVtx_isTight",&tree_Hemi_SecVtx_isTight);
-    smalltree->Branch("tree_Hemi_Merging",&tree_Hemi_Merging);
-    smalltree->Branch("tree_Hemi_MergedVtx_Vtx_dr",&tree_Hemi_MergedVtx_Vtx_dr);
-    smalltree->Branch("tree_Hemi_MergedVtx_Vtx_dz",&tree_Hemi_MergedVtx_Vtx_dz);
-    smalltree->Branch("tree_Hemi_MergedVtx_Vtx_dd",&tree_Hemi_MergedVtx_Vtx_dd);
-    smalltree->Branch("tree_Hemi_MergedVtx_Vtx_dR",&tree_Hemi_MergedVtx_Vtx_dR);
+    smalltree->Branch("tree_event_MergedVtx_Vtx_dr",&tree_event_MergedVtx_Vtx_dr);
+    smalltree->Branch("tree_event_MergedVtx_Vtx_dz",&tree_event_MergedVtx_Vtx_dz);
+    smalltree->Branch("tree_event_MergedVtx_Vtx_dd",&tree_event_MergedVtx_Vtx_dd);
+    smalltree->Branch("tree_event_MergedVtx_Vtx_dR",&tree_event_MergedVtx_Vtx_dR);
+    smalltree->Branch("tree_event_MergedVtx_Vtx_step",&tree_event_MergedVtx_Vtx_step);
+
     smalltree->Branch("tree_Hemi_Vtx_trackWeight",&tree_Hemi_Vtx_trackWeight);
     smalltree->Branch("tree_Hemi_Vtx_MeantrackWeight",&tree_Hemi_Vtx_MeantrackWeight);
     // smalltree->Branch("tree_Hemi_Vtx_track_DCA_x",&tree_Hemi_Vtx_track_DCA_x);
@@ -3607,8 +3601,8 @@ else if (YEAR_ == 2017)
 
     TLorentzVector TLorentzGenAxis1(temp_px1,temp_py1,temp_pz1,temp_e1);
     TLorentzVector TLorentzGenAxis2(temp_px2,temp_py2,temp_pz2,temp_e2);
-    tree_GenAxes_Mass.push_back(sqrt(TLorentzGenAxis1.Mag2()));
-    tree_GenAxes_Mass.push_back(sqrt(TLorentzGenAxis2.Mag2()));
+    tree_GenAxes_Mass.push_back(TLorentzGenAxis1.Mag());
+    tree_GenAxes_Mass.push_back(TLorentzGenAxis2.Mag());
 
     int count = 0 ;
     int idx1 = -1;
@@ -3664,8 +3658,8 @@ else if (YEAR_ == 2017)
   TLorentzVector TLorentzCombinedAxis1(temp_px1,temp_py1,temp_pz1,temp_e1);
   TLorentzVector TLorentzCombinedAxis2(temp_px2,temp_py2,temp_pz2,temp_e2);
 
-  float CombinedMass1 = sqrt(TLorentzCombinedAxis1.Mag2());
-  float CombinedMass2 = sqrt(TLorentzCombinedAxis2.Mag2());
+  float CombinedMass1 = TLorentzCombinedAxis1.Mag();
+  float CombinedMass2 = TLorentzCombinedAxis2.Mag();
   if (isnan(CombinedMass1) || isinf(CombinedMass1)) CombinedMass1 = 0;
   if (isnan(CombinedMass2) || isinf(CombinedMass2)) CombinedMass2 = 0;
   tree_GenAxes_CombinedHemiLeptonMass.push_back(CombinedMass1);
@@ -4212,7 +4206,7 @@ else if (YEAR_ == 2017)
     float jet_phi = vjet[i].Phi();
     if ( njet1 > 0 ) dR1 = Deltar( jet_eta, jet_phi, vaxis1.Eta(), vaxis1.Phi() );
     if ( njet2 > 0 ) dR2 = Deltar( jet_eta, jet_phi, vaxis2.Eta(), vaxis2.Phi() );
-    //$$$$ test Paul (in case the conveners ask for three vertices)
+    // test Paul (in case the conveners ask for three vertices)
     // In case Conveners ask for mroe than 2 vertices for BSM physics, one way we could expect other vertices could be jets not being part of the
     // hemispheres => back to back in eta and phi jets from the jets from the signal. This really should have a minor impact if not null
     // btu we never know  what BSM physics is made of :D .
@@ -5957,7 +5951,7 @@ else if ( !( tk_pt > pt_Cut && tk_NChi2 < NChi2_Cut && tk_drSig > drSig_Cut ) ) 
     // --------- Track Selection BDT WPs --- //
     // ------------------------------------- //
 
-    double bdtcut = 0.86;//Tight WP      // ttbar ~ 1E-3 : selection efficiency
+    double bdtcut = 0.85;//Tight WP      // ttbar ~ 1E-3 : selection efficiency
     double bdtcut_step2 = 0.0;  //Loose WP // ttbar ~ 1E-2
  
     //---------------------------//
@@ -6423,7 +6417,7 @@ else if ( !( tk_pt > pt_Cut && tk_NChi2 < NChi2_Cut && tk_drSig > drSig_Cut ) ) 
     // std::cout<<"invaraint mass of LLP1 with LorentzVector : "<<sqrt(Total4Vector1.Mag2())<<std::endl;
       }
     }
-    tree_LLP_Mass.push_back(sqrt(Total4Vector1.Mag2()));
+    tree_LLP_Mass.push_back(Total4Vector1.Mag());
     tree_LLP.push_back(1);
     tree_LLP_pt.push_back(   LLP1_pt);
     tree_LLP_eta.push_back(  LLP1_eta);
@@ -6507,7 +6501,7 @@ else if ( !( tk_pt > pt_Cut && tk_NChi2 < NChi2_Cut && tk_drSig > drSig_Cut ) ) 
       }
     }
     
-    tree_LLP_Mass.push_back(sqrt(Total4Vector1.Mag2()));
+    tree_LLP_Mass.push_back(Total4Vector1.Mag());
     tree_LLP.push_back(2);
     tree_LLP_pt.push_back(   LLP2_pt);
     tree_LLP_eta.push_back(  LLP2_eta);
@@ -6661,10 +6655,9 @@ else if ( !( tk_pt > pt_Cut && tk_NChi2 < NChi2_Cut && tk_drSig > drSig_Cut ) ) 
             TLorentzVector TLorentzTrack(tkpx,tkpy,tkpz,tke);
             Vtx1Vector += TLorentzTrack;
           }
-
       }
 
-    float Vtx1Mass = TMath::Max(sqrt(Vtx1Vector.Mag2()),0.);
+    float Vtx1Mass = TMath::Max(Vtx1Vector.Mag(),0.);
     tree_Hemi_Vtx_Mass.push_back(Vtx1Mass);
 
   //------------------------------------------------------------------------------------------------//
@@ -6710,7 +6703,11 @@ else if ( !( tk_pt > pt_Cut && tk_NChi2 < NChi2_Cut && tk_drSig > drSig_Cut ) ) 
     tree_Hemi_Vtx_dist.push_back( recD );
     tree_Hemi_Vtx_MeantrackWeight.push_back(MeanWeight);
     tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
+
     int nVertex = 0;
+    if ( Vtx_step>0 && Vtx_chi<10 && Vtx_chi>0 ) nVertex++;
+
+  // -------------------------------------------//
     float posx1 = Vtx_x- tree_PV_x;
     float posy1 = Vtx_y- tree_PV_y;
     float posz1 = Vtx_z- tree_PV_z;
@@ -6718,12 +6715,11 @@ else if ( !( tk_pt > pt_Cut && tk_NChi2 < NChi2_Cut && tk_drSig > drSig_Cut ) ) 
     float eta_Vtx1 = -TMath::Log(tan(theta_Vtx1/2));
     if ( posz1 < 0 ) eta_Vtx1 = -eta_Vtx1;
     float phi1 = TMath::ATan2(posy1,posx1);
-    tree_Hemi_Vtx_eta.push_back(eta_Vtx1);
-    tree_Hemi_Vtx_phi.push_back(phi1);
-    if ( Vtx_step>0 && Vtx_chi<10 && Vtx_chi>0 ){nVertex++;}
+    float dRvtx1 = Deltar( eta_Vtx1, phi1, axis1_eta, axis1_phi );
+    tree_Hemi_Vtx_dR.push_back(dRvtx1);
+    
+    int ping1 = 0; // 0 if no match, 1/2 if matched to LLP1/2, 3 if matched to both 
 
-    float ddok, ddbad;
-    float ping1 = 0;
 
   if ( isMC_ && tree_nLLP > 0 ) {
     tree_Hemi_LLP_dR.push_back(axis1_dR);
@@ -6740,15 +6736,6 @@ else if ( !( tk_pt > pt_Cut && tk_NChi2 < NChi2_Cut && tk_drSig > drSig_Cut ) ) 
       tree_Hemi_LLP_Vtx_dy.push_back(Vtx_y - LLP1_y);
       tree_Hemi_LLP_Vtx_dz.push_back(Vtx_z - LLP1_z);
       tree_Hemi_LLP_Vtx_dr.push_back(TMath::Sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y) - TMath::Sqrt(LLP1_x*LLP1_x+LLP1_y*LLP1_y));
-
-      dSV = (Vtx_x - LLP1_x)*(Vtx_x - LLP1_x) + (Vtx_y - LLP1_y)*(Vtx_y - LLP1_y) + (Vtx_z - LLP1_z)*(Vtx_z - LLP1_z);
-      ddok = TMath::Sqrt(dSV)/LLP1_dist;
-      tree_Hemi_LLP_Vtx_dd.push_back( ddok );
-      dSV = (Vtx_x - LLP2_x)*(Vtx_x - LLP2_x) + (Vtx_y - LLP2_y)*(Vtx_y - LLP2_y) + (Vtx_z - LLP2_z)*(Vtx_z - LLP2_z);
-      ddbad = TMath::Sqrt(dSV)/LLP2_dist;
-      tree_Hemi_LLP_Vtx_ddbad.push_back( ddbad );
-      if      ( Vtx_chi >= 0. && Vtx_chi < 10. && ddok  < 0.1 ) ping1 = 1;
-      else if ( Vtx_chi >= 0. && Vtx_chi < 10. && ddbad < 0.1 ) ping1 = 2;
     }
     else {
       tree_Hemi_LLP_pt.push_back( LLP2_pt);
@@ -6763,18 +6750,18 @@ else if ( !( tk_pt > pt_Cut && tk_NChi2 < NChi2_Cut && tk_drSig > drSig_Cut ) ) 
       tree_Hemi_LLP_Vtx_dy.push_back(Vtx_y - LLP2_y);
       tree_Hemi_LLP_Vtx_dz.push_back(Vtx_z - LLP2_z);
       tree_Hemi_LLP_Vtx_dr.push_back(TMath::Sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y) - TMath::Sqrt(LLP2_x*LLP2_x+LLP2_y*LLP2_y));
-
-      dSV = (Vtx_x - LLP2_x)*(Vtx_x - LLP2_x) + (Vtx_y - LLP2_y)*(Vtx_y - LLP2_y) + (Vtx_z - LLP2_z)*(Vtx_z - LLP2_z);
-      ddok = TMath::Sqrt(dSV)/LLP2_dist;
-      tree_Hemi_LLP_Vtx_dd.push_back( ddok );
-      dSV = (Vtx_x - LLP1_x)*(Vtx_x - LLP1_x) + (Vtx_y - LLP1_y)*(Vtx_y - LLP1_y) + (Vtx_z - LLP1_z)*(Vtx_z - LLP1_z);
-      ddbad = TMath::Sqrt(dSV)/LLP1_dist;
-      tree_Hemi_LLP_Vtx_ddbad.push_back( ddbad );
-      if      ( Vtx_chi >= 0. && Vtx_chi < 10. && ddok  < 0.1 ) ping1 = 2;
-      else if ( Vtx_chi >= 0. && Vtx_chi < 10. && ddbad < 0.1 ) ping1 = 1;
     }
     tree_Hemi_LLP.push_back(iLLPrec1);
 
+      dSV = (Vtx_x - LLP1_x)*(Vtx_x - LLP1_x) + (Vtx_y - LLP1_y)*(Vtx_y - LLP1_y) + (Vtx_z - LLP1_z)*(Vtx_z - LLP1_z);
+      float dSV1 = TMath::Sqrt(dSV)/LLP1_dist;
+      dSV = (Vtx_x - LLP2_x)*(Vtx_x - LLP2_x) + (Vtx_y - LLP2_y)*(Vtx_y - LLP2_y) + (Vtx_z - LLP2_z)*(Vtx_z - LLP2_z);
+      float dSV2 = TMath::Sqrt(dSV)/LLP2_dist;
+      if ( Vtx_chi > 0. && Vtx_chi < 10. ) {
+      if ( dSV1  < 0.1 ) ping1 = 1;
+      if ( dSV2  < 0.1 ) ping1 += 2;
+    }
+    
     // associate reconstructed muon and neutralino
     TLorentzVector vmuOK, vmuNO;
     float muOK_dR, muOK_pt, muOK_mass;
@@ -6831,7 +6818,6 @@ if ( LLP2_mother * lep1_Q < 0 ) {
     float Vtx1_Mass = Vtx1Mass ;
     float H1_Mass = Vobs1.Mag();
     // float Vtx1_dist = recD;
-
     float Vtx1_MeanDCA = DCA_VTX_Meand;
     if (Vtx1_Weights.size() != Vtx1_index.size()){ std::cout<<"size Vtx1_weights and Vtx1_index and  ntracks and chi and step: "<<Vtx1_Weights.size()<<" and "<<Vtx1_index.size()<<" and "<<Vtx_ntk<<" and "<<Vtx_chi<<" and "<<Vtx_step<<std::endl;}
     
@@ -6865,9 +6851,11 @@ if ( LLP2_mother * lep1_Q < 0 ) {
         Vtx_step = 1; // 1 here
         TightVertex = true; 
       }
+
     //------------------------------------------------------------------------------------------------//
     //------------------------------------------Hemi 2 step 2-----------------------------------------//
     //------------------------------------------------------------------------------------------------//
+
     badVtx = false;
     if ( !(VtxHemi2->chi2()>0 && VtxHemi2->chi2()<10)  ) badVtx = true;
     if ( badVtx  && displacedTracks_Hemi2_mva.size() > 1 && (ActivateStep2 || IterAVF))
@@ -6876,9 +6864,11 @@ if ( LLP2_mother * lep1_Q < 0 ) {
         Vtx_step = 2; // 1 here
         TightVertex = true;       
       }
+
     //------------------------------------------------------------------------------------------------//
     //------------------------------------------Hemi 2 step 3-----------------------------------------//
     //------------------------------------------------------------------------------------------------//
+
     badVtx = false;
     if ( !(VtxHemi2->chi2()>0 && VtxHemi2->chi2()<10) ) badVtx = true;
     if ( badVtx  && displacedTracks_step2_Hemi2.size() > 1 && ActivateStep3)
@@ -6887,9 +6877,11 @@ if ( LLP2_mother * lep1_Q < 0 ) {
         Vtx_step = 3; // 1 here
         TightVertex = false;
       }
+
     //------------------------------------------------------------------------------------------------//
     //------------------------------------------Hemi 2 step 4-----------------------------------------//
     //------------------------------------------------------------------------------------------------//
+
     badVtx = false;
     if ( !(VtxHemi2->chi2()>0 && VtxHemi2->chi2()<10)  ) badVtx = true;
     if ( badVtx  && displacedTracks_step2_Hemi2.size() > 1 && (ActivateStep4 || IterAVF) )
@@ -6898,7 +6890,6 @@ if ( LLP2_mother * lep1_Q < 0 ) {
         Vtx_step = 4; // 1 here
         TightVertex = false;
       }
-
 
     Vtx_ntk = VtxHemi2->nTrk();
     Vtx_x = VtxHemi2->x();
@@ -6928,16 +6919,14 @@ if ( LLP2_mother * lep1_Q < 0 ) {
             TLorentzVector TLorentzTrack(tkpx,tkpy,tkpz,tke);
             Vtx2Vector += TLorentzTrack;
           }
-
       }
 
-    float Vtx2Mass = TMath::Max(sqrt(Vtx2Vector.Mag2()),0.);
+    float Vtx2Mass = TMath::Max(Vtx2Vector.Mag(),0.);
     tree_Hemi_Vtx_Mass.push_back(Vtx2Mass);
 
 //------------------------------------------------------------------------------------------------//
   //------------------------------------------------------------------------------------------------//
 
-  float Vtx2_step = Vtx_step;
   float Vtx_chi2 = Vtx_chi;
   tree_Hemi.push_back(2);
   tree_Hemi_njet.push_back(njet2);
@@ -6978,11 +6967,152 @@ if ( LLP2_mother * lep1_Q < 0 ) {
   tree_Hemi_Vtx_MeantrackWeight.push_back(MeanWeight);
   tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
 
+if ( Vtx_step>0 && Vtx_chi<10 && Vtx_chi>0 ) nVertex++;
 
+  // -------------------------------------------//
+  float posx2 = Vtx_x - tree_PV_x;
+  float posy2 = Vtx_y - tree_PV_y;
+  float posz2 = Vtx_z - tree_PV_z;
+  float theta_Vtx2 = TMath::ATan2( sqrt(posx2*posx2+posy2*posy2) , abs(posz2) ) ;
+  float eta_Vtx2 = -TMath::Log(tan(theta_Vtx2/2));
+  if ( posz2 < 0 ) eta_Vtx2 = -eta_Vtx2;
+  float phi2 = TMath::ATan2(posy2,posx2);
+  float dRvtx2 = Deltar( eta_Vtx2, phi2, axis2_eta, axis2_phi );
+  tree_Hemi_Vtx_dR.push_back(dRvtx2);
+
+  int ping2 = 0; // 0 if no match, 1/2 if matched to LLP1/2, 3 if matched to both
+  bool ping_Hemi1 = false, ping_Hemi2 = false;
+
+  if ( isMC_ && tree_nLLP > 0 ) {
+    tree_Hemi_LLP_dR.push_back(axis2_dR);
+    if ( iLLPrec2 == 1 ) {
+      tree_Hemi_LLP_pt.push_back( LLP1_pt);
+      tree_Hemi_LLP_eta.push_back(LLP1_eta);
+      tree_Hemi_LLP_phi.push_back(LLP1_phi);
+      tree_Hemi_LLP_x.push_back(LLP1_x);
+      tree_Hemi_LLP_y.push_back(LLP1_y);
+      tree_Hemi_LLP_z.push_back(LLP1_z);
+      tree_Hemi_LLP_dist.push_back(LLP1_dist);
+      tree_Hemi_LLP_mother.push_back( LLP1_mother );
+      tree_Hemi_LLP_Vtx_dx.push_back(Vtx_x - LLP1_x);
+      tree_Hemi_LLP_Vtx_dy.push_back(Vtx_y - LLP1_y);
+      tree_Hemi_LLP_Vtx_dz.push_back(Vtx_z - LLP1_z);
+      tree_Hemi_LLP_Vtx_dr.push_back(TMath::Sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y) - TMath::Sqrt(LLP1_x*LLP1_x+LLP1_y*LLP1_y));
+    }
+    else {
+      tree_Hemi_LLP_pt.push_back( LLP2_pt);
+      tree_Hemi_LLP_eta.push_back(LLP2_eta);
+      tree_Hemi_LLP_phi.push_back(LLP2_phi);
+      tree_Hemi_LLP_x.push_back(LLP2_x);
+      tree_Hemi_LLP_y.push_back(LLP2_y);
+      tree_Hemi_LLP_z.push_back(LLP2_z);
+      tree_Hemi_LLP_dist.push_back(LLP2_dist);
+      tree_Hemi_LLP_mother.push_back( LLP2_mother );
+      tree_Hemi_LLP_Vtx_dx.push_back(Vtx_x - LLP2_x);
+      tree_Hemi_LLP_Vtx_dy.push_back(Vtx_y - LLP2_y);
+      tree_Hemi_LLP_Vtx_dz.push_back(Vtx_z - LLP2_z);
+      tree_Hemi_LLP_Vtx_dr.push_back(TMath::Sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y) - TMath::Sqrt(LLP2_x*LLP2_x+LLP2_y*LLP2_y));
+    }
+    tree_Hemi_LLP.push_back(iLLPrec2);
+    tree_Hemi_LLP_dR12.push_back(dRneuneu);
+    tree_Hemi_LLP_dR12.push_back(dRneuneu);
+
+    // associate reconstructed muon and neutralino
+    TLorentzVector vmuOK, vmuNO;
+    float muOK_dR, muOK_pt, muOK_mass;
+    float muNO_dR, muNO_pt, muNO_mass;
+    int muOK, muNO;
+    if ( iLLPrec2 == 1 ) {
+      // be cautious: smuon ID 100013 has charge -1 !
+      if ( LLP1_mother * lep1_Q < 0 ) {
+        muOK = imu1;
+        muNO = imu2;
+      }
+      else {
+        muOK = imu2;
+        muNO = imu1;
+      }
+    }
+    else {
+      // be cautious: smuon ID 100013 has charge -1 !
+      if ( LLP2_mother * lep1_Q < 0 ) {
+        muOK = imu1;
+        muNO = imu2;
+      }
+      else {
+        muOK = imu2;
+        muNO = imu1;
+      }
+    }
+    vmuOK.SetPtEtaPhiM(tree_muon_pt[muOK], tree_muon_eta[muOK], tree_muon_phi[muOK], mu_mass);
+    vmuNO.SetPtEtaPhiM(tree_muon_pt[muNO], tree_muon_eta[muNO], tree_muon_phi[muNO], mu_mass);
+        muOK_dR = Deltar( tree_muon_eta[muOK], tree_muon_phi[muOK], axis2_eta, axis2_phi );
+    muNO_dR = Deltar( tree_muon_eta[muNO], tree_muon_phi[muNO], axis2_eta, axis2_phi );
+        muOK_pt = (vmuOK+vaxis2).Pt();
+    muNO_pt = (vmuNO+vaxis2).Pt();
+    muOK_mass = TMath::Max((vmuOK+vaxis2).Mag(),0.);
+    muNO_mass = TMath::Max((vmuNO+vaxis2).Mag(),0.);
+    tree_Hemi_LLP_muOK_dR.push_back( muOK_dR );
+    tree_Hemi_LLP_muNO_dR.push_back( muNO_dR );
+    tree_Hemi_LLP_muOK_pt.push_back( muOK_pt );
+    tree_Hemi_LLP_muNO_pt.push_back( muNO_pt );
+    tree_Hemi_LLP_muOK_mass.push_back( muOK_mass );
+    tree_Hemi_LLP_muNO_mass.push_back( muNO_mass );
+
+    dSV = (Vtx_x - LLP1_x)*(Vtx_x - LLP1_x) + (Vtx_y - LLP1_y)*(Vtx_y - LLP1_y) + (Vtx_z - LLP1_z)*(Vtx_z - LLP1_z);
+    float dSV1 = TMath::Sqrt(dSV)/LLP1_dist;
+    dSV = (Vtx_x - LLP2_x)*(Vtx_x - LLP2_x) + (Vtx_y - LLP2_y)*(Vtx_y - LLP2_y) + (Vtx_z - LLP2_z)*(Vtx_z - LLP2_z);
+    float dSV2 = TMath::Sqrt(dSV)/LLP2_dist;
+    if ( Vtx_chi > 0. && Vtx_chi < 10. ) {
+      if ( dSV1  < 0.1 ) ping2 = 1;
+      if ( dSV2  < 0.1 ) ping2 += 2;
+    }
+
+    if ( (ping1 == 3 || ping2 == 3) && ping1*ping2 > 0 ) {
+      ping_Hemi1 = true;
+      ping_Hemi2 = true;
+    }
+    else if ( ping1 > 0 && ping2 == 0 ) {
+      ping_Hemi1 = true;
+    }
+    else if ( ping2 > 0 && ping1 == 0 ) {
+      ping_Hemi2 = true;
+    }
+    else if ( ping1 != ping2 ) {
+      ping_Hemi1 = true;
+      ping_Hemi2 = true;
+    }
+    else if ( ping1 == ping2 && ping1*ping2 > 0 ) {
+      if      ( ping1 == iLLPrec1 ) {
+        ping_Hemi1 = true;
+      }
+      else if ( ping2 == iLLPrec2 ) {
+        ping_Hemi2 = true;
+      }
+      else if ( (Vtx1_step >= 1 && Vtx1_step <= 2) || Vtx_step > 2 ) {
+        ping_Hemi1 = true;
+      }
+      else {
+        ping_Hemi2 = true;
+      }
+    }
+
+    tree_Hemi_LLP_ping.push_back( ping_Hemi1 );
+    tree_Hemi_LLP_ping.push_back( ping_Hemi2 );
+    int ping_event = 0;
+    if      ( ping_Hemi1 && ping_Hemi2 ) ping_event = 2;
+    else if ( ping_Hemi1 || ping_Hemi2 ) ping_event = 1;
+    tree_event_LLP_ping.push_back( ping_event );
+  }
+  
+  tree_Hemi_dR12.push_back(dR_axis12);
+  tree_Hemi_dR12.push_back(dR_axis12);
+    
   //------------------------------------------------//
+
   float Vtx2_ntk = Vtx_ntk;
   float Vtx2_chi = Vtx_chi;
-
+  float Vtx2_step = Vtx_step;
   // float Vtx2_r = sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y);
   // float Vtx2_z = Vtx_z;
   float Vtx2_MTW = MeanWeight;
@@ -6991,40 +7121,43 @@ if ( LLP2_mother * lep1_Q < 0 ) {
   // float Vtx2_dist = recD;
   float Vtx2_MeanDCA = DCA_VTX_Meand;
 
-  // -------------------------------------------//
-  float posx2 = Vtx_x - tree_PV_x;
-  float posy2 = Vtx_y - tree_PV_y;
-  float posz2 = Vtx_z - tree_PV_z;
-  if(Vtx_step>0 && Vtx_chi<10 && Vtx_chi>0){nVertex++;}
+  
+  // -------------------------------------------------//
+  // ---------------- CLOSE VERTICES -----------------//
+  // -------------------------------------------------//
 
   float dr_2V = -10.;//quantities that should be lower for the backgrounds/ compared to signal
   float dz_2V = -10.;
   float dd_2V = -10.;
   float dRVtx = -10.;
-  float theta_Vtx2 = TMath::ATan2( sqrt(posx2*posx2+posy2*posy2) , abs(posz2) ) ;
-  float eta_Vtx2 = -TMath::Log(tan(theta_Vtx2/2));
-  if ( posz2 < 0 ) eta_Vtx2 = -eta_Vtx2;
-  float phi2 = TMath::ATan2(posy2,posx2);
-  tree_Hemi_Vtx_eta.push_back(eta_Vtx2);
-  tree_Hemi_Vtx_phi.push_back(phi2);
-
+  
   int SecStep = -1;
+int MergeHemi = -1, SecHemi = -1;
+  int MergeStep = -1;
+  int pong_Merge = 0, pong_Sec = 0;
+  bool pong_Hemi1 = false, pong_Hemi2 = false;
 
-  if(nVertex==2)
+  if ( nVertex == 2 )
     {
         //Trying to deal with the two reconstructed vertices being really close <1mm
       dr_2V = sqrt((posx2-posx1)*(posx2-posx1)+(posy2-posy1)*(posy2-posy1));
-      dz_2V = sqrt((posz2-posz1)*(posz2-posz1));
-      dd_2V = sqrt((posx2-posx1)*(posx2-posx1)+(posy2-posy1)*(posy2-posy1)+(posz2-posz1)*(posz2-posz1));
+      dz_2V = abs(posz2-posz1);
+      dd_2V = sqrt(dr_2V*dr_2V + dz_2V*dz_2V);
 
-      tree_Hemi_Vtx_Vtx_dr.push_back(dr_2V);
-      tree_Hemi_Vtx_Vtx_dz.push_back(dz_2V);
-      tree_Hemi_Vtx_Vtx_dd.push_back(dd_2V);
       dRVtx = Deltar(eta_Vtx1,phi1,eta_Vtx2,phi2); 
-      tree_Hemi_Vtx_dRvtx.push_back(dRVtx);
+      tree_event_Vtx_Vtx_dr.push_back(dr_2V);
+      tree_event_Vtx_Vtx_dz.push_back(dz_2V);
+      tree_event_Vtx_Vtx_dd.push_back(dd_2V);
+      tree_event_Vtx_Vtx_dR.push_back(dRVtx);
 
-      bool isTightNewVtx = true;
-      
+      int eventStep = 0;
+      if      (  Vtx1_step >= 1 && Vtx1_step <= 2 
+             &&  Vtx2_step >= 1 && Vtx2_step <= 2 )  eventStep = 1; 
+      else if ( (Vtx1_step >= 1 && Vtx1_step <= 2) 
+             || (Vtx2_step >= 1 && Vtx2_step <= 2) ) eventStep = 2;
+      else eventStep = 3;
+      tree_event_Vtx_Vtx_step.push_back(eventStep);
+
       if (dr_2V < 0.1 && dz_2V < 0.1 && ActivateMerging) 
         {  // criteria to activate the merging is in cm
            // The criteria that should be applied is that this dd_2V(dz and dr) distance should be below the resolution that we have on the vertices
@@ -7038,12 +7171,10 @@ if ( LLP2_mother * lep1_Q < 0 ) {
           float MergedVtxMass = -1000;
           std::vector<float>  MergeVtx_Weights;
           std::vector<unsigned int>  MergeVtx_index;
-          SecStep = -1; 
           MeanWeight=0;
           // Vtx1_ntrk10
           // Vtx1_ntrk20
           
-          if (Vtx1_step>2 && Vtx2_step>2){isTightNewVtx= false;}
           if (Vtx1_step>2 && Vtx2_step>2) //both vtx are loose=> final vtx is loose
             {
               Mergedx = (posx1+posx2)/2;
@@ -7054,7 +7185,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
               SecStep = -4;
               MeanWeight = (Vtx1_MTW+Vtx2_MTW)/2;
               DCA_VTX_Meand = (Vtx1_MeanDCA+Vtx2_MeanDCA)/2;
-              MergedVtxMass = TMath::Sqrt((Vtx1Vector+Vtx2Vector).Mag2());
+              MergedVtxMass = (Vtx1Vector+Vtx2Vector).Mag();
             }
           else if ((Vtx1_step > 2 && Vtx2_step <= 2) || (Vtx1_step <= 2 && Vtx2_step > 2)) //mix of tight and loose, we keep the tight vtx
             {
@@ -7095,7 +7226,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
               SecStep = -1;
               MeanWeight = (Vtx1_MTW+Vtx2_MTW)/2;
               DCA_VTX_Meand =  (Vtx1_MeanDCA+Vtx2_MeanDCA)/2;
-              MergedVtxMass = TMath::Sqrt((Vtx1Vector+Vtx2Vector).Mag2());
+              MergedVtxMass = (Vtx1Vector+Vtx2Vector).Mag();
             }
             // std::cout<<"vtx1_chi: "<<Vtx1_chi<<std::endl;
             // std::cout<<"vtx2_chi: "<<Vtx2_chi<<std::endl;
@@ -7108,26 +7239,72 @@ if ( LLP2_mother * lep1_Q < 0 ) {
             Mergedy += tree_PV_y;
             Mergedz += tree_PV_z;
             float Mergedr = sqrt(Mergedx*Mergedx+Mergedy*Mergedy);
+
+            //----------------------------------------------------
+            // --  Check the closest Hemisphere to this pseudo-vertex
+            //----------------------------------------------------
+            float dR_axis1 = Deltar(MergedEta, MergedPhi, axis1_eta, axis1_phi);
+            float dR_axis2 = Deltar(MergedEta, MergedPhi, axis2_eta, axis2_phi);
+            float dRmerge = dR_axis1;
+            bool isAxis1 = true;
+            if (dR_axis2 < dR_axis1) isAxis1 = false;
+            if ( isAxis1 ) {
+              MergeHemi = 1;
+              MergeStep = Vtx1_step;
+              if ( SecStep == -2 ) MergeStep = Vtx2_step;
+            }
+            else {
+              MergeHemi = 2;
+              MergeStep = Vtx2_step;
+              if ( SecStep == -3 ) MergeStep = Vtx1_step;
+              dRmerge = dR_axis2;
+            }
+            tree_Hemi_SecVtx.push_back(MergeHemi);
+            tree_Hemi_SecVtx_step.push_back(MergeStep);
+
             tree_Hemi_SecVtx_x.push_back(Mergedx);
             tree_Hemi_SecVtx_y.push_back(Mergedy);
             tree_Hemi_SecVtx_z.push_back(Mergedz);
             tree_Hemi_SecVtx_r.push_back(Mergedr);
             tree_Hemi_SecVtx_nTrks.push_back(MergeVtx_ntk);
             tree_Hemi_SecVtx_NChi2.push_back(MergeVtx_chi);
-            tree_Hemi_SecVtx_step.push_back(SecStep);
             tree_Hemi_SecVtx_dist.push_back( recD );
             tree_Hemi_SecVtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
             tree_Hemi_SecVtx_SumtrackWeight.push_back(MeanWeight);         
-            tree_Hemi_SecVtx_isTight.push_back(isTightNewVtx);
             tree_Hemi_SecVtx_Mass.push_back(MergedVtxMass);
+            tree_Hemi_SecVtx_dR.push_back(dRmerge);
 
-                //----------------------------------------------------
-                // --  Check the closest Hemisphere to this pseudo-vertex
-                //----------------------------------------------------
-            float dR_axis1 = Deltar(MergedEta, MergedPhi, axis1_eta, axis1_phi);
-            float dR_axis2 = Deltar(MergedEta, MergedPhi, axis2_eta, axis2_phi);
-            bool isAxis1 = true;
-            if (dR_axis2 < dR_axis1) {isAxis1 = false;}
+            if ( isMC_ && tree_nLLP > 0 ) {
+              if ( MergeHemi == 1 ) {
+                tree_Hemi_SecLLP.push_back( iLLPrec1 );
+	            }
+              if ( MergeHemi == 2 ) {
+                tree_Hemi_SecLLP.push_back( iLLPrec2 );
+	            }
+	            if ( ((MergeHemi == 1 && iLLPrec1 == 1) || 
+	                  (MergeHemi == 2 && iLLPrec2 == 1)) ) {
+                tree_Hemi_LLP_SecVtx_dx.push_back(Mergedx - LLP1_x);
+                tree_Hemi_LLP_SecVtx_dy.push_back(Mergedy - LLP1_y);
+                tree_Hemi_LLP_SecVtx_dz.push_back(Mergedz - LLP1_z);
+                tree_Hemi_LLP_SecVtx_dr.push_back(TMath::Sqrt(Mergedr*Mergedr) - TMath::Sqrt(LLP1_x*LLP1_x+LLP1_y*LLP1_y));
+	            }
+              if ( ((MergeHemi == 1 && iLLPrec1 == 2) ||
+	                  (MergeHemi == 2 && iLLPrec2 == 2)) ) {
+                tree_Hemi_LLP_SecVtx_dx.push_back(Mergedx - LLP2_x);
+                tree_Hemi_LLP_SecVtx_dy.push_back(Mergedy - LLP2_y);
+                tree_Hemi_LLP_SecVtx_dz.push_back(Mergedz - LLP2_z);
+                tree_Hemi_LLP_SecVtx_dr.push_back(TMath::Sqrt(Mergedr*Mergedr) - TMath::Sqrt(LLP2_x*LLP2_x+LLP2_y*LLP2_y));
+	            }
+	          
+              dSV = (Mergedx - LLP1_x)*(Mergedx - LLP1_x) + (Mergedy - LLP1_y)*(Mergedy - LLP1_y) + (Mergedz - LLP1_z)*(Mergedz - LLP1_z);
+              float dSV1 = TMath::Sqrt(dSV)/LLP1_dist;
+              dSV = (Mergedx - LLP2_x)*(Mergedx - LLP2_x) + (Mergedy - LLP2_y)*(Mergedy - LLP2_y) + (Mergedz - LLP2_z)*(Mergedz - LLP2_z);
+              float dSV2 = TMath::Sqrt(dSV)/LLP2_dist;
+              if ( MergeVtx_chi > 0. && MergeVtx_chi < 10. ) {
+                if ( dSV1  < 0.1 ) pong_Merge = 1;
+                if ( dSV2  < 0.1 ) pong_Merge += 2;
+              }
+	          }
 
                 //----------------------------------------------------
                 // -- Use the whole set of tracks available from the hemisphere + remove the ones used in the previous vertex 
@@ -7227,8 +7404,6 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                               }
                           }
                       }
-
-
                 }
 
                 // GlobalPoint PVPos(PV.x(),PV.y(),PV.z());
@@ -7239,7 +7414,6 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                 if (VtxSec->chi2() > 0. && VtxSec->chi2() < 10.) 
                   {
                     SecStep = 1; // 1 here
-                    isTightNewVtx = true;
                   }
 
                 badVtx = false;
@@ -7248,7 +7422,6 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                   {
                     VtxSec->Vertexing(NewTTracks,FHNewTTrack,true,true,false,0.,10.,&PVPos);
                     SecStep = 2; // 1 here
-                    isTightNewVtx = true;       
                   }
 
                 // then steps 3 and 4 =< Loose 
@@ -7256,7 +7429,6 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                 FHNewTTrack.clear();
                 if ((VtxSec->chi2() < 0. || VtxSec->chi2() > 10.) || NewTTracks.size()<2)//|| NewTTracks.size()<2
                   {
-                    // isTightNewVtx= false;
                     count_trk = 0;
                     if (Vtx1_step == 3 || Vtx1_step == 4)
                       {
@@ -7328,7 +7500,6 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                               }
                           }
                       }
-
                   }
 
                 badVtx = false;
@@ -7338,7 +7509,6 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                   {
                     VtxSec->Vertexing(NewTTracks,FHNewTTrack,true,false,false,0.,10.,&PVPos);
                     SecStep = 3; // 1 here
-                    isTightNewVtx= false;
                   }
                 badVtx = false;
                 if ( (VtxSec->chi2() < 0. || VtxSec->chi2() > 10.)  ) badVtx = true;
@@ -7346,9 +7516,6 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                   {
                     VtxSec->Vertexing(NewTTracks,FHNewTTrack,true,true,false,0.,10.,&PVPos);
                     SecStep = 4; // 1 here
-                    isTightNewVtx = false;
-                    
-
                   }
 
                   float SecVtx_x = VtxSec->x();
@@ -7363,6 +7530,10 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                   MeanWeight    = VtxSec->SumWeight();
                   // if(SecVtx_chi>0 && SecVtx_chi<10)
                     //   {
+                  SecHemi = 2;
+		              if ( MergeHemi == 2 ) SecHemi = 1;
+                        tree_Hemi_SecVtx.push_back(SecHemi);
+
                         tree_Hemi_SecVtx_x.push_back(SecVtx_x);
                         tree_Hemi_SecVtx_y.push_back(SecVtx_y);
                         tree_Hemi_SecVtx_z.push_back(SecVtx_z);
@@ -7377,29 +7548,54 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                         recD = TMath::Sqrt(recX*recX + recY*recY + recZ*recZ);
                         float theta_SecVtx = TMath::ATan2(sqrt(recX*recX+recY*recY),abs(recZ)) ;
                         float eta_SecVtx = -TMath::Log(tan(theta_SecVtx/2));
-                        if (SecVtx_z<0){eta_SecVtx = -eta_SecVtx;}
-                        tree_Hemi_SecVtx_eta.push_back(eta_SecVtx);
+                        if ( SecVtx_z < 0 ) eta_SecVtx = -eta_SecVtx;
+                        float SecPhi = TMath::ATan2(recY,recX);
+	                      float dRsec = Deltar( eta_SecVtx, SecPhi, axis2_eta, axis2_phi );
+	    	                if ( !isAxis1 ) dRsec = Deltar( eta_SecVtx, SecPhi, axis1_eta, axis1_phi );
+	                      tree_Hemi_SecVtx_dR.push_back(dRsec);
                         tree_Hemi_SecVtx_dist.push_back( recD );
                         tree_Hemi_SecVtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
                         tree_Hemi_SecVtx_SumtrackWeight.push_back(MeanWeight);
-                        tree_Hemi_SecVtx_isTight.push_back(isTightNewVtx);
+                        
                         //-> In this section: we have in fact two newly built vertices with a good chi2
                         //Check that the two newly built vertices are not "clsoe" from each other <=> far from the millimeter scale and that the hopefully,
                         // the delta R between the two vertices is going towards 3.14 :s
+
                         if (SecVtx_chi>0 && SecVtx_chi<10 && MergeVtx_chi>0 && MergeVtx_chi<10 )
                           {
                             float New_dr_2V = sqrt((Mergedx-SecVtx_x)*(Mergedx-SecVtx_x)+(Mergedy-SecVtx_y)*(Mergedy-SecVtx_y));
-                            float New_dz_2V = sqrt((Mergedz-SecVtx_z)*(Mergedz-SecVtx_z));
-                            float New_dd_2V = sqrt((Mergedx-SecVtx_x)*(Mergedx-SecVtx_x)+(Mergedy-SecVtx_y)*(Mergedy-SecVtx_y)+(Mergedz-SecVtx_z)*(Mergedz-SecVtx_z));
-                            tree_Hemi_MergedVtx_Vtx_dr.push_back(New_dr_2V);
-                            tree_Hemi_MergedVtx_Vtx_dz.push_back(New_dz_2V);
-                            tree_Hemi_MergedVtx_Vtx_dd.push_back(New_dd_2V);
+                            float New_dz_2V = abs(Mergedz-SecVtx_z);
+                            float New_dd_2V = sqrt(New_dr_2V*New_dr_2V + (Mergedz-SecVtx_z)*(Mergedz-SecVtx_z));
+                            tree_event_MergedVtx_Vtx_dr.push_back(New_dr_2V);
+                            tree_event_MergedVtx_Vtx_dz.push_back(New_dz_2V);
+                            tree_event_MergedVtx_Vtx_dd.push_back(New_dd_2V);
                             float SecPhi = -10;
                             if (SecVtx_x!= 0) {SecPhi = TMath::ATan2(recY,recX);} else {SecPhi = acos(recX/sqrt(recX*recX+recY*recY));}
                             float New_dRVtx = Deltar(MergedEta,MergedPhi,eta_SecVtx,SecPhi);
-                            tree_Hemi_MergedVtx_Vtx_dR.push_back(New_dRVtx);
+                            tree_event_MergedVtx_Vtx_dR.push_back(New_dRVtx);
+                            int eventNewStep = 0;
+                            if ( MergeStep >= 1 && MergeStep <= 2 
+                                &&  SecStep >= 1 &&   SecStep <= 2 ) eventNewStep = 1; 
+                            else if ( (MergeStep >= 1 && MergeStep <= 2) 
+                                    || (  SecStep >= 1 &&   SecStep <= 2) ) eventNewStep = 2;
+                            else eventNewStep = 3;
+                            tree_event_MergedVtx_Vtx_step.push_back(eventNewStep);
+                            tree_Hemi_Merging.push_back(true);
+                            tree_Hemi_Merging.push_back(true);
                           }
-
+                        else if ( !(SecVtx_chi>0 && SecVtx_chi<10) && MergeVtx_chi>0 && MergeVtx_chi<10 )
+	                      if ( MergeHemi == 1 ) {
+			                      tree_Hemi_Merging.push_back(true);
+			                      tree_Hemi_Merging.push_back(false);
+			                    }
+			                  else if ( MergeHemi == 2 ){
+                          tree_Hemi_Merging.push_back(false);
+                          tree_Hemi_Merging.push_back(true);
+                        }
+                        else {
+                            tree_Hemi_Merging.push_back(false);
+                            tree_Hemi_Merging.push_back(false);
+                        }
 
                         TLorentzVector NewVtxVector(0,0,0,0);
                         if (SecVtx_chi== -10 && SecStep == 4)SecVtx_Trks.clear();
@@ -7417,271 +7613,108 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                                 TLorentzVector TLorentzTrack(tkpx,tkpy,tkpz,tke);
                                 NewVtxVector += TLorentzTrack;
                               }
-
                           }
 
-                        float NewVtxMass = TMath::Max(sqrt(NewVtxVector.Mag2()),0.);
+                        float NewVtxMass = TMath::Max(NewVtxVector.Mag(),0.);
                         tree_Hemi_SecVtx_Mass.push_back(NewVtxMass);
 
 
-                        
-                      // }// SecVtx is Valid
-
-                        float Newping1 = 0;
-                        float Newping2 = 0;
-                        bool Newping_Hemi1 = false, Newping_Hemi2 = false;
-                        float SVtx_x = -1000;
-                        float SVtx_y = -1000;
-                        float SVtx_z = -1000;
-                        float SVtx_chi = -100;
-                        float NewdSV = -1;
-                        float Newddok, Newddbad;
-
-                        // Merged Vtx
                         if ( isMC_ && tree_nLLP > 0 ) {
-                          SVtx_x = tree_Hemi_SecVtx_x[0];
-                          SVtx_y = tree_Hemi_SecVtx_y[0];
-                          SVtx_z = tree_Hemi_SecVtx_z[0];
-                          SVtx_chi = tree_Hemi_SecVtx_NChi2[0];
-                          if ( iLLPrec1 == 1 ) {
+                          if ( SecHemi == 1 ) tree_Hemi_SecLLP.push_back( iLLPrec1 );
+                          if ( SecHemi == 2 ) tree_Hemi_SecLLP.push_back( iLLPrec2 );
+                          if ( ((SecHemi == 1 && iLLPrec1 == 1) || 
+	                              (SecHemi == 2 && iLLPrec2 == 1)) ) {
+                            tree_Hemi_LLP_SecVtx_dx.push_back(SecVtx_x - LLP1_x);
+                            tree_Hemi_LLP_SecVtx_dy.push_back(SecVtx_y - LLP1_y);
+                            tree_Hemi_LLP_SecVtx_dz.push_back(SecVtx_z - LLP1_z);
+                            tree_Hemi_LLP_SecVtx_dr.push_back(sqrt(SecVtx_x*SecVtx_x+SecVtx_y*SecVtx_y) - sqrt(LLP1_x*LLP1_x+LLP1_y*LLP1_y));
+	                        }
+                          if ( ((SecHemi == 1 && iLLPrec1 == 2) ||
+	                              (SecHemi == 2 && iLLPrec2 == 2)) ) {
+                            tree_Hemi_LLP_SecVtx_dx.push_back(SecVtx_x - LLP2_x);
+                            tree_Hemi_LLP_SecVtx_dy.push_back(SecVtx_y - LLP2_y);
+                            tree_Hemi_LLP_SecVtx_dz.push_back(SecVtx_z - LLP2_z);
+                            tree_Hemi_LLP_SecVtx_dr.push_back(sqrt(SecVtx_x*SecVtx_x+SecVtx_y*SecVtx_y) - sqrt(LLP2_x*LLP2_x+LLP2_y*LLP2_y));
+                            }
 
-                            tree_Hemi_LLP_SecVtx_dx.push_back(SVtx_x - LLP1_x);
-                            tree_Hemi_LLP_SecVtx_dy.push_back(SVtx_y - LLP1_y);
-                            tree_Hemi_LLP_SecVtx_dz.push_back(SVtx_z - LLP1_z);
-                            tree_Hemi_LLP_SecVtx_dr.push_back(TMath::Sqrt(SVtx_x*SVtx_x+SVtx_y*SVtx_y) - TMath::Sqrt(LLP1_x*LLP1_x+LLP1_y*LLP1_y));
+                          dSV = (SecVtx_x - LLP1_x)*(SecVtx_x - LLP1_x) + (SecVtx_y - LLP1_y)*(SecVtx_y - LLP1_y) + (SecVtx_z - LLP1_z)*(SecVtx_z - LLP1_z);
+                            float dSV1 = TMath::Sqrt(dSV)/LLP1_dist;
+                            dSV = (SecVtx_x - LLP2_x)*(SecVtx_x - LLP2_x) + (SecVtx_y - LLP2_y)*(SecVtx_y - LLP2_y) + (SecVtx_z - LLP2_z)*(SecVtx_z - LLP2_z);
+                            float dSV2 = TMath::Sqrt(dSV)/LLP2_dist;
+                            if ( SecVtx_chi > 0. && SecVtx_chi < 10. ) {
+                              if ( dSV1  < 0.1 ) pong_Sec = 1;
+                              if ( dSV2  < 0.1 ) pong_Sec += 2;
+                            }
 
-                            NewdSV = (SVtx_x - LLP1_x)*(SVtx_x - LLP1_x) + (SVtx_y - LLP1_y)*(SVtx_y - LLP1_y) + (SVtx_z - LLP1_z)*(SVtx_z - LLP1_z);
-                            Newddok = TMath::Sqrt( NewdSV)/LLP1_dist;
-                            tree_Hemi_LLP_SecVtx_dd.push_back( Newddok );
-                            NewdSV = (SVtx_x - LLP2_x)*(SVtx_x - LLP2_x) + (SVtx_y - LLP2_y)*(SVtx_y - LLP2_y) + (SVtx_z - LLP2_z)*(SVtx_z - LLP2_z);
-                            ddbad = TMath::Sqrt( NewdSV)/LLP2_dist;
-                            tree_Hemi_LLP_SecVtx_ddbad.push_back( Newddbad );
-                            if      ( Vtx_chi >= 0. && Vtx_chi < 10. && Newddok  < 0.1 ) Newping1 = 1;
-                            else if ( Vtx_chi >= 0. && Vtx_chi < 10. && Newddbad < 0.1 ) Newping1 = 2;
+                            if ( (pong_Merge == 3 || pong_Sec == 3) && pong_Merge*pong_Sec > 0 ) {
+                              pong_Hemi1 = true;
+                              pong_Hemi2 = true;
+                            }
+                            else if ( pong_Merge > 0 && pong_Sec == 0 ) {
+                              pong_Hemi1 = true;
+                            }
+                            else if ( pong_Sec > 0 && pong_Merge == 0 ) {
+                              pong_Hemi2 = true;
+                            }
+                            else if ( pong_Merge != pong_Sec ) {
+                              pong_Hemi1 = true;
+                              pong_Hemi2 = true;
+                            }
+                            else if ( pong_Merge == pong_Sec && pong_Merge*pong_Sec > 0 ) {
+                              if      ( pong_Merge == iLLPrec1 ) {
+                                pong_Hemi1 = true;
+                              }
+                              else if ( pong_Sec == iLLPrec2 ) {
+                                pong_Hemi2 = true;
+                              }
+                              else if ( (Vtx1_step >= 1 && Vtx1_step <= 2) || Vtx_step > 2 ) {
+                                pong_Hemi1 = true;
+                                }
+                                else {
+                                  pong_Hemi2 = true;
+                                }
+                            }
+
+                          if ( isAxis1 ) {
+                              tree_Hemi_SecLLP_ping.push_back( pong_Hemi1 );
+                              tree_Hemi_SecLLP_ping.push_back( pong_Hemi2 );
                           }
-                          else {
+                        else {
+                          tree_Hemi_SecLLP_ping.push_back( pong_Hemi2 );
+			                    tree_Hemi_SecLLP_ping.push_back( pong_Hemi1 );
+	                      }
+                        int pong_event = 0;
+                        if	  ( pong_Hemi1 && pong_Hemi2 ) pong_event = 2;
+                        else if ( pong_Hemi1 || pong_Hemi2 ) pong_event = 1;
+                        tree_event_SecLLP_ping.push_back( pong_event );
+}
+            	     
+               }// SecVtx is Valid
 
-                            tree_Hemi_LLP_SecVtx_dx.push_back(SVtx_x - LLP2_x);
-                            tree_Hemi_LLP_SecVtx_dy.push_back(SVtx_y - LLP2_y);
-                            tree_Hemi_LLP_SecVtx_dz.push_back(SVtx_z - LLP2_z);
-                            tree_Hemi_LLP_SecVtx_dr.push_back(TMath::Sqrt(SVtx_x*SVtx_x+SVtx_y*SVtx_y) - TMath::Sqrt(LLP2_x*LLP2_x+LLP2_y*LLP2_y));
+        }//end of critera for merging
+      else {
+          tree_Hemi_Merging.push_back(false);
+          tree_Hemi_Merging.push_back(false);
+	    }
 
-                            NewdSV = (SVtx_x - LLP2_x)*(SVtx_x - LLP2_x) + (SVtx_y - LLP2_y)*(SVtx_y - LLP2_y) + (SVtx_z - LLP2_z)*(SVtx_z - LLP2_z);
-                            Newddok = TMath::Sqrt( NewdSV)/LLP2_dist;
-                            tree_Hemi_LLP_SecVtx_dd.push_back( Newddok );
-                            NewdSV = (SVtx_x - LLP1_x)*(SVtx_x - LLP1_x) + (SVtx_y - LLP1_y)*(SVtx_y - LLP1_y) + (SVtx_z - LLP1_z)*(SVtx_z - LLP1_z);
-                            Newddbad = TMath::Sqrt( NewdSV)/LLP1_dist;
-                            tree_Hemi_LLP_SecVtx_ddbad.push_back( Newddbad );
-                            if      ( SVtx_chi >= 0. && SVtx_chi < 10. && Newddok  < 0.1 ) Newping1 = 2;
-                            else if ( SVtx_chi >= 0. && SVtx_chi < 10. && Newddbad < 0.1 ) Newping1 = 1;
-                          }
-                          tree_Hemi_SecLLP.push_back(iLLPrec1);
-                        
-
-                        SVtx_x = tree_Hemi_SecVtx_x[1];
-                        SVtx_y = tree_Hemi_SecVtx_y[1];
-                        SVtx_z = tree_Hemi_SecVtx_z[1];
-                        SVtx_chi = tree_Hemi_SecVtx_NChi2[1];
-
-                      // Second SecVtx
-                      
-                          if ( iLLPrec2 == 1 ) {
-
-                            tree_Hemi_LLP_SecVtx_dx.push_back(SVtx_x - LLP1_x);
-                            tree_Hemi_LLP_SecVtx_dy.push_back(SVtx_y - LLP1_y);
-                            tree_Hemi_LLP_SecVtx_dz.push_back(SVtx_z - LLP1_z);
-                            tree_Hemi_LLP_SecVtx_dr.push_back(TMath::Sqrt(SVtx_x*SVtx_x+SVtx_y*SVtx_y) - TMath::Sqrt(LLP1_x*LLP1_x+LLP1_y*LLP1_y));
-
-                            NewdSV = (SVtx_x - LLP1_x)*(SVtx_x - LLP1_x) + (SVtx_y - LLP1_y)*(SVtx_y - LLP1_y) + (SVtx_z - LLP1_z)*(SVtx_z - LLP1_z);
-                            Newddok = TMath::Sqrt(NewdSV)/LLP1_dist;
-                            tree_Hemi_LLP_SecVtx_dd.push_back( Newddok );
-                            NewdSV = (SVtx_x - LLP2_x)*(SVtx_x - LLP2_x) + (SVtx_y - LLP2_y)*(SVtx_y - LLP2_y) + (SVtx_z - LLP2_z)*(SVtx_z - LLP2_z);
-                            float Newddbad = TMath::Sqrt(NewdSV)/LLP2_dist;
-                            tree_Hemi_LLP_SecVtx_ddbad.push_back( Newddbad );
-                            if      ( SVtx_chi >= 0. && SVtx_chi < 10. && Newddok  < 0.1 ) Newping2 = 1;
-                            else if ( SVtx_chi >= 0. && SVtx_chi < 10. && Newddbad < 0.1 ) Newping2 = 2;
-                          }
-                          else {
-
-                            tree_Hemi_LLP_SecVtx_dx.push_back(SVtx_x - LLP2_x);
-                            tree_Hemi_LLP_SecVtx_dy.push_back(SVtx_y - LLP2_y);
-                            tree_Hemi_LLP_SecVtx_dz.push_back(SVtx_z - LLP2_z);
-                            tree_Hemi_LLP_SecVtx_dr.push_back(TMath::Sqrt(SVtx_x*SVtx_x+SVtx_y*SVtx_y) - TMath::Sqrt(LLP2_x*LLP2_x+LLP2_y*LLP2_y));
-
-                            NewdSV = (SVtx_x - LLP2_x)*(SVtx_x - LLP2_x) + (SVtx_y - LLP2_y)*(SVtx_y - LLP2_y) + (SVtx_z - LLP2_z)*(SVtx_z - LLP2_z);
-                            Newddok = TMath::Sqrt(NewdSV)/LLP2_dist;
-                            tree_Hemi_LLP_SecVtx_dd.push_back( Newddok );
-                            NewdSV = (SVtx_x - LLP1_x)*(SVtx_x - LLP1_x) + (SVtx_y - LLP1_y)*(SVtx_y - LLP1_y) + (SVtx_z - LLP1_z)*(SVtx_z - LLP1_z);
-                            Newddbad = TMath::Sqrt(NewdSV)/LLP1_dist;
-                            tree_Hemi_LLP_SecVtx_ddbad.push_back( Newddbad );
-                            if      ( SVtx_chi >= 0. && SVtx_chi < 10. && Newddok  < 0.1 ) Newping2 = 2;
-                            else if ( SVtx_chi >= 0. && SVtx_chi < 10. && Newddbad < 0.1 ) Newping2 = 1;
-                          }
-                          tree_Hemi_SecLLP.push_back(iLLPrec2);
-
-                          if ( Newping1 == iLLPrec1 ) Newping_Hemi1 = true;
-                          if ( Newping2 == iLLPrec2 ) Newping_Hemi2 = true;
-                          if ( Newping1 == iLLPrec2 && Newping2 == iLLPrec1 ) {
-                            Newping_Hemi1 = true;
-                            Newping_Hemi2 = true;
-                          }
-                          if ( Newping2 == 0 && Newping1 == iLLPrec2 ) Newping_Hemi1 = true;
-                          if ( Newping1 == 0 && Newping2 == iLLPrec1 ) Newping_Hemi2 = true;
-                          tree_Hemi_SecLLP_ping.push_back( Newping_Hemi1 );
-                          tree_Hemi_SecLLP_ping.push_back( Newping_Hemi2 );
-
-                        }
-                        else  {
-                          tree_Hemi_SecLLP_ping.push_back( false );
-                          tree_Hemi_SecLLP_ping.push_back( false );
-                        }
-                        int Newping_event = 0;
-                        if      ( Newping_Hemi1 && Newping_Hemi2 ) Newping_event = 2;
-                        else if ( Newping_Hemi1 || Newping_Hemi2 ) Newping_event = 1;
-                        tree_event_SecLLP_ping.push_back( Newping_event );
-
-
-        }//end of criterai for merging
     }// end Nvertex == 2
+  else {
+      tree_Hemi_Merging.push_back(false);
+      tree_Hemi_Merging.push_back(false);
+    }
 
+tree_event_nVtx.push_back(nVertex);
 
-  tree_Hemi_Vtx_nVtx.push_back(nVertex);
-  //For the merging flag, if you have 2N vertices to merge together, there is a highchance that you get N1 (= N in theory) merged vertices thanks to the IAVF 
+    //For the merging flag, if you have 2N vertices to merge together, there is a highchance that you get N1 (= N in theory) merged vertices thanks to the IAVF 
   // (for the signal sample at least). But you should also reconstruct N2 (N2 = N) other vertices to get 2 vertices in each event. However, we may be lacking
   // tracks for the N2 vertex => usually N2 < N1. The way this information is regitered is that the Merging2 value will be set to 0 if 
   //the vertxing does not converge but the merging can be good so Merging1 will be set to 1. (to explain the difference between N1 and N2)
   // -------------------------------------------//
   
-  
-
-
-
 // "mva_Vtx_ntrk10" 
 // "mva_Vtx_ntrk20"
 // "mva_Vtx_MeanDCA
 //done after
-
-
-
-  float ping2 = 0;
-  bool ping_Hemi1 = false, ping_Hemi2 = false;
-
-  if ( isMC_ && tree_nLLP > 0 ) {
-    tree_Hemi_LLP_dR.push_back(axis2_dR);
-    if ( iLLPrec2 == 1 ) {
-      tree_Hemi_LLP_pt.push_back( LLP1_pt);
-      tree_Hemi_LLP_eta.push_back(LLP1_eta);
-      tree_Hemi_LLP_phi.push_back(LLP1_phi);
-      tree_Hemi_LLP_x.push_back(LLP1_x);
-      tree_Hemi_LLP_y.push_back(LLP1_y);
-      tree_Hemi_LLP_z.push_back(LLP1_z);
-      tree_Hemi_LLP_dist.push_back(LLP1_dist);
-      tree_Hemi_LLP_mother.push_back( LLP1_mother );
-      tree_Hemi_LLP_Vtx_dx.push_back(Vtx_x - LLP1_x);
-      tree_Hemi_LLP_Vtx_dy.push_back(Vtx_y - LLP1_y);
-      tree_Hemi_LLP_Vtx_dz.push_back(Vtx_z - LLP1_z);
-      tree_Hemi_LLP_Vtx_dr.push_back(TMath::Sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y) - TMath::Sqrt(LLP1_x*LLP1_x+LLP1_y*LLP1_y));
-
-      dSV = (Vtx_x - LLP1_x)*(Vtx_x - LLP1_x) + (Vtx_y - LLP1_y)*(Vtx_y - LLP1_y) + (Vtx_z - LLP1_z)*(Vtx_z - LLP1_z);
-      ddok = TMath::Sqrt(dSV)/LLP1_dist;
-      tree_Hemi_LLP_Vtx_dd.push_back( ddok );
-      dSV = (Vtx_x - LLP2_x)*(Vtx_x - LLP2_x) + (Vtx_y - LLP2_y)*(Vtx_y - LLP2_y) + (Vtx_z - LLP2_z)*(Vtx_z - LLP2_z);
-      ddbad = TMath::Sqrt(dSV)/LLP2_dist;
-      tree_Hemi_LLP_Vtx_ddbad.push_back( ddbad );
-      if      ( Vtx_chi >= 0. && Vtx_chi < 10. && ddok  < 0.1 ) ping2 = 1;
-      else if ( Vtx_chi >= 0. && Vtx_chi < 10. && ddbad < 0.1 ) ping2 = 2;
-    }
-    else {
-      tree_Hemi_LLP_pt.push_back( LLP2_pt);
-      tree_Hemi_LLP_eta.push_back(LLP2_eta);
-      tree_Hemi_LLP_phi.push_back(LLP2_phi);
-      tree_Hemi_LLP_x.push_back(LLP2_x);
-      tree_Hemi_LLP_y.push_back(LLP2_y);
-      tree_Hemi_LLP_z.push_back(LLP2_z);
-      tree_Hemi_LLP_dist.push_back(LLP2_dist);
-      tree_Hemi_LLP_mother.push_back( LLP2_mother );
-      tree_Hemi_LLP_Vtx_dx.push_back(Vtx_x - LLP2_x);
-      tree_Hemi_LLP_Vtx_dy.push_back(Vtx_y - LLP2_y);
-      tree_Hemi_LLP_Vtx_dz.push_back(Vtx_z - LLP2_z);
-      tree_Hemi_LLP_Vtx_dr.push_back(TMath::Sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y) - TMath::Sqrt(LLP2_x*LLP2_x+LLP2_y*LLP2_y));
-
-      dSV = (Vtx_x - LLP2_x)*(Vtx_x - LLP2_x) + (Vtx_y - LLP2_y)*(Vtx_y - LLP2_y) + (Vtx_z - LLP2_z)*(Vtx_z - LLP2_z);
-      ddok = TMath::Sqrt(dSV)/LLP2_dist;
-      tree_Hemi_LLP_Vtx_dd.push_back( ddok );
-      dSV = (Vtx_x - LLP1_x)*(Vtx_x - LLP1_x) + (Vtx_y - LLP1_y)*(Vtx_y - LLP1_y) + (Vtx_z - LLP1_z)*(Vtx_z - LLP1_z);
-      ddbad = TMath::Sqrt(dSV)/LLP1_dist;
-      tree_Hemi_LLP_Vtx_ddbad.push_back( ddbad );
-      if      ( Vtx_chi >= 0. && Vtx_chi < 10. && ddok  < 0.1 ) ping2 = 2;
-      else if ( Vtx_chi >= 0. && Vtx_chi < 10. && ddbad < 0.1 ) ping2 = 1;
-    }
-    tree_Hemi_LLP.push_back(iLLPrec2);
-    tree_Hemi_LLP_dR12.push_back(dRneuneu);
-    tree_Hemi_LLP_dR12.push_back(dRneuneu);
-
-    // associate reconstructed muon and neutralino
-    TLorentzVector vmuOK, vmuNO;
-    float muOK_dR, muOK_pt, muOK_mass;
-    float muNO_dR, muNO_pt, muNO_mass;
-    int muOK, muNO;
-    if ( iLLPrec2 == 1 ) {
-      // be cautious: smuon ID 100013 has charge -1 !
-      if ( LLP1_mother * lep1_Q < 0 ) {
-        muOK = imu1;
-        muNO = imu2;
-      }
-      else {
-        muOK = imu2;
-        muNO = imu1;
-      }
-    }
-    else {
-      // be cautious: smuon ID 100013 has charge -1 !
-      if ( LLP2_mother * lep1_Q < 0 ) {
-        muOK = imu1;
-        muNO = imu2;
-      }
-      else {
-        muOK = imu2;
-        muNO = imu1;
-      }
-    }
-    vmuOK.SetPtEtaPhiM(tree_muon_pt[muOK], tree_muon_eta[muOK], tree_muon_phi[muOK], mu_mass);
-    vmuNO.SetPtEtaPhiM(tree_muon_pt[muNO], tree_muon_eta[muNO], tree_muon_phi[muNO], mu_mass);
-        muOK_dR = Deltar( tree_muon_eta[muOK], tree_muon_phi[muOK], axis2_eta, axis2_phi );
-    muNO_dR = Deltar( tree_muon_eta[muNO], tree_muon_phi[muNO], axis2_eta, axis2_phi );
-        muOK_pt = (vmuOK+vaxis2).Pt();
-    muNO_pt = (vmuNO+vaxis2).Pt();
-    muOK_mass = TMath::Max((vmuOK+vaxis2).Mag(),0.);
-    muNO_mass = TMath::Max((vmuNO+vaxis2).Mag(),0.);
-    tree_Hemi_LLP_muOK_dR.push_back( muOK_dR );
-    tree_Hemi_LLP_muNO_dR.push_back( muNO_dR );
-    tree_Hemi_LLP_muOK_pt.push_back( muOK_pt );
-    tree_Hemi_LLP_muNO_pt.push_back( muNO_pt );
-    tree_Hemi_LLP_muOK_mass.push_back( muOK_mass );
-    tree_Hemi_LLP_muNO_mass.push_back( muNO_mass );
-
-    if ( ping1 == iLLPrec1 ) ping_Hemi1 = true;
-    if ( ping2 == iLLPrec2 ) ping_Hemi2 = true;
-    if ( ping1 == iLLPrec2 && ping2 == iLLPrec1 ) {
-      ping_Hemi1 = true;
-      ping_Hemi2 = true;
-    }
-    if ( ping2 == 0 && ping1 == iLLPrec2 ) ping_Hemi1 = true;
-    if ( ping1 == 0 && ping2 == iLLPrec1 ) ping_Hemi2 = true;
-    tree_Hemi_LLP_ping.push_back( ping_Hemi1 );
-    tree_Hemi_LLP_ping.push_back( ping_Hemi2 );
-    int ping_event = 0;
-    if      ( ping_Hemi1 && ping_Hemi2 ) ping_event = 2;
-    else if ( ping_Hemi1 || ping_Hemi2 ) ping_event = 1;
-    tree_event_LLP_ping.push_back( ping_event );
-  }
-  else  {
-    tree_Hemi_LLP_ping.push_back( false );
-    tree_Hemi_LLP_ping.push_back( false );
-  }
-  tree_Hemi_dR12.push_back(dR_axis12);
-  tree_Hemi_dR12.push_back(dR_axis12);
-    
 
 //------------Duplicate for each hemisphere-----------//
     // some informations for tracks in their hemisphere
@@ -7841,7 +7874,6 @@ float Vtx1_ntrk20 =0;
  } // endif tree_njetNOmu > 0
   } // endif tree_Filter
 //$$
-
 
   smalltree->Fill();
     // pFile->cd();
@@ -8305,8 +8337,6 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_Hemi_LLP_Vtx_dy.clear();
     tree_Hemi_LLP_Vtx_dz.clear();
     tree_Hemi_LLP_Vtx_dr.clear();
-    tree_Hemi_LLP_Vtx_dd.clear();
-    tree_Hemi_LLP_Vtx_ddbad.clear();
     tree_Hemi_LLP_muOK_dR.clear();
     tree_Hemi_LLP_muOK_pt.clear();
     tree_Hemi_LLP_muOK_mass.clear();
@@ -8316,15 +8346,7 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_Hemi_LLP_dR12.clear();
     tree_Hemi_LLP_ping.clear();
     tree_event_LLP_ping.clear();
-    tree_event_SecLLP_ping.clear();
-    tree_Hemi_LLP_SecVtx_dx.clear();
-    tree_Hemi_LLP_SecVtx_dy.clear();
-    tree_Hemi_LLP_SecVtx_dz.clear();
-    tree_Hemi_LLP_SecVtx_dr.clear();
-    tree_Hemi_LLP_SecVtx_dd.clear();
-    tree_Hemi_LLP_SecVtx_ddbad.clear();
-    tree_Hemi_SecLLP.clear();
-    tree_Hemi_SecLLP_ping.clear();
+    
     tree_Hemi_Vtx_step.clear();
     tree_Hemi_Vtx_isTight.clear();
     tree_Hemi_Vtx_NChi2.clear();
@@ -8333,43 +8355,52 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_Hemi_Vtx_nTrks_bad.clear();
     tree_Hemi_Vtx_x.clear();
     tree_Hemi_Vtx_y.clear();
-    tree_Hemi_Vtx_r.clear();
     tree_Hemi_Vtx_z.clear();
+    tree_Hemi_Vtx_r.clear();
+    tree_Hemi_Vtx_dR.clear();
     tree_Hemi_Vtx_xError.clear();
     tree_Hemi_Vtx_yError.clear();
     tree_Hemi_Vtx_zError.clear();
-    tree_Hemi_Vtx_eta.clear();
-    tree_Hemi_Vtx_Vtx_dr.clear();
-    tree_Hemi_Vtx_Vtx_dz.clear();
-    tree_Hemi_Vtx_Vtx_dd.clear();
-    tree_Hemi_Vtx_phi.clear();
-    tree_Hemi_Vtx_dRvtx.clear();
-    tree_Hemi_Vtx_nVtx.clear();
+    tree_event_nVtx.clear();
+    tree_event_Vtx_Vtx_dr.clear();
+    tree_event_Vtx_Vtx_dz.clear();
+    tree_event_Vtx_Vtx_dd.clear();
+    tree_event_Vtx_Vtx_dR.clear();
+    tree_event_Vtx_Vtx_step.clear();
+
+    tree_Hemi_SecLLP.clear();
+    tree_Hemi_LLP_SecVtx_dx.clear();
+    tree_Hemi_LLP_SecVtx_dy.clear();
+    tree_Hemi_LLP_SecVtx_dz.clear();
+    tree_Hemi_LLP_SecVtx_dr.clear();
+    tree_Hemi_SecLLP_ping.clear();
+    tree_event_SecLLP_ping.clear();
 
     // tree_Hemi_SecVtx_track_DCA_x.clear();
     // tree_Hemi_SecVtx_track_DCA_y.clear();
     // tree_Hemi_SecVtx_track_DCA_z.clear();
     // tree_Hemi_SecVtx_track_DCA_r.clear();
     // tree_Hemi_SecVtx_track_DCA_d.clear();
+    tree_Hemi_SecVtx.clear();
+    tree_Hemi_SecVtx_step.clear();
     tree_Hemi_SecVtx_x.clear();
     tree_Hemi_SecVtx_y.clear();
     tree_Hemi_SecVtx_z.clear();
     tree_Hemi_SecVtx_r.clear();
+    tree_Hemi_SecVtx_dR.clear();
     tree_Hemi_SecVtx_nTrks.clear();
-    tree_Hemi_SecVtx_step.clear();
-    tree_Hemi_SecVtx_eta.clear();
-    tree_Hemi_SecVtx_phi.clear();
+    tree_Hemi_SecVtx_NChi2.clear();
     tree_Hemi_SecVtx_dist.clear();
     tree_Hemi_SecVtx_track_MeanDCA_d.clear();
     tree_Hemi_SecVtx_SumtrackWeight.clear();
     tree_Hemi_SecVtx_trackWeight.clear();
     tree_Hemi_SecVtx_Mass.clear();
-    tree_Hemi_SecVtx_isTight.clear();
-    tree_Hemi_MergedVtx_Vtx_dr.clear();
-    tree_Hemi_MergedVtx_Vtx_dz.clear();
-    tree_Hemi_MergedVtx_Vtx_dd.clear();
-    tree_Hemi_MergedVtx_Vtx_dR.clear();
-    tree_Hemi_SecVtx_NChi2.clear();
+    tree_event_MergedVtx_Vtx_dr.clear();
+    tree_event_MergedVtx_Vtx_dz.clear();
+    tree_event_MergedVtx_Vtx_dd.clear();
+    tree_event_MergedVtx_Vtx_dR.clear();
+    tree_event_MergedVtx_Vtx_step.clear();
+    
     tree_Hemi_Vtx_trackWeight.clear();
     tree_Hemi_Vtx_MeantrackWeight.clear();
     // tree_Hemi_Vtx_track_DCA_x.clear();
