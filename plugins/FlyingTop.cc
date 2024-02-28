@@ -7528,10 +7528,10 @@ int MergeHemi = -1, SecHemi = -1;
                   std::vector<unsigned int>  NewVtx_index = VtxSec->Vtx_TrkIndex();
                   DCA_VTX_Meand = VtxSec->MeanDCA();
                   MeanWeight    = VtxSec->SumWeight();
-                  // if(SecVtx_chi>0 && SecVtx_chi<10)
-                    //   {
-                  SecHemi = 2;
-		              if ( MergeHemi == 2 ) SecHemi = 1;
+                  if(SecVtx_chi>0 && SecVtx_chi<10)
+                      {
+                        SecHemi = 2;
+		                    if ( MergeHemi == 2 ) SecHemi = 1;
                         tree_Hemi_SecVtx.push_back(SecHemi);
 
                         tree_Hemi_SecVtx_x.push_back(SecVtx_x);
@@ -7584,14 +7584,16 @@ int MergeHemi = -1, SecHemi = -1;
                             tree_Hemi_Merging.push_back(true);
                           }
                         else if ( !(SecVtx_chi>0 && SecVtx_chi<10) && MergeVtx_chi>0 && MergeVtx_chi<10 )
-	                      if ( MergeHemi == 1 ) {
-			                      tree_Hemi_Merging.push_back(true);
-			                      tree_Hemi_Merging.push_back(false);
-			                    }
-			                  else if ( MergeHemi == 2 ){
-                          tree_Hemi_Merging.push_back(false);
-                          tree_Hemi_Merging.push_back(true);
-                        }
+                          {
+                            if ( MergeHemi == 1 ) {
+                                tree_Hemi_Merging.push_back(true);
+                                tree_Hemi_Merging.push_back(false);
+                              }
+                            else if ( MergeHemi == 2 ){
+                              tree_Hemi_Merging.push_back(false);
+                              tree_Hemi_Merging.push_back(true);
+                            }
+                          }
                         else {
                             tree_Hemi_Merging.push_back(false);
                             tree_Hemi_Merging.push_back(false);
@@ -7687,7 +7689,7 @@ int MergeHemi = -1, SecHemi = -1;
                         if	  ( pong_Hemi1 && pong_Hemi2 ) pong_event = 2;
                         else if ( pong_Hemi1 || pong_Hemi2 ) pong_event = 1;
                         tree_event_SecLLP_ping.push_back( pong_event );
-}
+                  }
             	     
                }// SecVtx is Valid
 
