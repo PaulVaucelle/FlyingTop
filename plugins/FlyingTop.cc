@@ -225,6 +225,10 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
   
     bool isMC_;
     int YEAR_ ;
+    double SHIFT_X_;
+    double SHIFT_Y_;
+    double SHIFTBP_X_;
+    double SHIFTBP_Y_;
     string RochString;
     std::string weightFile_;
     std::string weightFileEVTS_;
@@ -390,18 +394,18 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     TMVA::Reader *reader = new TMVA::Reader( "!Color:Silent" );
 
     //Vtx level BDT to select signal vertices
-    float mva_V_nTrks;
-    float mva_V_chi;
-    float mva_V_step;
-    float mva_V_r;
-    float mva_V_z;
-    float mva_V_MTW;
-    float mva_V_Mass;
-    float mva_H_Mass;
-    float mva_V_dist;
-    float mva_V_ntrk10;
-    float mva_V_ntrk20;
-    float mva_V_MeanDCA;
+    float mva_V_nTrks = 0 ;
+    float mva_V_chi = 0;
+    float mva_V_step = 0;
+    float mva_V_r= 0;
+    float mva_V_z = 0;
+    float mva_V_MTW = 0;
+    float mva_V_Mass =  0;
+    float mva_H_Mass = 0;
+    float mva_V_dist = 0;
+    float mva_V_ntrk10 = 0;
+    float mva_V_ntrk20 = 0 ;
+    float mva_V_MeanDCA = 0;
     TMVA::Reader *readerVtx = new TMVA::Reader( "!Color:Silent" );
     TMVA::Reader *readerVtxStep1 = new TMVA::Reader( "!Color:Silent" );
 
@@ -1172,6 +1176,10 @@ typedef ROOT::Math::SVector<double, 3> SVector3;
 FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     isMC_(iConfig.getParameter<bool>("isMC")),
     YEAR_ (iConfig.getParameter<int>("YEAR")),
+    SHIFT_X_(iConfig.getParameter<double>("SHIFT_X")),
+    SHIFT_Y_(iConfig.getParameter<double>("SHIFT_Y")),
+    SHIFTBP_X_(iConfig.getParameter<double>("SHIFTBP_X")),
+    SHIFTBP_Y_(iConfig.getParameter<double>("SHIFTBP_Y")),
     RochString (iConfig.getParameter<std::string>("RochString")),
     weightFile_( iConfig.getUntrackedParameter<std::string>("weightFileMVA") ),
     weightFileEVTS_ (iConfig.getUntrackedParameter<std::string>("weightFileMVA_EVTS")),
@@ -3067,6 +3075,7 @@ else if (YEAR_ == 2016)
         tree_genAxis_dEtaneuneu.push_back(dEta);
       }
       
+
       // quarks from neutralino
       if ( ID >= 1 && ID <= 6 && abs(mom->pdgId()) == 1000023 ) {
         if ( nllp >= 2 ) {
@@ -3076,13 +3085,15 @@ else if (YEAR_ == 2016)
           float dV2 = (genIt.vx() - LLP2_x)*(genIt.vx() - LLP2_x)
                     + (genIt.vy() - LLP2_y)*(genIt.vy() - LLP2_y)
                     + (genIt.vz() - LLP2_z)*(genIt.vz() - LLP2_z);
-          if ( dV1 > 0.01 && dV2 > 0.01 ) nllp++; // should be == 2, so just to check : dV2 is always equal to 0 here
+          //$$$$$$$$          if ( dV1 > 0.01 && dV2 > 0.01 ) nllp++; // should be == 2, so just to check : dV2 is always equal to 0 here
+          if ( dV1 > 0.0001 && dV2 > 0.0001 ) nllp++; // should be == 2, so just to check : dV2 is always equal to 0 here
         }
         if ( nllp == 1 ) {
           float dV = (genIt.vx() - LLP1_x)*(genIt.vx() - LLP1_x)
                   + (genIt.vy() - LLP1_y)*(genIt.vy() - LLP1_y)
                   + (genIt.vz() - LLP1_z)*(genIt.vz() - LLP1_z);
-          if ( dV > 0.01 ) {
+          //$$$$$$$$          if ( dV > 0.01 ) {
+          if ( dV > 0.0001 ) {
             nllp = 2;
             LLP2_x = genIt.vx();
             LLP2_y = genIt.vy();
@@ -3733,7 +3744,11 @@ else if (YEAR_ == 2016)
       tree_Yc_r.push_back(	   Yr);
       
       int VtxLayerNI = -10;
-      if ( DetailedMap ) VtxLayerNI = NI->VertexBelongsToTracker(Yr, Yz);
+      float dx = 0;
+      float dy = 0;
+      // Shifts have to be applied to the vertex position to match the tracker geometry but since we don't care about the photon conversion reconstruction
+      // we don't need to apply them here, that's why there are set to 0 here
+      if ( DetailedMap ) VtxLayerNI = NI->VertexBelongsToTracker(Yx,Yy, Yz, dx, dy);
       else {
           VtxLayerNI = NI->VertexBelongsToBarrelLayer(Yr, Yz);
           if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
@@ -4732,35 +4747,35 @@ else if (YEAR_ == 2016)
             std::pair<int,GloballyPositioned<float>::PositionType> posFHPosition = posPHP->Main(firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
             float xF = posFHPosition.second.x() - PV.x();
             float yF = posFHPosition.second.y() - PV.y();
-	    float rF = TMath::Sqrt( xF*xF + yF*yF );
-            float zF = TMath::Abs( posFHPosition.second.z() - PV.z() );
-	    // PXB
-	    if ( rF > 2.7 && rF < 16.5 && zF < 27.0 ) {
-	      if ( rF <  distMagXY - 0.40 ) badTkHit = true;
-	    }
-	    // TIB
-	    if ( rF > 23.5 && rF < 36.2 && zF < 66.0 ) {
-	      if ( rF <  distMagXY - 0.84 ) badTkHit = true;
-	    }
-	    if ( rF > 40.0 && rF < 52.0 && zF < 66.0 ) {
-	      if ( rF <  distMagXY - 2.24 ) badTkHit = true;
-	    }
-	    // TOB
-	    if ( rF > 58.4 && rF < 62.9 && zF < 107. ) {
-	      if ( rF <  distMagXY - 2.8 ) badTkHit = true;
-	    }
-	    // PXF
-	    if ( rF > 4.5 && rF < 16.1 && zF > 29.6 && zF < 52.0 ) {
-	      if ( zF <  distMagZ - 3.2 ) badTkHit = true;
-	    }
-	    // TID
-	    if ( rF > 22.5 && rF < 50.5 && zF > 74.3 && zF < 109.7 ) {
-	      if ( zF <  distMagZ - 3.9 ) badTkHit = true;
-	    }
-	    // TEC
-	    if ( rF > 22.0 && rF < 70.0 && zF > 126.4 && zF < 193.7 ) {
-	      if ( zF <  distMagZ - 6.7 ) badTkHit = true;
-	    }
+            float rF = TMath::Sqrt( xF*xF + yF*yF );
+                  float zF = TMath::Abs( posFHPosition.second.z() - PV.z() );
+            // PXB
+            if ( rF > 2.7 && rF < 16.5 && zF < 27.0 ) {
+              if ( rF <  distMagXY - 0.40 ) badTkHit = true;
+            }
+            // TIB
+            if ( rF > 23.5 && rF < 36.2 && zF < 66.0 ) {
+              if ( rF <  distMagXY - 0.84 ) badTkHit = true;
+            }
+            if ( rF > 40.0 && rF < 52.0 && zF < 66.0 ) {
+              if ( rF <  distMagXY - 2.24 ) badTkHit = true;
+            }
+            // TOB
+            if ( rF > 58.4 && rF < 62.9 && zF < 107. ) {
+              if ( rF <  distMagXY - 2.8 ) badTkHit = true;
+            }
+            // PXF
+            if ( rF > 4.5 && rF < 16.1 && zF > 29.6 && zF < 52.0 ) {
+              if ( zF <  distMagZ - 3.2 ) badTkHit = true;
+            }
+            // TID
+            if ( rF > 22.5 && rF < 50.5 && zF > 74.3 && zF < 109.7 ) {
+              if ( zF <  distMagZ - 3.9 ) badTkHit = true;
+            }
+            // TEC
+            if ( rF > 22.0 && rF < 70.0 && zF > 126.4 && zF < 193.7 ) {
+              if ( zF <  distMagZ - 6.7 ) badTkHit = true;
+            }
 
           }
         }
@@ -4788,35 +4803,35 @@ else if (YEAR_ == 2016)
             std::pair<int,GloballyPositioned<float>::PositionType> negFHPosition = negPHP->Main(firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
             float xF = negFHPosition.second.x() - PV.x();
             float yF = negFHPosition.second.y() - PV.y();
-	    float rF = TMath::Sqrt( xF*xF + yF*yF );
-            float zF = TMath::Abs( negFHPosition.second.z() - PV.z() );
-	    // PXB
-	    if ( rF > 2.7 && rF < 16.5 && zF < 27.0 ) {
-	      if ( rF <  distMagXY - 0.40 ) badTkHit = true;
-	    }
-	    // TIB
-	    if ( rF > 23.5 && rF < 36.2 && zF < 66.0 ) {
-	      if ( rF <  distMagXY - 0.84 ) badTkHit = true;
-	    }
-	    if ( rF > 40.0 && rF < 52.0 && zF < 66.0 ) {
-	      if ( rF <  distMagXY - 2.24 ) badTkHit = true;
-	    }
-	    // TOB
-	    if ( rF > 58.4 && rF < 62.9 && zF < 107. ) {
-	      if ( rF <  distMagXY - 2.8 ) badTkHit = true;
-	    }
-	    // PXF
-	    if ( rF > 4.5 && rF < 16.1 && zF > 29.6 && zF < 52.0 ) {
-	      if ( zF <  distMagZ - 3.2 ) badTkHit = true;
-	    }
-	    // TID
-	    if ( rF > 22.5 && rF < 50.5 && zF > 74.3 && zF < 109.7 ) {
-	      if ( zF <  distMagZ - 3.9 ) badTkHit = true;
-	    }
-	    // TEC
-	    if ( rF > 22.0 && rF < 70.0 && zF > 126.4 && zF < 193.7 ) {
-	      if ( zF <  distMagZ - 6.7 ) badTkHit = true;
-	    }
+            float rF = TMath::Sqrt( xF*xF + yF*yF );
+                  float zF = TMath::Abs( negFHPosition.second.z() - PV.z() );
+            // PXB
+            if ( rF > 2.7 && rF < 16.5 && zF < 27.0 ) {
+              if ( rF <  distMagXY - 0.40 ) badTkHit = true;
+            }
+            // TIB
+            if ( rF > 23.5 && rF < 36.2 && zF < 66.0 ) {
+              if ( rF <  distMagXY - 0.84 ) badTkHit = true;
+            }
+            if ( rF > 40.0 && rF < 52.0 && zF < 66.0 ) {
+              if ( rF <  distMagXY - 2.24 ) badTkHit = true;
+            }
+            // TOB
+            if ( rF > 58.4 && rF < 62.9 && zF < 107. ) {
+              if ( rF <  distMagXY - 2.8 ) badTkHit = true;
+            }
+            // PXF
+            if ( rF > 4.5 && rF < 16.1 && zF > 29.6 && zF < 52.0 ) {
+              if ( zF <  distMagZ - 3.2 ) badTkHit = true;
+            }
+            // TID
+            if ( rF > 22.5 && rF < 50.5 && zF > 74.3 && zF < 109.7 ) {
+              if ( zF <  distMagZ - 3.9 ) badTkHit = true;
+            }
+            // TEC
+            if ( rF > 22.0 && rF < 70.0 && zF > 126.4 && zF < 193.7 ) {
+              if ( zF <  distMagZ - 6.7 ) badTkHit = true;
+            }
 
           }
         }
@@ -4874,12 +4889,12 @@ else if (YEAR_ == 2016)
         // delta eta pointing
         double dr = sqrt(dx*dx + dy*dy);
         double etaZ = 0.;
-	if ( dz != 0. ) etaZ = -TMath::Log(abs(TMath::Tan(TMath::ATan(dr/dz)/2.)));
-	if ( dz < 0. )  etaZ = -etaZ;
+        if ( dz != 0. ) etaZ = -TMath::Log(abs(TMath::Tan(TMath::ATan(dr/dz)/2.)));
+        if ( dz < 0. )  etaZ = -etaZ;
         double ptot = TMath::Sqrt(px*px + py*py + pz*pz);
         double etaP = 0.;
         if ( abs(pz) < ptot ) etaP = 0.5 * TMath::Log((ptot+pz)/(ptot-pz));
-	float detaPointing = etaP - etaZ;
+	      float detaPointing = etaP - etaZ;
                    
         // calculate total energy of V0 3 ways: assume it's a Kshort, a Lambda, or a LambdaBar.
         double piPlusE = sqrt(positiveP.mag2() + piMassSquared);
@@ -4952,7 +4967,7 @@ else if (YEAR_ == 2016)
           theKshort->setP4(p4);
           theKshort->setCharge(charge);
           if ( abs(theKshort->mass() - kShortMass) < kShortMassCut_ ) 
-	  {
+	        {
             float K0x = theKshort->vertex().x();
             float K0y = theKshort->vertex().y();
             float K0z = theKshort->vertex().z(); 
@@ -5449,8 +5464,12 @@ else if (YEAR_ == 2016)
 
 	// tracker active layers
         // PropaHitPattern* NI = new PropaHitPattern();
+        // Shift from the (0,0) center of CMS w.r.t the alignement of the tracker.
+        // / With this correction => everything is in the (0,0) reference frame
+        float Shift_x = SHIFT_X_;
+        float Shift_y = SHIFT_Y_;
         int VtxLayerNI = -1;
-        if (DetailedMap) VtxLayerNI = NI->VertexBelongsToTracker(SecInt_r, SecInt_z);
+        if (DetailedMap) VtxLayerNI = NI->VertexBelongsToTracker(SecInt_x,SecInt_y, SecInt_z,Shift_x,Shift_y );
         else {
           VtxLayerNI = NI->VertexBelongsToBarrelLayer(SecInt_r, SecInt_z);
           if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecInt_z);
@@ -5462,6 +5481,13 @@ else if (YEAR_ == 2016)
             idxSecIntMGT[trd2].first = true;
 	  }
 	  // beam pipe
+    // Shift is slightly different for the Beam pipe compared to BPIXL1
+    float ShiftBP_x = SHIFTBP_X_;
+    float ShiftBP_y = SHIFTBP_Y_;
+
+    SecInt_x = SecInt_x - ShiftBP_x;
+    SecInt_y = SecInt_y - ShiftBP_y;
+    SecInt_r = sqrt(SecInt_x*SecInt_x+SecInt_y*SecInt_y);
 	  if ( abs(SecInt_z) < 27. && SecInt_r > 1.9 && SecInt_r < 2.26 ) {// !! Beam pipe MC:  abs(SecInt_z) < 27. && SecInt_r > 2.16 && SecInt_r < 2.26
                                                                       // !! Beam pipe shifted w.r.t data : put 1.9instead of 2.16
                                                                       // !! there are other changes in PropaHitPattern.h  to improve data/MC matching
@@ -5470,6 +5496,9 @@ else if (YEAR_ == 2016)
             idxSecIntMGT[trd2].first = true;
 	  }
 	  // PIXB inner support
+    SecInt_x = SecInt_x + ShiftBP_x - Shift_x;
+    SecInt_y = SecInt_y + ShiftBP_y - Shift_y;
+    SecInt_r = sqrt(SecInt_x*SecInt_x+SecInt_y*SecInt_y);
 	  if ( abs(SecInt_z) < 27. && SecInt_r > 2.49 && SecInt_r < 2.54 ) {
 	    VtxLayerNI = -2;
             idxSecIntMGT[trd1].first = true;
