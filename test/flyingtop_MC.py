@@ -13,12 +13,84 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 #$$
 process.load("Geometry.CaloEventSetup.CaloTowerConstituents_cfi")
 
+# https://twiki.cern.ch/twiki/bin/view/CMS/TopPtReweighting#TOP_PAG_corrections_based_on_dat 
+###--------------------------
 IsMC=True
 year = 2018
 from Configuration.AlCa.GlobalTag import GlobalTag
+# Global Tags:
+
+#     Data: 106X_dataRun2_v37
+#     MC 2016APV: 106X_mcRun2_asymptotic_preVFP_v11
+#     MC 2016: 106X_mcRun2_asymptotic_v17
+#     MC 2017: 106X_mc2017_realistic_v10
+#     MC 2018: 106X_upgrade2018_realistic_v16_L1v1 
+# /opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/PU/MC/2016
+# mcpufile = cms.string("Pileup_MC2018UL_bin100.root"),
+#  datapufile = cms.string("MyDataPileupHistogram_bin100.root"),
+
+
+isPostAPV = True
+ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2018UL.txt"
+EGERA = '2018-UL'
+GT = '106X_upgrade2018_realistic_v16_L1v1'
+TIGHTJETIDERA = 'RUN2ULCHS'  #NOTE: Use "RUN2UL16CHS" for UL2016 eras
+L1PREFERA = '20172018'
+DATAPUFILE = 'MyDataPileupHistogram2018.root'
+MCPUFILE   = 'Pileup_MC2018UL_bin100.root'
+SHIFT_X = 0
+SHIFT_Y = 0
+SHIFTBP_X = 0
+SHIFTBP_Y = 0
+
+if year == 2018 :
+    ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2018UL.txt"
+    GT = '106X_upgrade2018_realistic_v16_L1v1'
+    EGERA = '2018-UL'
+    TIGHTJETIDERA = 'RUN2ULCHS'
+    L1PREFERA = '20172018'
+    SHIFT_X = -0.09
+    SHIFT_Y = 0.12
+    SHIFTBP_X = -0.18
+    SHIFTBP_Y = 0.19
+if year == 2017 :
+    ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2017UL.txt"
+    GT = '106X_mc2017_realistic_v10'
+    EGERA = '2017-UL'
+    TIGHTJETIDERA = 'RUN2ULCHS' 
+    L1PREFERA = '20172018'
+    DATAPUFILE = 'MyDataPileupHistogram2017.root'
+    MCPUFILE   = 'Pileup_MC2017UL_bin100.root'
+    SHIFT_X = 0
+    SHIFT_Y = 0
+    SHIFTBP_X = 0
+    SHIFTBP_Y = 0
+if year == 2016 :
+    TIGHTJETIDERA = 'RUN2UL16CHS'  #NOTE: Use "RUN2UL16CHS" for UL2016 eras
+    DATAPUFILE = 'MyDataPileupHistogram2016.root'
+    MCPUFILE   = 'Pileup_MC2016UL_bin100.root'
+    if isPostAPV :
+        ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2016aUL.txt"
+        GT = '106X_mcRun2_asymptotic_preVFP_v11'
+        EGERA = '2016-UL'
+        L1PREFERA = '2016'
+        SHIFT_X = 0
+        SHIFT_Y = 0
+        SHIFTBP_X = 0
+        SHIFTBP_Y = 0
+        
+    else :
+        ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2016bUL.txt"
+        GT = '106X_mcRun2_asymptotic_v17'
+        EGERA = '2016-UL'
+        L1PREFERA = '2016'
+        SHIFT_X = 0
+        SHIFT_Y = 0
+        SHIFTBP_X = 0
+        SHIFTBP_Y = 0
 
 if IsMC:                                                                                                                                                                                     
-    process.GlobalTag = GlobalTag(process.GlobalTag, '106X_upgrade2018_realistic_v16_L1v1', '')##106X_upgrade2018_realistic_v16_L1v1 default one signal sample                               
+    process.GlobalTag = GlobalTag(process.GlobalTag, GT, '')##106X_upgrade2018_realistic_v16_L1v1 default one signal sample                               
 else:
     process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_Sep2018Rereco_v1', '') ## for 2018 MuonEG    
     
@@ -29,7 +101,7 @@ else:
 # FlyingTopAnalyzer                                                                                          
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 process.GoodVertexFilter = cms.EDFilter("VertexSelector",
                                         src = cms.InputTag("offlineSlimmedPrimaryVertices"),
@@ -57,24 +129,24 @@ process.source = cms.Source("PoolSource",
     #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_3.root',
     #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_4.root',
     #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_5.root',
-    #   'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_6.root',
-    #   'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_7.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_6.root',
+    #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_7.root',
     #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_8.root',
     #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_9.root',
     #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_10.root'
 
 
        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau100/MINIAODSIM_v16_L1v1_1.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_2.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_3.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_4.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_5.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_6.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_7.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_9.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_8.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_9.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_10.root'
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_2.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_3.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_4.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_5.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_6.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_7.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_9.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_8.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_9.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_10.root'
 
 
 # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2017/RPV_2017_smu200_neu180_ctau010/MINIAODSIM_1.root',
@@ -467,7 +539,7 @@ from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
 setupEgammaPostRecoSeq(process,
                        runEnergyCorrections=True,
                        runVID=False, #saves CPU time by not needlessly re-running VID, if you want the Fall17V2 IDs, set this to True or remove (default is True)
-                       era='2018-UL'
+                       era=EGERA
 )    
 
 
@@ -515,7 +587,7 @@ process.updatedJets = updatedPatJets.clone(
 #
 process.tightJetId = cms.EDProducer("PatJetIDValueMapProducer",
     filterParams=cms.PSet(
-        version = cms.string('RUN2ULCHS'), #NOTE: Use "RUN2UL16CHS" for UL2016 eras
+        version = cms.string(TIGHTJETIDERA), #NOTE: Use "RUN2UL16CHS" for UL2016 eras
         quality = cms.string('TIGHT'),
     ),
     src = cms.InputTag("updatedJets")
@@ -523,14 +595,16 @@ process.tightJetId = cms.EDProducer("PatJetIDValueMapProducer",
 
 process.tightLepVetoJetId = cms.EDProducer("PatJetIDValueMapProducer",
   filterParams=cms.PSet(
-    version = cms.string('RUN2ULCHS'), #NOTE: Use "RUN2UL16CHS" for UL2016 eras^M
+    version = cms.string(TIGHTJETIDERA), #NOTE: Use "RUN2UL16CHS" for UL2016 eras^M
     quality = cms.string('TIGHTLEPVETO'),
   ),
   src = cms.InputTag("updatedJets")
 )
 #
 # Module to calculate Pileup Jet ID
-#
+# _chsalgos_106X_UL16
+# _chsalgos_106X_UL17
+# _chsalgos_106X_UL18
 from RecoJets.JetProducers.PileupJetID_cfi import _chsalgos_106X_UL18
 process.load("RecoJets.JetProducers.PileupJetID_cfi")
 process.pileupJetIdUpdated = process.pileupJetId.clone(
@@ -562,29 +636,24 @@ process.prefiringweight = l1PrefiringWeightProducer.clone(
     #TheJets = cms.InputTag("updatedPatJetsUpdatedJEC"), #this should be the slimmedJets collection with up to date JECs !                                                               
     TheJets= cms.InputTag('slimmedJets'),
     DataEraECAL = cms.string("None"),
-    DataEraMuon = cms.string("20172018"),
+    DataEraMuon = cms.string(L1PREFERA),
     UseJetEMPt = cms.bool(False),
     PrefiringRateSystematicUnctyECAL = cms.double(0.2),
     PrefiringRateSystematicUnctyMuon = cms.double(0.2)
 )
 
-isPostAPV = True
-ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2018UL.txt"
-if year == 2018 :
-    ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2018UL.txt"
-if year == 2017 :
-    ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2017UL.txt"
-if year == 2016 :
-    if isPostAPV :
-        ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2016aUL.txt"
-    else :
-        ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2016bUL.txt"
+
+
 process.options = cms.untracked.PSet( )
 process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
                                 #    RochString = cms.string("./FlyingTop/FlyingTop/test/"), 
                                 #    Roccor = cms.FileInPath("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"),
                                     isMC =cms.bool(IsMC), 
                                     YEAR = cms.int32(year),
+                                    SHIFT_X = cms.double(-0.09),   
+                                    SHIFT_Y = cms.double(0.12), 
+                                    SHIFTBP_X = cms.double(-0.18), 
+                                    SHIFTBP_Y = cms.double(0.19),
                                     RochString = cms.string(ROCCORPATH),
                                     weightFileMVA = cms.untracked.string( "BDT_TRK_CTAU10cm_vs_TT.xml"),#track selection => previous :BDT_TRK_ALLSIGvsDYTT_30_01_2024.xml/ BDT_TRK_ALLSIGvsALLBKG.xml // TMVAClassification_BDTG_TRKSEL_.weights.xml
                                     weightFileMVA_EVTS = cms.untracked.string("BDT_EVT_ALLSIGvsALLBKG.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
@@ -598,33 +667,33 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
                                     # weightFileMVA_HEMI2TT = cms.untracked.string("BDT_HEMI2_ALLSIGvsTTTo2L2Nu.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
                                     weightFileMVA_VTX = cms.untracked.string("BDT_VTX_ALLSTEPS_ALLSignal.xml"),#vtx selection : TMVAClassification_BDTG_VTXSEL_.weights.xml
                                     weightFileMVA_VTX_step1 = cms.untracked.string("BDT_VTX_STEPS12_ALLSignal.xml"),#vtx selection :  TMVAClassification_BDTG_VTXSel_TIGHTWP.weights.xml
-                                   mcpufile = cms.string("Pileup_MC2018UL_bin100.root"),
-                                   mcpupath = cms.string("pileup"),
-                                   datapufile = cms.string("MyDataPileupHistogram_bin100.root"),
-                                   datapupath = cms.string("pileup"),
+                                    mcpufile = cms.string("Pileup_MC2018UL_bin100.root"),
+                                    mcpupath = cms.string("pileup"),
+                                    datapufile = cms.string("MyDataPileupHistogram_bin100.root"),
+                                    datapupath = cms.string("pileup"),
                                 #    muoneps1file   = cms.string("NUM_TightID_DEN_TrackerMuons_abseta_pt.root"),
                                 #    muoneps1path   = cms.string("NUM_TightID_DEN_TrackerMuons_abseta_pt"),
                                 #    muoneps2file   = cms.string("NUM_TkIsoTight_DEN_TightID_TrackerMuons_abseta_pt.root"),
                                 #    muoneps2path   = cms.string("NUM_TkIsoTight_DEN_TightID_TrackerMuons_abseta_pt"),
                                 #    muoneps3file   = cms.string("NUM_IsoMu24_or_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_DEN_TkIsoTight_and_TightID_abseta_pt.root"),
                                 #    muoneps3path   = cms.string("NUM_IsoMu24_or_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_DEN_TkIsoTight_and_TightID_abseta_pt"),
-                                   genEventInfoInput        = cms.InputTag("generator"),
-                                   LHEEventProductInput     = cms.InputTag("externalLHEProducer"),#source or externalLHEProducer
-                                   genpruned   = cms.InputTag('prunedGenParticles'),
-                                   genpacked   = cms.InputTag('packedGenParticles'),
-                                   vertices    = cms.InputTag('offlineSlimmedPrimaryVertices'),
-                                   mets        = cms.InputTag("slimmedMETs"),
-                                   jets        = cms.InputTag("updatedJetsWithUserData"),
-                                   genjets     = cms.InputTag("slimmedGenJets"),
-                                   electrons   = cms.InputTag("slimmedElectrons"),
-                                   muons       = cms.InputTag("slimmedMuons"),
-                                   pfCands     = cms.InputTag("packedPFCandidates"),
-                                   lostpfCands = cms.InputTag("lostTracks"),
-                                   Kshorts     = cms.InputTag("slimmedKshortVertices"),#recoVertexCompositePtrCandidates_slimmedKshortVertices__PAT
-                                   Lambda      = cms.InputTag("slimmedLambdaVertices"),#recoVertexCompositePtrCandidates_slimmedLambdaVertices__PAT
-                                   beamSpot    = cms.untracked.InputTag('offlineBeamSpot'),
-                                   puCollection = cms.InputTag("slimmedAddPileupInfo"),
-                                   rhoCollection = cms.InputTag("fixedGridRhoFastjetAll")
+                                    genEventInfoInput        = cms.InputTag("generator"),
+                                    LHEEventProductInput     = cms.InputTag("externalLHEProducer"),#source or externalLHEProducer
+                                    genpruned   = cms.InputTag('prunedGenParticles'),
+                                    genpacked   = cms.InputTag('packedGenParticles'),
+                                    vertices    = cms.InputTag('offlineSlimmedPrimaryVertices'),
+                                    mets        = cms.InputTag("slimmedMETs"),
+                                    jets        = cms.InputTag("updatedJetsWithUserData"),
+                                    genjets     = cms.InputTag("slimmedGenJets"),
+                                    electrons   = cms.InputTag("slimmedElectrons"),
+                                    muons       = cms.InputTag("slimmedMuons"),
+                                    pfCands     = cms.InputTag("packedPFCandidates"),
+                                    lostpfCands = cms.InputTag("lostTracks"),
+                                    Kshorts     = cms.InputTag("slimmedKshortVertices"),#recoVertexCompositePtrCandidates_slimmedKshortVertices__PAT
+                                    Lambda      = cms.InputTag("slimmedLambdaVertices"),#recoVertexCompositePtrCandidates_slimmedLambdaVertices__PAT
+                                    beamSpot    = cms.untracked.InputTag('offlineBeamSpot'),
+                                    puCollection = cms.InputTag("slimmedAddPileupInfo"),
+                                    rhoCollection = cms.InputTag("fixedGridRhoFastjetAll"),
                                 )
 
 #process.tsk = cms.Task()
@@ -649,7 +718,7 @@ process.p = cms.Path(
 
 ########## output of ntuple
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string("Ntuple_Test9.root") )
+process.TFileService = cms.Service("TFileService", fileName = cms.string("NtupleTest.root") )
 
 process.options.numberOfThreads=cms.untracked.uint32(4)
 
