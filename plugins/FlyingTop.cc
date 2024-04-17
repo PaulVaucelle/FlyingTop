@@ -225,10 +225,6 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
   
     bool isMC_;
     int YEAR_ ;
-    double SHIFT_X_;
-    double SHIFT_Y_;
-    double SHIFTBP_X_;
-    double SHIFTBP_Y_;
     string RochString;
     std::string weightFile_;
     std::string weightFileEVTS_;
@@ -1176,11 +1172,7 @@ typedef ROOT::Math::SVector<double, 3> SVector3;
 FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     isMC_(iConfig.getParameter<bool>("isMC")),
     YEAR_ (iConfig.getParameter<int>("YEAR")),
-    SHIFT_X_(iConfig.getParameter<double>("SHIFT_X")),
-    SHIFT_Y_(iConfig.getParameter<double>("SHIFT_Y")),
-    SHIFTBP_X_(iConfig.getParameter<double>("SHIFTBP_X")),
-    SHIFTBP_Y_(iConfig.getParameter<double>("SHIFTBP_Y")),
-    RochString (iConfig.getParameter<std::string>("RochString")),
+        RochString (iConfig.getParameter<std::string>("RochString")),
     weightFile_( iConfig.getUntrackedParameter<std::string>("weightFileMVA") ),
     weightFileEVTS_ (iConfig.getUntrackedParameter<std::string>("weightFileMVA_EVTS")),
     weightFileEVTSDY_ (iConfig.getUntrackedParameter<std::string>("weightFileMVA_EVTSDY")),
@@ -2042,6 +2034,26 @@ bool FlyingTopAnalyzer::isAncestor(const reco::Candidate* ancestor, const reco::
 void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   clearVariables();
+
+//$$$$ 
+  //  ---------------------------------------------------------------- //
+  //  --------------- beam pipe and detector centers ----------------- //
+  //  ------ tuned via a scan in (x,y), see /ui2_data1/blochd/LLTopAna/SecIntAna.C and output/h_SecInt_2017_data.root, ...
+  //  ---------------------------------------------------------------- //
+  float x_bmp = 0., y_bmp = 0.;
+  float x_det = 0., y_det = 0.;
+  if ( !isMC_ ) {
+    if ( YEAR_ == 2017 ) {
+      x_bmp =  0.12; y_bmp = -0.19;
+      x_det =  0.12; y_det = -0.12;
+    }
+    if ( YEAR_ == 2018 ) {
+      x_bmp =  0.18; y_bmp = -0.19;
+      x_det =  0.09; y_det = -0.12;
+    }
+  }
+  //  ---------------------------------------------------------------- //
+//$$$$ 
 
   runNumber   = iEvent.id().run();
   eventNumber = iEvent.id().event();
@@ -3074,7 +3086,6 @@ else if (YEAR_ == 2016)
         tree_genAxis_dPhineuneu.push_back(dPhi);
         tree_genAxis_dEtaneuneu.push_back(dEta);
       }
-      
 
       // quarks from neutralino
       if ( ID >= 1 && ID <= 6 && abs(mom->pdgId()) == 1000023 ) {
@@ -3085,14 +3096,14 @@ else if (YEAR_ == 2016)
           float dV2 = (genIt.vx() - LLP2_x)*(genIt.vx() - LLP2_x)
                     + (genIt.vy() - LLP2_y)*(genIt.vy() - LLP2_y)
                     + (genIt.vz() - LLP2_z)*(genIt.vz() - LLP2_z);
-          //$$$$$$$$          if ( dV1 > 0.01 && dV2 > 0.01 ) nllp++; // should be == 2, so just to check : dV2 is always equal to 0 here
+          //$$         if ( dV1 > 0.01 && dV2 > 0.01 ) nllp++; // should be == 2, so just to check : dV2 is always equal to 0 here
           if ( dV1 > 0.0001 && dV2 > 0.0001 ) nllp++; // should be == 2, so just to check : dV2 is always equal to 0 here
         }
         if ( nllp == 1 ) {
           float dV = (genIt.vx() - LLP1_x)*(genIt.vx() - LLP1_x)
                   + (genIt.vy() - LLP1_y)*(genIt.vy() - LLP1_y)
                   + (genIt.vz() - LLP1_z)*(genIt.vz() - LLP1_z);
-          //$$$$$$$$          if ( dV > 0.01 ) {
+          //$$          if ( dV > 0.01 ) {
           if ( dV > 0.0001 ) {
             nllp = 2;
             LLP2_x = genIt.vx();
@@ -3744,11 +3755,7 @@ else if (YEAR_ == 2016)
       tree_Yc_r.push_back(	   Yr);
       
       int VtxLayerNI = -10;
-      float dx = 0;
-      float dy = 0;
-      // Shifts have to be applied to the vertex position to match the tracker geometry but since we don't care about the photon conversion reconstruction
-      // we don't need to apply them here, that's why there are set to 0 here
-      if ( DetailedMap ) VtxLayerNI = NI->VertexBelongsToTracker(Yx,Yy, Yz, dx, dy);
+      if ( DetailedMap ) VtxLayerNI = NI->VertexBelongsToTracker(Yr, Yz);
       else {
           VtxLayerNI = NI->VertexBelongsToBarrelLayer(Yr, Yz);
           if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
@@ -5462,14 +5469,17 @@ else if (YEAR_ == 2016)
              theSecInt->vertexNormalizedChi2() < 10. ) SecInt_selec = true; //&& dca < 1.
         tree_SecInt_selec.push_back(   SecInt_selec);
 
+//$$$$
+        // redefine SecInt_r to account for the displaced detector center in data
+        if ( !isMC_ ) SecInt_r = TMath::Sqrt( (SecInt_x-x_det)*(SecInt_x-x_det) + (SecInt_y-y_det)*(SecInt_y-y_det) );
+//$$$$
 	// tracker active layers
         // PropaHitPattern* NI = new PropaHitPattern();
         // Shift from the (0,0) center of CMS w.r.t the alignement of the tracker.
         // / With this correction => everything is in the (0,0) reference frame
-        float Shift_x = SHIFT_X_;
-        float Shift_y = SHIFT_Y_;
+
         int VtxLayerNI = -1;
-        if (DetailedMap) VtxLayerNI = NI->VertexBelongsToTracker(SecInt_x,SecInt_y, SecInt_z,Shift_x,Shift_y );
+        if (DetailedMap) VtxLayerNI = NI->VertexBelongsToTracker(SecInt_r, SecInt_z);
         else {
           VtxLayerNI = NI->VertexBelongsToBarrelLayer(SecInt_r, SecInt_z);
           if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecInt_z);
@@ -5481,45 +5491,40 @@ else if (YEAR_ == 2016)
             idxSecIntMGT[trd2].first = true;
 	  }
 	  // beam pipe
-    // Shift is slightly different for the Beam pipe compared to BPIXL1
-    float ShiftBP_x = SHIFTBP_X_;
-    float ShiftBP_y = SHIFTBP_Y_;
-
-    SecInt_x = SecInt_x - ShiftBP_x;
-    SecInt_y = SecInt_y - ShiftBP_y;
-    SecInt_r = sqrt(SecInt_x*SecInt_x+SecInt_y*SecInt_y);
-	  if ( abs(SecInt_z) < 27. && SecInt_r > 1.9 && SecInt_r < 2.26 ) {// !! Beam pipe MC:  abs(SecInt_z) < 27. && SecInt_r > 2.16 && SecInt_r < 2.26
-                                                                      // !! Beam pipe shifted w.r.t data : put 1.9instead of 2.16
-                                                                      // !! there are other changes in PropaHitPattern.h  to improve data/MC matching
+    //$$$$
+// 	  if ( abs(SecInt_z) < 27. && SecInt_r > 1.9 && SecInt_r < 2.26 ) {// !! Beam pipe MC:  abs(SecInt_z) < 27. && SecInt_r > 2.16 && SecInt_r < 2.26
+    float r_bmp = TMath::Sqrt( (SecInt_x-x_bmp)*(SecInt_x-x_bmp) + (SecInt_y-y_bmp)*(SecInt_y-y_bmp) );
+	  if ( abs(SecInt_z) < 27. && r_bmp > 2.15 && r_bmp < 2.27 ) {
+//$$$$
       	    VtxLayerNI = -1;
             idxSecIntMGT[trd1].first = true;
             idxSecIntMGT[trd2].first = true;
 	  }
 	  // PIXB inner support
-    SecInt_x = SecInt_x + ShiftBP_x - Shift_x;
-    SecInt_y = SecInt_y + ShiftBP_y - Shift_y;
-    SecInt_r = sqrt(SecInt_x*SecInt_x+SecInt_y*SecInt_y);
-	  if ( abs(SecInt_z) < 27. && SecInt_r > 2.49 && SecInt_r < 2.54 ) {
+    //$$$$ 	  if ( abs(SecInt_z) < 27. && SecInt_r > 2.49 && SecInt_r < 2.54 ) {
+if ( abs(SecInt_z) < 27. && SecInt_r > 2.44 && SecInt_r < 2.55 ) {
 	    VtxLayerNI = -2;
             idxSecIntMGT[trd1].first = true;
             idxSecIntMGT[trd2].first = true;
 	  }
 	  // PIXB outer support
-	  if ( SecInt_r > 21.5 && SecInt_r < 22.25 ) {// !! MC values :  SecInt_r > 21.55 && SecInt_r < 21.85 have to be changed for data to
-                                                  // !! 21.5 and 22.25
+	  //$$$$	  if ( SecInt_r > 21.5 && SecInt_r < 22.25 ) { // !! MC values :  SecInt_r > 21.55 && SecInt_r < 21.85 have to be changed for data to 21.5 and 22.25
+if ( SecInt_r > 21.4 && SecInt_r < 22.1 ) {
 	    VtxLayerNI = -3;
             idxSecIntMGT[trd1].first = true;
             idxSecIntMGT[trd2].first = true;
 	  }
 	  // PIXB rails
 	  if ( abs(SecInt_z) < 27. && abs(SecInt_x) < 10. && 
-	       abs(SecInt_y) > 18.9 && abs(SecInt_y) < 19.4 ) {
+	       //$$$$	       abs(SecInt_y) > 18.9 && abs(SecInt_y) < 19.5 ) {
+	       abs(SecInt_y) > 18.9 && abs(SecInt_y) < 20.9 ) {
 	    VtxLayerNI = -4;
             idxSecIntMGT[trd1].first = true;
             idxSecIntMGT[trd2].first = true;
 	  }
 	  // services : r 18 - 19 and z 29 - 200 according to "other" material map
-	  if ( abs(SecInt_z) > 29. && SecInt_r > 18.0 && SecInt_r < 19.0 ) {
+	  //$$$$	  if ( abs(SecInt_z) > 29. && SecInt_r > 18.0 && SecInt_r < 19.1 ) {
+	  if ( abs(SecInt_z) > 29. && SecInt_r > 18.0 && SecInt_r < 20.6 ) {
 	    VtxLayerNI = -3;
             idxSecIntMGT[trd1].first = true;
             idxSecIntMGT[trd2].first = true;
@@ -6578,12 +6583,13 @@ else if ( !( tk_pt > pt_Cut && tk_NChi2 < NChi2_Cut && tk_drSig > drSig_Cut ) ) 
     float DCA_VTX_Meand = 0;
     std::vector<float>  Vtx1_Weights;
     std::vector<unsigned int> Vtx1_index;
-    //$$$$    int TightVertex = true;
+    //$$    int TightVertex = true;
     int TightVertex = false; // ok ?
 
     GlobalPoint PVPos(PV.x(),PV.y(),PV.z());
     Vtx* VtxHemi1 = new Vtx();
     // void Vertexing(std::vector<reco::TransientTrack> VertexTracks, vector<std::pair<bool,TLorentzVector>> Track_FirstHit, bool ActivateStep = true, bool RequireGoodChi2Seed = false,bool RequireGoodChi2VertexIter = false, float Chi2down = 0., float Chi2up = 10., GlobalPoint *PV = nullptr )
+    // Track_FirstHit_Hemi1_mva.first tells you if the track is lost => don't car about the first hit of lost tracks.
     VtxHemi1->IAVFVertexing(displacedTracks_Hemi1_mva,Track_FirstHit_Hemi1_mva,ActivateStep1,false,false,0.,10.,&PVPos);
     if (VtxHemi1->chi2()>0 && VtxHemi1->chi2()<10)
       {
@@ -6620,7 +6626,7 @@ else if ( !( tk_pt > pt_Cut && tk_NChi2 < NChi2_Cut && tk_drSig > drSig_Cut ) ) 
     if ( badVtx  && displacedTracks_step2_Hemi1.size() > 1 && (ActivateStep4 || IterAVF) )
       {
         VtxHemi1->IAVFVertexing(displacedTracks_step2_Hemi1,Track_FirstHit_step2_Hemi1,ActivateStep4,true,false,0.,10.,&PVPos);
-        //$$$$        Vtx_step = 4; 
+        //$$        Vtx_step = 4; 
         if ( VtxHemi1->chi2()>0 && VtxHemi1->chi2()<10 ) Vtx_step = 4; 
         TightVertex = false;
       }
@@ -6637,7 +6643,7 @@ else if ( !( tk_pt > pt_Cut && tk_NChi2 < NChi2_Cut && tk_drSig > drSig_Cut ) ) 
     std::vector<TransientTrack> Vtx1_Trks = VtxHemi1->GetTTracks();
     GlobalError Vtx1posError = VtxHemi1->Vtx_PosErr();
 
-    //$$$$    if (VtxHemi1->chi2() == -10 && Vtx_step == 4)Vtx1_Trks.clear();
+    //$$    if (VtxHemi1->chi2() == -10 && Vtx_step == 4)Vtx1_Trks.clear();
     if ( VtxHemi1->chi2() == -10 ) Vtx1_Trks.clear();
     TLorentzVector Vtx1Vector(0,0,0,0);
     for (unsigned int i = 0 ; i <Vtx1_Weights.size(); i++)
@@ -6683,9 +6689,9 @@ else if ( !( tk_pt > pt_Cut && tk_NChi2 < NChi2_Cut && tk_drSig > drSig_Cut ) ) 
 
     if ( ActivateONLYAVF )
       {
-        //$$$$
+        //$$
                 TightVertex = false; // ok ?
-        //$$$$
+        //$$
         VtxHemi1->AVFVertexing(displacedTracks_Hemi1_mva);
         if (VtxHemi1->chi2()>0 && VtxHemi1->chi2()<10)
           {
@@ -6865,7 +6871,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
     DCA_VTX_Meand = 0;
     std::vector<float>  Vtx2_Weights;
     std::vector<unsigned int>    Vtx2_index;
-    //$$$$    TightVertex = true;
+    //$$    TightVertex = true;
     TightVertex = false; // ok ?
     // void Vertexing(std::vector<reco::TransientTrack> VertexTracks, vector<std::pair<bool,TLorentzVector>> Track_FirstHit, bool ActivateStep = true, bool RequireGoodChi2Seed = false,bool RequireGoodChi2VertexIter = false, float Chi2down = 0., float Chi2up = 10., GlobalPoint *PV = nullptr )//return type to be chnged
                 
@@ -6913,7 +6919,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
     if ( badVtx  && displacedTracks_step2_Hemi2.size() > 1 && (ActivateStep4 || IterAVF) )
       {
         VtxHemi2->IAVFVertexing(displacedTracks_step2_Hemi2,Track_FirstHit_step2_Hemi2,ActivateStep4,true,false,0.,10.,&PVPos);
-        //$$$$        Vtx_step = 4;
+        //$$        Vtx_step = 4;
         if ( VtxHemi2->chi2()>0 && VtxHemi2->chi2()<10 ) Vtx_step = 4;
         TightVertex = false;
       }
@@ -6930,7 +6936,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
     std::vector<TransientTrack> Vtx2_Trks = VtxHemi2->GetTTracks();
     GlobalError Vtx2posError = VtxHemi2->Vtx_PosErr();
 
-    //$$$$    if (VtxHemi2->chi2() == -10 && Vtx_step == 4)Vtx2_Trks.clear();
+    //$$    if (VtxHemi2->chi2() == -10 && Vtx_step == 4)Vtx2_Trks.clear();
     if ( VtxHemi2->chi2() == -10 ) Vtx2_Trks.clear();
     TLorentzVector Vtx2Vector(0,0,0,0);
     for (unsigned int i = 0 ; i <Vtx2_Weights.size(); i++)
@@ -6976,9 +6982,9 @@ if ( LLP2_mother * lep1_Q < 0 ) {
   if ( ActivateONLYAVF )
       {
         VtxHemi2->AVFVertexing(displacedTracks_Hemi2_mva);
-        //$$$$
+        //$$
         TightVertex = false; // ok ?
-        //$$$$
+        //$$
         if (VtxHemi2->chi2()>0 && VtxHemi2->chi2()<10)
           {
             Vtx_step = 1; 
@@ -7183,10 +7189,10 @@ if ( Vtx_step>0 && Vtx_chi<10 && Vtx_chi>0 ) nVertex++;
   float dd_2V = -10.;
   float dRVtx = -10.;
   
-  //$$$$
+  //$$
 int MergeHemi = 1, SecHemi = 2;
   int MergeStep = 0, SecStep = -1;
-//$$$$
+//$$
   int pong_Merge = 0, pong_Sec = 0;
   bool pong_Hemi1 = false, pong_Hemi2 = false;
 
@@ -7218,7 +7224,7 @@ int MergeHemi = 1, SecHemi = 2;
 
       tree_event_Vtx_Vtx_step.push_back(eventStep);
 
-            if ( ActivateMerging && (dd_2V < dSVcut || dd_2V/recD < ddcut) ) 
+      if ( ActivateMerging && (dd_2V < dSVcut || dd_2V/recD < ddcut) ) 
         {  // criteria to activate the merging is in cm
            // The criteria that should be applied is that this dd_2V(dz and dr) distance should be below the resolution that we have on the vertices
            // Here are just some low  values for the two resolutions
@@ -7287,10 +7293,10 @@ int MergeHemi = 1, SecHemi = 2;
               MergedVtxMass = (Vtx1Vector+Vtx2Vector).Mag();
             }
 
-          //$$$$
+          //$$
                   // Merged vertex is always valid, but just to be cautious...
             if ( MergeVtx_chi > 0. && MergeVtx_chi < 10. ) {
-          //$$$$
+          //$$
             // std::cout<<"vtx1_chi: "<<Vtx1_chi<<std::endl;
             // std::cout<<"vtx2_chi: "<<Vtx2_chi<<std::endl;
             float thetaMerged = TMath::ATan2( sqrt(Mergedx*Mergedx+Mergedy*Mergedy) , abs(Mergedz) ) ;
@@ -7560,9 +7566,9 @@ int MergeHemi = 1, SecHemi = 2;
                 if ( badVtx  && NewTTracks.size() > 1 && (ActivateStep4 || IterAVF) && !NewTightVertex)
                   {
                     VtxSec->IAVFVertexing(NewTTracks,FHNewTTrack,true,true,false,0.,10.,&PVPos);
-                    //$$$$
+                    //$$
                     if ( VtxSec->chi2() > 0. && VtxSec->chi2() < 10.) SecStep = 4; // missing ?
-                    //$$$$
+                    //$$
                   }
 
                   float SecVtx_x = VtxSec->x();
@@ -7577,7 +7583,7 @@ int MergeHemi = 1, SecHemi = 2;
                   float SecSumWeight	 = VtxSec->SumWeight();
 
                   TLorentzVector NewVtxVector(0,0,0,0);
-                  //$$$$          if ( SecVtx_chi== -10 && SecStep == 4 ) SecVtx_Trks.clear();
+                  //$$          if ( SecVtx_chi== -10 && SecStep == 4 ) SecVtx_Trks.clear();
                   if ( SecVtx_chi== -10 ) SecVtx_Trks.clear();
                   for (unsigned int i = 0 ; i <SecVtx_Trks.size(); i++)
                     {
@@ -7613,7 +7619,7 @@ int MergeHemi = 1, SecHemi = 2;
                             tree_event_MergedVtx_Vtx_dz.push_back(New_dz_2V);
                             tree_event_MergedVtx_Vtx_dd.push_back(New_dd_2V);
                             tree_event_MergedVtx_Vtx_reldd.push_back(New_dd_2V/SecrecD);
-                           float theta_SecVtx = TMath::ATan2(sqrt(SecrecX*SecrecX+SecrecY*SecrecY),abs(SecrecZ)) ;
+                            float theta_SecVtx = TMath::ATan2(sqrt(SecrecX*SecrecX+SecrecY*SecrecY),abs(SecrecZ)) ;
                             float eta_SecVtx = -TMath::Log(tan(theta_SecVtx/2));
                             if ( SecVtx_z < 0 ) eta_SecVtx = -eta_SecVtx;
                             float SecPhi = TMath::ATan2(SecrecY,SecrecX);
@@ -7655,9 +7661,9 @@ int MergeHemi = 1, SecHemi = 2;
                                           DCA_VTX_Meand = SecDCA_VTX_Meand;
                                           MergedVtxMass = NewVtxVector.Mag(); 
                                         }
-                                        //$$$$
+                                        //$$
                                             // else do nothing (MergeVtx informations still valid)
-                                        //$$$$
+                                        //$$
                                     }
                                   else if ( eventNewStep == -1 ) // both vtx are tight=> final vtx is tight
                                     {
@@ -7791,9 +7797,9 @@ int MergeHemi = 1, SecHemi = 2;
             	     
               //  } // SecVtx is Valid
 
-        //$$$$
+        //$$
         } // endif merge vertex is valid (just to be cautious)
-        //$$$$
+        //$$
 
       } // end of critera for merging
       else {
