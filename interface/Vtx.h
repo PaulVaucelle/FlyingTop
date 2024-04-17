@@ -15,6 +15,56 @@
 #include "RecoVertex/AdaptiveVertexFit/interface/AdaptiveVertexFitter.h"
 /*---------------*/
 
+using namespace reco;
+class Vtx {
+   public:
+
+      //Constructor
+      Vtx()
+        {}
+      
+      //Destructor
+      ~Vtx(){/*prolly wanna add something here*/
+             }
+
+    //Vertexing related methods
+    //--------------------------------------------------------------------------------------------//
+
+    /**
+     * Performs vertexing using the Adaptive Vertex Fitter (AVF) algorithm.
+     * 
+     * @param VertexTracks The vector of transient tracks used for vertexing.
+     * @return void
+     */
+    void AVFVertexing(std::vector<reco::TransientTrack> VertexTracks)//return type to be chnged
+        {
+          static AdaptiveVertexFitter 
+          theFitter_Vertex(
+                      GeometricAnnealing ( sigmacut, Tini, ratio ), 
+                      DefaultLinearizationPointFinder(),
+                      KalmanVertexUpdator<5>(), 
+                      KalmanVertexTrackCompatibilityEstimator<5>(), 
+                      KalmanVertexSmoother() );
+          theFitter_Vertex.setParameters( maxshift, maxlpshift, maxstep, weightThreshold );
+
+          TransientVertex TV_AVF = theFitter_Vertex.vertex(VertexTracks);
+          Vtx_x = -100.;
+          Vtx_y = -100.;
+          Vtx_z = -100.;
+          Vtx_chi = -10.;
+          if (TV_AVF.isValid())
+            {
+              if (TV_AVF.normalisedChiSquared()<10 && TV_AVF.normalisedChiSquared()>0)
+                {
+                  Vtx_x = TV_AVF.position().x();
+                  Vtx_y = TV_AVF.position().y();
+                  Vtx_z = TV_AVF.position().z();
+                  Vtx_chi = TV_AVF.normalisedChiSquared();
+                }
+            }
+        }
+    
+
       //----------------------------------------IAVF-----------------------------------------------//
       //                           Iterative Adaptive Vertex Fitter                                //
       //Input : Collections od displaced Tracks ordered by decreasing values of BDT => to have the //
@@ -36,23 +86,20 @@
       //                                                                                           //
       //PS: Maximum efficiency is reached for MiniAOD when using the covariance matrix correction  //
       //-------------------------------------------------------------------------------------------//
-using namespace reco;
-class Vtx {
-   public:
 
-      //Constructor
-      Vtx()
-        {}
-      
-      //Destructor
-      ~Vtx(){/*prolly wanna add something here*/
-            Vtx_Weights.clear();
-            Vtx_index.clear();}
-
-      //Vertexing related methods
-
-
-    void Vertexing(std::vector<reco::TransientTrack> VertexTracks, vector<std::pair<bool,TLorentzVector>> Track_FirstHit, bool ActivateStep = true, bool RequireGoodChi2Seed = false,bool RequireGoodChi2VertexIter = false, float Chi2down = 0., float Chi2up = 10., GlobalPoint *PV = nullptr )//return type to be chnged
+    /**
+     * Performs vertexing using the AdaptiveVertexFitter algorithm.
+     * 
+     * @param VertexTracks The vector of transient tracks representing the vertex tracks.
+     * @param Track_FirstHit The vector of pairs indicating whether each track has its first hit after the vertex and the corresponding TLorentzVector.
+     * @param ActivateStep Flag to activate the vertexing step.
+     * @param RequireGoodChi2Seed Flag to require a good chi-squared value for the seed vertex.
+     * @param RequireGoodChi2VertexIter Flag to require a good chi-squared value for each vertex iteration.
+     * @param Chi2down The lower bound for the chi-squared value.
+     * @param Chi2up The upper bound for the chi-squared value.
+     * @param PV Pointer to the GlobalPoint representing the primary vertex.
+     */
+    void IAVFVertexing(std::vector<reco::TransientTrack> VertexTracks, vector<std::pair<bool,TLorentzVector>> Track_FirstHit, bool ActivateStep = true, bool RequireGoodChi2Seed = false,bool RequireGoodChi2VertexIter = false, float Chi2down = 0., float Chi2up = 10., GlobalPoint *PV = nullptr )//return type to be chnged
         {
                 static AdaptiveVertexFitter 
                 theFitter_Vertex(
@@ -66,7 +113,8 @@ class Vtx {
             // Values to be returned ----
             Vtx_ntk = VertexTracks.size();
             DCA_VTX_Meand = 0;
-            int badtkhit_index = -1;
+            // int badtkhit_index = -1;
+            int badtkhit_index[2]= {-1,-1};
             bool success = false;
             MeanWeight=0;
             float tempMeanWeight=0;
@@ -96,25 +144,34 @@ class Vtx {
                                   TransientVertex TV = theFitter_Vertex.vertex(vTT); // We take the first "good-looking" seed to start
                                   if ( TV.isValid() )
                                     {
-                                      if(RequireGoodChi2Seed && TV.normalisedChiSquared() < Chi2down && TV.normalisedChiSquared() > Chi2up) continue; 
-                                      for (int m = 0; m < ntracks; m++) // we check that both tracks have their first hit "after" the vertex
+                                      if ( RequireGoodChi2Seed && (TV.normalisedChiSquared() < Chi2down || TV.normalisedChiSquared() > Chi2up) ) continue; 
+                                      // if ( Track_FirstHit[k].first == true ) {success = true; }  //first hit of lost track is biased //
+                                      float PosFH1 = sqrt((Track_FirstHit[k].second.X()-PV->x())*(Track_FirstHit[k].second.X()-PV->x())+(Track_FirstHit[k].second.Y()-PV->y())*(Track_FirstHit[k].second.Y()-PV->y())+(Track_FirstHit[k].second.Z()-PV->z())*(Track_FirstHit[k].second.Z()-PV->z()));
+                                      float PosFH2 = sqrt((Track_FirstHit[p].second.X()-PV->x())*(Track_FirstHit[p].second.X()-PV->x())+(Track_FirstHit[p].second.Y()-PV->y())*(Track_FirstHit[p].second.Y()-PV->y())+(Track_FirstHit[p].second.Z()-PV->z())*(Track_FirstHit[p].second.Z()-PV->z()));
+                                      float PosVtx1 = sqrt((TV.position().x()-PV->x())*(TV.position().x()-PV->x())+(TV.position().y()-PV->y())*(TV.position().y()-PV->y())+(TV.position().z()-PV->z())*(TV.position().z()-PV->z()));
+                                      bool Pass1 = false;
+                                      bool Pass2 = false;
+
+                                      float diff1 = sqrt((Track_FirstHit[k].second.X()-TV.position().x())*(Track_FirstHit[k].second.X()-TV.position().x())+(Track_FirstHit[k].second.Y()-TV.position().y())*(Track_FirstHit[k].second.Y()-TV.position().y())+(Track_FirstHit[k].second.Z()-TV.position().z())*(Track_FirstHit[k].second.Z()-TV.position().z()));
+                                      float diff2 = sqrt((Track_FirstHit[p].second.X()-TV.position().x())*(Track_FirstHit[p].second.X()-TV.position().x())+(Track_FirstHit[p].second.Y()-TV.position().y())*(Track_FirstHit[p].second.Y()-TV.position().y())+(Track_FirstHit[p].second.Z()-TV.position().z())*(Track_FirstHit[p].second.Z()-TV.position().z()));
+                                      if ( PosFH1 > PosVtx1 || diff1 < 0.1 || diff1/PosVtx1 < 0.1 || Track_FirstHit[k].first == true) {Pass1 = true;}
+                                      if ( PosFH2 > PosVtx1 || diff2 < 0.1 || diff2/PosVtx1 < 0.1 || Track_FirstHit[p].first == true) {Pass2 = true;}
+                                      // if (Track_FirstHit[k].first == true;) {Pass1 = true; }
+                                      if ( Pass1 && Pass2 ) 
                                         {
-                                          if ( Track_FirstHit[m].first == true ) continue; //first hit of lost track is biased
-                                          float PosFH = sqrt((Track_FirstHit[m].second.X()-PV->x())*(Track_FirstHit[m].second.X()-PV->x())+(Track_FirstHit[m].second.Y()-PV->y())*(Track_FirstHit[m].second.Y()-PV->y())+(Track_FirstHit[m].second.Z()-PV->z())*(Track_FirstHit[m].second.Z()-PV->z()));
-                                          float PosVtx1 = sqrt((TV.position().x()-PV->x())*(TV.position().x()-PV->x())+(TV.position().y()-PV->y())*(TV.position().y()-PV->y())+(TV.position().z()-PV->z())*(TV.position().z()-PV->z()));
-                                          if ( PosFH>PosVtx1 ) 
-                                              {
-                                                  success   = true; 
-                                                  tempchi2  = TV.normalisedChiSquared();
-                                                  tempx     = TV.position().x();
-                                                  tempy     = TV.position().y();
-                                                  tempz     = TV.position().z();
-                                                  posError  = TV.positionError();
-                                                  continue;
-                                              }
-                                          else badtkhit_index = m; // we keep in memory the index of the track that does not have a godd first hit
+                                          success   = true; 
+                                          tempchi2  = TV.normalisedChiSquared();
+                                          tempx     = TV.position().x();
+                                          tempy     = TV.position().y();
+                                          tempz     = TV.position().z();
+                                          posError  = TV.positionError();
+                                          
                                         }
-                                      if (Vtx_ntk == 2 && !success ) break; // removing 1 track gives no other option than break
+                                      else if (!Pass1) {badtkhit_index[0] = k;}
+                                      else if (!Pass2) {badtkhit_index[1] = p;}
+                                      // else if ( !(Pass1 && Pass2) ){success = false;}  useless since success is already set to false                             
+
+                                      if (Vtx_ntk == 2 && !success ) break; // removing 1 track from a 2 track collection gives no other option than break => no Vtx
                                       else if ( success )
                                         {
                                           Vtx_index.clear();
@@ -131,6 +188,7 @@ class Vtx {
                                                     vTT.pop_back();
                                                     ntracks--;
                                                     updatedTV   = theFitter_Vertex.vertex(vTT);
+                                                    if (!updatedTV.isValid()) continue;
                                                     tempchi2    = updatedTV.normalisedChiSquared();
                                                     tempx       = updatedTV.position().x();
                                                     tempy       = updatedTV.position().y();
@@ -138,6 +196,8 @@ class Vtx {
                                                     posError    = updatedTV.positionError();
                                                     tempMeanWeight  = 0;
                                                     Vtx_Weights.clear();
+                                                    
+                                                    ntracks = vTT.size();
                                                     for (int i = 0; i < ntracks; i++)
                                                       {
                                                         tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
@@ -149,7 +209,7 @@ class Vtx {
                                               if ( updatedTV.isValid() ) 
                                                 {
 
-                                                  if(RequireGoodChi2VertexIter && updatedTV.normalisedChiSquared() < Chi2down && updatedTV.normalisedChiSquared() > Chi2up) success = false;
+                                                  if(RequireGoodChi2VertexIter && (updatedTV.normalisedChiSquared() < Chi2down || updatedTV.normalisedChiSquared() > Chi2up)) success = false;
                                                   tempchi2  = updatedTV.normalisedChiSquared();
                                                   tempx     = updatedTV.position().x();
                                                   tempy     = updatedTV.position().y();
@@ -157,12 +217,15 @@ class Vtx {
                                                   posError  = updatedTV.positionError();
                                                   float TPosFH = sqrt((Track_FirstHit[m].second.X()-PV->x())*(Track_FirstHit[m].second.X()-PV->x())+(Track_FirstHit[m].second.Y()-PV->y())*(Track_FirstHit[m].second.Y()-PV->y())+(Track_FirstHit[m].second.Z()-PV->z())*(Track_FirstHit[m].second.Z()-PV->z()));
                                                   float TPosVtx1 = sqrt((tempx-PV->x())*(tempx-PV->x())+(tempy-PV->y())*(tempy-PV->y())+(tempz-PV->z())*(tempz-PV->z()));
-                                                  if (TPosFH>TPosVtx1 || Track_FirstHit[m].first == true) success = true; // continue not useful
+
+                                                  float diff0 = sqrt((Track_FirstHit[m].second.X()-tempx)*(Track_FirstHit[m].second.X()-tempx)+(Track_FirstHit[m].second.Y()-tempy)*(Track_FirstHit[m].second.Y()-tempy)+(Track_FirstHit[m].second.Z()-tempz)*(Track_FirstHit[m].second.Z()-tempz));
+                                                  if ( TPosFH > TPosVtx1 || diff0 < 0.1 || diff0/TPosVtx1 < 0.1 || Track_FirstHit[m].first == true) success = true;
                                                   else  
                                                     {
                                                       vTT.pop_back();
-                                                      ntracks--;
+                                                      ntracks--;//not useful anymore
                                                       updatedTV = theFitter_Vertex.vertex(vTT);
+                                                      if (!updatedTV.isValid()) continue;
                                                       tempchi2  = updatedTV.normalisedChiSquared();
                                                       tempx     = updatedTV.position().x();
                                                       tempy     = updatedTV.position().y();
@@ -170,6 +233,7 @@ class Vtx {
                                                       posError  = updatedTV.positionError();
                                                       tempMeanWeight=0;
                                                       Vtx_Weights.clear();
+                                                      ntracks = vTT.size();
                                                       for(int i = 0; i < ntracks; i++)
                                                         {
                                                           tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
@@ -181,6 +245,8 @@ class Vtx {
                                                   tempMeanWeight=0;
                                                   Vtx_Weights.clear();
                                                   Vtx_index.push_back(m);
+                                                  // std::cout<<"ntracks : "<<ntracks<<" and Vtt.size : "<<vTT.size()<<std::endl;
+                                                  ntracks = vTT.size();
                                                   for (int i = 0; i < ntracks; i++)
                                                     {
                                                       tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
@@ -194,13 +260,13 @@ class Vtx {
                                       else if (Vtx_ntk > 2 && !success)
                                         {
                                           Vtx_index.clear();
-                                          if (badtkhit_index == k) 
+                                          if (badtkhit_index[0] == k) 
                                             {
                                               vTT.erase(vTT.begin());
                                               ntracks--;
                                               Vtx_index.push_back(p);
                                             }
-                                          else if (badtkhit_index == p) 
+                                          else if (badtkhit_index[1] == p) 
                                             {
                                               vTT.erase(vTT.end());
                                               ntracks--;
@@ -208,13 +274,16 @@ class Vtx {
                                             }
                                           else 
                                             {
+                                              //This should not happen
+                                              std::cout<<"---------------> this should not happend"<<std::endl;
                                               Vtx_index.push_back(k);
                                               Vtx_index.push_back(p);
                                             }
                                           for (int m = 0; m < Vtx_ntk; m++) // We then add track by track to the vertex and check the validity of the vertex
                                             {
-                                              if (m == k || m == p || m == badtkhit_index) continue; // we take care to not take into account the track with a wrong first hit
-                                              ntracks++;//++
+                                              if (m == k || m == p) continue; // we take care to not take into account the track with a wrong first hit 
+                                              // even more security to avoid taking the same track twice
+                                              ntracks++;
                                               tempMeanWeight=0;
                                               vTT.push_back(VertexTracks[m]);
                                               TransientVertex updatedTV = theFitter_Vertex.vertex(vTT);
@@ -224,6 +293,7 @@ class Vtx {
                                                   ntracks--;
                                                   if ( vTT.size() < 2 ) continue;
                                                   updatedTV   = theFitter_Vertex.vertex(vTT);
+                                                  if (!updatedTV.isValid()) continue;
                                                   tempchi2    = updatedTV.normalisedChiSquared();
                                                   tempx       = updatedTV.position().x();
                                                   tempy       = updatedTV.position().y();
@@ -233,6 +303,7 @@ class Vtx {
                                                   tempMeanWeight=0;
                                                   if ( ntracks < 2 )  success = false;
                                                   if ( ntracks >= 2 ) success = true;
+                                                  ntracks = vTT.size();
                                                   for (int i=0; i<ntracks; i++)
                                                     {
                                                       tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
@@ -243,7 +314,7 @@ class Vtx {
                                                 }
                                               if ( updatedTV.isValid() ) 
                                                 {
-                                                  if(RequireGoodChi2VertexIter && updatedTV.normalisedChiSquared() < Chi2down && updatedTV.normalisedChiSquared() > Chi2up) success = false;
+                                                  if(RequireGoodChi2VertexIter && (updatedTV.normalisedChiSquared() < Chi2down || updatedTV.normalisedChiSquared() > Chi2up)) success = false;
                                                   tempchi2 = updatedTV.normalisedChiSquared();
                                                   tempx=updatedTV.position().x();
                                                   tempy=updatedTV.position().y();
@@ -251,14 +322,22 @@ class Vtx {
                                                   posError = updatedTV.positionError();
                                                   float TPosFH = sqrt((Track_FirstHit[m].second.X()-PV->x())*(Track_FirstHit[m].second.X()-PV->x())+(Track_FirstHit[m].second.Y()-PV->y())*(Track_FirstHit[m].second.Y()-PV->y())+(Track_FirstHit[m].second.Z()-PV->z())*(Track_FirstHit[m].second.Z()-PV->z()));
                                                   float TPosVtx1 = sqrt((tempx-PV->x())*(tempx-PV->x())+(tempy-PV->y())*(tempy-PV->y())+(tempz-PV->z())*(tempz-PV->z()));
-                                                  if (TPosFH>TPosVtx1 || Track_FirstHit[m].first == true ) success = true; //continue not useful
+                                                  //$$$$
+                                                  /*
+                                                  *         if (TPosFH>TPosVtx1 || Track_FirstHit[m].first == true ) success = true; // Track_FirstHit[m].first == true => remove lostTrack 
+                                                  */
+                                                  float diff0 = sqrt((Track_FirstHit[m].second.X()-tempx)*(Track_FirstHit[m].second.X()-tempx)+(Track_FirstHit[m].second.Y()-tempy)*(Track_FirstHit[m].second.Y()-tempy)+(Track_FirstHit[m].second.Z()-tempz)*(Track_FirstHit[m].second.Z()-tempz));
+                                                  if ( TPosFH > TPosVtx1 || diff0 < 0.1 || diff0/TPosVtx1 < 0.1 || Track_FirstHit[m].first == true) success = true;
+                                                              
                                                   else  
                                                     {
                                                       vTT.pop_back();
                                                       ntracks--;
                                                       if (vTT.size() < 2) continue;
                                                       updatedTV   = theFitter_Vertex.vertex(vTT);
+                                                      if (!updatedTV.isValid()) continue; // It is not supposed to happen but somehow it happened once
                                                       tempchi2    = updatedTV.normalisedChiSquared();
+                                                      // std::cout<<"here"<<std::endl;
                                                       tempx       = updatedTV.position().x();
                                                       tempy       = updatedTV.position().y();
                                                       tempz       = updatedTV.position().z();
@@ -267,11 +346,13 @@ class Vtx {
                                                       tempMeanWeight=0;
                                                       if ( ntracks < 2 ) success = false;
                                                       else	       success = true;
+                                                      ntracks = vTT.size();
+                                                      ntracks = vTT.size();
                                                       for (int i=0; i<ntracks; i++)
                                                         {
                                                           tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
                                                           Vtx_Weights.push_back(updatedTV.trackWeight(vTT[i]));
-                                                          if (i == ntracks-1){MeanWeight = tempMeanWeight;} 
+                                                          if (i ==ntracks-1){MeanWeight = tempMeanWeight;} 
                                                         }
                                                       continue;
                                                     }
@@ -279,6 +360,7 @@ class Vtx {
                                                   tempMeanWeight=0;
                                                   Vtx_index.push_back(m);
                                                   success = true;
+                                                  ntracks = vTT.size();
                                                   for (int i=0; i<ntracks; i++)
                                                     {
                                                       tempMeanWeight+=updatedTV.trackWeight(vTT[i]);
@@ -290,6 +372,7 @@ class Vtx {
                                         }
 
                                       // We should have a Vertex after these conditions
+                                      success = true;
                                       Vtx_ntk   = ntracks;
                                       Vtx_chi   = tempchi2;
                                       Vtx_x     = tempx;
@@ -329,24 +412,25 @@ class Vtx {
                                         if ( MeanWeight == 0 ) //<=>only two tracks in the valid vertex
                                           {
                                             Vtx_Weights.clear();
+                                            ntracks = vTT.size();
                                             for(int i = 0; i < ntracks; i++)
                                             {
                                               MeanWeight+=TV.trackWeight(vTT[i]);
                                               Vtx_Weights.push_back(TV.trackWeight(vTT[i]));
                                             }
                                           }
+                                    }//end of tv is valid
+                                  else
+                                    {
+                                      ntracks=0;
+                                      vTT.clear();
                                     }
-                                    else
-                                      {
-                                        ntracks=0;
-                                        vTT.clear();
-                                      }
                                     if ( success ) break;
                                 } // end loop on 2nd tracks
                             if ( success ) break;
 
-                        }    // end loop on tracks
-                }// end of TV.isValid()
+                        }    // end 1st  loop on tracks
+                }// end of ntk>1
               else 
                 {
                   std::cout<<"Not enough tracks(<2) in input or step not activated :D "<<std::endl;
@@ -379,7 +463,7 @@ class Vtx {
       float y(){return Vtx_y;}
       float z(){return Vtx_z;}
 
-      float chi(){return Vtx_chi;}
+      float chi2(){return Vtx_chi;}
       int  step(){return Vtx_step;}
       int  nTrk(){return Vtx_ntk;}
       void SetStep(int nstep){Vtx_step = nstep;}
@@ -423,6 +507,22 @@ class Vtx {
        //------------//
 
 };
+// CMSSW_14_1_X_2024-02-22-2300/​RecoVertex/​LinearizationPointFinders/​interface/​FsmwLinearizationPointFinder.h
+// 0005 
+// 0006 /** A linearization point finder. It works the following way:
+// 0007    *  1. Calculate in an optimal way 'n_pairs' different crossing points.
+// 0008    *     Optimal in this context means the following:
+// 0009    *     a. Try to use as many different tracks as possible;
+// 0010    *        avoid using the same track all the time.
+// 0011    *     b. Use the most energetic tracks.
+// 0012    *     c. Try not to group the most energetic tracks together.
+// 0013    *        Try to group more energetic tracks with less energetic tracks.
+// 0014    *        We assume collimated bundles here, so this is why.
+// 0015    *     d. Perform optimally. Do not sort more tracks (by total energy, see b)
+// 0016    *        than necessary.
+// 0017    *     e. If n_pairs >= (number of all possible combinations),
+// 0018    *        do not leave any combinations out.
+// 0019    *     ( a. and e. are almost but not entirely fulfilled in the current impl )
 
 
 
