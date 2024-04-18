@@ -55,10 +55,13 @@ eval  `scramv1 r -sh`
 git cms-init
 
 mkdir FlyingTop
+
 cd FlyingTop
+
 mkedanlzr FlyingTop
 
 git clone https://github.com/PaulVaucelle/FlyingTop.git
+
 git checkout CMSSW_10_6_30
 
 ----------------------------
@@ -74,7 +77,7 @@ git clone https://github.com/cms-egamma/EgammaPostRecoTools.git
 
  mv EgammaPostRecoTools/python/EgammaPostRecoTools.py RecoEgamma/EgammaTools/python/.
  
-git clone -b ULSSfiles_correctScaleSysMC https://github.com/jainshilpi/EgammaAnalysis-ElectronTools.git 
+git clone -b ULSSfiles_correctScaleSysMC https://github.com/jainshilpi/EgammaAnalysis-ElectronTools.git EgammaAnalysis/ElectronTools/data/
 
 git cms-addpkg EgammaAnalysis/ElectronTools
 
