@@ -49,24 +49,41 @@ class PropaHitPattern{
 
         //Rminus - Rplus - abs(z) 
         // PXB
-        DetailedLayer.push_back({2.26,3.5,27});// !!!!!! WARNING : Changes due to data/MC agreement being not that rgeat in the barrel region
-        // !!! Putting an large hypothetical layer that gathers beam pipe, pxl first layer, and same for pxl layers , more patatoide things than
-          // !! a really precise map of the tracker. This is due to th algignmeent of the tracker being different between data/MC
-        DetailedLayer.push_back({2.74,2.855,27}); // 0.64
-        DetailedLayer.push_back({3.055,3.165,27});
-        DetailedLayer.push_back({3.275,3.375,27});
-        DetailedLayer.push_back({6.4,7.3,27}); // !!! large layer
-        DetailedLayer.push_back({6.578,6.627,27}); // 0.67
-        DetailedLayer.push_back({6.935,6.982,27});
-        DetailedLayer.push_back({7.205,7.25,27});
-        DetailedLayer.push_back({10.5,11.3,27}); // !!! large layer
-        DetailedLayer.push_back({10.707,10.738,27}); // 0.63
-        DetailedLayer.push_back({11.037,11.066,27});
-        DetailedLayer.push_back({11.307,11.336,27});
-        DetailedLayer.push_back({15.6,16.40,27}); // !!! large layer
-        DetailedLayer.push_back({15.815,15.836,27}); // 0.62
-        DetailedLayer.push_back({16.146,16.166,27});
-        DetailedLayer.push_back({16.416,16.436,27});
+        //$$$$
+//  *         DetailedLayer.push_back({2.26,3.5,27});// !!!!!! WARNING : Changes due to data/MC agreement being not that rgeat in the barrel region
+        //  *         // !!! Putting an large hypothetical layer that gathers beam pipe, pxl first layer, and same for pxl layers , more patatoide things than
+          //  *           // !! a really precise map of the tracker. This is due to th algignmeent of the tracker being different between data/MC
+        //         DetailedLayer.push_back({2.74,2.855,27}); // 0.64
+        //         DetailedLayer.push_back({3.055,3.165,27});
+        //         DetailedLayer.push_back({3.275,3.375,27});
+//$$$$
+// corrected for PXB according to the observed reco layers in 2017-2018 data and MC
+// see /ui2_data1/blochd/LLTopAna/SecIntAna.C and output/h_SecInt_2017_data.root, ...
+        DetailedLayer.push_back({2.71,2.88,27}); // 0.64
+        DetailedLayer.push_back({3.02,3.17,27});
+        DetailedLayer.push_back({3.26,3.38,27});
+//$$$$         DetailedLayer.push_back({6.4,7.3,27}); // !!! large layer
+        //         DetailedLayer.push_back({6.578,6.627,27}); // 0.67
+        //         DetailedLayer.push_back({6.935,6.982,27});
+        //         DetailedLayer.push_back({7.205,7.25,27});
+        DetailedLayer.push_back({6.57,6.64,27}); // 0.67
+        DetailedLayer.push_back({6.92,7.01,27});
+        DetailedLayer.push_back({7.19,7.26,27});
+//$$$$         DetailedLayer.push_back({10.5,11.3,27}); // !!! large layer
+        //         DetailedLayer.push_back({10.707,10.738,27}); // 0.63
+        //         DetailedLayer.push_back({11.037,11.066,27});
+        //         DetailedLayer.push_back({11.307,11.336,27});
+        DetailedLayer.push_back({10.70,10.77,27}); // 0.63
+        DetailedLayer.push_back({11.02,11.11,27});
+        DetailedLayer.push_back({11.29,11.34,27});
+//$$$$         DetailedLayer.push_back({15.6,16.40,27}); // !!! large layer
+        //         DetailedLayer.push_back({15.815,15.836,27}); // 0.62
+        //         DetailedLayer.push_back({16.146,16.166,27});
+        //         DetailedLayer.push_back({16.416,16.436,27});
+        DetailedLayer.push_back({15.80,15.87,27}); // 0.62
+        DetailedLayer.push_back({16.13,16.22,27});
+        DetailedLayer.push_back({16.40,16.47,27});
+//$$$$
 
         //TIB
         DetailedLayer.push_back({23.5,24.45,66}); // 1.0
@@ -76,9 +93,7 @@ class PropaHitPattern{
         DetailedLayer.push_back({40,40.86,66});   // 4.0
         DetailedLayer.push_back({43.15,44.05,66});
         DetailedLayer.push_back({47.85,48.78,66});// 4.0
-//$$$$
         DetailedLayer.push_back({51.00,51.95,66}); 
-//$$$$
 
         //TOB
         DetailedLayer.push_back({58.44,58.63,107});  // 4.5
@@ -282,7 +297,7 @@ class PropaHitPattern{
             {
 /*               float thickness = TMath::Sqrt(stdcyl[j]*stdcyl[j]+stdcyl_Exp[j]*stdcyl_Exp[j]);
  */ 
-              float thickness = TMath::Sqrt(CylThick[j]*CylThick[j]/4+stdcyl_Exp[j]*stdcyl_Exp[j]);//CylThick[j]/2 to the square
+              float thickness = TMath::Sqrt(CylThick[j]*CylThick[j]/4+stdcyl_Exp[j]*stdcyl_Exp[j]); // CylThick[j]/2 to the square
               float down = cyl[j] - thickness;
               float up   = cyl[j] + thickness;
               if(VTX_r>=down && VTX_r<=up && abs(VTX_z)<=27 && VTX_r<20){return this->Layer[j].first;}//PXB
@@ -321,26 +336,20 @@ class PropaHitPattern{
             return 0;
         }
 
-
 //NEW 20/03/2023
       //The following method is a more detailed mapping of the cms tracker (not complete atm) => until TOB L1 and TEC Wheel5
-      int VertexBelongsToTracker(float VTX_x, float VTX_y,float VTX_z, float dx, float dy) // dx and dy are the shifts in the alignement of the tracker in the x and y direction
-      // w.r.t the nominal position (0,0)
+      int VertexBelongsToTracker(float VTX_r, float VTX_z)
         {
           std::vector<std::vector<float> > disk = this->diskDDB();
           float* stdisk_Exp = this->stddiskDDB_Exp();
           std::vector<std::vector<float> > cyl = this->CylDDB();
           float* stdcyl_Exp = this->stdCylDDB_Exp();
           int IsInTracker = 0;
-          float VTX_r = TMath::Sqrt((VTX_x-dx)*(VTX_x-dx)+(VTX_y-dy)*(VTX_y-dy));
-          //$$$$
+          
           for (int j=0; j<24; j++)
-          //$$$$
-            {
+                      {
               float ModuleThickness_2 = (cyl[j][1]-cyl[j][0])/2; // (rmax-rmin)/2
-
               float thickness = TMath::Sqrt(ModuleThickness_2*ModuleThickness_2+stdcyl_Exp[j]*stdcyl_Exp[j]/1.64/1.64); // thickness/2 + 1 sigma resolution
-
               float radius = cyl[j][1]-ModuleThickness_2; // radius of the considered module
               float down = radius - thickness;
               float up   = radius + thickness;
@@ -350,9 +359,7 @@ class PropaHitPattern{
           for (int j=0; j<69; j++)
             {
               float ModuleThickness_2 = (disk[j][1]-disk[j][0])/2; // (zmax-zmin)/2
-
               float thickness = TMath::Sqrt(ModuleThickness_2*ModuleThickness_2+stdisk_Exp[j]*stdisk_Exp[j]/1.64/1.64); // thickness/2 + 1 sigma resolution
-
               float z = disk[j][1]-ModuleThickness_2; // z of the considered module
               float down = z - thickness;
               float up   = z + thickness;
@@ -394,12 +401,11 @@ class PropaHitPattern{
         float stdCyl_Exp[11]={0.12,0.12,0.12,0.12,0.7,0.7,0.7,0.7,0.7,0.7,3.};
         float stddisk_Exp[22]={1.0,1.0,1.0,2.5,2.5,2.5,2.5,2.5,2.5,4.,4.,4.,4.,4.,4.,4.,4.,4.,4.,0.,0.,0.};
 
-//$$$$
 /*         // compute the experimental resolution as follows : 
-	use the LLP ct=50 cm signal MC, and for each tracker subdetector region consider the track pairs which both come from the same LLP,
-	plot the delta r (or z) between the reconstructed 2-LLP tracks SV and the nearest LLP decay point
-	then get the delta r (or z) cut which removes 90% of the events
-	(corresponding to a 1.64 sigma cut if gaussian).
+	// use the LLP ct=50 cm signal MC, and for each tracker subdetector region consider the track pairs which both come from the same LLP,
+	// plot the delta r (or z) between the reconstructed 2-LLP tracks SV and the nearest LLP decay point
+	// then get the delta r (or z) cut which removes 90% of the events
+	// (corresponding to a 1.64 sigma cut if gaussian).
 	// Using the Ntuple, the selections are:
 	// in PXB:
 	// ttree->Draw("tree_SecInt_LLP_dr","tree_SecInt_LLP>0&&tree_SecInt_selec&&tree_SecInt_r>2.6&&tree_SecInt_r<20&&abs(tree_SecInt_z)<27&&tree_SecInt_LLP_dr/tree_SecInt_r<0.1&&tree_SecInt_LLP_dr>0.12")
@@ -421,7 +427,6 @@ class PropaHitPattern{
   */        
         float stdDCyl_Exp[24]={0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,3.,3.,3.,3.}; // detailed
         float stdDdisk_Exp[69]={1.0,1.0,1.0,1.0,1.0,1.0,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.}; // detailed
-//$$$$
 
         std::vector<std::pair<uint16_t,float> > Layer;
         std::vector<std::pair<uint16_t,float> > Disk;
@@ -434,7 +439,7 @@ class PropaHitPattern{
         //                    Module thickness                     //
         //#########################################################// 
         // != from the std dev
-        // Computed from reco ntuples using the hitpattern
+        // Computed from MC reco ntuples using the hitpattern
 
         float Cyl_thick[11]={0.11,0.05,0.03,0.021,0.95,0.91,1.,1.,0.95,0.97,0.2};
         float Disk_thick[22]={3,3,3,2.4,3.5,2.4,3.5,2.4,3.5,0.5,0.7,0.5,0.7,0.5,0.7,0.5,0.7,0.5,0.7,0.5,0.7,0.5};
