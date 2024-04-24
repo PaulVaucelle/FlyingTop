@@ -1,26 +1,22 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon Mar 25 09:30:12 2024 by ROOT version 6.14/09
+// Tue Apr 16 16:04:05 2024 by ROOT version 6.14/09
 // from TTree ttree/ttree
-// found on file: RPV_2018_smu200_neu180_ctau300.root
+// found on file: NtupleS_Testavec.root
 //////////////////////////////////////////////////////////
 
-#ifndef ABCD_h
-#define ABCD_h
+#ifndef MiniNtuple_h
+#define MiniNtuple_h
 
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
 
 // Header file for the classes stored in the TTree if any.
-#include <vector>
-
-//$$
+#include "vector"
 #include <TMath.h>
-using namespace std;
-//$$
 
-class ABCD {
+class MiniNtuple {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
@@ -1151,61 +1147,49 @@ public :
    TBranch        *b_HLT_IsoMu24_v;   //!
    TBranch        *b_HLT_IsoMu27_v;   //!
 
-   ABCD(TTree *tree=0);
-   virtual ~ABCD();
+   MiniNtuple(TTree *tree=0);
+   virtual ~MiniNtuple();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     Init(TTree *tree);
-   virtual void   Loop(Int_t    aNN = 0, 
-                  Float_t  aTagCut = 0.01, 
-                  Float_t  aPtMin = 20., 
-                  Float_t  aPtMax = 1000., 
-                  Float_t  aEtaMin = 0., 
-                  Float_t  aEtaMax = 10., 
-                  Float_t  aFreeCut = 0., 
-                  Int_t    aIntCut = 0, 
-		  TString  afilename = "output.root",
-		  TString  aweightFileMVA = "weightFileMVA.xml",
-        TString sample ="", TString Production="",
-        bool Signal = true);
-//$$
+   virtual void     Loop(TString sample ="", TString Production="",bool Signal = true);
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
 };
 
 #endif
 
-#ifdef ABCD_cxx
-ABCD::ABCD(TTree *tree) : fChain(0) 
+#ifdef MiniNtuple_cxx
+MiniNtuple::MiniNtuple(TTree *tree) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("RPV_2018_smu200_neu180_ctau300.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("NtupleS_Testavec.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("RPV_2018_smu200_neu180_ctau300.root");
+         f = new TFile("NtupleS_Testavec.root");
       }
-      TDirectory * dir = (TDirectory*)f->Get("RPV_2018_smu200_neu180_ctau300.root:/FlyingTop");
+      TDirectory * dir = (TDirectory*)f->Get("NtupleS_Testavec.root:/FlyingTop");
       dir->GetObject("ttree",tree);
 
    }
    Init(tree);
 }
 
-ABCD::~ABCD()
+MiniNtuple::~MiniNtuple()
 {
    if (!fChain) return;
    delete fChain->GetCurrentFile();
 }
 
-Int_t ABCD::GetEntry(Long64_t entry)
+Int_t MiniNtuple::GetEntry(Long64_t entry)
 {
 // Read contents of entry.
    if (!fChain) return 0;
    return fChain->GetEntry(entry);
 }
-Long64_t ABCD::LoadTree(Long64_t entry)
+Long64_t MiniNtuple::LoadTree(Long64_t entry)
 {
 // Set the environment to read one entry
    if (!fChain) return -5;
@@ -1218,7 +1202,7 @@ Long64_t ABCD::LoadTree(Long64_t entry)
    return centry;
 }
 
-void ABCD::Init(TTree *tree)
+void MiniNtuple::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -1229,7 +1213,7 @@ void ABCD::Init(TTree *tree)
    // (once per file to be processed).
 
    // Set object pointer
-tree_LHE_Weights = 0;
+   tree_LHE_Weights = 0;
    tree_muon_isPrompt = 0;
    tree_muon_pt = 0;
    tree_muon_SF = 0;
@@ -2276,7 +2260,7 @@ tree_LHE_Weights = 0;
    Notify();
 }
 
-Bool_t ABCD::Notify()
+Bool_t MiniNtuple::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
@@ -2287,14 +2271,14 @@ Bool_t ABCD::Notify()
    return kTRUE;
 }
 
-void ABCD::Show(Long64_t entry)
+void MiniNtuple::Show(Long64_t entry)
 {
 // Print contents of entry.
 // If entry is not specified, print current entry
    if (!fChain) return;
    fChain->Show(entry);
 }
-Int_t ABCD::Cut(Long64_t entry)
+Int_t MiniNtuple::Cut(Long64_t entry)
 {
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
@@ -2316,4 +2300,4 @@ double DeltaPhi(double phi1, double phi2) {
   }
   return DeltaPhi;
 }
-#endif // #ifdef ABCD_cxx
+#endif // #ifdef MiniNtuple_cxx

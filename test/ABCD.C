@@ -80,8 +80,11 @@ void ABCD::Loop(int aNN, float aTagCut, float aPtMin, float aPtMax,
 //**********************************
 // Histograms
 //**********************************
- TH1F* hData_Filter     = new TH1F("hData_Filter","",2,-0.5,1.5);
+   TH1F* hData_Event_Weight = new TH1F("hData_Event_Weight","",200,0,2);
+   TH1F* hData_Filter     = new TH1F("hData_Filter","",2,-0.5,1.5);
 
+   TH1F* hData_Mmumu      = new TH1F("hData_Mmumu","",25,0.,500.);
+   TH1F* hData_Evt_MVAval = new TH1F("hData_Evt_MVAval","",100,-1,1);
    //-----------------------------------------------------------//
    // ABCD using Evt and Tight+looseWP 
    //-----------------------------------------------------------//
@@ -123,10 +126,10 @@ void ABCD::Loop(int aNN, float aTagCut, float aPtMin, float aPtMax,
    //-----------------------------------------------------------//
    // ABCD using Evt and Vtx BDT
    //-----------------------------------------------------------//
-      TH1F* hData_1Vtx_MVAval                = new TH1F("hData_1Vtx_MVAval","",,100,-1,1);
-      TH1F* hData_2Vtx_MVAval                = new TH1F("hData_2Vtx_MVAval","",,100,-1,1);
+      TH1F* hData_1Vtx_MVAval                = new TH1F("hData_1Vtx_MVAval","",100,-1,1);
+      TH1F* hData_2Vtx_MVAval                = new TH1F("hData_2Vtx_MVAval","",100,-1,1);
       TH1F* hData_2VtxAll_MVAval             = new TH1F("hData_2VtxAll_MVAval","",100,-1,1);
-      TH1F* hData_2VtxAll_MVAval             = new TH1F("hData_2VtxAll_MVAval","",100,-1,1);
+
 
    //------SR-1vtx----//
       TH1F* hData_EVTVtx_1Vtx_CutEvt_Mmumu   = new TH1F("hData_EVTVtx_1Vtx_CutEvt_Mmumu","",25,0.,500.);
@@ -169,48 +172,97 @@ void ABCD::Loop(int aNN, float aTagCut, float aPtMin, float aPtMax,
 
 
 //------SR-----//
-   TH1F* hData_Hemi_0Vtx_CutEvt_Mmumu       = new TH1F("hData_Hemi_0Vtx_CutEvt_Mmumu","",25,0.,500.);
-   TH1F* hData_Hemi_1Vtx_CutEvt_Mass    = new TH1F("hData_Hemi_1Vtx_CutEvt_Mass","",25,0.,100.);
-   TH1F* hData_Hemi_1Vtx_CutEvt_Mmumu   = new TH1F("hData_Hemi_1Vtx_CutEvt_Mmumu","",25,0.,500.);
-   TH1F* hData_Hemi_2Vtx_CutEvt_Mass    = new TH1F("hData_Hemi_2Vtx_CutEvt_Mass","",25,0.,100.);
-   TH1F* hData_Hemi_2Vtx_CutEvt_Mmumu   = new TH1F("hData_Hemi_2Vtx_CutEvt_Mmumu","",25,0.,500.);
-   TH1F* hData_Hemi_2VtxAll_CutEvt_Mass    = new TH1F("hData_Hemi_2VtxAll_CutEvt_Mass","",25,0.,100.);
+
+   TH1F* hData_Hemi_BDTevt = new TH1F("hData_Hemi_BDTevt", "", 100, -1, 1);
+   TH1F* hData_Hemi_0Vtx_CutEvt_Mmumu = new TH1F("hData_Hemi_0Vtx_CutEvt_Mmumu", "", 25, 0., 500.);
+   TH1F* hData_Hemi_0Vtx_BDTevt = new TH1F("hData_Hemi_0Vtx_BDTevt", "", 100, -1, 1);
+   TH1F* hData_Hemi_1Vtx_CutEvt_Mmumu = new TH1F("hData_Hemi_1Vtx_CutEvt_Mmumu", "", 25, 0., 500.);
+   TH1F* hData_Hemi_1Vtx_CutEvt_Mass = new TH1F("hData_Hemi_1Vtx_CutEvt_Mass", "", 25, 0., 100.);
+   TH1F* hData_Hemi_1Vtx_BDTevt = new TH1F("hData_Hemi_1Vtx_BDTevt", "", 100, -1, 1);
+   TH1F* hData_Hemi_1Vtx_BDTvtx = new TH1F("hData_Hemi_1Vtx_BDTvtx", "", 100, -1, 1);
+   TH1F* hData_Hemi_2Vtx_CutEvt_Mmumu = new TH1F("hData_Hemi_2Vtx_CutEvt_Mmumu", "", 25, 0., 500.);
+   TH1F* hData_Hemi_2Vtx_CutEvt_Mass = new TH1F("hData_Hemi_2Vtx_CutEvt_Mass", "", 25, 0., 100.);
+   TH1F* hData_Hemi_2Vtx_CutEvt_BDTevt = new TH1F("hData_Hemi_2Vtx_CutEvt_BDTevt", "", 100, -1, 1);
+   TH1F* hData_Hemi_2Vtx_CutEvt_MaxBDTvtx = new TH1F("hData_Hemi_2Vtx_CutEvt_MaxBDTvtx", "", 100, -1, 1);
+   TH1F* hData_Hemi_2VtxAll_CutEvt_Mass = new TH1F("hData_Hemi_2VtxAll_CutEvt_Mass", "", 25, 0., 100.);
+   TH1F* hData_Hemi_2VtxAll_CutEvt_BDTvtx = new TH1F("hData_Hemi_2VtxAll_CutEvt_BDTvtx", "", 100, -1, 1);
+   
 //------low pt-----//
-   TH1F* hData_CRlowpt_0Vtx_CutEvt_Mmumu       = new TH1F("hData_CRlowpt_0Vtx_CutEvt_Mmumu","",25,0.,500.);
+   TH1F* hData_CRlowpt_BDTevt              = new TH1F("hData_CRlowpt_BDTevt", "", 100, -1, 1);
+   TH1F* hData_CRlowpt_0Vtx_CutEvt_Mmumu   = new TH1F("hData_CRlowpt_0Vtx_CutEvt_Mmumu","",25,0.,500.);
+   TH1F* hData_CRlowpt_0Vtx_BDTevt         = new TH1F("hData_CRlowpt_0Vtx_BDTevt", "", 100, -1, 1);
    TH1F* hData_CRlowpt_1Vtx_CutEvt_Mass    = new TH1F("hData_CRlowpt_1Vtx_CutEvt_Mass","",25,0.,100.);
    TH1F* hData_CRlowpt_1Vtx_CutEvt_Mmumu   = new TH1F("hData_CRlowpt_1Vtx_CutEvt_Mmumu","",25,0.,500.);
+   TH1F* hData_CRlowpt_1Vtx_BDTevt= new TH1F("hData_CRlowpt_1Vtx_BDTevt", "", 100, -1, 1);
+   TH1F* hData_CRlowpt_1Vtx_BDTvtx= new TH1F("hData_CRlowpt_1Vtx_BDTvtx", "", 100, -1, 1);
    TH1F* hData_CRlowpt_2Vtx_CutEvt_Mass    = new TH1F("hData_CRlowpt_2Vtx_CutEvt_Mass","",25,0.,100.);
    TH1F* hData_CRlowpt_2Vtx_CutEvt_Mmumu   = new TH1F("hData_CRlowpt_2Vtx_CutEvt_Mmumu","",25,0.,500.);
-   TH1F* hData_CRlowpt_2VtxAll_CutEvt_Mass    = new TH1F("hData_CRlowpt_2VtxAll_CutEvt_Mass","",25,0.,100.);
+   TH1F* hData_CRlowpt_2Vtx_CutEvt_BDTevt= new TH1F("hData_CRlowpt_2Vtx_CutEvt_BDTevt", "", 100, -1, 1);
+   TH1F* hData_CRlowpt_2Vtx_CutEvt_MaxBDTvtx= new TH1F("hData_CRlowpt_2Vtx_CutEvt_MaxBDTvtx", "", 100, -1, 1);
+   TH1F* hData_CRlowpt_2VtxAll_CutEvt_Mass = new TH1F("hData_CRlowpt_2VtxAll_CutEvt_Mass","",25,0.,100.);
+   TH1F* hData_CRlowpt_2VtxAll_CutEvt_BDTvtx= new TH1F("hData_CRlowpt_2VtxAll_CutEvt_BDTvtx", "", 100, -1, 1);
+
 //------loose -----//
-   TH1F* hData_CRloose_0Vtx_CutEvt_Mmumu       = new TH1F("hData_CRloose_0Vtx_CutEvt_Mmumu","",25,0.,500.);
-   TH1F* hData_CRloose_1Vtx_CutEvt_Mass    = new TH1F("hData_CRloose_1Vtx_CutEvt_Mass","",25,0.,100.);
-   TH1F* hData_CRloose_1Vtx_CutEvt_Mmumu   = new TH1F("hData_CRloose_1Vtx_CutEvt_Mmumu","",25,0.,500.);
-   TH1F* hData_CRloose_2Vtx_CutEvt_Mass    = new TH1F("hData_CRloose_2Vtx_CutEvt_Mass","",25,0.,100.);
-   TH1F* hData_CRloose_2Vtx_CutEvt_Mmumu   = new TH1F("hData_CRloose_2Vtx_CutEvt_Mmumu","",25,0.,500.);
-   TH1F* hData_CRloose_2VtxAll_CutEvt_Mass    = new TH1F("hData_CRloose_2VtxAll_CutEvt_Mass","",25,0.,100.);
+
+   TH1F* hData_CRloose_BDTevt = new TH1F("hData_CRloose_BDTevt", "", 100, -1, 1);
+   TH1F* hData_CRloose_0Vtx_CutEvt_Mmumu = new TH1F("hData_CRloose_0Vtx_CutEvt_Mmumu", "", 25, 0., 500.);
+   TH1F* hData_CRloose_0Vtx_BDTevt = new TH1F("hData_CRloose_0Vtx_BDTevt", "", 100, -1, 1);
+   TH1F* hData_CRloose_1Vtx_CutEvt_Mmumu = new TH1F("hData_CRloose_1Vtx_CutEvt_Mmumu", "", 25, 0., 500.);
+   TH1F* hData_CRloose_1Vtx_CutEvt_Mass = new TH1F("hData_CRloose_1Vtx_CutEvt_Mass", "", 25, 0., 100.);
+   TH1F* hData_CRloose_1Vtx_BDTevt = new TH1F("hData_CRloose_1Vtx_BDTevt", "", 100, -1, 1);
+   TH1F* hData_CRloose_1Vtx_BDTvtx = new TH1F("hData_CRloose_1Vtx_BDTvtx", "", 100, -1, 1);
+   TH1F* hData_CRloose_2Vtx_CutEvt_Mmumu = new TH1F("hData_CRloose_2Vtx_CutEvt_Mmumu", "", 25, 0., 500.);
+   TH1F* hData_CRloose_2Vtx_CutEvt_Mass = new TH1F("hData_CRloose_2Vtx_CutEvt_Mass", "", 25, 0., 100.);
+   TH1F* hData_CRloose_2Vtx_CutEvt_BDTevt = new TH1F("hData_CRloose_2Vtx_CutEvt_BDTevt", "", 100, -1, 1);
+   TH1F* hData_CRloose_2Vtx_CutEvt_MaxBDTvtx = new TH1F("hData_CRloose_2Vtx_CutEvt_MaxBDTvtx", "", 100, -1, 1);
+   TH1F* hData_CRloose_2VtxAll_CutEvt_Mass = new TH1F("hData_CRloose_2VtxAll_CutEvt_Mass", "", 25, 0., 100.);
+   TH1F* hData_CRloose_2VtxAll_CutEvt_BDTvtx = new TH1F("hData_CRloose_2VtxAll_CutEvt_BDTvtx", "", 100, -1, 1);
 
 //------loose low pt -----//
-   TH1F* hData_CRlooselowpt_0Vtx_CutEvt_Mmumu       = new TH1F("hData_CRlooselowpt_0Vtx_CutEvt_Mmumu","",25,0.,500.);
-   TH1F* hData_CRlooselowpt_1Vtx_CutEvt_Mass    = new TH1F("hData_CRlooselowpt_1Vtx_CutEvt_Mass","",25,0.,100.);
-   TH1F* hData_CRlooselowpt_1Vtx_CutEvt_Mmumu   = new TH1F("hData_CRlooselowpt_1Vtx_CutEvt_Mmumu","",25,0.,500.);
-   TH1F* hData_CRlooselowpt_2Vtx_CutEvt_Mass    = new TH1F("hData_CRlooselowpt_2Vtx_CutEvt_Mass","",25,0.,100.);
-   TH1F* hData_CRlooselowpt_2Vtx_CutEvt_Mmumu   = new TH1F("hData_CRlooselowpt_2Vtx_CutEvt_Mmumu","",25,0.,500.);
-   TH1F* hData_CRlooselowpt_2VtxAll_CutEvt_Mass    = new TH1F("hData_CRlooselowpt_2VtxAll_CutEvt_Mass","",25,0.,100.);
+
+   TH1F* hData_CRlooselowpt_BDTevt = new TH1F("hData_CRlooselowpt_BDTevt", "", 100, -1, 1);
+   TH1F* hData_CRlooselowpt_0Vtx_CutEvt_Mmumu = new TH1F("hData_CRlooselowpt_0Vtx_CutEvt_Mmumu", "", 25, 0., 500.);
+   TH1F* hData_CRlooselowpt_1Vtx_BDTevt = new TH1F("hData_CRlooselowpt_1Vtx_BDTevt", "", 100, -1, 1);
+   TH1F* hData_CRlooselowpt_1Vtx_BDTvtx = new TH1F("hData_CRlooselowpt_1Vtx_BDTvtx", "", 100, -1, 1);
+   TH1F* hData_CRlooselowpt_1Vtx_CutEvt_Mmumu = new TH1F("hData_CRlooselowpt_1Vtx_CutEvt_Mmumu", "", 25, 0., 500.);
+   TH1F* hData_CRlooselowpt_1Vtx_CutEvt_Mass = new TH1F("hData_CRlooselowpt_1Vtx_CutEvt_Mass", "", 25, 0., 100.);
+   TH1F* hData_CRlooselowpt_2Vtx_CutEvt_BDTevt = new TH1F("hData_CRlooselowpt_2Vtx_CutEvt_BDTevt", "", 100, -1, 1);
+   TH1F* hData_CRlooselowpt_2Vtx_CutEvt_MaxBDTvtx = new TH1F("hData_CRlooselowpt_2Vtx_CutEvt_MaxBDTvtx", "", 100, -1, 1);
+   TH1F* hData_CRlooselowpt_2Vtx_CutEvt_Mmumu = new TH1F("hData_CRlooselowpt_2Vtx_CutEvt_Mmumu", "", 25, 0., 500.);
+   TH1F* hData_CRlooselowpt_2Vtx_CutEvt_Mass = new TH1F("hData_CRlooselowpt_2Vtx_CutEvt_Mass", "", 25, 0., 100.);
+   TH1F* hData_CRlooselowpt_2VtxAll_CutEvt_Mass = new TH1F("hData_CRlooselowpt_2VtxAll_CutEvt_Mass", "", 25, 0., 100.);
+   TH1F* hData_CRlooselowpt_2VtxAll_CutEvt_BDTvtx = new TH1F("hData_CRlooselowpt_2VtxAll_CutEvt_BDTvtx", "", 100, -1, 1);
+
 //------ fwd -----//
-   TH1F* hData_CRfwd_0Vtx_CutEvt_Mmumu       = new TH1F("hData_CRfwd_0Vtx_CutEvt_Mmumu","",25,0.,500.);
-   TH1F* hData_CRfwd_1Vtx_CutEvt_Mass    = new TH1F("hData_CRfwd_1Vtx_CutEvt_Mass","",25,0.,100.);
-   TH1F* hData_CRfwd_1Vtx_CutEvt_Mmumu   = new TH1F("hData_CRfwd_1Vtx_CutEvt_Mmumu","",25,0.,500.);
-   TH1F* hData_CRfwd_2Vtx_CutEvt_Mass    = new TH1F("hData_CRfwd_2Vtx_CutEvt_Mass","",25,0.,100.);
-   TH1F* hData_CRfwd_2Vtx_CutEvt_Mmumu   = new TH1F("hData_CRfwd_2Vtx_CutEvt_Mmumu","",25,0.,500.);
-   TH1F* hData_CRfwd_2VtxAll_CutEvt_Mass    = new TH1F("hData_CRfwd_2VtxAll_CutEvt_Mass","",25,0.,100.);
+
+   TH1F* hData_CRfwd_BDTevt = new TH1F("hData_CRfwd_BDTevt", "", 100, -1, 1);
+   TH1F* hData_CRfwd_0Vtx_CutEvt_Mmumu = new TH1F("hData_CRfwd_0Vtx_CutEvt_Mmumu", "", 25, 0., 500.);
+   TH1F* hData_CRfwd_0Vtx_BDTevt = new TH1F("hData_CRfwd_0Vtx_BDTevt", "", 100, -1, 1);
+   TH1F* hData_CRfwd_1Vtx_CutEvt_Mmumu = new TH1F("hData_CRfwd_1Vtx_CutEvt_Mmumu", "", 25, 0., 500.);
+   TH1F* hData_CRfwd_1Vtx_CutEvt_Mass = new TH1F("hData_CRfwd_1Vtx_CutEvt_Mass", "", 25, 0., 100.);
+   TH1F* hData_CRfwd_1Vtx_BDTevt = new TH1F("hData_CRfwd_1Vtx_BDTevt", "", 100, -1, 1);
+   TH1F* hData_CRfwd_1Vtx_BDTvtx = new TH1F("hData_CRfwd_1Vtx_BDTvtx", "", 100, -1, 1);
+   TH1F* hData_CRfwd_2Vtx_CutEvt_Mmumu = new TH1F("hData_CRfwd_2Vtx_CutEvt_Mmumu", "", 25, 0., 500.);
+   TH1F* hData_CRfwd_2Vtx_CutEvt_Mass = new TH1F("hData_CRfwd_2Vtx_CutEvt_Mass", "", 25, 0., 100.);
+   TH1F* hData_CRfwd_2Vtx_CutEvt_BDTevt = new TH1F("hData_CRfwd_2Vtx_CutEvt_BDTevt", "", 100, -1, 1);
+   TH1F* hData_CRfwd_2Vtx_CutEvt_MaxBDTvtx = new TH1F("hData_CRfwd_2Vtx_CutEvt_MaxBDTvtx", "", 100, -1, 1);
+   TH1F* hData_CRfwd_2VtxAll_CutEvt_Mass = new TH1F("hData_CRfwd_2VtxAll_CutEvt_Mass", "", 25, 0., 100.);
+   TH1F* hData_CRfwd_2VtxAll_CutEvt_BDTvtx = new TH1F("hData_CRfwd_2VtxAll_CutEvt_BDTvtx", "", 100, -1, 1);
+
    //----- Samesign ----//  
-   TH1F* hData_CRss_0Vtx_CutEvt_Mmumu       = new TH1F("hData_CRss_0Vtx_CutEvt_Mmumu","",25,0.,500.);
-   TH1F* hData_CRss_1Vtx_CutEvt_Mass    = new TH1F("hData_CRss_1Vtx_CutEvt_Mass","",25,0.,100.);
-   TH1F* hData_CRss_1Vtx_CutEvt_Mmumu   = new TH1F("hData_CRss_1Vtx_CutEvt_Mmumu","",25,0.,500.);
-   TH1F* hData_CRss_2Vtx_CutEvt_Mass    = new TH1F("hData_CRss_2Vtx_CutEvt_Mass","",25,0.,100.);
-   TH1F* hData_CRss_2Vtx_CutEvt_Mmumu   = new TH1F("hData_CRss_2Vtx_CutEvt_Mmumu","",25,0.,500.);
-   TH1F* hData_CRss_2VtxAll_CutEvt_Mass    = new TH1F("hData_CRss_2VtxAll_CutEvt_Mass","",25,0.,100.);
+   TH1F* hData_SameSign_BDTevt               = new TH1F("hData_SameSign_BDTevt","",100,-1,1);
+   TH1F* hData_CRss_0Vtx_CutEvt_Mmumu        = new TH1F("hData_CRss_0Vtx_CutEvt_Mmumu","",25,0.,500.);
+   TH1F* hData_CRss_0Vtx_BDTevt              = new TH1F("hData_CRss_0Vtx_BDTevt","",100,-1,1);
+   TH1F* hData_CRss_1Vtx_CutEvt_Mass         = new TH1F("hData_CRss_1Vtx_CutEvt_Mass","",25,0.,100.);
+   TH1F* hData_CRss_1Vtx_CutEvt_Mmumu        = new TH1F("hData_CRss_1Vtx_CutEvt_Mmumu","",25,0.,500.);
+   TH1F* hData_CRss_1Vtx_BDTevt              = new TH1F("hData_CRss_1Vtx_BDTevt","",100,-1,1);
+   TH1F* hData_CRss_1Vtx_BDTvtx              = new TH1F("hData_CRss_1Vtx_BDTvtx","",100,-1,1);
+   TH1F* hData_CRss_2Vtx_CutEvt_Mass         = new TH1F("hData_CRss_2Vtx_CutEvt_Mass","",25,0.,100.);
+   TH1F* hData_CRss_2Vtx_CutEvt_Mmumu        = new TH1F("hData_CRss_2Vtx_CutEvt_Mmumu","",25,0.,500.);
+   TH1F* hData_CRss_2Vtx_CutEvt_BDTevt       = new TH1F("hData_CRss_2Vtx_CutEvt_BDTevt","",100,-1,1);
+   TH1F* hData_CRss_2Vtx_CutEvt_MaxBDTvtx    = new TH1F("hData_CRss_2Vtx_CutEvt_MaxBDTvtx","",100,-1,1);
+   TH1F* hData_CRss_2VtxAll_CutEvt_Mass      = new TH1F("hData_CRss_2VtxAll_CutEvt_Mass","",25,0.,100.);
+   TH1F* hData_CRss_2VtxAll_CutEvt_BDTvtx    = new TH1F("hData_CRss_2VtxAll_CutEvt_BDTvtx","",100,-1,1);
 
 ///////////////////////////////////////////////////////////////////
 
@@ -255,6 +307,7 @@ void ABCD::Loop(int aNN, float aTagCut, float aPtMin, float aPtMax,
    bool BlindSR = false;
    float Nevent = 0;
    bool signal = Signal;
+   double Pref_PU_gen_wt=1;
    //   if (nentries>760000){nentries =760000;}
 
    cout<< "Line : "  << __LINE__ << " " << nentries << endl; 
@@ -283,8 +336,10 @@ void ABCD::Loop(int aNN, float aTagCut, float aPtMin, float aPtMax,
       if (jentry==0.8*nentries) {std::cout<<"80/100 :"<<std::endl;}
       if (jentry==0.9*nentries) {std::cout<<"90/100 :"<<std::endl;}
 
-      hData_Filter->Fill( tree_Filter );
-
+      
+      Pref_PU_gen_wt=tree_only_gen_wt*Prefweight*PUweight;
+      hData_Event_Weight->Fill( Pref_PU_gen_wt );
+      hData_Filter->Fill( tree_Filter,Pref_PU_gen_wt );
       //--------------------------------------------------------------//
       bool isHemiVtx1 = false, isHemiVtx2 = false;
       bool isCutVtx = false, isCutVtx1 = false, isCutVtx2 = false;
@@ -305,7 +360,7 @@ void ABCD::Loop(int aNN, float aTagCut, float aPtMin, float aPtMax,
       float  hemi2_pt  = -1.;
       ////////////////////////////////
 
-      hData_Mmumu->Fill( tree_Mmumu );
+      hData_Mmumu->Fill( tree_Mmumu,Pref_PU_gen_wt );
       
       if ( !tree_Filter && !tree_FilterSameSign ) continue;//
       if (tree_njetNOmu < 1) continue;
@@ -439,7 +494,7 @@ void ABCD::Loop(int aNN, float aTagCut, float aPtMin, float aPtMax,
        eta_Vtx1 = -TMath::Log(tan(theta_SecVtx1/2.));
        if ( posz1 < 0 ) eta_Vtx1 = -eta_Vtx1;
      }
-   }
+   }// End of Merging information
    isHemiVtx1 = false;
    isHemiVtx2 = false;
 
@@ -449,25 +504,25 @@ void ABCD::Loop(int aNN, float aTagCut, float aPtMin, float aPtMax,
    if ( Vtx_NChi0 > 0 && Vtx_NChi0 < 10 && Vtx_step0 >= 1 && Vtx_step0 <= 2 ) {
      isHemiVtx1 = true;
      VtxMass = Vtx_Mass0;
-     BDTvtx1 = tree_Hemi_Vtx_MVAval_Step1->at(0);
+     BDTvtx1 = tree_Hemi_Vtx_MVAval_Tight->at(0);
      BDTvtx  = BDTvtx1;
    }
    if ( Vtx_NChi0 > 0 && Vtx_NChi0 < 10 && Vtx_step0 >= 3 && Vtx_step0 <= 4 ) {
      isHemiVtx1Loose = true;
      VtxMass = Vtx_Mass0;
-     BDTvtx1 = tree_Hemi_Vtx_MVAval->at(0);
+     BDTvtx1 = tree_Hemi_Vtx_MVAval_Loose->at(0);
      BDTvtx  = BDTvtx1;
    }
    if ( Vtx_NChi1 > 0 && Vtx_NChi1 < 10 && Vtx_step1 >= 1 && Vtx_step1 <= 2 ) {
      isHemiVtx2 = true;
      if ( Vtx_Mass1 > VtxMass ) VtxMass = Vtx_Mass1;
-     BDTvtx2 = tree_Hemi_Vtx_MVAval_Step1->at(1);
+     BDTvtx2 = tree_Hemi_Vtx_MVAval_Tight->at(1);
      if ( BDTvtx2 > BDTvtx ) BDTvtx = BDTvtx2;
    }
    if ( Vtx_NChi1 > 0 && Vtx_NChi1 < 10 && Vtx_step1 >= 3 && Vtx_step1 <= 4 ) {
      isHemiVtx2Loose = true;
      if ( Vtx_Mass1 > VtxMass ) VtxMass = Vtx_Mass1;
-     BDTvtx2 = tree_Hemi_Vtx_MVAval->at(1);
+     BDTvtx2 = tree_Hemi_Vtx_MVAval_Loose->at(1);
      if ( BDTvtx2 > BDTvtx ) BDTvtx = BDTvtx2;
    }
    if      ( isHemiVtx1 && isHemiVtx2 ) nVtx = 2;
@@ -504,59 +559,59 @@ void ABCD::Loop(int aNN, float aTagCut, float aPtMin, float aPtMax,
    //-----------------------------------------------------------//
    float EVTSWP = 0;
    float VTXWP = 0.5;
-   hData_Evt_MVAval->Fill( tree_Evts_MVAval );
+   hData_Evt_MVAval->Fill( tree_Evts_MVAval,Pref_PU_gen_wt );
    //$$
    if (tree_Evts_MVAval > EVTSWP) isCutEvt = true;
 
    //$$
    //----------------------//
    if (nVtx == 1 && isCutEvt ) {
-      hData_EVT12_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-      hData_EVT12_1Vtx_CutEvt_Mass->Fill(VtxMass);
-      hData_EVT12_1Vtx_BDTvtx->Fill( BDTvtx );
+      hData_EVT12_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+      hData_EVT12_1Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
+      hData_EVT12_1Vtx_BDTvtx->Fill( BDTvtx ,Pref_PU_gen_wt);
    }
 
    if (nVtx == 1 && !isCutEvt) {
-      hData_NoEVT12_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-      hData_NoEVT12_1Vtx_CutEvt_Mass->Fill(VtxMass);
-      hData_NoEVT12_1Vtx_BDTvtx->Fill( BDTvtx );
+      hData_NoEVT12_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+      hData_NoEVT12_1Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
+      hData_NoEVT12_1Vtx_BDTvtx->Fill( BDTvtx ,Pref_PU_gen_wt);
    }
 
    if (nVtxLoose == 1 && isCutEvt) {
-      hData_EVT34_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-      hData_EVT34_1Vtx_CutEvt_Mass->Fill(VtxMass);
-      hData_EVT34_1Vtx_BDTvtx->Fill( BDTvtx );
+      hData_EVT34_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+      hData_EVT34_1Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
+      hData_EVT34_1Vtx_BDTvtx->Fill( BDTvtx,Pref_PU_gen_wt );
    }
 
    if (nVtxLoose == 1 && !isCutEvt) {
-      hData_NoEVT34_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-      hData_NoEVT34_1Vtx_CutEvt_Mass->Fill(VtxMass);
-      hData_NoEVT34_1Vtx_BDTvtx->Fill( BDTvtx );
+      hData_NoEVT34_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+      hData_NoEVT34_1Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
+      hData_NoEVT34_1Vtx_BDTvtx->Fill( BDTvtx,Pref_PU_gen_wt );
    }
    //----------------------//
 
    if (nVtx == 2 && isCutEvt) {
-      hData_EVT12_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-      hData_EVT12_2Vtx_CutEvt_Mass->Fill(VtxMass);
-      hData_EVT12_2Vtx_BDTvtx->Fill( BDTvtx );
+      hData_EVT12_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+      hData_EVT12_2Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
+      hData_EVT12_2Vtx_BDTvtx->Fill( BDTvtx,Pref_PU_gen_wt );
    }
 
    if (nVtx == 2 && !isCutEvt) {
-      hData_NoEVT12_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-      hData_NoEVT12_2Vtx_CutEvt_Mass->Fill(VtxMass);
-      hData_NoEVT12_2Vtx_BDTvtx->Fill( BDTvtx );
+      hData_NoEVT12_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+      hData_NoEVT12_2Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
+      hData_NoEVT12_2Vtx_BDTvtx->Fill( BDTvtx,Pref_PU_gen_wt );
    }
 
    if (nVtxLoose == 2 && isCutEvt) {
-      hData_EVT34_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-      hData_EVT34_2Vtx_CutEvt_Mass->Fill(VtxMass);
-      hData_EVT34_2Vtx_BDTvtx->Fill( BDTvtx );
+      hData_EVT34_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+      hData_EVT34_2Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
+      hData_EVT34_2Vtx_BDTvtx->Fill( BDTvtx,Pref_PU_gen_wt );
    }
 
    if (nVtxLoose == 2 && !isCutEvt) {
-      hData_NoEVT34_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-      hData_NoEVT34_2Vtx_CutEvt_Mass->Fill(VtxMass);
-      hData_NoEVT34_2Vtx_BDTvtx->Fill( BDTvtx );
+      hData_NoEVT34_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+      hData_NoEVT34_2Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
+      hData_NoEVT34_2Vtx_BDTvtx->Fill( BDTvtx ,Pref_PU_gen_wt);
    }
     //----------------------//
    //$$
@@ -573,74 +628,74 @@ void ABCD::Loop(int aNN, float aTagCut, float aPtMin, float aPtMax,
 
    if (nVtx == 1 && isCutEvt)
       {
-         hData_1Vtx_MVAval->Fill(BDTvtx);
+         hData_1Vtx_MVAval->Fill(BDTvtx,Pref_PU_gen_wt);
       }
    if (nVtx == 2 && isCutEvt)
       {
-         hData_2Vtx_MVAval->Fill(BDTvtx);
-         hData_2VtxAll_MVAval->Fill(BDTvtx1);
-         hData_2VtxAll_MVAval->Fill(BDTvtx2);
+         hData_2Vtx_MVAval->Fill(BDTvtx,Pref_PU_gen_wt);
+         hData_2VtxAll_MVAval->Fill(BDTvtx1,Pref_PU_gen_wt);
+         hData_2VtxAll_MVAval->Fill(BDTvtx2,Pref_PU_gen_wt);
       }
    //----------------------//
 
    if (nVtx == 1 && isCutEvt  && isCutVtx) {
-      hData_EVTVtx_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-      hData_EVTVtx_1Vtx_CutEvt_Mass->Fill(VtxMass);
+      hData_EVTVtx_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+      hData_EVTVtx_1Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
    }
 
    if (nVtx == 1 && !isCutEvt  && isCutVtx) {
-      hData_NoEVTVtx_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-      hData_NoEVTVtx_1Vtx_CutEvt_Mass->Fill(VtxMass);
+      hData_NoEVTVtx_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+      hData_NoEVTVtx_1Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
    }
 
    if (nVtx == 1 && isCutEvt && !isCutVtx) {
-      hData_EVTNoVtx_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-      hData_EVTNoVtx_1Vtx_CutEvt_Mass->Fill(VtxMass);
+      hData_EVTNoVtx_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+      hData_EVTNoVtx_1Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
    }
 
    if (nVtx == 1 && !isCutEvt && !isCutVtx) {
-      hData_NoEVTNoVtx_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-      hData_NoEVTNoVtx_1Vtx_CutEvt_Mass->Fill(VtxMass);
+      hData_NoEVTNoVtx_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+      hData_NoEVTNoVtx_1Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
    }
    //----------------------//
 
    if (nVtx == 2 && isCutEvt && isCutVtx) {
-      hData_EVTVtx_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-      hData_EVTVtx_2Vtx_CutEvt_Mass->Fill(VtxMass);
+      hData_EVTVtx_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+      hData_EVTVtx_2Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
       if (isCutVtx1 && isCutVtx2)
          {
-            hData_EVTVtx_2VtxAll_CutEvt_Mmumu->Fill(tree_Mmumu);
-            hData_EVTVtx_2VtxAll_CutEvt_Mass->Fill(VtxMass);
+            hData_EVTVtx_2VtxAll_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+            hData_EVTVtx_2VtxAll_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
          }
    }
 
    if (nVtx == 2 && !isCutEvt && isCutVtx) {
-      hData_NoEVTVtx_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-      hData_NoEVTVtx_2Vtx_CutEvt_Mass->Fill(VtxMass);
+      hData_NoEVTVtx_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+      hData_NoEVTVtx_2Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
       if (isCutVtx1 && isCutVtx2)
          {
-            hData_NoEVTVtx_2VtxAll_CutEvt_Mmumu->Fill(tree_Mmumu);
-            hData_NoEVTVtx_2VtxAll_CutEvt_Mass->Fill(VtxMass);
+            hData_NoEVTVtx_2VtxAll_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+            hData_NoEVTVtx_2VtxAll_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
          }
    }
 
    if (nVtx == 2 && isCutEvt && !isCutVtx ) {
-      hData_EVTNoVtx_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-      hData_EVTNoVtx_2Vtx_CutEvt_Mass->Fill(VtxMass);
+      hData_EVTNoVtx_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+      hData_EVTNoVtx_2Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
       if (!isCutVtx1 && !isCutVtx2)
          {
-            hData_EVTNoVtx_2VtxAll_CutEvt_Mmumu->Fill(tree_Mmumu);
-            hData_EVTNoVtx_2VtxAll_CutEvt_Mass->Fill(VtxMass);
+            hData_EVTNoVtx_2VtxAll_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+            hData_EVTNoVtx_2VtxAll_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
          }
    }
 
    if (nVtx == 2 && !isCutEvt && !isCutVtx ) {
-      hData_NoEVTNoVtx_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-      hData_NoEVTNoVtx_2Vtx_CutEvt_Mass->Fill(VtxMass);
+      hData_NoEVTNoVtx_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+      hData_NoEVTNoVtx_2Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
       if (!isCutVtx1 && !isCutVtx2)
          {
-            hData_NoEVTNoVtx_2VtxAll_CutEvt_Mmumu->Fill(tree_Mmumu);
-            hData_NoEVTNoVtx_2VtxAll_CutEvt_Mass->Fill(VtxMass);
+            hData_NoEVTNoVtx_2VtxAll_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+            hData_NoEVTNoVtx_2VtxAll_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
          }
    }
 
@@ -652,36 +707,36 @@ void ABCD::Loop(int aNN, float aTagCut, float aPtMin, float aPtMax,
       if (!BlindSR) {
          
          if (Filter && (abs(tree_Hemi_eta->at(0)) > 2.4 || abs(tree_Hemi_eta->at(1)) > 2.4)) continue;
-         hData_Hemi_BDTevt->Fill( tree_Evts_MVAval );
+         hData_Hemi_BDTevt->Fill( tree_Evts_MVAval ,Pref_PU_gen_wt);
          //$$
          if (VtxMass > 8.) isCutVtx = true;
          if (hemi_ptmin > 80.) isCutEvt = true;
          //$$
          
          if (nVtx == 0 && isCutEvt) {
-            hData_Hemi_0Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-            hData_Hemi_0Vtx_BDTevt->Fill( tree_Evts_MVAval );
+            hData_Hemi_0Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+            hData_Hemi_0Vtx_BDTevt->Fill( tree_Evts_MVAval,Pref_PU_gen_wt );
          }
 
          
          if (nVtx == 1 && isCutEvt) {
-            hData_Hemi_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-            hData_Hemi_1Vtx_CutEvt_Mass->Fill(VtxMass);
-            hData_Hemi_1Vtx_BDTevt->Fill( tree_Evts_MVAval );
-            hData_Hemi_1Vtx_BDTvtx->Fill( BDTvtx );
+            hData_Hemi_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+            hData_Hemi_1Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
+            hData_Hemi_1Vtx_BDTevt->Fill( tree_Evts_MVAval ,Pref_PU_gen_wt);
+            hData_Hemi_1Vtx_BDTvtx->Fill( BDTvtx,Pref_PU_gen_wt );
          }
 
          
          if (nVtx == 2 && isCutEvt) {
-            hData_Hemi_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-            hData_Hemi_2Vtx_CutEvt_Mass->Fill(VtxMass);
-            hData_Hemi_2Vtx_CutEvt_BDTevt->Fill( tree_Evts_MVAval );
-            hData_Hemi_2Vtx_CutEvt_MaxBDTvtx->Fill( BDTvtx );
+            hData_Hemi_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+            hData_Hemi_2Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
+            hData_Hemi_2Vtx_CutEvt_BDTevt->Fill( tree_Evts_MVAval,Pref_PU_gen_wt );
+            hData_Hemi_2Vtx_CutEvt_MaxBDTvtx->Fill( BDTvtx,Pref_PU_gen_wt );
 
-            hData_Hemi_2VtxAll_CutEvt_Mass->Fill(Vtx_Mass0);
-            hData_Hemi_2VtxAll_CutEvt_Mass->Fill(Vtx_Mass1);
-            hData_Hemi_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx1 );
-            hData_Hemi_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx2 );
+            hData_Hemi_2VtxAll_CutEvt_Mass->Fill(Vtx_Mass0,Pref_PU_gen_wt);
+            hData_Hemi_2VtxAll_CutEvt_Mass->Fill(Vtx_Mass1,Pref_PU_gen_wt);
+            hData_Hemi_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx1 ,Pref_PU_gen_wt);
+            hData_Hemi_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx2 ,Pref_PU_gen_wt);
          }
 
       }
@@ -696,34 +751,34 @@ void ABCD::Loop(int aNN, float aTagCut, float aPtMin, float aPtMax,
          {
              //$$
             if ( abs(tree_Hemi_eta->at(0)) > 2.4 || abs(tree_Hemi_eta->at(1)) > 2.4 ) continue;
-            hData_CRlowpt_BDTevt->Fill( tree_Evts_MVAval );
+            hData_CRlowpt_BDTevt->Fill( tree_Evts_MVAval,Pref_PU_gen_wt );
             if ( VtxMass > 8. ) isCutVtx = true; 
             // if ( hemi_ptmin > 80. ) isCutEvt = true;   
             //$$
             if (nVtx == 0 )
                {
-                  hData_CRlowpt_0Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
-                  hData_CRlowpt_0Vtx_BDTevt->Fill( tree_Evts_MVAval );
+                  hData_CRlowpt_0Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu,Pref_PU_gen_wt );
+                  hData_CRlowpt_0Vtx_BDTevt->Fill( tree_Evts_MVAval,Pref_PU_gen_wt );
                   
                }
             if (nVtx == 1 )
                {
-                  hData_CRlowpt_1Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
-                  hData_CRlowpt_1Vtx_CutEvt_Mass->Fill(   VtxMass );
-                  hData_CRlowpt_1Vtx_BDTevt->Fill( tree_Evts_MVAval );
-                  hData_CRlowpt_1Vtx_BDTvtx->Fill( BDTvtx );
+                  hData_CRlowpt_1Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu ,Pref_PU_gen_wt);
+                  hData_CRlowpt_1Vtx_CutEvt_Mass->Fill(   VtxMass,Pref_PU_gen_wt );
+                  hData_CRlowpt_1Vtx_BDTevt->Fill( tree_Evts_MVAval,Pref_PU_gen_wt );
+                  hData_CRlowpt_1Vtx_BDTvtx->Fill( BDTvtx,Pref_PU_gen_wt );
                }
             if (nVtx == 2 )
                {
                   hData_CRlowpt_2Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
-                  hData_CRlowpt_2Vtx_CutEvt_Mass->Fill(   VtxMass );
-                  hData_CRlowpt_2Vtx_CutEvt_BDTevt->Fill( tree_Evts_MVAval );
-                  hData_CRlowpt_2Vtx_CutEvt_MaxBDTvtx->Fill( BDTvtx );
+                  hData_CRlowpt_2Vtx_CutEvt_Mass->Fill(   VtxMass ,Pref_PU_gen_wt);
+                  hData_CRlowpt_2Vtx_CutEvt_BDTevt->Fill( tree_Evts_MVAval,Pref_PU_gen_wt );
+                  hData_CRlowpt_2Vtx_CutEvt_MaxBDTvtx->Fill( BDTvtx ,Pref_PU_gen_wt);
 
-                  hData_CRlowpt_2VtxAll_CutEvt_Mass->Fill( Vtx_Mass0 );
-                  hData_CRlowpt_2VtxAll_CutEvt_Mass->Fill( Vtx_Mass1 );
-                  hData_CRlowpt_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx1 );
-                  hData_CRlowpt_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx2 );
+                  hData_CRlowpt_2VtxAll_CutEvt_Mass->Fill( Vtx_Mass0,Pref_PU_gen_wt );
+                  hData_CRlowpt_2VtxAll_CutEvt_Mass->Fill( Vtx_Mass1 ,Pref_PU_gen_wt);
+                  hData_CRlowpt_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx1,Pref_PU_gen_wt );
+                  hData_CRlowpt_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx2 ,Pref_PU_gen_wt);
                }
 
          }
@@ -734,36 +789,36 @@ void ABCD::Loop(int aNN, float aTagCut, float aPtMin, float aPtMax,
       BDTvtx = -2.; BDTvtx1 = -2.; BDTvtx2 = -2.;
       if ( Filter && abs(tree_Hemi_eta->at(0)) < 2.4 && abs(tree_Hemi_eta->at(1)) < 2.4 ) 
          {
-            hData_CRloose_BDTevt->Fill( tree_Evts_MVAval );
+            hData_CRloose_BDTevt->Fill( tree_Evts_MVAval ,Pref_PU_gen_wt);
             //$$
             if ( VtxMass > 8. ) isCutVtx = true; 
             if ( hemi_ptmin > 80. ) isCutEvt = true;
             //$$ 
             if (nVtxLoose == 0 && isCutEvt)
                {
-                  hData_CRloose_0Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
-                  hData_CRloose_0Vtx_BDTevt->Fill( tree_Evts_MVAval );
+                  hData_CRloose_0Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu,Pref_PU_gen_wt );
+                  hData_CRloose_0Vtx_BDTevt->Fill( tree_Evts_MVAval ,Pref_PU_gen_wt);
                   
                }
             if (nVtxLoose == 1 && isCutEvt)
                {
-                  hData_CRloose_1Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
-                  hData_CRloose_1Vtx_CutEvt_Mass->Fill(   VtxMass );
+                  hData_CRloose_1Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu ,Pref_PU_gen_wt);
+                  hData_CRloose_1Vtx_CutEvt_Mass->Fill(   VtxMass,Pref_PU_gen_wt );
 
-                  hData_CRloose_1Vtx_BDTevt->Fill( tree_Evts_MVAval );
-                  hData_CRloose_1Vtx_BDTvtx->Fill( BDTvtx );
+                  hData_CRloose_1Vtx_BDTevt->Fill( tree_Evts_MVAval,Pref_PU_gen_wt );
+                  hData_CRloose_1Vtx_BDTvtx->Fill( BDTvtx,Pref_PU_gen_wt );
                }
             if (nVtxLoose == 2 && isCutEvt)
                {
-                  hData_CRloose_2Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
-                  hData_CRloose_2Vtx_CutEvt_Mass->Fill(   VtxMass );
-                  hData_CRloose_2Vtx_CutEvt_BDTevt->Fill( tree_Evts_MVAval );
-                  hData_CRloose_2Vtx_CutEvt_MaxBDTvtx->Fill( BDTvtx );
+                  hData_CRloose_2Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu ,Pref_PU_gen_wt);
+                  hData_CRloose_2Vtx_CutEvt_Mass->Fill(   VtxMass,Pref_PU_gen_wt );
+                  hData_CRloose_2Vtx_CutEvt_BDTevt->Fill( tree_Evts_MVAval,Pref_PU_gen_wt );
+                  hData_CRloose_2Vtx_CutEvt_MaxBDTvtx->Fill( BDTvtx,Pref_PU_gen_wt );
 
-                  hData_CRloose_2VtxAll_CutEvt_Mass->Fill( Vtx_Mass0 );
-                  hData_CRloose_2VtxAll_CutEvt_Mass->Fill( Vtx_Mass1 );
-                  hData_CRloose_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx1 );
-                  hData_CRloose_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx2 );
+                  hData_CRloose_2VtxAll_CutEvt_Mass->Fill( Vtx_Mass0 ,Pref_PU_gen_wt);
+                  hData_CRloose_2VtxAll_CutEvt_Mass->Fill( Vtx_Mass1 ,Pref_PU_gen_wt);
+                  hData_CRloose_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx1,Pref_PU_gen_wt );
+                  hData_CRloose_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx2,Pref_PU_gen_wt );
                }  
          }
 
@@ -773,34 +828,34 @@ void ABCD::Loop(int aNN, float aTagCut, float aPtMin, float aPtMax,
       BDTvtx = -2.; BDTvtx1 = -2.; BDTvtx2 = -2.;
       if (Filter && hemi_ptmin > 40. && hemi_ptmin < 80. )
          {
-            hData_CRlooselowpt_BDTevt->Fill( tree_Evts_MVAval );
+            hData_CRlooselowpt_BDTevt->Fill( tree_Evts_MVAval,Pref_PU_gen_wt );
             //$$
             if ( VtxMass > 8. ) isCutVtx = true; 
             // if ( hemi_ptmin > 80. ) isCutEvt = true;   
             //$$
             if (nVtxLoose == 0 )
                {
-                  hData_CRlooselowpt_0Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
-                  hData_CRlooselowpt_1Vtx_BDTevt->Fill( tree_Evts_MVAval );
-                  hData_CRlooselowpt_1Vtx_BDTvtx->Fill( BDTvtx );
+                  hData_CRlooselowpt_0Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu,Pref_PU_gen_wt );
+                  hData_CRlooselowpt_1Vtx_BDTevt->Fill( tree_Evts_MVAval,Pref_PU_gen_wt );
+                  hData_CRlooselowpt_1Vtx_BDTvtx->Fill( BDTvtx ,Pref_PU_gen_wt);
                   
                }
             if (nVtxLoose == 1 )
                {
-                  hData_CRlooselowpt_1Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
-                  hData_CRlooselowpt_1Vtx_CutEvt_Mass->Fill(   VtxMass );
-                  hData_CRlooselowpt_2Vtx_CutEvt_BDTevt->Fill( tree_Evts_MVAval );
-                  hData_CRlooselowpt_2Vtx_CutEvt_MaxBDTvtx->Fill( BDTvtx );
+                  hData_CRlooselowpt_1Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu,Pref_PU_gen_wt );
+                  hData_CRlooselowpt_1Vtx_CutEvt_Mass->Fill(   VtxMass,Pref_PU_gen_wt );
+                  hData_CRlooselowpt_2Vtx_CutEvt_BDTevt->Fill( tree_Evts_MVAval,Pref_PU_gen_wt );
+                  hData_CRlooselowpt_2Vtx_CutEvt_MaxBDTvtx->Fill( BDTvtx,Pref_PU_gen_wt );
                }
             if (nVtxLoose == 2)
                {
-                  hData_CRlooselowpt_2Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
-                  hData_CRlooselowpt_2Vtx_CutEvt_Mass->Fill(   VtxMass );
+                  hData_CRlooselowpt_2Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu,Pref_PU_gen_wt );
+                  hData_CRlooselowpt_2Vtx_CutEvt_Mass->Fill(   VtxMass,Pref_PU_gen_wt );
 
-                  hData_CRlooselowpt_2VtxAll_CutEvt_Mass->Fill( Vtx_Mass0 );
-                  hData_CRlooselowpt_2VtxAll_CutEvt_Mass->Fill( Vtx_Mass1 );
-                  hData_CRlooselowpt_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx1 );
-                  hData_CRlooselowpt_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx2 );
+                  hData_CRlooselowpt_2VtxAll_CutEvt_Mass->Fill( Vtx_Mass0 ,Pref_PU_gen_wt);
+                  hData_CRlooselowpt_2VtxAll_CutEvt_Mass->Fill( Vtx_Mass1 ,Pref_PU_gen_wt);
+                  hData_CRlooselowpt_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx1,Pref_PU_gen_wt );
+                  hData_CRlooselowpt_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx2 ,Pref_PU_gen_wt);
                }
 
          }
@@ -808,67 +863,68 @@ void ABCD::Loop(int aNN, float aTagCut, float aPtMin, float aPtMax,
       if(Filter && ((abs(tree_Hemi_eta->at(0)) > 2.4 && abs(tree_Hemi_eta->at(0)) < 3.0) ||
          (abs(tree_Hemi_eta->at(1)) > 2.4 && abs(tree_Hemi_eta->at(1)) < 3.0)))
             {
+               hData_CRfwd_BDTevt->Fill(tree_Evts_MVAval,Pref_PU_gen_wt);
                if ( VtxMass > 8. ) isCutVtx = true; 
                if ( hemi_ptmin > 80. ) isCutEvt = true;   
                //$$
                if (nVtx == 0 && isCutEvt)
                   {
-                     hData_CRfwd_0Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
-                     hData_CRfwd_0Vtx_BDTevt->Fill( tree_Evts_MVAval );
+                     hData_CRfwd_0Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu ,Pref_PU_gen_wt);
+                     hData_CRfwd_0Vtx_BDTevt->Fill( tree_Evts_MVAval ,Pref_PU_gen_wt);
 
                   }
                if (nVtx == 1 && isCutEvt)
                   {
-                     hData_CRfwd_1Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
-                     hData_CRfwd_1Vtx_CutEvt_Mass->Fill(   VtxMass );
-                     hData_CRfwd_1Vtx_BDTevt->Fill( tree_Evts_MVAval );
-                     hData_CRfwd_1Vtx_BDTvtx->Fill( BDTvtx );
+                     hData_CRfwd_1Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu ,Pref_PU_gen_wt);
+                     hData_CRfwd_1Vtx_CutEvt_Mass->Fill(   VtxMass,Pref_PU_gen_wt );
+                     hData_CRfwd_1Vtx_BDTevt->Fill( tree_Evts_MVAval ,Pref_PU_gen_wt);
+                     hData_CRfwd_1Vtx_BDTvtx->Fill( BDTvtx,Pref_PU_gen_wt );
                   }
                if (nVtx == 2 && isCutEvt)
                   {
-                     hData_CRfwd_2Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu );
-                     hData_CRfwd_2Vtx_CutEvt_Mass->Fill(   VtxMass );
-                     hData_CRfwd_2Vtx_CutEvt_BDTevt->Fill( tree_Evts_MVAval );
-                     hData_CRfwd_2Vtx_CutEvt_MaxBDTvtx->Fill( BDTvtx );
+                     hData_CRfwd_2Vtx_CutEvt_Mmumu->Fill(  tree_Mmumu,Pref_PU_gen_wt );
+                     hData_CRfwd_2Vtx_CutEvt_Mass->Fill(   VtxMass,Pref_PU_gen_wt );
+                     hData_CRfwd_2Vtx_CutEvt_BDTevt->Fill( tree_Evts_MVAval,Pref_PU_gen_wt );
+                     hData_CRfwd_2Vtx_CutEvt_MaxBDTvtx->Fill( BDTvtx,Pref_PU_gen_wt );
 
-                     hData_CRfwd_2VtxAll_CutEvt_Mass->Fill( Vtx_Mass0 );
-                     hData_CRfwd_2VtxAll_CutEvt_Mass->Fill( Vtx_Mass1 );
-                     hData_CRfwd_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx1 );
-                     hData_CRfwd_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx2 );
+                     hData_CRfwd_2VtxAll_CutEvt_Mass->Fill( Vtx_Mass0 ,Pref_PU_gen_wt);
+                     hData_CRfwd_2VtxAll_CutEvt_Mass->Fill( Vtx_Mass1 ,Pref_PU_gen_wt);
+                     hData_CRfwd_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx1,Pref_PU_gen_wt );
+                     hData_CRfwd_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx2,Pref_PU_gen_wt );
                   }
             }
          //--------CR : SameSign  --------//
       if (tree_FilterSameSign && !Filter &&
             abs(tree_Hemi_eta->at(0)) < 2.4 && abs(tree_Hemi_eta->at(1)) < 2.4)
          {
-               hData_SameSign_BDTevt->Fill( tree_Evts_MVAval );
+               hData_SameSign_BDTevt->Fill( tree_Evts_MVAval,Pref_PU_gen_wt );
                if ( VtxMass > 8. ) isCutVtx = true; 
                if ( hemi_ptmin > 80. ) isCutEvt = true;   
                //$$
                if (nVtx == 0 && isCutEvt) {
-                  hData_CRss_0Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-                  hData_CRss_0Vtx_BDTevt->Fill( tree_Evts_MVAval );
+                  hData_CRss_0Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+                  hData_CRss_0Vtx_BDTevt->Fill( tree_Evts_MVAval,Pref_PU_gen_wt );
                   
                }
 
                if (nVtx == 1 && isCutEvt) {
-                  hData_CRss_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-                  hData_CRss_1Vtx_CutEvt_Mass->Fill(VtxMass);
-                  hData_CRss_1Vtx_BDTevt->Fill( tree_Evts_MVAval );
-                  hData_CRss_1Vtx_BDTvtx->Fill( BDTvtx );
+                  hData_CRss_1Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+                  hData_CRss_1Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
+                  hData_CRss_1Vtx_BDTevt->Fill( tree_Evts_MVAval,Pref_PU_gen_wt );
+                  hData_CRss_1Vtx_BDTvtx->Fill( BDTvtx,Pref_PU_gen_wt );
                }
 
                
                if (nVtx == 2 && isCutEvt) {
-                  hData_CRss_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu);
-                  hData_CRss_2Vtx_CutEvt_Mass->Fill(VtxMass);
-                  hData_CRss_2Vtx_CutEvt_BDTevt->Fill( tree_Evts_MVAval );
-                  hData_CRss_2Vtx_CutEvt_MaxBDTvtx->Fill( BDTvtx );
+                  hData_CRss_2Vtx_CutEvt_Mmumu->Fill(tree_Mmumu,Pref_PU_gen_wt);
+                  hData_CRss_2Vtx_CutEvt_Mass->Fill(VtxMass,Pref_PU_gen_wt);
+                  hData_CRss_2Vtx_CutEvt_BDTevt->Fill( tree_Evts_MVAval,Pref_PU_gen_wt );
+                  hData_CRss_2Vtx_CutEvt_MaxBDTvtx->Fill( BDTvtx,Pref_PU_gen_wt );
 
-                  hData_CRss_2VtxAll_CutEvt_Mass->Fill(Vtx_Mass0);
-                  hData_CRss_2VtxAll_CutEvt_Mass->Fill(Vtx_Mass1);
-                  hData_CRss_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx1 );
-                  hData_CRss_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx2 );
+                  hData_CRss_2VtxAll_CutEvt_Mass->Fill(Vtx_Mass0,Pref_PU_gen_wt);
+                  hData_CRss_2VtxAll_CutEvt_Mass->Fill(Vtx_Mass1,Pref_PU_gen_wt);
+                  hData_CRss_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx1 ,Pref_PU_gen_wt);
+                  hData_CRss_2VtxAll_CutEvt_BDTvtx->Fill( BDTvtx2,Pref_PU_gen_wt );
                }
          }
 

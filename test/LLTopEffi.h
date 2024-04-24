@@ -1,12 +1,12 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon Mar 25 09:30:12 2024 by ROOT version 6.14/09
+// Wed Feb 28 15:14:41 2024 by ROOT version 5.34/36
 // from TTree ttree/ttree
-// found on file: RPV_2018_smu200_neu180_ctau300.root
+// found on file: RPV_2018_smu200to500_ctau100.root
 //////////////////////////////////////////////////////////
 
-#ifndef ABCD_h
-#define ABCD_h
+#ifndef LLTopTree_h
+#define LLTopTree_h
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -20,12 +20,12 @@
 using namespace std;
 //$$
 
-class ABCD {
+// Fixed size dimensions of array or collections stored in the TTree if any.
+
+class LLTopTree {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
-
-// Fixed size dimensions of array or collections stored in the TTree if any.
 
    // Declaration of leaf types
    Int_t           runNumber;
@@ -34,8 +34,6 @@ public :
    vector<float>   *tree_LHE_Weights;
    Float_t         tree_MCEvt_weight;
    Double_t        tree_only_gen_wt;
-   Double_t        tree_event_weight;
-   Double_t        tree_genTop_Weight;
    Double_t        PUweight;
    Double_t        Prefweight;
    Int_t           PU_events;
@@ -332,7 +330,6 @@ public :
    vector<float>   *tree_track_Hemi_d0Sig;
    vector<float>   *tree_track_HemiOp_d0;
    vector<float>   *tree_track_HemiOp_d0Sig;
-   vector<int>     *tree_track_Hemi_isjet;
    vector<int>     *tree_track_sim_LLP;
    vector<bool>    *tree_track_sim_isFromB;
    vector<bool>    *tree_track_sim_isFromC;
@@ -460,6 +457,7 @@ public :
    vector<float>   *tree_LLP12_dphi;
    vector<float>   *tree_LLP_Mass;
    vector<int>     *tree_Hemi;
+   vector<int>     *tree_Hemi_Merging;
    vector<int>     *tree_Hemi_njet;
    vector<int>     *tree_Hemi_njet_nomu;
    vector<float>   *tree_Hemi_pt;
@@ -475,10 +473,6 @@ public :
    vector<float>   *tree_HemiMuOp_mass;
    vector<float>   *tree_HemiMuOp_pt;
    vector<float>   *tree_HemiMuOp_dR;
-   vector<int>     *tree_Hemi_LooseBTag_axes;
-   vector<int>     *tree_Hemi_MediumBTag_axes;
-   vector<int>     *tree_Hemi_TightBTag_axes;
-   vector<float>   *tree_Hemi_dR12;
    vector<int>     *tree_Hemi_LLP;
    vector<float>   *tree_Hemi_LLP_pt;
    vector<float>   *tree_Hemi_LLP_eta;
@@ -517,18 +511,10 @@ public :
    vector<float>   *tree_Hemi_Vtx_yError;
    vector<float>   *tree_Hemi_Vtx_zError;
    vector<float>   *tree_Hemi_Vtx_BTag;
-   vector<float>   *tree_Hemi_Vtx_trackWeight;
-   vector<float>   *tree_Hemi_Vtx_SumtrackWeight;
-   vector<float>   *tree_Hemi_Vtx_track_MeanDCA_d;
-   vector<float>   *tree_Hemi_Vtx_Mass;
-   vector<float>   *tree_Hemi_Vtx_dist;
-   vector<int>     *tree_Hemi_Vtx_ntrk10;
-   vector<int>     *tree_Hemi_Vtx_ntrk20;
    vector<int>     *tree_event_nVtx;
    vector<float>   *tree_event_Vtx_Vtx_dr;
    vector<float>   *tree_event_Vtx_Vtx_dz;
    vector<float>   *tree_event_Vtx_Vtx_dd;
-   vector<float>   *tree_event_Vtx_Vtx_reldd;
    vector<float>   *tree_event_Vtx_Vtx_dR;
    vector<int>     *tree_event_Vtx_Vtx_step;
    vector<float>   *tree_Hemi_SecLLP;
@@ -555,20 +541,26 @@ public :
    vector<float>   *tree_event_MergedVtx_Vtx_dr;
    vector<float>   *tree_event_MergedVtx_Vtx_dz;
    vector<float>   *tree_event_MergedVtx_Vtx_dd;
-   vector<float>   *tree_event_MergedVtx_Vtx_reldd;
    vector<float>   *tree_event_MergedVtx_Vtx_dR;
    vector<int>     *tree_event_MergedVtx_Vtx_step;
-   vector<float>   *tree_Hemi_Vtx_BDT_nTrks;
-   vector<float>   *tree_Hemi_Vtx_BDT_NChi2;
-   vector<float>   *tree_Hemi_Vtx_BDT_step;
-   vector<float>   *tree_Hemi_Vtx_BDT_STW;
-   vector<float>   *tree_Hemi_Vtx_BDT_Mass;
-   vector<float>   *tree_Hemi_Vtx_BDT_HMass;
-   vector<float>   *tree_Hemi_Vtx_BDT_ntrk10;
-   vector<float>   *tree_Hemi_Vtx_BDT_ntrk20;
-   vector<float>   *tree_Hemi_Vtx_BDT_MeanDCA;
-   vector<float>   *tree_Hemi_Vtx_MVAval_Loose;
-   vector<float>   *tree_Hemi_Vtx_MVAval_Tight;
+   vector<float>   *tree_Hemi_Vtx_trackWeight;
+   vector<float>   *tree_Hemi_Vtx_MeantrackWeight;
+   vector<float>   *tree_Hemi_Vtx_track_MeanDCA_d;
+   vector<float>   *tree_Hemi_Vtx_Mass;
+   vector<float>   *tree_Hemi_Vtx_MVAval;
+   vector<float>   *tree_Hemi_Vtx_MVAval_Step1;
+   vector<float>   *tree_Hemi_Vtx_TVtx_dx;
+   vector<float>   *tree_Hemi_Vtx_TVtx_dy;
+   vector<float>   *tree_Hemi_Vtx_TVtx_dz;
+   vector<float>   *tree_Hemi_Vtx_TVtx_NChi2;
+   vector<float>   *tree_Hemi_Vtx_dist;
+   vector<float>   *tree_Hemi_dR12;
+   vector<int>     *tree_Hemi_Vtx_ntrk10;
+   vector<int>     *tree_Hemi_Vtx_ntrk20;
+   vector<int>     *tree_track_Hemi_isjet;
+   vector<int>     *tree_Hemi_LooseBTag_axes;
+   vector<int>     *tree_Hemi_MediumBTag_axes;
+   vector<int>     *tree_Hemi_TightBTag_axes;
    Bool_t          HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v;
    Bool_t          HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v;
    Bool_t          HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v;
@@ -596,8 +588,6 @@ public :
    TBranch        *b_tree_LHE_Weights;   //!
    TBranch        *b_tree_MCEvt_weight;   //!
    TBranch        *b_tree_only_gen_wt;   //!
-   TBranch        *b_tree_event_weight;   //!
-   TBranch        *b_tree_genTop_Weight;   //!
    TBranch        *b_PUweight;   //!
    TBranch        *b_Prefweight;   //!
    TBranch        *b_PU_events;   //!
@@ -894,7 +884,6 @@ public :
    TBranch        *b_tree_track_Hemi_d0Sig;   //!
    TBranch        *b_tree_track_HemiOp_d0;   //!
    TBranch        *b_tree_track_HemiOp_d0Sig;   //!
-   TBranch        *b_tree_track_Hemi_isjet;   //!
    TBranch        *b_tree_track_sim_LLP;   //!
    TBranch        *b_tree_track_sim_isFromB;   //!
    TBranch        *b_tree_track_sim_isFromC;   //!
@@ -1022,6 +1011,7 @@ public :
    TBranch        *b_tree_LLP12_dphi;   //!
    TBranch        *b_tree_LLP_Mass;   //!
    TBranch        *b_tree_Hemi;   //!
+   TBranch        *b_tree_Hemi_Merging;   //!
    TBranch        *b_tree_Hemi_njet;   //!
    TBranch        *b_tree_Hemi_njet_nomu;   //!
    TBranch        *b_tree_Hemi_pt;   //!
@@ -1037,10 +1027,6 @@ public :
    TBranch        *b_tree_HemiMuOp_mass;   //!
    TBranch        *b_tree_HemiMuOp_pt;   //!
    TBranch        *b_tree_HemiMuOp_dR;   //!
-   TBranch        *b_tree_Hemi_LooseBTag_axes;   //!
-   TBranch        *b_tree_Hemi_MediumBTag_axes;   //!
-   TBranch        *b_tree_Hemi_TightBTag_axes;   //!
-   TBranch        *b_tree_Hemi_dR12;   //!
    TBranch        *b_tree_Hemi_LLP;   //!
    TBranch        *b_tree_Hemi_LLP_pt;   //!
    TBranch        *b_tree_Hemi_LLP_eta;   //!
@@ -1079,18 +1065,10 @@ public :
    TBranch        *b_tree_Hemi_Vtx_yError;   //!
    TBranch        *b_tree_Hemi_Vtx_zError;   //!
    TBranch        *b_tree_Hemi_Vtx_BTag;   //!
-   TBranch        *b_tree_Hemi_Vtx_trackWeight;   //!
-   TBranch        *b_tree_Hemi_Vtx_SumtrackWeight;   //!
-   TBranch        *b_tree_Hemi_Vtx_track_MeanDCA_d;   //!
-   TBranch        *b_tree_Hemi_Vtx_Mass;   //!
-   TBranch        *b_tree_Hemi_Vtx_dist;   //!
-   TBranch        *b_tree_Hemi_Vtx_ntrk10;   //!
-   TBranch        *b_tree_Hemi_Vtx_ntrk20;   //!
    TBranch        *b_tree_event_nVtx;   //!
    TBranch        *b_tree_event_Vtx_Vtx_dr;   //!
    TBranch        *b_tree_event_Vtx_Vtx_dz;   //!
    TBranch        *b_tree_event_Vtx_Vtx_dd;   //!
-   TBranch        *b_tree_event_Vtx_Vtx_reldd;   //!
    TBranch        *b_tree_event_Vtx_Vtx_dR;   //!
    TBranch        *b_tree_event_Vtx_Vtx_step;   //!
    TBranch        *b_tree_Hemi_SecLLP;   //!
@@ -1117,20 +1095,26 @@ public :
    TBranch        *b_tree_event_MergedVtx_Vtx_dr;   //!
    TBranch        *b_tree_event_MergedVtx_Vtx_dz;   //!
    TBranch        *b_tree_event_MergedVtx_Vtx_dd;   //!
-   TBranch        *b_tree_event_MergedVtx_Vtx_reldd;   //!
    TBranch        *b_tree_event_MergedVtx_Vtx_dR;   //!
    TBranch        *b_tree_event_MergedVtx_Vtx_step;   //!
-   TBranch        *b_tree_Hemi_Vtx_BDT_nTrks;   //!
-   TBranch        *b_tree_Hemi_Vtx_BDT_NChi2;   //!
-   TBranch        *b_tree_Hemi_Vtx_BDT_step;   //!
-   TBranch        *b_tree_Hemi_Vtx_BDT_STW;   //!
-   TBranch        *b_tree_Hemi_Vtx_BDT_Mass;   //!
-   TBranch        *b_tree_Hemi_Vtx_BDT_HMass;   //!
-   TBranch        *b_tree_Hemi_Vtx_BDT_ntrk10;   //!
-   TBranch        *b_tree_Hemi_Vtx_BDT_ntrk20;   //!
-   TBranch        *b_tree_Hemi_Vtx_BDT_MeanDCA;   //!
-   TBranch        *b_tree_Hemi_Vtx_MVAval_Loose;   //!
-   TBranch        *b_tree_Hemi_Vtx_MVAval_Tight;   //!
+   TBranch        *b_tree_Hemi_Vtx_trackWeight;   //!
+   TBranch        *b_tree_Hemi_Vtx_MeantrackWeight;   //!
+   TBranch        *b_tree_Hemi_Vtx_track_MeanDCA_d;   //!
+   TBranch        *b_tree_Hemi_Vtx_Mass;   //!
+   TBranch        *b_tree_Hemi_Vtx_MVAval;   //!
+   TBranch        *b_tree_Hemi_Vtx_MVAval_Step1;   //!
+   TBranch        *b_tree_Hemi_Vtx_TVtx_dx;   //!
+   TBranch        *b_tree_Hemi_Vtx_TVtx_dy;   //!
+   TBranch        *b_tree_Hemi_Vtx_TVtx_dz;   //!
+   TBranch        *b_tree_Hemi_Vtx_TVtx_NChi2;   //!
+   TBranch        *b_tree_Hemi_Vtx_dist;   //!
+   TBranch        *b_tree_Hemi_dR12;   //!
+   TBranch        *b_tree_Hemi_Vtx_ntrk10;   //!
+   TBranch        *b_tree_Hemi_Vtx_ntrk20;   //!
+   TBranch        *b_tree_track_Hemi_isjet;   //!
+   TBranch        *b_tree_Hemi_LooseBTag_axes;   //!
+   TBranch        *b_tree_Hemi_MediumBTag_axes;   //!
+   TBranch        *b_tree_Hemi_TightBTag_axes;   //!
    TBranch        *b_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v;   //!
    TBranch        *b_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v;   //!
    TBranch        *b_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v;   //!
@@ -1151,12 +1135,14 @@ public :
    TBranch        *b_HLT_IsoMu24_v;   //!
    TBranch        *b_HLT_IsoMu27_v;   //!
 
-   ABCD(TTree *tree=0);
-   virtual ~ABCD();
+   LLTopTree(TTree *tree=0);
+   virtual ~LLTopTree();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     Init(TTree *tree);
+//$$
+//$$   virtual void   Loop();
    virtual void   Loop(Int_t    aNN = 0, 
                   Float_t  aTagCut = 0.01, 
                   Float_t  aPtMin = 20., 
@@ -1166,9 +1152,7 @@ public :
                   Float_t  aFreeCut = 0., 
                   Int_t    aIntCut = 0, 
 		  TString  afilename = "output.root",
-		  TString  aweightFileMVA = "weightFileMVA.xml",
-        TString sample ="", TString Production="",
-        bool Signal = true);
+		  TString  aweightFileMVA = "weightFileMVA.xml");
 //$$
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
@@ -1176,36 +1160,36 @@ public :
 
 #endif
 
-#ifdef ABCD_cxx
-ABCD::ABCD(TTree *tree) : fChain(0) 
+#ifdef LLTopTree_cxx
+LLTopTree::LLTopTree(TTree *tree) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("RPV_2018_smu200_neu180_ctau300.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("RPV_2018_smu200to500_ctau100.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("RPV_2018_smu200_neu180_ctau300.root");
+         f = new TFile("RPV_2018_smu200to500_ctau100.root");
       }
-      TDirectory * dir = (TDirectory*)f->Get("RPV_2018_smu200_neu180_ctau300.root:/FlyingTop");
+      TDirectory * dir = (TDirectory*)f->Get("RPV_2018_smu200to500_ctau100.root:/FlyingTop");
       dir->GetObject("ttree",tree);
 
    }
    Init(tree);
 }
 
-ABCD::~ABCD()
+LLTopTree::~LLTopTree()
 {
    if (!fChain) return;
    delete fChain->GetCurrentFile();
 }
 
-Int_t ABCD::GetEntry(Long64_t entry)
+Int_t LLTopTree::GetEntry(Long64_t entry)
 {
 // Read contents of entry.
    if (!fChain) return 0;
    return fChain->GetEntry(entry);
 }
-Long64_t ABCD::LoadTree(Long64_t entry)
+Long64_t LLTopTree::LoadTree(Long64_t entry)
 {
 // Set the environment to read one entry
    if (!fChain) return -5;
@@ -1218,7 +1202,7 @@ Long64_t ABCD::LoadTree(Long64_t entry)
    return centry;
 }
 
-void ABCD::Init(TTree *tree)
+void LLTopTree::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -1229,7 +1213,7 @@ void ABCD::Init(TTree *tree)
    // (once per file to be processed).
 
    // Set object pointer
-tree_LHE_Weights = 0;
+   tree_LHE_Weights = 0;
    tree_muon_isPrompt = 0;
    tree_muon_pt = 0;
    tree_muon_SF = 0;
@@ -1481,7 +1465,6 @@ tree_LHE_Weights = 0;
    tree_track_Hemi_d0Sig = 0;
    tree_track_HemiOp_d0 = 0;
    tree_track_HemiOp_d0Sig = 0;
-   tree_track_Hemi_isjet = 0;
    tree_track_sim_LLP = 0;
    tree_track_sim_isFromB = 0;
    tree_track_sim_isFromC = 0;
@@ -1598,6 +1581,7 @@ tree_LHE_Weights = 0;
    tree_LLP12_dphi = 0;
    tree_LLP_Mass = 0;
    tree_Hemi = 0;
+   tree_Hemi_Merging = 0;
    tree_Hemi_njet = 0;
    tree_Hemi_njet_nomu = 0;
    tree_Hemi_pt = 0;
@@ -1613,10 +1597,6 @@ tree_LHE_Weights = 0;
    tree_HemiMuOp_mass = 0;
    tree_HemiMuOp_pt = 0;
    tree_HemiMuOp_dR = 0;
-   tree_Hemi_LooseBTag_axes = 0;
-   tree_Hemi_MediumBTag_axes = 0;
-   tree_Hemi_TightBTag_axes = 0;
-   tree_Hemi_dR12 = 0;
    tree_Hemi_LLP = 0;
    tree_Hemi_LLP_pt = 0;
    tree_Hemi_LLP_eta = 0;
@@ -1655,18 +1635,10 @@ tree_LHE_Weights = 0;
    tree_Hemi_Vtx_yError = 0;
    tree_Hemi_Vtx_zError = 0;
    tree_Hemi_Vtx_BTag = 0;
-   tree_Hemi_Vtx_trackWeight = 0;
-   tree_Hemi_Vtx_SumtrackWeight = 0;
-   tree_Hemi_Vtx_track_MeanDCA_d = 0;
-   tree_Hemi_Vtx_Mass = 0;
-   tree_Hemi_Vtx_dist = 0;
-   tree_Hemi_Vtx_ntrk10 = 0;
-   tree_Hemi_Vtx_ntrk20 = 0;
    tree_event_nVtx = 0;
    tree_event_Vtx_Vtx_dr = 0;
    tree_event_Vtx_Vtx_dz = 0;
    tree_event_Vtx_Vtx_dd = 0;
-   tree_event_Vtx_Vtx_reldd = 0;
    tree_event_Vtx_Vtx_dR = 0;
    tree_event_Vtx_Vtx_step = 0;
    tree_Hemi_SecLLP = 0;
@@ -1693,20 +1665,26 @@ tree_LHE_Weights = 0;
    tree_event_MergedVtx_Vtx_dr = 0;
    tree_event_MergedVtx_Vtx_dz = 0;
    tree_event_MergedVtx_Vtx_dd = 0;
-   tree_event_MergedVtx_Vtx_reldd = 0;
    tree_event_MergedVtx_Vtx_dR = 0;
    tree_event_MergedVtx_Vtx_step = 0;
-   tree_Hemi_Vtx_BDT_nTrks = 0;
-   tree_Hemi_Vtx_BDT_NChi2 = 0;
-   tree_Hemi_Vtx_BDT_step = 0;
-   tree_Hemi_Vtx_BDT_STW = 0;
-   tree_Hemi_Vtx_BDT_Mass = 0;
-   tree_Hemi_Vtx_BDT_HMass = 0;
-   tree_Hemi_Vtx_BDT_ntrk10 = 0;
-   tree_Hemi_Vtx_BDT_ntrk20 = 0;
-   tree_Hemi_Vtx_BDT_MeanDCA = 0;
-   tree_Hemi_Vtx_MVAval_Loose = 0;
-   tree_Hemi_Vtx_MVAval_Tight = 0;
+   tree_Hemi_Vtx_trackWeight = 0;
+   tree_Hemi_Vtx_MeantrackWeight = 0;
+   tree_Hemi_Vtx_track_MeanDCA_d = 0;
+   tree_Hemi_Vtx_Mass = 0;
+   tree_Hemi_Vtx_MVAval = 0;
+   tree_Hemi_Vtx_MVAval_Step1 = 0;
+   tree_Hemi_Vtx_TVtx_dx = 0;
+   tree_Hemi_Vtx_TVtx_dy = 0;
+   tree_Hemi_Vtx_TVtx_dz = 0;
+   tree_Hemi_Vtx_TVtx_NChi2 = 0;
+   tree_Hemi_Vtx_dist = 0;
+   tree_Hemi_dR12 = 0;
+   tree_Hemi_Vtx_ntrk10 = 0;
+   tree_Hemi_Vtx_ntrk20 = 0;
+   tree_track_Hemi_isjet = 0;
+   tree_Hemi_LooseBTag_axes = 0;
+   tree_Hemi_MediumBTag_axes = 0;
+   tree_Hemi_TightBTag_axes = 0;
    // Set branch addresses and branch pointers
    if (!tree) return;
    fChain = tree;
@@ -1719,8 +1697,6 @@ tree_LHE_Weights = 0;
    fChain->SetBranchAddress("tree_LHE_Weights", &tree_LHE_Weights, &b_tree_LHE_Weights);
    fChain->SetBranchAddress("tree_MCEvt_weight", &tree_MCEvt_weight, &b_tree_MCEvt_weight);
    fChain->SetBranchAddress("tree_only_gen_wt", &tree_only_gen_wt, &b_tree_only_gen_wt);
-   fChain->SetBranchAddress("tree_event_weight", &tree_event_weight, &b_tree_event_weight);
-   fChain->SetBranchAddress("tree_genTop_Weight", &tree_genTop_Weight, &b_tree_genTop_Weight);
    fChain->SetBranchAddress("PUweight", &PUweight, &b_PUweight);
    fChain->SetBranchAddress("Prefweight", &Prefweight, &b_Prefweight);
    fChain->SetBranchAddress("PU_events", &PU_events, &b_PU_events);
@@ -2017,7 +1993,6 @@ tree_LHE_Weights = 0;
    fChain->SetBranchAddress("tree_track_Hemi_d0Sig", &tree_track_Hemi_d0Sig, &b_tree_track_Hemi_d0Sig);
    fChain->SetBranchAddress("tree_track_HemiOp_d0", &tree_track_HemiOp_d0, &b_tree_track_HemiOp_d0);
    fChain->SetBranchAddress("tree_track_HemiOp_d0Sig", &tree_track_HemiOp_d0Sig, &b_tree_track_HemiOp_d0Sig);
-   fChain->SetBranchAddress("tree_track_Hemi_isjet", &tree_track_Hemi_isjet, &b_tree_track_Hemi_isjet);
    fChain->SetBranchAddress("tree_track_sim_LLP", &tree_track_sim_LLP, &b_tree_track_sim_LLP);
    fChain->SetBranchAddress("tree_track_sim_isFromB", &tree_track_sim_isFromB, &b_tree_track_sim_isFromB);
    fChain->SetBranchAddress("tree_track_sim_isFromC", &tree_track_sim_isFromC, &b_tree_track_sim_isFromC);
@@ -2145,6 +2120,7 @@ tree_LHE_Weights = 0;
    fChain->SetBranchAddress("tree_LLP12_dphi", &tree_LLP12_dphi, &b_tree_LLP12_dphi);
    fChain->SetBranchAddress("tree_LLP_Mass", &tree_LLP_Mass, &b_tree_LLP_Mass);
    fChain->SetBranchAddress("tree_Hemi", &tree_Hemi, &b_tree_Hemi);
+   fChain->SetBranchAddress("tree_Hemi_Merging", &tree_Hemi_Merging, &b_tree_Hemi_Merging);
    fChain->SetBranchAddress("tree_Hemi_njet", &tree_Hemi_njet, &b_tree_Hemi_njet);
    fChain->SetBranchAddress("tree_Hemi_njet_nomu", &tree_Hemi_njet_nomu, &b_tree_Hemi_njet_nomu);
    fChain->SetBranchAddress("tree_Hemi_pt", &tree_Hemi_pt, &b_tree_Hemi_pt);
@@ -2160,10 +2136,6 @@ tree_LHE_Weights = 0;
    fChain->SetBranchAddress("tree_HemiMuOp_mass", &tree_HemiMuOp_mass, &b_tree_HemiMuOp_mass);
    fChain->SetBranchAddress("tree_HemiMuOp_pt", &tree_HemiMuOp_pt, &b_tree_HemiMuOp_pt);
    fChain->SetBranchAddress("tree_HemiMuOp_dR", &tree_HemiMuOp_dR, &b_tree_HemiMuOp_dR);
-   fChain->SetBranchAddress("tree_Hemi_LooseBTag_axes", &tree_Hemi_LooseBTag_axes, &b_tree_Hemi_LooseBTag_axes);
-   fChain->SetBranchAddress("tree_Hemi_MediumBTag_axes", &tree_Hemi_MediumBTag_axes, &b_tree_Hemi_MediumBTag_axes);
-   fChain->SetBranchAddress("tree_Hemi_TightBTag_axes", &tree_Hemi_TightBTag_axes, &b_tree_Hemi_TightBTag_axes);
-   fChain->SetBranchAddress("tree_Hemi_dR12", &tree_Hemi_dR12, &b_tree_Hemi_dR12);
    fChain->SetBranchAddress("tree_Hemi_LLP", &tree_Hemi_LLP, &b_tree_Hemi_LLP);
    fChain->SetBranchAddress("tree_Hemi_LLP_pt", &tree_Hemi_LLP_pt, &b_tree_Hemi_LLP_pt);
    fChain->SetBranchAddress("tree_Hemi_LLP_eta", &tree_Hemi_LLP_eta, &b_tree_Hemi_LLP_eta);
@@ -2202,18 +2174,10 @@ tree_LHE_Weights = 0;
    fChain->SetBranchAddress("tree_Hemi_Vtx_yError", &tree_Hemi_Vtx_yError, &b_tree_Hemi_Vtx_yError);
    fChain->SetBranchAddress("tree_Hemi_Vtx_zError", &tree_Hemi_Vtx_zError, &b_tree_Hemi_Vtx_zError);
    fChain->SetBranchAddress("tree_Hemi_Vtx_BTag", &tree_Hemi_Vtx_BTag, &b_tree_Hemi_Vtx_BTag);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_trackWeight", &tree_Hemi_Vtx_trackWeight, &b_tree_Hemi_Vtx_trackWeight);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_SumtrackWeight", &tree_Hemi_Vtx_SumtrackWeight, &b_tree_Hemi_Vtx_SumtrackWeight);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_track_MeanDCA_d", &tree_Hemi_Vtx_track_MeanDCA_d, &b_tree_Hemi_Vtx_track_MeanDCA_d);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_Mass", &tree_Hemi_Vtx_Mass, &b_tree_Hemi_Vtx_Mass);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_dist", &tree_Hemi_Vtx_dist, &b_tree_Hemi_Vtx_dist);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_ntrk10", &tree_Hemi_Vtx_ntrk10, &b_tree_Hemi_Vtx_ntrk10);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_ntrk20", &tree_Hemi_Vtx_ntrk20, &b_tree_Hemi_Vtx_ntrk20);
    fChain->SetBranchAddress("tree_event_nVtx", &tree_event_nVtx, &b_tree_event_nVtx);
    fChain->SetBranchAddress("tree_event_Vtx_Vtx_dr", &tree_event_Vtx_Vtx_dr, &b_tree_event_Vtx_Vtx_dr);
    fChain->SetBranchAddress("tree_event_Vtx_Vtx_dz", &tree_event_Vtx_Vtx_dz, &b_tree_event_Vtx_Vtx_dz);
    fChain->SetBranchAddress("tree_event_Vtx_Vtx_dd", &tree_event_Vtx_Vtx_dd, &b_tree_event_Vtx_Vtx_dd);
-   fChain->SetBranchAddress("tree_event_Vtx_Vtx_reldd", &tree_event_Vtx_Vtx_reldd, &b_tree_event_Vtx_Vtx_reldd);
    fChain->SetBranchAddress("tree_event_Vtx_Vtx_dR", &tree_event_Vtx_Vtx_dR, &b_tree_event_Vtx_Vtx_dR);
    fChain->SetBranchAddress("tree_event_Vtx_Vtx_step", &tree_event_Vtx_Vtx_step, &b_tree_event_Vtx_Vtx_step);
    fChain->SetBranchAddress("tree_Hemi_SecLLP", &tree_Hemi_SecLLP, &b_tree_Hemi_SecLLP);
@@ -2240,20 +2204,26 @@ tree_LHE_Weights = 0;
    fChain->SetBranchAddress("tree_event_MergedVtx_Vtx_dr", &tree_event_MergedVtx_Vtx_dr, &b_tree_event_MergedVtx_Vtx_dr);
    fChain->SetBranchAddress("tree_event_MergedVtx_Vtx_dz", &tree_event_MergedVtx_Vtx_dz, &b_tree_event_MergedVtx_Vtx_dz);
    fChain->SetBranchAddress("tree_event_MergedVtx_Vtx_dd", &tree_event_MergedVtx_Vtx_dd, &b_tree_event_MergedVtx_Vtx_dd);
-   fChain->SetBranchAddress("tree_event_MergedVtx_Vtx_reldd", &tree_event_MergedVtx_Vtx_reldd, &b_tree_event_MergedVtx_Vtx_reldd);
    fChain->SetBranchAddress("tree_event_MergedVtx_Vtx_dR", &tree_event_MergedVtx_Vtx_dR, &b_tree_event_MergedVtx_Vtx_dR);
    fChain->SetBranchAddress("tree_event_MergedVtx_Vtx_step", &tree_event_MergedVtx_Vtx_step, &b_tree_event_MergedVtx_Vtx_step);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_BDT_nTrks", &tree_Hemi_Vtx_BDT_nTrks, &b_tree_Hemi_Vtx_BDT_nTrks);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_BDT_NChi2", &tree_Hemi_Vtx_BDT_NChi2, &b_tree_Hemi_Vtx_BDT_NChi2);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_BDT_step", &tree_Hemi_Vtx_BDT_step, &b_tree_Hemi_Vtx_BDT_step);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_BDT_STW", &tree_Hemi_Vtx_BDT_STW, &b_tree_Hemi_Vtx_BDT_STW);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_BDT_Mass", &tree_Hemi_Vtx_BDT_Mass, &b_tree_Hemi_Vtx_BDT_Mass);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_BDT_HMass", &tree_Hemi_Vtx_BDT_HMass, &b_tree_Hemi_Vtx_BDT_HMass);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_BDT_ntrk10", &tree_Hemi_Vtx_BDT_ntrk10, &b_tree_Hemi_Vtx_BDT_ntrk10);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_BDT_ntrk20", &tree_Hemi_Vtx_BDT_ntrk20, &b_tree_Hemi_Vtx_BDT_ntrk20);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_BDT_MeanDCA", &tree_Hemi_Vtx_BDT_MeanDCA, &b_tree_Hemi_Vtx_BDT_MeanDCA);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_MVAval_Loose", &tree_Hemi_Vtx_MVAval_Loose, &b_tree_Hemi_Vtx_MVAval_Loose);
-   fChain->SetBranchAddress("tree_Hemi_Vtx_MVAval_Tight", &tree_Hemi_Vtx_MVAval_Tight, &b_tree_Hemi_Vtx_MVAval_Tight);
+   fChain->SetBranchAddress("tree_Hemi_Vtx_trackWeight", &tree_Hemi_Vtx_trackWeight, &b_tree_Hemi_Vtx_trackWeight);
+   fChain->SetBranchAddress("tree_Hemi_Vtx_MeantrackWeight", &tree_Hemi_Vtx_MeantrackWeight, &b_tree_Hemi_Vtx_MeantrackWeight);
+   fChain->SetBranchAddress("tree_Hemi_Vtx_track_MeanDCA_d", &tree_Hemi_Vtx_track_MeanDCA_d, &b_tree_Hemi_Vtx_track_MeanDCA_d);
+   fChain->SetBranchAddress("tree_Hemi_Vtx_Mass", &tree_Hemi_Vtx_Mass, &b_tree_Hemi_Vtx_Mass);
+   fChain->SetBranchAddress("tree_Hemi_Vtx_MVAval", &tree_Hemi_Vtx_MVAval, &b_tree_Hemi_Vtx_MVAval);
+   fChain->SetBranchAddress("tree_Hemi_Vtx_MVAval_Step1", &tree_Hemi_Vtx_MVAval_Step1, &b_tree_Hemi_Vtx_MVAval_Step1);
+   fChain->SetBranchAddress("tree_Hemi_Vtx_TVtx_dx", &tree_Hemi_Vtx_TVtx_dx, &b_tree_Hemi_Vtx_TVtx_dx);
+   fChain->SetBranchAddress("tree_Hemi_Vtx_TVtx_dy", &tree_Hemi_Vtx_TVtx_dy, &b_tree_Hemi_Vtx_TVtx_dy);
+   fChain->SetBranchAddress("tree_Hemi_Vtx_TVtx_dz", &tree_Hemi_Vtx_TVtx_dz, &b_tree_Hemi_Vtx_TVtx_dz);
+   fChain->SetBranchAddress("tree_Hemi_Vtx_TVtx_NChi2", &tree_Hemi_Vtx_TVtx_NChi2, &b_tree_Hemi_Vtx_TVtx_NChi2);
+   fChain->SetBranchAddress("tree_Hemi_Vtx_dist", &tree_Hemi_Vtx_dist, &b_tree_Hemi_Vtx_dist);
+   fChain->SetBranchAddress("tree_Hemi_dR12", &tree_Hemi_dR12, &b_tree_Hemi_dR12);
+   fChain->SetBranchAddress("tree_Hemi_Vtx_ntrk10", &tree_Hemi_Vtx_ntrk10, &b_tree_Hemi_Vtx_ntrk10);
+   fChain->SetBranchAddress("tree_Hemi_Vtx_ntrk20", &tree_Hemi_Vtx_ntrk20, &b_tree_Hemi_Vtx_ntrk20);
+   fChain->SetBranchAddress("tree_track_Hemi_isjet", &tree_track_Hemi_isjet, &b_tree_track_Hemi_isjet);
+   fChain->SetBranchAddress("tree_Hemi_LooseBTag_axes", &tree_Hemi_LooseBTag_axes, &b_tree_Hemi_LooseBTag_axes);
+   fChain->SetBranchAddress("tree_Hemi_MediumBTag_axes", &tree_Hemi_MediumBTag_axes, &b_tree_Hemi_MediumBTag_axes);
+   fChain->SetBranchAddress("tree_Hemi_TightBTag_axes", &tree_Hemi_TightBTag_axes, &b_tree_Hemi_TightBTag_axes);
    fChain->SetBranchAddress("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v", &HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v, &b_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v);
    fChain->SetBranchAddress("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v", &HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v, &b_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v);
    fChain->SetBranchAddress("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v", &HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v, &b_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v);
@@ -2276,7 +2246,7 @@ tree_LHE_Weights = 0;
    Notify();
 }
 
-Bool_t ABCD::Notify()
+Bool_t LLTopTree::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
@@ -2287,14 +2257,14 @@ Bool_t ABCD::Notify()
    return kTRUE;
 }
 
-void ABCD::Show(Long64_t entry)
+void LLTopTree::Show(Long64_t entry)
 {
 // Print contents of entry.
 // If entry is not specified, print current entry
    if (!fChain) return;
    fChain->Show(entry);
 }
-Int_t ABCD::Cut(Long64_t entry)
+Int_t LLTopTree::Cut(Long64_t entry)
 {
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
@@ -2316,4 +2286,6 @@ double DeltaPhi(double phi1, double phi2) {
   }
   return DeltaPhi;
 }
-#endif // #ifdef ABCD_cxx
+//$$
+
+#endif // #ifdef LLTopTree_cxx
