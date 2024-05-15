@@ -11,14 +11,14 @@ std::vector<float> DiLeptonMass(bool SSLep, int nLep, int nAllLepton, std::vecto
         if (nLep >= 2 ) 
             {
                 for (int mu = 0; mu < nAllLepton - 1; mu++) {
-                    if (!isPrompt[index[mu]]) continue;
+
                     if (!ID[index[mu]]) continue;
                     if (!ISO[index[mu]]) continue;
                     if (!isPrompt[index[mu]]) continue;
-                    double mupt1 = PT[index[mu]];
+                    mupt1 = PT[index[mu]];
                     if (mupt1 < 25.) continue;
-                    double mueta1 = ETA[index[mu]];
-                    double muphi1 = PHI[index[mu]];
+                    mueta1 = ETA[index[mu]];
+                    muphi1 = PHI[index[mu]];
                     v1.SetPtEtaPhiM(mupt1, mueta1, muphi1, Lepmass[0]);
                     Q1 = CHARGE[index[mu]];
 
@@ -26,7 +26,7 @@ std::vector<float> DiLeptonMass(bool SSLep, int nLep, int nAllLepton, std::vecto
                         if (!isPrompt[index[mu2]]) continue;
                         if (!ID[index[mu2]]) continue;
                         if (!ISO[index[mu2]]) continue;
-                        double mupt2 = PT[index[mu2]];
+                        mupt2 = PT[index[mu2]];
                         if (mupt2 < 10.) continue;
                         Q2 = CHARGE[index[mu2]];
                         if (Q1 == Q2 && !SSLep) continue;
@@ -67,30 +67,29 @@ std::vector<float> DiLeptonMass(bool SSLep, int nLep, int nAllLepton, std::vecto
         TLorentzVector v1, v2, v;
         std::vector<float> OutputData ;
         float Mmumu = 0, MmumuSameSign = 0;
-        int imu1 = -1, imu2 = -1;
-        int imu1_SS = -1, imu2_SS = -1;
+        int jmu1 = -1, jmu2 = -1;
+        int jmu1_SS = -1, jmu2_SS = -1;
         int Q1 = 0, Q2 = 0;
         float mupt1, mueta1, muphi1, mupt2, mueta2, muphi2;
         if (nLep >= 1 && nLep2 >= 1 ) 
             {
                 for (int mu = 0; mu < nAllLepton - 1; mu++) {
-                    if (!isPrompt[index[mu]]) continue;
+                    // if (!isPrompt[index[mu]]) continue;
                     if (!ID[index[mu]]) continue;
                     if (!ISO[index[mu]]) continue;
-                    if (!isPrompt[index[mu]]) continue;
-                    double mupt1 = PT[index[mu]];
+                    // if (!isPrompt[index[mu]]) continue;
+                    mupt1 = PT[index[mu]];
                     if (mupt1 < 25.) continue;
-                    double mueta1 = ETA[index[mu]];
-                    double muphi1 = PHI[index[mu]];
+		            mueta1 = ETA[index[mu]]; 
+                    muphi1 = PHI[index[mu]];
                     v1.SetPtEtaPhiM(mupt1, mueta1, muphi1, Lepmass[0]);
                     Q1 = CHARGE[index[mu]];
 
                     for (int mu2 = 0; mu2 < nAllLepton2; mu2++) {
-                        if (!isPrompt2[index2[mu2]]) continue;
+                        // if (!isPrompt2[index2[mu2]]) continue;
                         if (!ID2[index2[mu2]]) continue;
-                        if (!ISO2[index2[mu2]]) continue;
-                        double mupt2 = PT2[index2[mu2]];
-                        if (mupt2 < 10.) continue;
+			            mupt2 = PT2[index2[mu2]];
+                        if (mupt2 < 14.) continue;
                         Q2 = CHARGE2[index2[mu2]];
                         if (Q1 == Q2 && !SSLep) continue;
                         mueta2 = ETA2[index2[mu2]];
@@ -99,23 +98,23 @@ std::vector<float> DiLeptonMass(bool SSLep, int nLep, int nAllLepton, std::vecto
                         v = v1 + v2;
                         if (v.Mag() > Mmumu && Q1 != Q2) {
                             Mmumu = v.Mag();
-                            imu1 = index[mu];
-                            imu2 = index2[mu2];
+                            jmu1 = index[mu];
+                            jmu2 = index2[mu2];
                         }
                         if (v.Mag() > MmumuSameSign && SSLep && Q1 == Q2) {
                             MmumuSameSign = v.Mag();
-                            imu1_SS = index[mu];
-                            imu2_SS = index2[mu2];
+                            jmu1_SS = index[mu];
+                            jmu2_SS = index2[mu2];
                         }
                     }
                 }
                 
                 OutputData.push_back(Mmumu);
                 OutputData.push_back(MmumuSameSign);
-                OutputData.push_back(imu1);
-                OutputData.push_back(imu2);
-                OutputData.push_back(imu1_SS);
-                OutputData.push_back(imu2_SS);
+                OutputData.push_back(jmu1);
+                OutputData.push_back(jmu2);
+                OutputData.push_back(jmu1_SS);
+                OutputData.push_back(jmu2_SS);
                 return OutputData;
             }// if at least 2 leptons
         else    
