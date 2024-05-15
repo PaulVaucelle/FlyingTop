@@ -11,176 +11,377 @@ class PropaHitPattern{
    public:
 
       //Constructor
-      PropaHitPattern(){        
-        Layer.push_back(make_pair(1160,2.959));//PIXBL1
-        Layer.push_back(make_pair(1168,6.778));//PIXBL2
-        Layer.push_back(make_pair(1176,10.89));//PIXBL3
-        Layer.push_back(make_pair(1184,16.));  //PIXBL4
-        Layer.push_back(make_pair(1416,23.83));//TIBL1
-        Layer.push_back(make_pair(1420,27.02));//TIBL1stereo
-        Layer.push_back(make_pair(1424,32.23));//TIBL2
-        Layer.push_back(make_pair(1428,35.41));//TIBL2stereo
-        Layer.push_back(make_pair(1432,41.75));//TIBL3
-        Layer.push_back(make_pair(1440,49.71));//TIBL4
-        Layer.push_back(make_pair(1672,60.43));//TOBL1
+      PropaHitPattern(int year){
+        Layer.clear();
+        Disk.clear();
+        DetailedLayer.clear();
+        DetailedDisk.clear();
 
-        Disk.push_back(make_pair(1288,32.35));//PXFdisk1
-        Disk.push_back(make_pair(1296,39.41));//PXFdisk2
-        Disk.push_back(make_pair(1304,48.96));//PXFdisk3
-        Disk.push_back(make_pair(1544,77.9)); //TIDWHeel1
-        Disk.push_back(make_pair(1548,80.71));//TIDWHeel1stereo
-        Disk.push_back(make_pair(1552,90.4)); //TIDWHeel2
-        Disk.push_back(make_pair(1556,94.02));//TIDWHeel2stereo
-        Disk.push_back(make_pair(1560,102.7));//TIDWHeel3
-        Disk.push_back(make_pair(1564,107.0));//TIDWHeel3stereo
-        Disk.push_back(make_pair(1800,131.6));//TECWHeel1
-        Disk.push_back(make_pair(1804,129.4));//TECWHeel1stereo
-        Disk.push_back(make_pair(1808,145.5));//TECWHeel2
-        Disk.push_back(make_pair(1812,142.8));//TECWHeel2stereo
-        Disk.push_back(make_pair(1816,160.1));//TECWHeel3
-        Disk.push_back(make_pair(1820,157.1));//TECWHeel3stereo
-        Disk.push_back(make_pair(1824,174.2));//TECWHeel4
-        Disk.push_back(make_pair(1828,172.7));//TECWHeel4stereo
-        Disk.push_back(make_pair(1832,188.4));//TECWHeel5
-        Disk.push_back(make_pair(1836,186.3));//TECWHeel5stereo
-        Disk.push_back(make_pair(1840,203.2));//TECWHeel6
-        Disk.push_back(make_pair(1844,203.8));//TECWHeel6stereo
-        Disk.push_back(make_pair(1848,222.2));//TECWHeel7}
+        if (year == 2018)
+          {
+            Layer.push_back(make_pair(1160,2.959));//PIXBL1
+            Layer.push_back(make_pair(1168,6.778));//PIXBL2
+            Layer.push_back(make_pair(1176,10.89));//PIXBL3
+            Layer.push_back(make_pair(1184,16.));  //PIXBL4
+            Layer.push_back(make_pair(1416,23.83));//TIBL1
+            Layer.push_back(make_pair(1420,27.02));//TIBL1stereo
+            Layer.push_back(make_pair(1424,32.23));//TIBL2
+            Layer.push_back(make_pair(1428,35.41));//TIBL2stereo
+            Layer.push_back(make_pair(1432,41.75));//TIBL3
+            Layer.push_back(make_pair(1440,49.71));//TIBL4
+            Layer.push_back(make_pair(1672,60.43));//TOBL1
 
-        //Rminus - Rplus - abs(z) 
-        // PXB
+            Disk.push_back(make_pair(1288,32.35));//PXFdisk1
+            Disk.push_back(make_pair(1296,39.41));//PXFdisk2
+            Disk.push_back(make_pair(1304,48.96));//PXFdisk3
+            Disk.push_back(make_pair(1544,77.9)); //TIDWHeel1
+            Disk.push_back(make_pair(1548,80.71));//TIDWHeel1stereo
+            Disk.push_back(make_pair(1552,90.4)); //TIDWHeel2
+            Disk.push_back(make_pair(1556,94.02));//TIDWHeel2stereo
+            Disk.push_back(make_pair(1560,102.7));//TIDWHeel3
+            Disk.push_back(make_pair(1564,107.0));//TIDWHeel3stereo
+            Disk.push_back(make_pair(1800,131.6));//TECWHeel1
+            Disk.push_back(make_pair(1804,129.4));//TECWHeel1stereo
+            Disk.push_back(make_pair(1808,145.5));//TECWHeel2
+            Disk.push_back(make_pair(1812,142.8));//TECWHeel2stereo
+            Disk.push_back(make_pair(1816,160.1));//TECWHeel3
+            Disk.push_back(make_pair(1820,157.1));//TECWHeel3stereo
+            Disk.push_back(make_pair(1824,174.2));//TECWHeel4
+            Disk.push_back(make_pair(1828,172.7));//TECWHeel4stereo
+            Disk.push_back(make_pair(1832,188.4));//TECWHeel5
+            Disk.push_back(make_pair(1836,186.3));//TECWHeel5stereo
+            Disk.push_back(make_pair(1840,203.2));//TECWHeel6
+            Disk.push_back(make_pair(1844,203.8));//TECWHeel6stereo
+            Disk.push_back(make_pair(1848,222.2));//TECWHeel7}
+          }
+        else if (year == 2017)
+          {
+            Layer.push_back(make_pair(1160,2.959));//PIXBL1
+            Layer.push_back(make_pair(1168,6.774));//PIXBL2
+            Layer.push_back(make_pair(1176,10.89));//PIXBL3
+            Layer.push_back(make_pair(1184,16.));  //PIXBL4
+            Layer.push_back(make_pair(1416,23.83));//TIBL1
+            Layer.push_back(make_pair(1420,27.02));//TIBL1stereo
+            Layer.push_back(make_pair(1424,32.23));//TIBL2
+            Layer.push_back(make_pair(1428,35.42));//TIBL2stereo
+            Layer.push_back(make_pair(1432,41.78));//TIBL3
+            Layer.push_back(make_pair(1440,49.75));//TIBL4
+            Layer.push_back(make_pair(1672,60.42));//TOBL1
+
+            Disk.push_back(make_pair(1288,32.36));//PXFdisk1
+            Disk.push_back(make_pair(1296,39.54));//PXFdisk2
+            Disk.push_back(make_pair(1304,49));//PXFdisk3
+            Disk.push_back(make_pair(1544,77.9)); //TIDWHeel1
+            Disk.push_back(make_pair(1548,80.66));//TIDWHeel1stereo
+            Disk.push_back(make_pair(1552,90.34)); //TIDWHeel2
+            Disk.push_back(make_pair(1556,93.91));//TIDWHeel2stereo
+            Disk.push_back(make_pair(1560,102.8));//TIDWHeel3
+            Disk.push_back(make_pair(1564,106.9));//TIDWHeel3stereo
+            Disk.push_back(make_pair(1800,131.6));//TECWHeel1
+            Disk.push_back(make_pair(1804,129.4));//TECWHeel1stereo
+            Disk.push_back(make_pair(1808,145.5));//TECWHeel2
+            Disk.push_back(make_pair(1812,142.8));//TECWHeel2stereo
+            Disk.push_back(make_pair(1816,160));//TECWHeel3
+            Disk.push_back(make_pair(1820,156.8));//TECWHeel3stereo
+            Disk.push_back(make_pair(1824,174));//TECWHeel4
+            Disk.push_back(make_pair(1828,172.8));//TECWHeel4stereo
+            Disk.push_back(make_pair(1832,188.1));//TECWHeel5
+            Disk.push_back(make_pair(1836,186.2));//TECWHeel5stereo
+            Disk.push_back(make_pair(1840,203.3));//TECWHeel6
+            Disk.push_back(make_pair(1844,203.8));//TECWHeel6stereo
+            Disk.push_back(make_pair(1848,223.7));//TECWHeel7}
+          }
+        else if (year == 2016)
+          {
+            Layer.push_back(make_pair(1160,4.376));//PIXBL1
+            Layer.push_back(make_pair(1168,7.274));//PIXBL2
+            Layer.push_back(make_pair(1176,10.17));//PIXBL3
+            Layer.push_back(make_pair(1184,16.));  //PIXBL4, no PIXBL4 in 2016
+            Layer.push_back(make_pair(1416,23.83));//TIBL1
+            Layer.push_back(make_pair(1420,27.02));//TIBL1stereo
+            Layer.push_back(make_pair(1424,32.23));//TIBL2
+            Layer.push_back(make_pair(1428,35.41));//TIBL2stereo
+            Layer.push_back(make_pair(1432,41.83));//TIBL3
+            Layer.push_back(make_pair(1440,49.75));//TIBL4
+            Layer.push_back(make_pair(1672,60.49));//TOBL1
+
+            Disk.push_back(make_pair(1288,35.55));//PXFdisk1
+            Disk.push_back(make_pair(1296,48.3));//PXFdisk2
+            Disk.push_back(make_pair(1304,48.96));//PXFdisk3, no PXFdisk3 in 2016
+            Disk.push_back(make_pair(1544,78.01)); //TIDWHeel1
+            Disk.push_back(make_pair(1548,80.59));//TIDWHeel1stereo
+            Disk.push_back(make_pair(1552,90.59)); //TIDWHeel2
+            Disk.push_back(make_pair(1556,94.0));//TIDWHeel2stereo
+            Disk.push_back(make_pair(1560,102.9));//TIDWHeel3
+            Disk.push_back(make_pair(1564,106.8));//TIDWHeel3stereo
+            Disk.push_back(make_pair(1800,131.6));//TECWHeel1
+            Disk.push_back(make_pair(1804,129.6));//TECWHeel1stereo
+            Disk.push_back(make_pair(1808,145.5));//TECWHeel2
+            Disk.push_back(make_pair(1812,142.8));//TECWHeel2stereo
+            Disk.push_back(make_pair(1816,160.1));//TECWHeel3
+            Disk.push_back(make_pair(1820,157.2));//TECWHeel3stereo
+            Disk.push_back(make_pair(1824,174.2));//TECWHeel4
+            Disk.push_back(make_pair(1828,172.8));//TECWHeel4stereo
+            Disk.push_back(make_pair(1832,188.2));//TECWHeel5
+            Disk.push_back(make_pair(1836,186.5));//TECWHeel5stereo
+            Disk.push_back(make_pair(1840,203.4));//TECWHeel6
+            Disk.push_back(make_pair(1844,204.3));//TECWHeel6stereo
+            Disk.push_back(make_pair(1848,227.1));//TECWHeel7}
+          }       
+
+
+
+        if (year == 2018 || year == 2017)
+          {
+                //Rminus - Rplus - abs(z) 
+                // PXB
+                //$$$$
+        //  *         DetailedLayer.push_back({2.26,3.5,27});// !!!!!! WARNING : Changes due to data/MC agreement being not that rgeat in the barrel region
+                //  *         // !!! Putting an large hypothetical layer that gathers beam pipe, pxl first layer, and same for pxl layers , more patatoide things than
+                  //  *           // !! a really precise map of the tracker. This is due to th algignmeent of the tracker being different between data/MC
+                //         DetailedLayer.push_back({2.74,2.855,27}); // 0.64
+                //         DetailedLayer.push_back({3.055,3.165,27});
+                //         DetailedLayer.push_back({3.275,3.375,27});
         //$$$$
-//  *         DetailedLayer.push_back({2.26,3.5,27});// !!!!!! WARNING : Changes due to data/MC agreement being not that rgeat in the barrel region
-        //  *         // !!! Putting an large hypothetical layer that gathers beam pipe, pxl first layer, and same for pxl layers , more patatoide things than
-          //  *           // !! a really precise map of the tracker. This is due to th algignmeent of the tracker being different between data/MC
-        //         DetailedLayer.push_back({2.74,2.855,27}); // 0.64
-        //         DetailedLayer.push_back({3.055,3.165,27});
-        //         DetailedLayer.push_back({3.275,3.375,27});
-//$$$$
-// corrected for PXB according to the observed reco layers in 2017-2018 data and MC
-// see /ui2_data1/blochd/LLTopAna/SecIntAna.C and output/h_SecInt_2017_data.root, ...
-        DetailedLayer.push_back({2.71,2.88,27}); // 0.64
-        DetailedLayer.push_back({3.02,3.17,27});
-        DetailedLayer.push_back({3.26,3.38,27});
-//$$$$         DetailedLayer.push_back({6.4,7.3,27}); // !!! large layer
-        //         DetailedLayer.push_back({6.578,6.627,27}); // 0.67
-        //         DetailedLayer.push_back({6.935,6.982,27});
-        //         DetailedLayer.push_back({7.205,7.25,27});
-        DetailedLayer.push_back({6.57,6.64,27}); // 0.67
-        DetailedLayer.push_back({6.92,7.01,27});
-        DetailedLayer.push_back({7.19,7.26,27});
-//$$$$         DetailedLayer.push_back({10.5,11.3,27}); // !!! large layer
-        //         DetailedLayer.push_back({10.707,10.738,27}); // 0.63
-        //         DetailedLayer.push_back({11.037,11.066,27});
-        //         DetailedLayer.push_back({11.307,11.336,27});
-        DetailedLayer.push_back({10.70,10.77,27}); // 0.63
-        DetailedLayer.push_back({11.02,11.11,27});
-        DetailedLayer.push_back({11.29,11.34,27});
-//$$$$         DetailedLayer.push_back({15.6,16.40,27}); // !!! large layer
-        //         DetailedLayer.push_back({15.815,15.836,27}); // 0.62
-        //         DetailedLayer.push_back({16.146,16.166,27});
-        //         DetailedLayer.push_back({16.416,16.436,27});
-        DetailedLayer.push_back({15.80,15.87,27}); // 0.62
-        DetailedLayer.push_back({16.13,16.22,27});
-        DetailedLayer.push_back({16.40,16.47,27});
-//$$$$
+        // corrected for PXB according to the observed reco layers in 2017-2018 data and MC
+        // see /ui2_data1/blochd/LLTopAna/SecIntAna.C and output/h_SecInt_2017_data.root, ...
+                DetailedLayer.push_back({2.71,2.88,27}); // 0.64
+                DetailedLayer.push_back({3.02,3.17,27});
+                DetailedLayer.push_back({3.26,3.38,27});
+        //$$$$         DetailedLayer.push_back({6.4,7.3,27}); // !!! large layer
+                //         DetailedLayer.push_back({6.578,6.627,27}); // 0.67
+                //         DetailedLayer.push_back({6.935,6.982,27});
+                //         DetailedLayer.push_back({7.205,7.25,27});
+                DetailedLayer.push_back({6.57,6.64,27}); // 0.67
+                DetailedLayer.push_back({6.92,7.01,27});
+                DetailedLayer.push_back({7.19,7.26,27});
+        //$$$$         DetailedLayer.push_back({10.5,11.3,27}); // !!! large layer
+                //         DetailedLayer.push_back({10.707,10.738,27}); // 0.63
+                //         DetailedLayer.push_back({11.037,11.066,27});
+                //         DetailedLayer.push_back({11.307,11.336,27});
+                DetailedLayer.push_back({10.70,10.77,27}); // 0.63
+                DetailedLayer.push_back({11.02,11.11,27});
+                DetailedLayer.push_back({11.29,11.34,27});
+        //$$$$         DetailedLayer.push_back({15.6,16.40,27}); // !!! large layer
+                //         DetailedLayer.push_back({15.815,15.836,27}); // 0.62
+                //         DetailedLayer.push_back({16.146,16.166,27});
+                //         DetailedLayer.push_back({16.416,16.436,27});
+                DetailedLayer.push_back({15.80,15.87,27}); // 0.62
+                DetailedLayer.push_back({16.13,16.22,27});
+                DetailedLayer.push_back({16.40,16.47,27});
+        //$$$$
 
-        //TIB
-        DetailedLayer.push_back({23.5,24.45,66}); // 1.0
-        DetailedLayer.push_back({26.7,27.85,66}); // 1.2
-        DetailedLayer.push_back({31.85,32.8,66}); // 1.1
-        DetailedLayer.push_back({35,36.2,66});    // 1.2
-        DetailedLayer.push_back({40,40.86,66});   // 4.0
-        DetailedLayer.push_back({43.15,44.05,66});
-        DetailedLayer.push_back({47.85,48.78,66});// 4.0
-        DetailedLayer.push_back({51.00,51.95,66}); 
+                //TIB
+                DetailedLayer.push_back({23.5,24.45,66}); // 1.0
+                DetailedLayer.push_back({26.7,27.85,66}); // 1.2
+                DetailedLayer.push_back({31.85,32.8,66}); // 1.1
+                DetailedLayer.push_back({35,36.2,66});    // 1.2
+                DetailedLayer.push_back({40,40.86,66});   // 4.0
+                DetailedLayer.push_back({43.15,44.05,66});
+                DetailedLayer.push_back({47.85,48.78,66});// 4.0
+                DetailedLayer.push_back({51.00,51.95,66}); 
 
-        //TOB
-        DetailedLayer.push_back({58.44,58.63,107});  // 4.5
-        DetailedLayer.push_back({59.525,59.71,107});
-        DetailedLayer.push_back({61.64,61.82,107});
-        DetailedLayer.push_back({62.725,62.9,107});
+                //TOB
+                DetailedLayer.push_back({58.44,58.63,107});  // 4.5
+                DetailedLayer.push_back({59.525,59.71,107});
+                DetailedLayer.push_back({61.64,61.82,107});
+                DetailedLayer.push_back({62.725,62.9,107});
 
-        //abs(Zminus) - abs(Zplus) - Rminus - Rplus  .... 
-	//PXF
-        DetailedDisk.push_back({29.6,32.2,9.6,16.1}); // 5.4
-        DetailedDisk.push_back({31,35,4.5,11});
-        DetailedDisk.push_back({37,39.5,9.6,16.1});   // 5.5
-        DetailedDisk.push_back({38.6,42.5,4.5,11});
-        DetailedDisk.push_back({46.6,49.4,9.6,16.1}); // 5.4
-        DetailedDisk.push_back({48,52,4.5,11});
+                //abs(Zminus) - abs(Zplus) - Rminus - Rplus  .... 
+          //PXF
+                DetailedDisk.push_back({29.6,32.2,9.6,16.1}); // 5.4
+                DetailedDisk.push_back({31,35,4.5,11});
+                DetailedDisk.push_back({37,39.5,9.6,16.1});   // 5.5
+                DetailedDisk.push_back({38.6,42.5,4.5,11});
+                DetailedDisk.push_back({46.6,49.4,9.6,16.1}); // 5.4
+                DetailedDisk.push_back({48,52,4.5,11});
 
-	//TID
-        DetailedDisk.push_back({74.38,76.82,38.5,50.2}); // 6.2
-        DetailedDisk.push_back({77.65,80.55,22.5,34.5});
-        DetailedDisk.push_back({81.18,83.78,31.5,42});   // 4.0
-        DetailedDisk.push_back({87.3,89.8,38.5,50});     // 6.2
-        DetailedDisk.push_back({90.6,93.5,22.5,35});
-        DetailedDisk.push_back({94.1,97,31.5,42});       // 3.2
-        DetailedDisk.push_back({100.27,102.77,38.5,50.5}); // 5.9
-        DetailedDisk.push_back({103.57,106.18,22.5,35});
-        DetailedDisk.push_back({107.6,109.68,31.5,42});  // 2.1
+          //TID
+                DetailedDisk.push_back({74.38,76.82,38.5,50.2}); // 6.2
+                DetailedDisk.push_back({77.65,80.55,22.5,34.5});
+                DetailedDisk.push_back({81.18,83.78,31.5,42});   // 4.0
+                DetailedDisk.push_back({87.3,89.8,38.5,50});     // 6.2
+                DetailedDisk.push_back({90.6,93.5,22.5,35});
+                DetailedDisk.push_back({94.1,97,31.5,42});       // 3.2
+                DetailedDisk.push_back({100.27,102.77,38.5,50.5}); // 5.9
+                DetailedDisk.push_back({103.57,106.18,22.5,35});
+                DetailedDisk.push_back({107.6,109.68,31.5,42});  // 2.1
 
-	//TEC
-        DetailedDisk.push_back({126.42,127.45,60,70}); // 5.7
-        DetailedDisk.push_back({126.42,127.45,22,32});
-        DetailedDisk.push_back({127.15,127.7,40,50});
-        DetailedDisk.push_back({129.65,130.2,50,62});
-        DetailedDisk.push_back({129.87,130.57,32,41});
-        DetailedDisk.push_back({133.6,134.6,60,68});
-        DetailedDisk.push_back({136.8,137.4,50,62});
-        DetailedDisk.push_back({134.3,134.7,40,50});
-        DetailedDisk.push_back({137,137.7,33,40});
-        DetailedDisk.push_back({134.3,134.6,22,32});
+          //TEC
+                DetailedDisk.push_back({126.42,127.45,60,70}); // 5.7
+                DetailedDisk.push_back({126.42,127.45,22,32});
+                DetailedDisk.push_back({127.15,127.7,40,50});
+                DetailedDisk.push_back({129.65,130.2,50,62});
+                DetailedDisk.push_back({129.87,130.57,32,41});
+                DetailedDisk.push_back({133.6,134.6,60,68});
+                DetailedDisk.push_back({136.8,137.4,50,62});
+                DetailedDisk.push_back({134.3,134.7,40,50});
+                DetailedDisk.push_back({137,137.7,33,40});
+                DetailedDisk.push_back({134.3,134.6,22,32});
 
-        DetailedDisk.push_back({140.42,141.45,60,70}); // 5.7
-        DetailedDisk.push_back({140.42,141.45,22,32});
-        DetailedDisk.push_back({141.15,141.7,40,50});
-        DetailedDisk.push_back({143.65,144.2,50,62});
-        DetailedDisk.push_back({143.87,144.57,32,41});
-        DetailedDisk.push_back({147.6,148.6,60,68});
-        DetailedDisk.push_back({150.8,151.4,50,62});
-        DetailedDisk.push_back({148.3,148.7,40,50});
-        DetailedDisk.push_back({151,151.7,33,40});
-        DetailedDisk.push_back({148.3,148.6,22,32});
+                DetailedDisk.push_back({140.42,141.45,60,70}); // 5.7
+                DetailedDisk.push_back({140.42,141.45,22,32});
+                DetailedDisk.push_back({141.15,141.7,40,50});
+                DetailedDisk.push_back({143.65,144.2,50,62});
+                DetailedDisk.push_back({143.87,144.57,32,41});
+                DetailedDisk.push_back({147.6,148.6,60,68});
+                DetailedDisk.push_back({150.8,151.4,50,62});
+                DetailedDisk.push_back({148.3,148.7,40,50});
+                DetailedDisk.push_back({151,151.7,33,40});
+                DetailedDisk.push_back({148.3,148.6,22,32});
 
-        DetailedDisk.push_back({154.42,155.45,60,70}); // 5.7
-        DetailedDisk.push_back({154.42,155.45,22,32});
-        DetailedDisk.push_back({155.15,155.7,40,50});
-        DetailedDisk.push_back({157.65,158.2,50,62});
-        DetailedDisk.push_back({157.87,158.57,32,41});
-        DetailedDisk.push_back({161.6,162.6,60,68});
-        DetailedDisk.push_back({164.8,165.4,50,62});
-        DetailedDisk.push_back({162.3,162.7,40,50});
-        DetailedDisk.push_back({165,165.7,33,40});
-        DetailedDisk.push_back({162.3,162.6,22,32});
+                DetailedDisk.push_back({154.42,155.45,60,70}); // 5.7
+                DetailedDisk.push_back({154.42,155.45,22,32});
+                DetailedDisk.push_back({155.15,155.7,40,50});
+                DetailedDisk.push_back({157.65,158.2,50,62});
+                DetailedDisk.push_back({157.87,158.57,32,41});
+                DetailedDisk.push_back({161.6,162.6,60,68});
+                DetailedDisk.push_back({164.8,165.4,50,62});
+                DetailedDisk.push_back({162.3,162.7,40,50});
+                DetailedDisk.push_back({165,165.7,33,40});
+                DetailedDisk.push_back({162.3,162.6,22,32});
 
-        DetailedDisk.push_back({168.42,169.45,60,70}); // 5.7
-        DetailedDisk.push_back({169.15,169.7,40,50});
-        DetailedDisk.push_back({171.65,172.2,50,62});
-        DetailedDisk.push_back({171.87,172.57,32,41});
-        DetailedDisk.push_back({175.6,176.6,60,68});
-        DetailedDisk.push_back({178.8,179.4,50,62});
-        DetailedDisk.push_back({176.3,176.7,40,50});
-        DetailedDisk.push_back({179,179.7,33,40});
+                DetailedDisk.push_back({168.42,169.45,60,70}); // 5.7
+                DetailedDisk.push_back({169.15,169.7,40,50});
+                DetailedDisk.push_back({171.65,172.2,50,62});
+                DetailedDisk.push_back({171.87,172.57,32,41});
+                DetailedDisk.push_back({175.6,176.6,60,68});
+                DetailedDisk.push_back({178.8,179.4,50,62});
+                DetailedDisk.push_back({176.3,176.7,40,50});
+                DetailedDisk.push_back({179,179.7,33,40});
 
-        DetailedDisk.push_back({182.42,183.45,60,70}); // 5.7
-        DetailedDisk.push_back({183.15,183.7,40,50});
-        DetailedDisk.push_back({185.65,186.2,50,62});
-        DetailedDisk.push_back({185.87,186.57,32,41});
-        DetailedDisk.push_back({189.6,190.6,60,68});
-        DetailedDisk.push_back({192.8,193.4,50,62});
-        DetailedDisk.push_back({190.3,190.7,40,50});
-        DetailedDisk.push_back({193,193.7,33,40});
+                DetailedDisk.push_back({182.42,183.45,60,70}); // 5.7
+                DetailedDisk.push_back({183.15,183.7,40,50});
+                DetailedDisk.push_back({185.65,186.2,50,62});
+                DetailedDisk.push_back({185.87,186.57,32,41});
+                DetailedDisk.push_back({189.6,190.6,60,68});
+                DetailedDisk.push_back({192.8,193.4,50,62});
+                DetailedDisk.push_back({190.3,190.7,40,50});
+                DetailedDisk.push_back({193,193.7,33,40});
 
-        DetailedDisk.push_back({200.42,201.45,60,70});
-        DetailedDisk.push_back({201.15,201.7,40,50});
-        DetailedDisk.push_back({203.65,204.2,50,62});
-        DetailedDisk.push_back({203.87,204.57,32,41});
-        DetailedDisk.push_back({207.6,208.6,60,68});
-        DetailedDisk.push_back({210.8,211.4,50,62});
-        DetailedDisk.push_back({208.3,208.7,40,50});
-        DetailedDisk.push_back({211,211.7,33,40});
+                DetailedDisk.push_back({200.42,201.45,60,70});
+                DetailedDisk.push_back({201.15,201.7,40,50});
+                DetailedDisk.push_back({203.65,204.2,50,62});
+                DetailedDisk.push_back({203.87,204.57,32,41});
+                DetailedDisk.push_back({207.6,208.6,60,68});
+                DetailedDisk.push_back({210.8,211.4,50,62});
+                DetailedDisk.push_back({208.3,208.7,40,50});
+                DetailedDisk.push_back({211,211.7,33,40});
+          }
+        else if (year == 2016)
+          {
+            //Rminus - Rplus - abs(z) 
+            // PXB ( only 3 layers of PXB in 2016 )
+            //$$$$
+            //  *         DetailedLayer.push_back({2.26,3.5,27});// !!!!!! WARNING : Changes due to data/MC agreement being not that rgeat in the barrel region
+            //  *         // !!! Putting an large hypothetical layer that gathers beam pipe, pxl first layer, and same for pxl layers , more patatoide things than
+              //  *           // !! a really precise map of the tracker. This is due to th algignmeent of the tracker being different between data/MC
+            //$$$$
+            DetailedLayer.push_back({4.136,4.215,27}); // 0.64
+            DetailedLayer.push_back({4.612,4.684,27});
+            
+            DetailedLayer.push_back({7.048,7.095,27}); // 0.67
+            DetailedLayer.push_back({7.522,7.566,27});
+        
+            DetailedLayer.push_back({9.92,9.954,27}); // 0.63
+            DetailedLayer.push_back({10.396,10.424,27});
+
+
+            //TIB
+            DetailedLayer.push_back({23.5,24.8,66}); // 1.0
+            DetailedLayer.push_back({26.9,27.85,66}); // 1.2
+            DetailedLayer.push_back({31.85,33.2,66}); // 1.1
+            DetailedLayer.push_back({35,36.2,66});    // 1.2
+            DetailedLayer.push_back({39.9,40.86,66});   // 4.0
+            DetailedLayer.push_back({43.05,44.02,66});
+            DetailedLayer.push_back({47.85,48.79,66});// 4.0
+            DetailedLayer.push_back({51.00,51.95,66}); 
+
+            //TOB ( only TOB layer 1) 
+            DetailedLayer.push_back({58.44,58.63,107});  // 4.5
+            DetailedLayer.push_back({59.525,59.705,107});
+            DetailedLayer.push_back({61.64,61.82,107});
+            DetailedLayer.push_back({62.725,62.9,107});
+
+            //abs(Zminus) - abs(Zplus) - Rminus - Rplus  .... 
+            //PXF
+
+            DetailedDisk.push_back({33,38,5.8,14.5});
+            DetailedDisk.push_back({46.,51,5.8,14.5}); // 5.4
+
+              //TID
+            DetailedDisk.push_back({74.38,76.82,38.5,51}); // 6.2
+            DetailedDisk.push_back({77.67,80.5,22.,35});
+            DetailedDisk.push_back({81.18,84.01,31.5,42});   // 4.0
+            DetailedDisk.push_back({87.3,89.8,38.5,51});     // 6.2
+            DetailedDisk.push_back({90.6,93.5,22,35});
+            DetailedDisk.push_back({94.1,97,31.5,42});       // 3.2
+            DetailedDisk.push_back({100.27,102.77,38.5,51}); // 5.9
+            DetailedDisk.push_back({103.57,106.4,22.5,35});
+            DetailedDisk.push_back({107.06,109.92,31.5,42});  // 2.1
+
+            //TEC
+            DetailedDisk.push_back({126.42,127.45,60,71}); // 5.7
+            DetailedDisk.push_back({126.42,127.45,22.5,32.5});
+            DetailedDisk.push_back({127.15,127.65,40,50.5});
+            DetailedDisk.push_back({129.65,130.2,50,62});
+            DetailedDisk.push_back({129.87,130.57,31.5,41});
+            DetailedDisk.push_back({133.6,134.6,60,71});
+            DetailedDisk.push_back({136.85,137.34,50,62});
+            DetailedDisk.push_back({134.3,134.8,40,50.5});
+            DetailedDisk.push_back({137.02,137.37,31.5,42});
+            DetailedDisk.push_back({134.3,134.62,22,32});
+
+            DetailedDisk.push_back({140.42,141.45,60,71}); // 5.7
+            DetailedDisk.push_back({140.42,141.45,22.5,32.5});
+            DetailedDisk.push_back({141.15,141.66,40,50.5});
+            DetailedDisk.push_back({143.65,144.2,50,62});
+            DetailedDisk.push_back({143.87,144.9,31.5,41});
+            DetailedDisk.push_back({147.6,148.6,60,71});
+            DetailedDisk.push_back({150.85,151.34,50,62});
+            DetailedDisk.push_back({148.3,148.7,40,50.5});
+            DetailedDisk.push_back({151.04,151.38,32,40});
+            DetailedDisk.push_back({148.3,148.81,22,32});
+
+            DetailedDisk.push_back({154.42,155.45,60,70}); // 5.7
+            DetailedDisk.push_back({154.42,155.45,22.5,32.5});
+            DetailedDisk.push_back({155.15,155.7,40,50.5});
+            DetailedDisk.push_back({157.65,158.2,50,62});
+            DetailedDisk.push_back({157.87,158.57,32,41});
+            DetailedDisk.push_back({161.6,162.6,60,71});
+            DetailedDisk.push_back({164.85,165.4,50,62});
+            DetailedDisk.push_back({162.3,162.8,40,50.5});
+            DetailedDisk.push_back({165.05,165.38,32,41});
+            DetailedDisk.push_back({162.3,162.6,22.5,32.5});
+
+            DetailedDisk.push_back({168.42,169.45,60,71}); // 5.7
+            DetailedDisk.push_back({169.15,169.7,40,50.5});
+            DetailedDisk.push_back({171.65,172.2,50,62});
+            DetailedDisk.push_back({171.87,172.57,32,41});
+            DetailedDisk.push_back({175.6,176.6,60,71});
+            DetailedDisk.push_back({178.85,179.4,50,62});
+            DetailedDisk.push_back({176.3,176.7,40,50.5});
+            DetailedDisk.push_back({179.04,179.38,32,41});
+
+            DetailedDisk.push_back({182.42,183.45,60,71}); // 5.7
+            DetailedDisk.push_back({183.15,183.7,40,50.5});
+            DetailedDisk.push_back({185.65,186.2,50,62});
+            DetailedDisk.push_back({185.87,186.57,32,41});
+            DetailedDisk.push_back({189.6,190.6,60,71});
+            DetailedDisk.push_back({192.85,193.4,50,62});
+            DetailedDisk.push_back({190.3,190.7,40,50.5});
+            DetailedDisk.push_back({193,193.7,33,40});
+
+            DetailedDisk.push_back({199.9,201.45,60,71});
+            DetailedDisk.push_back({201.15,201.7,40,50.5});
+            DetailedDisk.push_back({203.65,204.2,50,62});
+            DetailedDisk.push_back({203.87,204.57,32,41});
+            DetailedDisk.push_back({207.08,207.82,60,71});
+            DetailedDisk.push_back({210.85,211.4,50,62});
+            DetailedDisk.push_back({208.3,208.7,40,50.5});
+            DetailedDisk.push_back({211,211.7,32,41});
+          }
+
       }
 
       // Needed Initialisation of the Tracker DAtaBase. The radius and the uncertainties are computed from the first hit of the tracks in RECO dataTier.
