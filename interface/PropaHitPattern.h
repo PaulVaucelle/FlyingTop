@@ -129,54 +129,45 @@ class PropaHitPattern{
             Disk.push_back(make_pair(1848,227.1));//TECWHeel7}
           }       
 
-
-
         if (year == 2018 || year == 2017)
+        // corrected according to the observed reco layers in 2017-2018 emu data
+        // see /ui2_data1/blochd/LLTopAna/SecIntAna.C and output/h_SecInt_2017_data.root and _2018_data.root
           {
                 //Rminus - Rplus - abs(z) 
                 // PXB
-                //$$$$
-        //  *         DetailedLayer.push_back({2.26,3.5,27});// !!!!!! WARNING : Changes due to data/MC agreement being not that rgeat in the barrel region
-                //  *         // !!! Putting an large hypothetical layer that gathers beam pipe, pxl first layer, and same for pxl layers , more patatoide things than
-                  //  *           // !! a really precise map of the tracker. This is due to th algignmeent of the tracker being different between data/MC
                 //         DetailedLayer.push_back({2.74,2.855,27}); // 0.64
                 //         DetailedLayer.push_back({3.055,3.165,27});
                 //         DetailedLayer.push_back({3.275,3.375,27});
-        //$$$$
-        // corrected for PXB according to the observed reco layers in 2017-2018 data and MC
-        // see /ui2_data1/blochd/LLTopAna/SecIntAna.C and output/h_SecInt_2017_data.root, ...
                 DetailedLayer.push_back({2.71,2.88,27}); // 0.64
                 DetailedLayer.push_back({3.02,3.17,27});
                 DetailedLayer.push_back({3.26,3.38,27});
-        //$$$$         DetailedLayer.push_back({6.4,7.3,27}); // !!! large layer
                 //         DetailedLayer.push_back({6.578,6.627,27}); // 0.67
                 //         DetailedLayer.push_back({6.935,6.982,27});
                 //         DetailedLayer.push_back({7.205,7.25,27});
-                DetailedLayer.push_back({6.57,6.64,27}); // 0.67
-                DetailedLayer.push_back({6.92,7.01,27});
-                DetailedLayer.push_back({7.19,7.26,27});
-        //$$$$         DetailedLayer.push_back({10.5,11.3,27}); // !!! large layer
+		DetailedLayer.push_back({6.57,6.64,27}); // 0.67
+		DetailedLayer.push_back({6.92,7.01,27});
+		DetailedLayer.push_back({7.19,7.26,27});
                 //         DetailedLayer.push_back({10.707,10.738,27}); // 0.63
                 //         DetailedLayer.push_back({11.037,11.066,27});
                 //         DetailedLayer.push_back({11.307,11.336,27});
-                DetailedLayer.push_back({10.70,10.77,27}); // 0.63
-                DetailedLayer.push_back({11.02,11.11,27});
-                DetailedLayer.push_back({11.29,11.34,27});
-        //$$$$         DetailedLayer.push_back({15.6,16.40,27}); // !!! large layer
+		DetailedLayer.push_back({10.70,10.77,27}); // 0.63
+		DetailedLayer.push_back({11.02,11.11,27});
+		DetailedLayer.push_back({11.29,11.34,27});
                 //         DetailedLayer.push_back({15.815,15.836,27}); // 0.62
                 //         DetailedLayer.push_back({16.146,16.166,27});
                 //         DetailedLayer.push_back({16.416,16.436,27});
-                DetailedLayer.push_back({15.80,15.87,27}); // 0.62
-                DetailedLayer.push_back({16.13,16.22,27});
+		DetailedLayer.push_back({15.80,15.87,27}); // 0.62
+		DetailedLayer.push_back({16.13,16.22,27});
                 DetailedLayer.push_back({16.40,16.47,27});
-        //$$$$
 
                 //TIB
-                DetailedLayer.push_back({23.5,24.45,66}); // 1.0
+                //         DetailedLayer.push_back({23.5,24.45,66}); // 1.0
+                DetailedLayer.push_back({23.3,24.45,66}); // 1.0
                 DetailedLayer.push_back({26.7,27.85,66}); // 1.2
                 DetailedLayer.push_back({31.85,32.8,66}); // 1.1
                 DetailedLayer.push_back({35,36.2,66});    // 1.2
-                DetailedLayer.push_back({40,40.86,66});   // 4.0
+                //         DetailedLayer.push_back({40,40.86,66});   // 4.0
+                DetailedLayer.push_back({39.6,40.86,66});   // 4.0
                 DetailedLayer.push_back({43.15,44.05,66});
                 DetailedLayer.push_back({47.85,48.78,66});// 4.0
                 DetailedLayer.push_back({51.00,51.95,66}); 
@@ -269,26 +260,35 @@ class PropaHitPattern{
                 DetailedDisk.push_back({211,211.7,33,40});
           }
         else if (year == 2016)
+//$$
+        // corrected according to the observed reco layers in 2016 emu data
+        // see /ui2_data1/blochd/LLTopAna/SecIntAna.C and output/h_SecInt_2016_data.root
+//$$
           {
             //Rminus - Rplus - abs(z) 
             // PXB ( only 3 layers of PXB in 2016 )
-            //$$$$
-            //  *         DetailedLayer.push_back({2.26,3.5,27});// !!!!!! WARNING : Changes due to data/MC agreement being not that rgeat in the barrel region
-            //  *         // !!! Putting an large hypothetical layer that gathers beam pipe, pxl first layer, and same for pxl layers , more patatoide things than
-              //  *           // !! a really precise map of the tracker. This is due to th algignmeent of the tracker being different between data/MC
-            //$$$$
-            DetailedLayer.push_back({4.136,4.215,27}); // 0.64
-            DetailedLayer.push_back({4.612,4.684,27});
-            
-            DetailedLayer.push_back({7.048,7.095,27}); // 0.67
-            DetailedLayer.push_back({7.522,7.566,27});
+//$$
+//             DetailedLayer.push_back({4.136,4.215,27}); // 0.64
+//             DetailedLayer.push_back({4.612,4.684,27});
+            DetailedLayer.push_back({4.136,4.26,27}); // 0.64
+            DetailedLayer.push_back({4.60,4.72,27});
+           
+//             DetailedLayer.push_back({7.048,7.095,27}); // 0.67
+//             DetailedLayer.push_back({7.522,7.566,27});
+            DetailedLayer.push_back({7.04,7.18,27}); // 0.67
+            DetailedLayer.push_back({7.50,7.64,27});
         
-            DetailedLayer.push_back({9.92,9.954,27}); // 0.63
-            DetailedLayer.push_back({10.396,10.424,27});
-
+//             DetailedLayer.push_back({9.92,9.954,27}); // 0.63
+//             DetailedLayer.push_back({10.396,10.424,27});
+            DetailedLayer.push_back({9.90,10.06,27}); // 0.63
+            DetailedLayer.push_back({10.38,10.54,27});
+//$$
 
             //TIB
-            DetailedLayer.push_back({23.5,24.8,66}); // 1.0
+//$$
+//             DetailedLayer.push_back({23.5,24.8,66});  // 1.0
+//$$
+            DetailedLayer.push_back({23.4,24.8,66});  // 1.0
             DetailedLayer.push_back({26.9,27.85,66}); // 1.2
             DetailedLayer.push_back({31.85,33.2,66}); // 1.1
             DetailedLayer.push_back({35,36.2,66});    // 1.2
@@ -305,11 +305,13 @@ class PropaHitPattern{
 
             //abs(Zminus) - abs(Zplus) - Rminus - Rplus  .... 
             //PXF
-
             DetailedDisk.push_back({33,38,5.8,14.5});
-            DetailedDisk.push_back({46.,51,5.8,14.5}); // 5.4
+//$$
+//             DetailedDisk.push_back({46.,51,5.8,14.5}); // 5.4
+            DetailedDisk.push_back({46,51.4,5.8,14.5}); // 5.4 // according to 2016 data
+//$$
 
-              //TID
+            //TID
             DetailedDisk.push_back({74.38,76.82,38.5,51}); // 6.2
             DetailedDisk.push_back({77.67,80.5,22.,35});
             DetailedDisk.push_back({81.18,84.01,31.5,42});   // 4.0
@@ -539,15 +541,21 @@ class PropaHitPattern{
 
 //NEW 20/03/2023
       //The following method is a more detailed mapping of the cms tracker (not complete atm) => until TOB L1 and TEC Wheel5
-      int VertexBelongsToTracker(float VTX_r, float VTX_z)
+      int VertexBelongsToTracker(float VTX_r, float VTX_z, int year)
         {
           std::vector<std::vector<float> > disk = this->diskDDB();
           float* stdisk_Exp = this->stddiskDDB_Exp();
           std::vector<std::vector<float> > cyl = this->CylDDB();
           float* stdcyl_Exp = this->stdCylDDB_Exp();
           int IsInTracker = 0;
-          
-          for (int j=0; j<24; j++)
+          int nBarrelLayer = 24;
+          int nDiskLayer = 69;
+          if (year == 2016)
+            {
+              nBarrelLayer = 18;
+              nDiskLayer = 65;
+            }
+          for (int j=0; j<nBarrelLayer; j++)
                       {
               float ModuleThickness_2 = (cyl[j][1]-cyl[j][0])/2; // (rmax-rmin)/2
               float thickness = TMath::Sqrt(ModuleThickness_2*ModuleThickness_2+stdcyl_Exp[j]*stdcyl_Exp[j]/1.64/1.64); // thickness/2 + 1 sigma resolution
@@ -557,7 +565,7 @@ class PropaHitPattern{
               if (VTX_r >= down && VTX_r <= up && abs(VTX_z) <= cyl[j][2] ) {IsInTracker=1; return 1;} // && VTX_r<20
               // else if (j==22 && (VTX_r<down || VTX_r>up)){IsInTracker = 0;}
             }
-          for (int j=0; j<69; j++)
+          for (int j=0; j<nDiskLayer; j++)
             {
               float ModuleThickness_2 = (disk[j][1]-disk[j][0])/2; // (zmax-zmin)/2
               float thickness = TMath::Sqrt(ModuleThickness_2*ModuleThickness_2+stdisk_Exp[j]*stdisk_Exp[j]/1.64/1.64); // thickness/2 + 1 sigma resolution
