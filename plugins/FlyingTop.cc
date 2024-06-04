@@ -380,16 +380,13 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     float ntrk40; /*!*/
     float dR; /*!*/
     float dRmax; /*!*/
-//$$$$$$
 //     float dzTopu;
 //     float dzSigTopu;
-//$$$$$$
     float TibHit;
     float TobHit;
     float PixBarHit;
     float TecHit;
     float isLost;
-//$$$$$$
 //     float ntrk10rel;
 //     float ntrk20rel;
 //     float ntrk30rel;
@@ -397,7 +394,6 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
 //     float ntrk20reltot;
 //     float ntrk30reltot;
 //     float ntrk40reltot;
-//$$$$$$
     //Track level BDT for displaced track selection
     TMVA::Reader *reader = new TMVA::Reader( "!Color:Silent" );
 
@@ -818,10 +814,8 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float>    tree_track_dz;  // with respect to PV
     std::vector<float>    tree_track_dzError;
     std::vector<float>    tree_track_dzSig;
-//$$$$$$
 //     std::vector<float>    tree_track_dzTOpu;  // with respect to clostest PU
 //     std::vector<float>    tree_track_dzSigTOpu;
-//$$$$$$
 //     http://cmsdoxygen.web.cern.ch/cmsdoxygen/CMSSW_10_1_3/doc/html/d8/df2/classreco_1_1TrackBase.html#aca7611bd1a33d535cefc72b6e497ece8
 
     std::vector<int>      tree_track_nHit;
@@ -862,12 +856,10 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector< bool >   tree_track_Hemi_ping;
     std::vector< float >  tree_track_Hemi_dFirstVtx;
     std::vector< int >    tree_track_Hemi_LLP;
-//$$$$$$
 //     std::vector< float >  tree_track_Hemi_d0;
 //     std::vector< float >  tree_track_Hemi_d0Sig;
 //     std::vector< float >  tree_track_HemiOp_d0;
 //     std::vector< float >  tree_track_HemiOp_d0Sig;
-//$$$$$$
     std::vector< int >    tree_track_Hemi_isjet;
 
     std::vector< int >    tree_track_sim_LLP;
@@ -886,7 +878,6 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector< float >  tree_track_sim_LLP_r;
     std::vector< float >  tree_track_sim_LLP_z;
    
-//$$$$
     std::vector<bool>     tree_V0_track_isFromV0;
     std::vector<bool>     tree_V0_track_isFromSI;
     std::vector<bool>     tree_V0_track_lost;
@@ -913,7 +904,6 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector< int >    tree_V0_track_Hemi;
     std::vector< float >  tree_V0_track_Hemi_dR;
     std::vector< float >  tree_V0_track_Hemi_dRmax;
-//$$$$
    
     //--------------------------------
     // gen infos -------
@@ -975,6 +965,9 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector< int >   tree_genFromLLP_mother_pdgId;
     std::vector< bool >  tree_genFromLLP_isFromB;
     std::vector< bool >  tree_genFromLLP_isFromC;
+
+    std::vector< float > tree_gen_top_pt;
+    std::vector< float > tree_gen_top_rw_pt;
 
     std::vector< float > tree_genAxis_dRneuneu;
     std::vector< float > tree_genAxis_dPhineuneu;
@@ -1218,7 +1211,17 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     bool HLT_PFMET250_HBHECleaned_v;   // USED
     bool HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v;   // USED
 
-
+    //------------------------------------
+    /// - Propagators init. ---------------
+    ///------------------------------------
+    // DO NOT PUT THOSE LINES IN THE EVENT LOOP !!!
+    // These lines initiliaze the tracker maps fro 2016 and 2017-2018
+    // These are arrays that need to be defined here to avoid huge RAM usage when running on the grid
+  
+    PropaHitPattern* PHP = new PropaHitPattern();
+    PropaHitPattern* NI = new PropaHitPattern();
+    PropaHitPattern* posPHP = new PropaHitPattern();
+    PropaHitPattern* negPHP = new PropaHitPattern();
 };
 
 
@@ -1619,10 +1622,8 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_track_dz",           &tree_track_dz);
     smalltree->Branch("tree_track_dzError",      &tree_track_dzError  );
     smalltree->Branch("tree_track_dzSig",        &tree_track_dzSig);
-//$$$$$$
 //     smalltree->Branch("tree_track_dzTOpu",       &tree_track_dzTOpu);
 //     smalltree->Branch("tree_track_dzSigTOpu",    &tree_track_dzSigTOpu  );
-//$$$$$$
     smalltree->Branch("tree_track_nHit",         &tree_track_nHit);
     smalltree->Branch("tree_track_nHitPixel",    &tree_track_nHitPixel);
     smalltree->Branch("tree_track_nHitTIB",      &tree_track_nHitTIB);
@@ -1659,12 +1660,10 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_track_Hemi_ping",      &tree_track_Hemi_ping);
     smalltree->Branch("tree_track_Hemi_dFirstVtx", &tree_track_Hemi_dFirstVtx);
     smalltree->Branch("tree_track_Hemi_LLP",       &tree_track_Hemi_LLP);
-//$$$$$$
 //     smalltree->Branch("tree_track_Hemi_d0",        &tree_track_Hemi_d0);
 //     smalltree->Branch("tree_track_Hemi_d0Sig",     &tree_track_Hemi_d0Sig);
 //     smalltree->Branch("tree_track_HemiOp_d0",      &tree_track_HemiOp_d0);
 //     smalltree->Branch("tree_track_HemiOp_d0Sig",   &tree_track_HemiOp_d0Sig);
-//$$$$$$
     smalltree->Branch("tree_track_Hemi_isjet",&tree_track_Hemi_isjet);
     
     // info about the simulated track from LLP matched to the reco track
@@ -1684,7 +1683,6 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_track_sim_LLP_r",      &tree_track_sim_LLP_r );
     smalltree->Branch("tree_track_sim_LLP_z",      &tree_track_sim_LLP_z );
 
-//$$$$
     // tracks from V0 (and SI) candidate
     smalltree->Branch("tree_V0_track_isFromV0",     &tree_V0_track_isFromV0);
     smalltree->Branch("tree_V0_track_isFromSI",     &tree_V0_track_isFromSI);
@@ -1712,7 +1710,6 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_V0_track_Hemi",         &tree_V0_track_Hemi);
     smalltree->Branch("tree_V0_track_Hemi_dR",      &tree_V0_track_Hemi_dR);
     smalltree->Branch("tree_V0_track_Hemi_dRmax",   &tree_V0_track_Hemi_dRmax);
-//$$$$
 
     // gen info
     smalltree->Branch("tree_GenPVx" ,  &tree_GenPVx);
@@ -1771,6 +1768,9 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_genFromLLP_mother_pdgId" , &tree_genFromLLP_mother_pdgId);
     smalltree->Branch("tree_genFromLLP_isFromB" ,      &tree_genFromLLP_isFromB);
     smalltree->Branch("tree_genFromLLP_isFromC" ,      &tree_genFromLLP_isFromC);
+
+    smalltree->Branch("tree_gen_top_pt",             &tree_gen_top_pt);
+    smalltree->Branch("tree_gen_top_rw_pt",          &tree_gen_top_rw_pt);
 
     smalltree->Branch("tree_genAxis_dRneuneu",       &tree_genAxis_dRneuneu);
     smalltree->Branch("tree_genAxis_dPhineuneu",     &tree_genAxis_dPhineuneu);
@@ -2070,7 +2070,6 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     // reader->AddVariable( "mva_track_firstHit_x", &firsthit_X); /*!*/
     // reader->AddVariable( "mva_track_firstHit_y", &firsthit_Y); /*!*/
     // reader->AddVariable( "mva_track_firstHit_z", &firsthit_Z); /*!*/
-//$$$$$$
 //     reader->AddVariable( "mva_track_dxy",     &dxy);
 //     reader->AddVariable( "mva_track_dz",      &dz);
 //     reader->AddVariable( "mva_track_pt",      &pt );
@@ -2087,13 +2086,9 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
 //     reader->AddVariable( "mva_track_dR",      &dR);
 //     reader->AddVariable( "mva_track_dRmax",   &dRmax);
 //     reader->AddVariable(" mva_track_lost", &isLost);
-//$$$$$$
     // updated 240510:
-//     reader->AddVariable( "mva_track_dxy",     &dxy);
-//     reader->AddVariable( "mva_track_dz",      &dz);
     reader->AddVariable( "mva_track_pt",      &pt );
     reader->AddVariable( "mva_track_eta",     &eta );
-//     reader->AddVariable( "mva_track_nchi2",   &NChi );
     reader->AddVariable( "mva_track_nhits",   &nhits );
     reader->AddVariable( "mva_ntrk10",        &ntrk10);
     reader->AddVariable( "mva_ntrk20",        &ntrk20);
@@ -2105,7 +2100,6 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     reader->AddVariable( "mva_track_dR",      &dR);
     reader->AddVariable( "mva_track_dRmax",   &dRmax);
     reader->AddVariable(" mva_track_lost",    &isLost);
-//$$$$$$
 
     // reader->AddVariable(" mva_track_dxyError", &dxyError); /*!*/
     // reader->AddVariable(" mva_track_dzTOpu", &dzTopu);//added on 24/03/2023 : if using bdts generated before this date, =>crash
@@ -2148,6 +2142,8 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     readerVtxStep1->AddVariable(" mva_Vtx_MeanDCA",  &mva_V_MeanDCA);
 
     readerVtxStep1->BookMVA("BDTG",weightFileVtxStep1_);
+
+
 }
 
 
@@ -2190,6 +2186,12 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   float x_bmp = 0., y_bmp = 0.;
   float x_det = 0., y_det = 0.;
   if ( !isMC_ ) {
+//$$$$
+    if ( YEAR_ == 2016 ) {
+      x_bmp =  0.12; y_bmp =  0.04;
+      x_det = -0.02; y_det = -0.08;
+//$$$$
+    }
     if ( YEAR_ == 2017 ) {
       x_bmp =  0.12; y_bmp = -0.19;
       x_det =  0.12; y_det = -0.12;
@@ -2200,14 +2202,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     }
   }
 
-  //------------------------------------
-/// - Propagators init. ---------------
-///------------------------------------
 
-    PropaHitPattern* PHP = new PropaHitPattern(YEAR_);
-    PropaHitPattern* NI = new PropaHitPattern(YEAR_);
-    PropaHitPattern* posPHP = new PropaHitPattern(YEAR_);
-    PropaHitPattern* negPHP = new PropaHitPattern(YEAR_);
   //  ---------------------------------------------------------------- //
 
   runNumber   = iEvent.id().run();
@@ -2218,7 +2213,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   
   PUweight = 1;
   Prefweight = 1;
-
+  tree_genTop_Weight = 1;
   using namespace edm;
   using namespace reco;
   using namespace pat;
@@ -2862,7 +2857,10 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     imu2 = DiLeptonData[3];
     imu1_SS = DiLeptonData[4];
     imu2_SS = DiLeptonData[5];
+
+
   }// end of Emu Channel
+
 
   //---------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!----------/////
   // After that for mumu and ee chanels: call the leading lepton by imu1 index and the sub leading lepton by imu2 index
@@ -2875,6 +2873,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   ////////   FILTER CHECK  /////////
   //////////////////////////////////
   //////////////////////////////////
+
   tree_only_tigger_filter = false;
   tree_Filter = false;
   tree_FilterSameSign = false;
@@ -2890,7 +2889,6 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
   // bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v;    // USED in 2016-2018                                                                                                             
   // bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v; // USED in 2016-2018  
-
 
   if (YEAR_ == 2018)
     {
@@ -2916,7 +2914,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     //if ( (HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v || HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v || HLT_Ele27_WPTight_Gsf_v || HLT_IsoMu24_v || HLT_IsoTkMu24_v) && EMuChannel )  tree_only_tigger_filter = true;        // only for H data                                                                                          
   }//else 
 
-if (YEAR_ == 2018)
+  if (YEAR_ == 2018)
   {
     if ( ( HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v || HLT_IsoMu24_v  ) // for all data and MC
         && nmu >= 2 && MuonChannel ) {
@@ -2936,11 +2934,7 @@ if (YEAR_ == 2018)
     }
   }
 
-
-
-
-
-else if (YEAR_ == 2017)
+  else if (YEAR_ == 2017)
   {
     if ( ( HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v ||  HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v || HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v||  HLT_IsoMu27_v ) 
     	 //if(( HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v ||  HLT_IsoMu27_v )//only for data runs B                                                                             
@@ -2963,12 +2957,7 @@ else if (YEAR_ == 2017)
     }
   }
 
-
-
-
-
-
-else if (YEAR_ == 2016)
+  else if (YEAR_ == 2016)
   {
     if ( ( HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v || HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v || HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v || HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v || HLT_IsoMu24_v || HLT_IsoTkMu24_v)//for MC 
              //if((HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v || HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v || HLT_IsoMu24_v || HLT_IsoTkMu24_v) && nmu >= 2 && MuonChannel ) {//only for data B-G    //if((HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v || HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v || HLT_IsoMu24_v || HLT_IsoTkMu24_v) && nmu >= 2 && MuonChannel) {//only for data  H                
@@ -3009,10 +2998,10 @@ else if (YEAR_ == 2016)
   /////////    lepton informations    ///////////
   ///////////////////////////////////////////////
 
-  if ( !tree_Filter && tree_FilterSameSign ) {
-    imu1 = imu1_SS;
-    imu2 = imu2_SS;
-  }
+  // if ( !tree_Filter && tree_FilterSameSign ) {
+  //   imu1 = imu1_SS;
+  //   imu2 = imu2_SS;
+  // }
 
   TLorentzVector Vlep1, Vlep2, vll;
   float lep1_pt=0, lep2_pt=0, lep1_eta=0, lep2_eta=0, lep1_phi=0, lep2_phi=0;
@@ -3045,14 +3034,14 @@ else if (YEAR_ == 2016)
     lep2_mass = el_mass;
   }
   if ( EMuChannel ) {
-          if(tree_Good_PV){
-	tree_reco_muon_leadingpt.push_back(tree_muon_pt[imu1] );
-	tree_reco_electron_leadingpt2.push_back(tree_electron_pt[imu2]);
-	tree_reco_muon_leadingeta.push_back(tree_muon_eta[imu1]);
-	tree_reco_electron_leadingeta2.push_back(tree_electron_eta[imu2]);
-	tree_reco_muon_leadingphi.push_back(tree_muon_phi[imu1] );
-	tree_reco_electron_leadingphi2.push_back(tree_electron_phi[imu2] );
-	if(tree_only_tigger_filter){
+    if (tree_Good_PV) {
+      tree_reco_muon_leadingpt.push_back(tree_muon_pt[imu1] );
+      tree_reco_electron_leadingpt2.push_back(tree_electron_pt[imu2]);
+      tree_reco_muon_leadingeta.push_back(tree_muon_eta[imu1]);
+      tree_reco_electron_leadingeta2.push_back(tree_electron_eta[imu2]);
+      tree_reco_muon_leadingphi.push_back(tree_muon_phi[imu1] );
+      tree_reco_electron_leadingphi2.push_back(tree_electron_phi[imu2] );
+      if (tree_only_tigger_filter) {
         tree_trig_muon_leadingpt.push_back(tree_muon_pt[imu1] );
         tree_trig_electron_leadingpt2.push_back(tree_electron_pt[imu2]);
         tree_trig_muon_leadingeta.push_back(tree_muon_eta[imu1]);
@@ -3060,7 +3049,7 @@ else if (YEAR_ == 2016)
         tree_trig_muon_leadingphi.push_back(tree_muon_phi[imu1]);
         tree_trig_electron_leadingphi2.push_back(tree_electron_phi[imu2]);
       }//end of trigger loop                                                                                                                                              
-  }//end of Good PV   
+    }//end of Good PV   
 
     lep1_pt  = tree_muon_pt[imu1];
     lep2_pt  = tree_electron_pt[imu2];
@@ -3074,38 +3063,38 @@ else if (YEAR_ == 2016)
     lep2_mass = el_mass;
     if ( tree_electron_pt[imu2] > tree_muon_pt[imu1] ) LeadingMuon = false;
 
-  Evts_muon1_pt    = lep1_pt;
-  Evts_muon2_pt    = lep2_pt;
-  Evts_muon1_eta   = lep1_eta;
-  Evts_muon2_eta   = lep2_eta;
-  Evts_muon1_phi   = lep1_phi;
-  Evts_muon2_phi   = lep2_phi;
-  if ( !LeadingMuon ) {
-    Evts_muon1_pt  = lep2_pt;
-    Evts_muon2_pt  = lep1_pt;
-  }
-      if(tree_Good_PV){
-	tree_reco_lepton_leadingpt.push_back(Evts_muon1_pt );
-	tree_reco_lepton_leadingpt2.push_back(  Evts_muon2_pt );
-	tree_reco_lepton_leadingeta.push_back(Evts_muon1_eta );
-	tree_reco_lepton_leadingeta2.push_back(Evts_muon2_eta );
-	tree_reco_lepton_leadingphi.push_back(Evts_muon1_phi );
-	tree_reco_lepton_leadingphi2.push_back(Evts_muon2_phi );
-	if(tree_only_tigger_filter){
-	  tree_trig_lepton_leadingpt.push_back(Evts_muon1_pt );
-	  tree_trig_lepton_leadingpt2.push_back(Evts_muon2_pt);
-	  tree_trig_lepton_leadingeta.push_back(Evts_muon1_eta );
-	  tree_trig_lepton_leadingeta2.push_back(Evts_muon2_eta);
-	  tree_trig_lepton_leadingphi.push_back(Evts_muon1_phi);
-	  tree_trig_lepton_leadingphi2.push_back(Evts_muon2_phi);
-	} // end trigger check                                                                                                                                              
-      }// Good PV 
+    Evts_muon1_pt    = lep1_pt;
+    Evts_muon2_pt    = lep2_pt;
+    Evts_muon1_eta   = lep1_eta;
+    Evts_muon2_eta   = lep2_eta;
+    Evts_muon1_phi   = lep1_phi;
+    Evts_muon2_phi   = lep2_phi;
+    if ( !LeadingMuon ) {
+      Evts_muon1_pt  = lep2_pt;
+      Evts_muon2_pt  = lep1_pt;
+    }
+    if (tree_Good_PV) {
+      tree_reco_lepton_leadingpt.push_back(Evts_muon1_pt );
+      tree_reco_lepton_leadingpt2.push_back(  Evts_muon2_pt );
+      tree_reco_lepton_leadingeta.push_back(Evts_muon1_eta );
+      tree_reco_lepton_leadingeta2.push_back(Evts_muon2_eta );
+      tree_reco_lepton_leadingphi.push_back(Evts_muon1_phi );
+      tree_reco_lepton_leadingphi2.push_back(Evts_muon2_phi );
+      if (tree_only_tigger_filter) {
+        tree_trig_lepton_leadingpt.push_back(Evts_muon1_pt );
+        tree_trig_lepton_leadingpt2.push_back(Evts_muon2_pt);
+        tree_trig_lepton_leadingeta.push_back(Evts_muon1_eta );
+        tree_trig_lepton_leadingeta2.push_back(Evts_muon2_eta);
+        tree_trig_lepton_leadingphi.push_back(Evts_muon1_phi);
+        tree_trig_lepton_leadingphi2.push_back(Evts_muon2_phi);
+      } // end trigger check																		  
+    }// Good PV 
   }
 
   Vlep1.SetPtEtaPhiM(lep1_pt,lep1_eta,lep1_phi,lep1_mass);
   Vlep2.SetPtEtaPhiM(lep2_pt,lep2_eta,lep2_phi,lep2_mass);
   vll = Vlep1 + Vlep2;
-    if(tree_Good_PV && tree_Mmumu > 10){
+    if (tree_Good_PV && tree_Mmumu > 10) {
       tree_ll_pt.push_back(vll.Pt());
       tree_ll_eta.push_back(vll.Eta());
       tree_ll_phi.push_back(vll.Phi());
@@ -3273,24 +3262,27 @@ else if (YEAR_ == 2016)
         // 	     << " x y z " << genIt.vx() << " " << genIt.vy() << " " << genIt.vz() << " " << endl; 
         // }
       }
+      // Computation of Top SF 
 
       if (ID == 6)
         {
-          if (genIt.isLastCopy())
+          if (genIt.isLastCopy())//required by the Top PAG
             {
               ntop++;
-              // tree_gen_top_pt.push_back(Gen_pt);
+              
+              tree_gen_top_pt.push_back(Gen_pt);
               if (ntop == 1)
                 {
-                  TopWeight = 0.103*exp(-0.0118*Gen_pt)-0.000134*Gen_pt+0.973;
-                  if (showlog)std::cout<<"TopWeight : "<<TopWeight<<" fro the : "<<ntop<<" top quark"<<std::endl;
+                  TopWeight = exp(0.0615-0.0005*Gen_pt);
+                  if (showlog)std::cout<<"TopWtpo_weieight : "<<TopWeight<<" fro the : "<<ntop<<" top quark"<<std::endl;
                 }
               if (ntop == 2)
                 {
-                  TopWeight = sqrt(TopWeight*(0.103*exp(-0.0118*Gen_pt)-0.000134*Gen_pt+0.973));
+                  TopWeight = sqrt(TopWeight*exp(0.0615-0.0005*Gen_pt));
                   if (showlog) std::cout<<"TopWeight : "<<TopWeight<<" fro the : "<<ntop<<" top quark"<<std::endl;
                 }
               tree_genTop_Weight = TopWeight;
+              tree_gen_top_rw_pt.push_back(TopWeight*Gen_pt);
             }
         }
       // neutralino from smuon
@@ -3796,12 +3788,12 @@ else if (YEAR_ == 2016)
           }
       } // end loop over gen muons
 
-// std::cout<<"ngen prompt muons = "<<nGenLepton<<std::endl;
+      // std::cout<<"ngen prompt muons = "<<nGenLepton<<std::endl;
     } // end loop over gen jets
 
-    // ///////////////////////////////
-    // // Invariant Mass of GenAxes 
-    // ///////////////////////////////
+    ///////////////////////////////
+    // Invariant Mass of GenAxes 
+    ///////////////////////////////
     
     float temp_px1 = GenVaxis1.Px();
     float temp_py1 = GenVaxis1.Py();
@@ -4005,7 +3997,7 @@ else if (YEAR_ == 2016)
       tree_Yc_r.push_back(	   Yr);
       
       int VtxLayerNI = -10;
-      if ( DetailedMap ) VtxLayerNI = NI->VertexBelongsToTracker(Yr, Yz);
+      if ( DetailedMap ) VtxLayerNI = NI->VertexBelongsToTracker(Yr, Yz,YEAR_);
       else { // deprecated
           VtxLayerNI = NI->VertexBelongsToBarrelLayer(Yr, Yz);
           if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(Yr, Yz);
@@ -4081,11 +4073,11 @@ else if (YEAR_ == 2016)
   //////////////////////////////////
   //////////////////////////////////
  
-    mva_Evts_muon1_pt    = lep1_pt;
-    mva_Evts_muon2_pt    = lep2_pt;
-    mva_Evts_muon12_dR   = Deltar(lep1_eta, lep1_phi, lep2_eta, lep2_phi);
-    mva_Evts_muon12_dPhi = abs( Deltaphi(lep1_phi, lep2_phi) );
-    mva_Evts_muon12_dEta = abs( lep1_eta - lep2_eta );
+  mva_Evts_muon1_pt    = lep1_pt;
+  mva_Evts_muon2_pt    = lep2_pt;
+  mva_Evts_muon12_dR   = Deltar(lep1_eta, lep1_phi, lep2_eta, lep2_phi);
+  mva_Evts_muon12_dPhi = abs( Deltaphi(lep1_phi, lep2_phi) );
+  mva_Evts_muon12_dEta = abs( lep1_eta - lep2_eta );
 
   tree_lepton_leadingpt.push_back(   mva_Evts_muon1_pt );  
   tree_lepton_leadingpt2.push_back(  mva_Evts_muon2_pt );
@@ -4093,7 +4085,6 @@ else if (YEAR_ == 2016)
   tree_lepton_leadingeta2.push_back( lep2_eta );
   tree_lepton_leadingphi.push_back( lep1_phi );
   tree_lepton_leadingphi2.push_back( lep2_phi );
-
 
   tree_lepton_lepton_dR.push_back(   mva_Evts_muon12_dR );
   tree_lepton_lepton_dPhi.push_back( mva_Evts_muon12_dPhi );
@@ -4122,9 +4113,9 @@ else if (YEAR_ == 2016)
 
   for (const pat::Jet &jet : *jets) 
   {
-    
-  if ( jet.pt() < jet_pt_min ) continue;
-  if ( !jet.userInt("tightLepVetoId") ) continue;
+    if ( jet.pt() < jet_pt_min ) continue;
+    if ( !jet.userInt("tightLepVetoId") ) continue;
+
     indjet++;
     float NHF                 = jet.neutralHadronEnergyFraction();
     float NEMF                = jet.neutralEmEnergyFraction();
@@ -4213,22 +4204,22 @@ else if (YEAR_ == 2016)
     tree_njet++;
 
     bool PromptLeptonJetMatching = false ; 
-        float dRmujet1 = Deltar( jet.eta(), jet.phi(), lep1_eta, lep1_phi );
+    float dRmujet1 = Deltar( jet.eta(), jet.phi(), lep1_eta, lep1_phi );
     float dRmujet2 = Deltar( jet.eta(), jet.phi(), lep2_eta, lep2_phi );
-        if ( dRmujet1 < 0.4 || dRmujet2 < 0.4 ) PromptLeptonJetMatching = true;
-        if ( !PromptLeptonJetMatching ) tree_njetNOmu++;
+    if ( dRmujet1 < 0.4 || dRmujet2 < 0.4 ) PromptLeptonJetMatching = true;
+    if ( !PromptLeptonJetMatching ) tree_njetNOmu++;
 
   } // end jet loop
 
   tree_HT = HT_val;
 
-    /////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////
   ////////////   ONLY EVENTS WITH JETS !   ////////////
   /////////////////////////////////////////////////////
 
-//   if ( tree_njetNOmu == 0 ) // not tree_njet ?
+  //   if ( tree_njetNOmu == 0 ) // not tree_njet ?
   //   {
-//     tree_jet_jet_dR.push_back(0);
+  //     tree_jet_jet_dR.push_back(0);
     //     tree_jet_jet_dPhi.push_back(0);
     //     tree_jet_jet_dEta.push_back(0);
     //     tree_jet_leadingpt.push_back(0);
@@ -5011,7 +5002,7 @@ else if (YEAR_ == 2016)
             float Phi = positiveTrackRef.phi();
             float vz  = positiveTrackRef.vz();
             
-            std::pair<int,GloballyPositioned<float>::PositionType> posFHPosition = posPHP->Main(firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
+            std::pair<int,GloballyPositioned<float>::PositionType> posFHPosition = posPHP->Main(YEAR_,firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
             float xF = posFHPosition.second.x() - PV.x();
             float yF = posFHPosition.second.y() - PV.y();
             float rF = TMath::Sqrt( xF*xF + yF*yF );
@@ -5067,7 +5058,7 @@ else if (YEAR_ == 2016)
             float Phi = negativeTrackRef.phi();
             float vz  = negativeTrackRef.vz();
             
-            std::pair<int,GloballyPositioned<float>::PositionType> negFHPosition = negPHP->Main(firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
+            std::pair<int,GloballyPositioned<float>::PositionType> negFHPosition = negPHP->Main(YEAR_,firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
             float xF = negFHPosition.second.x() - PV.x();
             float yF = negFHPosition.second.y() - PV.y();
             float rF = TMath::Sqrt( xF*xF + yF*yF );
@@ -5471,7 +5462,7 @@ else if (YEAR_ == 2016)
           float Phi = TrackRef.phi();
           float vz  = TrackRef.vz();
           
-          std::pair<int,GloballyPositioned<float>::PositionType> FHPosition = PHP->Main(firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
+          std::pair<int,GloballyPositioned<float>::PositionType> FHPosition = PHP->Main(YEAR_,firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
 
           float xF = FHPosition.second.x() - PV.x();
           float yF = FHPosition.second.y() - PV.y();
@@ -5736,7 +5727,7 @@ else if (YEAR_ == 2016)
         // / With this correction => everything is in the (0,0) reference frame
 
         int VtxLayerNI = -1;
-        if (DetailedMap) VtxLayerNI = NI->VertexBelongsToTracker(SecInt_r, SecInt_z);
+        if (DetailedMap) VtxLayerNI = NI->VertexBelongsToTracker(SecInt_r, SecInt_z,YEAR_);
         else { // deprecated
           VtxLayerNI = NI->VertexBelongsToBarrelLayer(SecInt_r, SecInt_z);
           if ( VtxLayerNI == 0 ) VtxLayerNI = NI->VertexBelongsToDiskLayer(SecInt_r, SecInt_z);
@@ -5755,26 +5746,32 @@ else if (YEAR_ == 2016)
             idxSecIntMGT[trd2].first = true;
 	  }
 	  // PIXB inner support
-          if ( abs(SecInt_z) < 27. && SecInt_r > 2.44 && SecInt_r < 2.55 ) {
+//$$$$          if ( abs(SecInt_z) < 27. && SecInt_r > 2.44 && SecInt_r < 2.55 ) {
+          if ( abs(SecInt_z) < 27. &&
+               ( (YEAR_ == 2016 && SecInt_r > 3.67 && SecInt_r < 3.79) || 
+                 (YEAR_ >= 2017 && SecInt_r > 2.43 && SecInt_r < 2.55) ) ) {
 	    VtxLayerNI = -2;
             idxSecIntMGT[trd1].first = true;
             idxSecIntMGT[trd2].first = true;
 	  }
+//$$$$
 	  // PIXB outer support
-          if ( SecInt_r > 21.4 && SecInt_r < 22.1 ) {
+//$$$$          if ( SecInt_r > 21.4 && SecInt_r < 22.1 ) {
+          if ( SecInt_r > 21.3 && SecInt_r < 22.1 ) {
 	    VtxLayerNI = -3;
             idxSecIntMGT[trd1].first = true;
             idxSecIntMGT[trd2].first = true;
 	  }
 	  // PIXB rails
 	  if ( abs(SecInt_z) < 27. && abs(SecInt_x) < 10. && 
-	       abs(SecInt_y) > 18.9 && abs(SecInt_y) < 20.9 ) {
+//$$$$	       abs(SecInt_y) > 18.9 && abs(SecInt_y) < 20.9 ) {
+	       abs(SecInt_y) > 18.7 && abs(SecInt_y) < 20.8 ) {
 	    VtxLayerNI = -4;
             idxSecIntMGT[trd1].first = true;
             idxSecIntMGT[trd2].first = true;
 	  }
 	  // services : r 18 - 19 and z 29 - 200 according to "other" material map
-	  if ( abs(SecInt_z) > 29. && SecInt_r > 18.0 && SecInt_r < 20.6 ) {
+          if ( abs(SecInt_z) > 29. && SecInt_r > 18.0 && SecInt_r < 20.6 ) {
 	    VtxLayerNI = -3;
             idxSecIntMGT[trd1].first = true;
             idxSecIntMGT[trd2].first = true;
@@ -5910,7 +5907,6 @@ else if (YEAR_ == 2016)
       tree_track_dzSig.push_back    (tk_dzSig);
       tree_track_energy.push_back   (tk_e);
 
-//$$$$$$
 //       // Tracks from pileup
 //       float tk_dzmin = 100.;
 //       float tk_dzminSig = 100000.;
@@ -5925,7 +5921,6 @@ else if (YEAR_ == 2016)
 //       }
 //       tree_track_dzTOpu.push_back       (tk_dzmin);
 //       tree_track_dzSigTOpu.push_back    (tk_dzminSig);
-//$$$$$$
 
       tree_track_isHighPurity.push_back (static_cast<int>(tk.quality(reco::TrackBase::highPurity)));
       tree_track_nHit.push_back	        (tk_nHit);
@@ -5965,9 +5960,9 @@ else if (YEAR_ == 2016)
  
       // Approximation for the lostTrack since the hitpattern information is not available (only 1160, tracking POG knows about it but do not seem to care)      
       if ( ipc >= pc->size() ) {
-        if ( abs(tk_eta) < 1. && YEAR_ >= 2017) firsthit = 1184; // PIXBL4 in barrel
+        if ( abs(tk_eta) < 1. && YEAR_ >= 2017)     firsthit = 1184; // PIXBL4 in barrel
         else if (abs(tk_eta) < 1. && YEAR_ == 2016) firsthit = 1176;
-        else		      firsthit = 1296; // PIXFD2 in forward
+        else                                        firsthit = 1296; // PIXFD2 in forward
       }      
  
       tree_track_firstHit.push_back(firsthit);
@@ -5987,7 +5982,7 @@ else if (YEAR_ == 2016)
       float vz  = tk_vz;
       //------Propagation with new interface --> See ../interface/PropaHitPattern.h-----//
       
-      std::pair<int,GloballyPositioned<float>::PositionType> FHPosition = PHP->Main(firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
+      std::pair<int,GloballyPositioned<float>::PositionType> FHPosition = PHP->Main(YEAR_,firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
       // returns 0 if in Barrel, 1 if disks with the position of the firsthit. Different propagators are used between 
       // barrel (StraightLinePlaneCrossing/geometry if propagator does not work)
       // and disks (HelixPlaneCrossing) 
@@ -6024,8 +6019,8 @@ else if (YEAR_ == 2016)
       else	        {tree_track_iJet.push_back (-1); tree_track_btag.push_back(-1);}
 
       // match to gen particle from LLP decay
-      if ( isMC_ )
-      {
+    if ( isMC_ )
+    {
       int      kmatch = -1;
       float    dFirstGenMin = 1000000.;
       int      track_sim_LLP = -1;
@@ -6204,9 +6199,9 @@ else if (YEAR_ == 2016)
     // --------- Track Selection BDT WPs --- //
     // ------------------------------------- //
 
-//$$$$$$
-    double bdtcut = 0.92; //Tight WP      // ttbar ~ 1E-3 : selection efficiency
-//$$$$$$
+//$$
+    double bdtcut = 0.94; //Tight WP      // ttbar ~ 1E-3 : selection efficiency
+//$$
     double bdtcut_step2 = 0.0; //Loose WP // ttbar ~ 1E-2
  
     //---------------------------//
@@ -6225,11 +6220,8 @@ else if (YEAR_ == 2016)
       dz         = abs(tree_track_dz[counter_track]);
       drSig      = tree_track_drSig[counter_track];
       dzSig      = tree_track_dzSig[counter_track];
-
-//$$$$$$
 //       dzTopu     = tree_track_dzTOpu[counter_track];
 //       dzSigTopu  = tree_track_dzSigTOpu[counter_track];
-//$$$$$$
       TibHit     = tree_track_nHitTIB[counter_track] ;
       TobHit     = tree_track_nHitTOB[counter_track] ;
       PixBarHit  = tree_track_nHitPXB[counter_track];
@@ -6291,7 +6283,6 @@ else if (YEAR_ == 2016)
         ntrk40 = ntrk40_lost;
       }
       
-//$$$$$$
 //       if ( ntrk40 == 0 ) {
 //         ntrk10rel = -0.02;
 //         ntrk20rel = -0.02;
@@ -6314,7 +6305,6 @@ else if (YEAR_ == 2016)
 //         ntrk30reltot = ntrk30 / tree_nTracks; 
 //         ntrk40reltot = ntrk40 / tree_nTracks; 
 //       }
-//$$$$$$
 
       // - Apply BDT -------------------
       bdtval = reader->EvaluateMVA( "BDTG" ); // default value = -10 (no -10 observed and -999 comes from EvaluateMVA)
@@ -6358,13 +6348,6 @@ else if (YEAR_ == 2016)
       else if ( tracks_axis == 2 ) tree_track_Hemi_LLP.push_back(iLLPrec2);
       else		           tree_track_Hemi_LLP.push_back(0);
 
-      // float x_tk = tree_track_x[counter_track] - tree_PV_x;   
-      // float y_tk = tree_track_y[counter_track] - tree_PV_y; 
-      // float dr = abs(tree_track_dxy[counter_track]);
-      // float drSig = tree_track_drSig[counter_track];
-      // float phi_tk = tree_track_phi[counter_track];   
-
-//$$$$$$
 //       // linear intercept of track and its hemisphere axis in transverse plane 
 //       float xT = (y_tk - x_tk*tan(phi_tk)) / (tan(vaxis1.Phi()) - tan(phi_tk));
 //       float yT = xT * tan(vaxis1.Phi());
@@ -6400,7 +6383,6 @@ else if (YEAR_ == 2016)
 //         tree_track_HemiOp_d0.push_back(0);
 //         tree_track_HemiOp_d0Sig.push_back(0);
 //       }
-//$$$$$$
       
     } //End loop on all the tracks
     
@@ -6451,7 +6433,6 @@ else if (YEAR_ == 2016)
     // tree_Hemi2_MVAvalTT = HEMI2_BDTvalTT;
 
 
-//$$$$
     //---------------------------------------------------------------//
     //----------- STORE TRACKS FROM V0s (AND SEC. INT.) -------------//
     //---------------------------------------------------------------//
@@ -6547,7 +6528,7 @@ else if (YEAR_ == 2016)
       float vz  = tk_vz;
       //------Propagation with new interface --> See ../interface/PropaHitPattern.h-----//
       
-      std::pair<int,GloballyPositioned<float>::PositionType> FHPosition = PHP->Main(firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
+      std::pair<int,GloballyPositioned<float>::PositionType> FHPosition = PHP->Main(YEAR_, firsthit,Prop,Surtraj,Eta,Phi,vz,P3D2,B3DV);
       // returns 0 if in Barrel, 1 if disks with the position of the firsthit. Different propagators are used between 
       // barrel (StraightLinePlaneCrossing/geometry if propagator does not work)
       // and disks (HelixPlaneCrossing) 
@@ -6628,7 +6609,6 @@ else if (YEAR_ == 2016)
       tree_V0_track_ntrk40.push_back(ntrk40);
 
     } // end loop on V0 (and SI) track candidates
-//$$$$
 
 
     /////////////////////////////////////////
@@ -7088,9 +7068,7 @@ else if (YEAR_ == 2016)
       {
         VtxHemi1->IAVFVertexing(displacedTracks_step2_Hemi1,Track_FirstHit_step2_Hemi1,ActivateStep4,true,false,0.,10.,&PVPos);
         if ( VtxHemi1->chi2()>0 && VtxHemi1->chi2()<10 ) Vtx_step = 4;
-//$$$$$$
         else  Vtx_step = 0;
-//$$$$$$ 
         TightVertex = false;
       }
 
@@ -7163,9 +7141,7 @@ else if (YEAR_ == 2016)
           {
             VtxHemi1->AVFVertexing(displacedTracks_step2_Hemi1);
             Vtx_step = 3; 
-//$$$$$$
 	    if ( !(VtxHemi1->chi2()>0 && VtxHemi1->chi2()<10) ) Vtx_step = 0; 
-//$$$$$$
             TightVertex = false;       
           }
         Vtx_x = VtxHemi1->x();
@@ -7382,9 +7358,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
       {
         VtxHemi2->IAVFVertexing(displacedTracks_step2_Hemi2,Track_FirstHit_step2_Hemi2,ActivateStep4,true,false,0.,10.,&PVPos);
         if ( VtxHemi2->chi2()>0 && VtxHemi2->chi2()<10 ) Vtx_step = 4;
-//$$$$$$
         else  Vtx_step = 0;
-//$$$$$$ 
         TightVertex = false;
       }
 
@@ -7456,9 +7430,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
           {
             VtxHemi2->AVFVertexing(displacedTracks_step2_Hemi2);
             Vtx_step = 3;
-//$$$$$$
 	    if ( !(VtxHemi2->chi2()>0 && VtxHemi2->chi2()<10) ) Vtx_step = 0; 
-//$$$$$$
             TightVertex = false;       
           }
         Vtx_x = VtxHemi2->x();
@@ -8027,11 +7999,8 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                 if ( badVtx  && NewTTracks.size() > 1 && (ActivateStep4 || IterAVF) && !NewTightVertex)
                   {
                     VtxSec->IAVFVertexing(NewTTracks,FHNewTTrack,true,true,false,0.,10.,&PVPos);
-                    //$$
-                    if ( VtxSec->chi2() > 0. && VtxSec->chi2() < 10.) SecStep = 4; // missing ?
-                    //$$$$$$
-                                  else SecStep = 0;
-                    //$$$$$$ 
+                    if ( VtxSec->chi2() > 0. && VtxSec->chi2() < 10.) SecStep = 4;
+                    else SecStep = 0;
                   }
 
                   float SecVtx_x = VtxSec->x();
@@ -8046,7 +8015,6 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                   float SecSumWeight	 = VtxSec->SumWeight();
 
                   TLorentzVector NewVtxVector(0,0,0,0);
-                  //$$          if ( SecVtx_chi== -10 && SecStep == 4 ) SecVtx_Trks.clear();
                   if ( SecVtx_chi== -10 ) SecVtx_Trks.clear();
                   for (unsigned int i = 0 ; i <SecVtx_Trks.size(); i++)
                     {
@@ -8124,9 +8092,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                                           DCA_VTX_Meand = SecDCA_VTX_Meand;
                                           MergedVtxMass = NewVtxVector.Mag(); 
                                         }
-                                        //$$
-                                            // else do nothing (MergeVtx informations still valid)
-                                        //$$
+                                      // else do nothing (MergeVtx informations still valid)
                                     }
                                   else if ( eventNewStep == -1 ) // both vtx are tight=> final vtx is tight
                                     {
@@ -8260,9 +8226,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
             	     
               //  } // SecVtx is Valid
 
-        //$$
         } // endif merge vertex is valid (just to be cautious)
-        //$$
 
       } // end of critera for merging
       else {
@@ -8799,10 +8763,8 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_track_dz.clear();
     tree_track_dzError.clear();
     tree_track_dzSig.clear();
-//$$$$$$
 //     tree_track_dzTOpu.clear();
 //     tree_track_dzSigTOpu.clear();
-//$$$$$$
     tree_track_nHit.clear();
     tree_track_nHitPixel.clear();
     tree_track_nHitTIB.clear();
@@ -8838,12 +8800,10 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_track_Hemi_ping.clear();
     tree_track_Hemi_dFirstVtx.clear();
     tree_track_Hemi_LLP.clear();
-//$$$$$$
 //     tree_track_Hemi_d0.clear();
 //     tree_track_Hemi_d0Sig.clear();
 //     tree_track_HemiOp_d0.clear();
 //     tree_track_HemiOp_d0Sig.clear();
-//$$$$$$
     tree_track_Hemi_isjet.clear();
         
     tree_track_sim_LLP.clear();
@@ -8862,7 +8822,6 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_track_sim_LLP_r.clear();
     tree_track_sim_LLP_z.clear();
 
-//$$$$
     tree_V0_track_isFromV0.clear();
     tree_V0_track_isFromSI.clear();
     tree_V0_track_lost.clear();
@@ -8889,7 +8848,6 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_V0_track_Hemi.clear();
     tree_V0_track_Hemi_dR.clear();
     tree_V0_track_Hemi_dRmax.clear();
-//$$$$
 
     tree_genParticle_pt.clear();
     tree_genParticle_eta.clear();
@@ -8937,6 +8895,9 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_genFromLLP_mother_pdgId.clear();
     tree_genFromLLP_isFromB.clear();
     tree_genFromLLP_isFromC.clear();
+
+    tree_gen_top_pt.clear();
+    tree_gen_top_rw_pt.clear();
 
     tree_genAxis_dRneuneu.clear();
     tree_genAxis_dPhineuneu.clear();
