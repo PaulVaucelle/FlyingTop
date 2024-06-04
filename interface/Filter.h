@@ -73,7 +73,7 @@ std::vector<float> DiLeptonMass(bool SSLep, int nLep, int nAllLepton, std::vecto
         float mupt1, mueta1, muphi1, mupt2, mueta2, muphi2;
         if (nLep >= 1 && nLep2 >= 1 ) 
             {
-                for (int mu = 0; mu < nAllLepton - 1; mu++) {
+                for (int mu = 0; mu < nAllLepton; mu++) {
                     // if (!isPrompt[index[mu]]) continue;
                     if (!ID[index[mu]]) continue;
                     if (!ISO[index[mu]]) continue;
