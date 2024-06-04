@@ -1,0 +1,189 @@
+#!/usr/bin/env python
+"""
+This is a small script that does the equivalent of multicrab.
+"""
+import os
+from optparse import OptionParser
+
+
+from datetime import date
+
+
+import CRABClient
+from CRABAPI.RawCommand import crabCommand
+from CRABClient.ClientExceptions import ClientException
+from httplib import HTTPException
+
+
+def getOptions():
+    """
+    Parse and return the arguments provided by the user.
+    """
+    usage = ("Usage: %prog --crabCmd CMD [--workArea WAD --crabCmdOpts OPTS]"
+             "\nThe multicrab command executes 'crab CMD OPTS' for each project directory contained in WAD"
+             "\nUse multicrab -h for help")
+
+    parser = OptionParser(usage=usage)
+
+    parser.add_option('-c', '--crabCmd',
+                      dest = 'crabCmd',
+                      default = '',
+                      help = "crab command",
+                      metavar = 'CMD')
+
+    parser.add_option('-w', '--workArea',
+                      dest = 'workArea',
+                      default = '',
+                      help = "work area directory (only if CMD != 'submit')",
+                      metavar = 'WAD')
+
+    parser.add_option('-o', '--crabCmdOpts',
+                      dest = 'crabCmdOpts',
+                      default = '',
+                      help = "options for crab command CMD",
+                      metavar = 'OPTS')
+
+    (options, arguments) = parser.parse_args()
+
+    if arguments:
+        parser.error("Found positional argument(s): %s." % (arguments))
+    if not options.crabCmd:
+        parser.error("(-c CMD, --crabCmd=CMD) option not provided.")
+    if options.crabCmd != 'submit':
+        if not options.workArea:
+            parser.error("(-w WAR, --workArea=WAR) option not provided.")
+        if not os.path.isdir(options.workArea):
+            parser.error("'%s' is not a valid directory." % (options.workArea))
+
+    return options
+
+
+def main():
+
+    options = getOptions()
+
+    # The submit command needs special treatment.
+    if options.crabCmd == 'submit':
+        today = date.today()
+        d1 = today.strftime("%d_%m_%Y")
+        #--------------------------------------------------------
+        # This is the base config:
+        #--------------------------------------------------------
+        from CRABClient.UserUtilities import config
+        config = config()
+
+        config.General.requestName = None
+        config.General.workArea = "Crab_09_04_24/2017/dataE"
+
+        config.JobType.pluginName = 'Analysis'
+        config.JobType.psetName = 'flyingtop_data_2017.py'
+        config.JobType.inputFiles = ['BDT_TRK_CTAU10cm_vs_TT.xml','BDT_EVT_ALLSIGvsALLBKG.xml','BDT_EVT_ALLSIGvsDYM50.xml','BDT_EVT_ALLSIGvsTTTo2L2Nu.xml','BDT_VTX_ALLSTEPS_ALLSignal.xml','BDT_VTX_STEPS12_ALLSignal.xml','Pileup_MC2017UL_bin100.root','MyDataPileupHistogram2017.root','RoccoR2017UL.txt']
+
+        #config.JobType.inputFiles = ['TMVAClassification_BDTG_TRKSEL_.weights.xml','BDT_EVTS_300_200_10.xml','TMVAClassification_BDTG_VTXSEL_.weights.xml','TMVAClassification_BDTG_VTXSel_TIGHTWP.weights.xml','Pileup_MC2018UL_bin100.root','MyDataPileupHistogram_bin100.root','RoccoR2018UL.txt']
+        #config.JobType.maxMemoryMB = 2500
+        #config.JobType.allowUndistributedCMSSW = True 
+        config.JobType.maxMemoryMB = 2500
+        # config.JobType.numCores = 4
+
+        config.Data.inputDataset = None
+        config.Data.splitting = 'LumiBased'
+        config.Data.unitsPerJob = 20
+        #config.Data.unitsPerJob = 50
+        #config.Data.totalUnits = 4000
+
+        #config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions16/13TeV/Legacy_2016/Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.txt'
+        config.Data.lumiMask =  'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions17/13TeV/Legacy_2017/Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt'
+        #config.Data.lumiMask = 'https://cms-service-dqmdc.web.cern.ch/CAF/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt'
+
+
+        #config.Data.lumiMask = '/opt/sbg/cms/ui2_data1/mmeena/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/Crab_23_11_23/crab_MuonEG/results/notFinishedLumis.txt'
+        config.Data.outLFNDirBase = '/store/user/mmeena/Ntuple_09_04_24/2017'
+        config.Data.outputDatasetTag = 'data'
+        config.Data.inputDBS = 'global' #for signal : phys03 // for bkg :  global 
+        config.Data.ignoreLocality = False
+        config.Site.storageSite = 'T2_FR_IPHC' # Choose your site. 
+        #config.Site.whitelist = ['T2_FR_IPHC']
+        #config.Site.blacklist = ['T2_US_Florida','T2_US_Caltech']
+        config.General.transferOutputs = True
+        
+        #--------------------------------------------------------
+
+        # Will submit one task for each of these input datasets.
+        inputDatasets = [
+            #'/MuonEG/Run2018A-UL2018_MiniAODv2_GT36-v1/MINIAOD'
+            #'/MuonEG/Run2018B-UL2018_MiniAODv2_GT36-v1/MINIAOD'
+            #'/MuonEG/Run2018C-UL2018_MiniAODv2_GT36-v1/MINIAOD'
+            #'/MuonEG/Run2018A-UL2018_MiniAODv2_GT36-v1/MINIAOD'
+           
+            #2017
+            
+            #'/MuonEG/Run2017B-UL2017_MiniAODv2-v1/MINIAOD'
+            #'/MuonEG/Run2017C-UL2017_MiniAODv2-v1/MINIAOD'
+            #'/MuonEG/Run2017D-UL2017_MiniAODv2-v1/MINIAOD'
+            '/MuonEG/Run2017E-UL2017_MiniAODv2-v1/MINIAOD'
+            #'/MuonEG/Run2017F-UL2017_MiniAODv2-v1/MINIAOD'
+            #2016
+            #'/MuonEG/Run2016B-ver1_HIPM_UL2016_MiniAODv2-v2/MINIAOD'  # pre APV
+            #'/MuonEG/Run2016B-ver2_HIPM_UL2016_MiniAODv2-v2/MINIAOD'
+            #'/MuonEG/Run2016C-HIPM_UL2016_MiniAODv2-v2/MINIAOD'
+            #'/MuonEG/Run2016D-HIPM_UL2016_MiniAODv2-v2/MINIAOD'
+            #'/MuonEG/Run2016E-HIPM_UL2016_MiniAODv2-v2/MINIAOD'
+            #'/MuonEG/Run2016F-HIPM_UL2016_MiniAODv2-v2/MINIAOD'
+            #'/MuonEG/Run2016F-UL2016_MiniAODv2-v2/MINIAOD' # post APV
+            #'/MuonEG/Run2016G-UL2016_MiniAODv2-v2/MINIAOD'
+            #'/MuonEG/Run2016H-UL2016_MiniAODv2-v2/MINIAOD'
+
+            #'/MuonEG/Run2018A-UL2018_MiniAODv2-v1/MINIAOD'
+            #'/MuonEG/Run2018B-UL2018_MiniAODv2-v1/MINIAOD',
+            #'/MuonEG/Run2018C-UL2018_MiniAODv2-v1/MINIAOD',
+            #'/MuonEG/Run2018D-UL2018_MiniAODv2-v1/MINIAOD'
+           
+            #'/DoubleMuon/Run2018A-UL2018_MiniAODv2-v1/MINIAOD',
+            #'/DoubleMuon/Run2018B-UL2018_MiniAODv2-v1/MINIAOD',
+            #'/DoubleMuon/Run2018C-UL2018_MiniAODv2-v1/MINIAOD',
+            #'/DoubleMuon/Run2018D-UL2018_MiniAODv2-v1/MINIAOD',
+            #'/SingleMuon/Run2018A-UL2018_MiniAODv2-v3/MINIAOD',
+            #'/SingleMuon/Run2018B-UL2018_MiniAODv2-v2/MINIAOD',
+            #'SingleMuon/Run2018C-UL2018_MiniAODv2-v2/MINIAOD',
+            #'/SingleMuon/Run2018D-UL2018_MiniAODv2-v3/MINIAOD'
+        ]
+
+        for inDS in inputDatasets:
+            # inDS is of the form /A/B/C. Since B is unique for each inDS, use this in the CRAB request name.
+            config.Data.publication = False
+            config.General.requestName = inDS.split('/')[1]
+            config.Data.inputDataset = inDS
+            config.Data.outputDatasetTag = '%s_%s' % (d1, config.General.requestName)
+            # Submit.
+            try:
+                print "Submitting for input dataset %s" % (inDS)
+                crabCommand(options.crabCmd, config = config, *options.crabCmdOpts.split())
+            except HTTPException as hte:
+                print "Submission for input dataset %s failed: %s" % (inDS, hte.headers)
+            except ClientException as cle:
+                print "Submission for input dataset %s failed: %s" % (inDS, cle)
+
+    # All other commands can be simply executed.
+    elif options.workArea:
+
+        for dir in os.listdir(options.workArea):
+            projDir = os.path.join(options.workArea, dir)
+            if not os.path.isdir(projDir):
+                continue
+            # Execute the crab command.
+            msg = "Executing (the equivalent of): crab %s --dir %s %s" % (options.crabCmd, projDir, options.crabCmdOpts)
+            print "-"*len(msg)
+            print msg
+            print "-"*len(msg)
+            try:
+                crabCommand(options.crabCmd, dir = projDir, *options.crabCmdOpts.split())
+            except HTTPException as hte:
+                print "Failed executing command %s for task %s: %s" % (options.crabCmd, projDir, hte.headers)
+            except ClientException as cle:
+                print "Failed executing command %s for task %s: %s" % (options.crabCmd, projDir, cle)
+
+
+if __name__ == '__main__':
+    main()
+                                                                                                                      
+        
