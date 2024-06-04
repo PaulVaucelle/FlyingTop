@@ -11,14 +11,12 @@ class PropaHitPattern{
    public:
 
       //Constructor
-      PropaHitPattern(int year){
+      PropaHitPattern(){
         Layer.clear();
         Disk.clear();
         DetailedLayer.clear();
         DetailedDisk.clear();
 
-        if (year == 2018)
-          {
             Layer.push_back(make_pair(1160,2.959));//PIXBL1
             Layer.push_back(make_pair(1168,6.778));//PIXBL2
             Layer.push_back(make_pair(1176,10.89));//PIXBL3
@@ -53,86 +51,47 @@ class PropaHitPattern{
             Disk.push_back(make_pair(1840,203.2));//TECWHeel6
             Disk.push_back(make_pair(1844,203.8));//TECWHeel6stereo
             Disk.push_back(make_pair(1848,222.2));//TECWHeel7}
-          }
-        else if (year == 2017)
-          {
-            Layer.push_back(make_pair(1160,2.959));//PIXBL1
-            Layer.push_back(make_pair(1168,6.774));//PIXBL2
-            Layer.push_back(make_pair(1176,10.89));//PIXBL3
-            Layer.push_back(make_pair(1184,16.));  //PIXBL4
-            Layer.push_back(make_pair(1416,23.83));//TIBL1
-            Layer.push_back(make_pair(1420,27.02));//TIBL1stereo
-            Layer.push_back(make_pair(1424,32.23));//TIBL2
-            Layer.push_back(make_pair(1428,35.42));//TIBL2stereo
-            Layer.push_back(make_pair(1432,41.78));//TIBL3
-            Layer.push_back(make_pair(1440,49.75));//TIBL4
-            Layer.push_back(make_pair(1672,60.42));//TOBL1
 
-            Disk.push_back(make_pair(1288,32.36));//PXFdisk1
-            Disk.push_back(make_pair(1296,39.54));//PXFdisk2
-            Disk.push_back(make_pair(1304,49));//PXFdisk3
-            Disk.push_back(make_pair(1544,77.9)); //TIDWHeel1
-            Disk.push_back(make_pair(1548,80.66));//TIDWHeel1stereo
-            Disk.push_back(make_pair(1552,90.34)); //TIDWHeel2
-            Disk.push_back(make_pair(1556,93.91));//TIDWHeel2stereo
-            Disk.push_back(make_pair(1560,102.8));//TIDWHeel3
-            Disk.push_back(make_pair(1564,106.9));//TIDWHeel3stereo
-            Disk.push_back(make_pair(1800,131.6));//TECWHeel1
-            Disk.push_back(make_pair(1804,129.4));//TECWHeel1stereo
-            Disk.push_back(make_pair(1808,145.5));//TECWHeel2
-            Disk.push_back(make_pair(1812,142.8));//TECWHeel2stereo
-            Disk.push_back(make_pair(1816,160));//TECWHeel3
-            Disk.push_back(make_pair(1820,156.8));//TECWHeel3stereo
-            Disk.push_back(make_pair(1824,174));//TECWHeel4
-            Disk.push_back(make_pair(1828,172.8));//TECWHeel4stereo
-            Disk.push_back(make_pair(1832,188.1));//TECWHeel5
-            Disk.push_back(make_pair(1836,186.2));//TECWHeel5stereo
-            Disk.push_back(make_pair(1840,203.3));//TECWHeel6
-            Disk.push_back(make_pair(1844,203.8));//TECWHeel6stereo
-            Disk.push_back(make_pair(1848,223.7));//TECWHeel7}
-          }
-        else if (year == 2016)
-          {
-            Layer.push_back(make_pair(1160,4.376));//PIXBL1
-            Layer.push_back(make_pair(1168,7.274));//PIXBL2
-            Layer.push_back(make_pair(1176,10.17));//PIXBL3
-            Layer.push_back(make_pair(1184,16.));  //PIXBL4, no PIXBL4 in 2016
-            Layer.push_back(make_pair(1416,23.83));//TIBL1
-            Layer.push_back(make_pair(1420,27.02));//TIBL1stereo
-            Layer.push_back(make_pair(1424,32.23));//TIBL2
-            Layer.push_back(make_pair(1428,35.41));//TIBL2stereo
-            Layer.push_back(make_pair(1432,41.83));//TIBL3
-            Layer.push_back(make_pair(1440,49.75));//TIBL4
-            Layer.push_back(make_pair(1672,60.49));//TOBL1
+            Layer2016.push_back(make_pair(1160,4.376));//PIXBL1
+            Layer2016.push_back(make_pair(1168,7.274));//PIXBL2
+            Layer2016.push_back(make_pair(1176,10.17));//PIXBL3
+            Layer2016.push_back(make_pair(1184,16.));  //PIXBL4, no PIXBL4 in 2016
+            Layer2016.push_back(make_pair(1416,23.83));//TIBL1
+            Layer2016.push_back(make_pair(1420,27.02));//TIBL1stereo
+            Layer2016.push_back(make_pair(1424,32.23));//TIBL2
+            Layer2016.push_back(make_pair(1428,35.41));//TIBL2stereo
+            Layer2016.push_back(make_pair(1432,41.83));//TIBL3
+            Layer2016.push_back(make_pair(1440,49.75));//TIBL4
+            Layer2016.push_back(make_pair(1672,60.49));//TOBL1
 
-            Disk.push_back(make_pair(1288,35.55));//PXFdisk1
-            Disk.push_back(make_pair(1296,48.3));//PXFdisk2
-            Disk.push_back(make_pair(1304,48.96));//PXFdisk3, no PXFdisk3 in 2016
-            Disk.push_back(make_pair(1544,78.01)); //TIDWHeel1
-            Disk.push_back(make_pair(1548,80.59));//TIDWHeel1stereo
-            Disk.push_back(make_pair(1552,90.59)); //TIDWHeel2
-            Disk.push_back(make_pair(1556,94.0));//TIDWHeel2stereo
-            Disk.push_back(make_pair(1560,102.9));//TIDWHeel3
-            Disk.push_back(make_pair(1564,106.8));//TIDWHeel3stereo
-            Disk.push_back(make_pair(1800,131.6));//TECWHeel1
-            Disk.push_back(make_pair(1804,129.6));//TECWHeel1stereo
-            Disk.push_back(make_pair(1808,145.5));//TECWHeel2
-            Disk.push_back(make_pair(1812,142.8));//TECWHeel2stereo
-            Disk.push_back(make_pair(1816,160.1));//TECWHeel3
-            Disk.push_back(make_pair(1820,157.2));//TECWHeel3stereo
-            Disk.push_back(make_pair(1824,174.2));//TECWHeel4
-            Disk.push_back(make_pair(1828,172.8));//TECWHeel4stereo
-            Disk.push_back(make_pair(1832,188.2));//TECWHeel5
-            Disk.push_back(make_pair(1836,186.5));//TECWHeel5stereo
-            Disk.push_back(make_pair(1840,203.4));//TECWHeel6
-            Disk.push_back(make_pair(1844,204.3));//TECWHeel6stereo
-            Disk.push_back(make_pair(1848,227.1));//TECWHeel7}
-          }       
+            Disk2016.push_back(make_pair(1288,35.55));//PXFdisk1
+            Disk2016.push_back(make_pair(1296,48.3));//PXFdisk2
+            Disk2016.push_back(make_pair(1304,48.96));//PXFdisk3, no PXFdisk3 in 2016
+            Disk2016.push_back(make_pair(1544,78.01)); //TIDWHeel1
+            Disk2016.push_back(make_pair(1548,80.59));//TIDWHeel1stereo
+            Disk2016.push_back(make_pair(1552,90.59)); //TIDWHeel2
+            Disk2016.push_back(make_pair(1556,94.0));//TIDWHeel2stereo
+            Disk2016.push_back(make_pair(1560,102.9));//TIDWHeel3
+            Disk2016.push_back(make_pair(1564,106.8));//TIDWHeel3stereo
+            Disk2016.push_back(make_pair(1800,131.6));//TECWHeel1
+            Disk2016.push_back(make_pair(1804,129.6));//TECWHeel1stereo
+            Disk2016.push_back(make_pair(1808,145.5));//TECWHeel2
+            Disk2016.push_back(make_pair(1812,142.8));//TECWHeel2stereo
+            Disk2016.push_back(make_pair(1816,160.1));//TECWHeel3
+            Disk2016.push_back(make_pair(1820,157.2));//TECWHeel3stereo
+            Disk2016.push_back(make_pair(1824,174.2));//TECWHeel4
+            Disk2016.push_back(make_pair(1828,172.8));//TECWHeel4stereo
+            Disk2016.push_back(make_pair(1832,188.2));//TECWHeel5
+            Disk2016.push_back(make_pair(1836,186.5));//TECWHeel5stereo
+            Disk2016.push_back(make_pair(1840,203.4));//TECWHeel6
+            Disk2016.push_back(make_pair(1844,204.3));//TECWHeel6stereo
+            Disk2016.push_back(make_pair(1848,227.1));//TECWHeel7}
+             
 
-        if (year == 2018 || year == 2017)
+
         // corrected according to the observed reco layers in 2017-2018 emu data
         // see /ui2_data1/blochd/LLTopAna/SecIntAna.C and output/h_SecInt_2017_data.root and _2018_data.root
-          {
+
                 //Rminus - Rplus - abs(z) 
                 // PXB
                 //         DetailedLayer.push_back({2.74,2.855,27}); // 0.64
@@ -258,135 +217,134 @@ class PropaHitPattern{
                 DetailedDisk.push_back({210.8,211.4,50,62});
                 DetailedDisk.push_back({208.3,208.7,40,50});
                 DetailedDisk.push_back({211,211.7,33,40});
-          }
-        else if (year == 2016)
+
 //$$
         // corrected according to the observed reco layers in 2016 emu data
         // see /ui2_data1/blochd/LLTopAna/SecIntAna.C and output/h_SecInt_2016_data.root
 //$$
-          {
+          
             //Rminus - Rplus - abs(z) 
             // PXB ( only 3 layers of PXB in 2016 )
 //$$
 //             DetailedLayer.push_back({4.136,4.215,27}); // 0.64
 //             DetailedLayer.push_back({4.612,4.684,27});
-            DetailedLayer.push_back({4.136,4.26,27}); // 0.64
-            DetailedLayer.push_back({4.60,4.72,27});
+            DetailedLayer2016.push_back({4.136,4.26,27}); // 0.64
+            DetailedLayer2016.push_back({4.60,4.72,27});
            
 //             DetailedLayer.push_back({7.048,7.095,27}); // 0.67
 //             DetailedLayer.push_back({7.522,7.566,27});
-            DetailedLayer.push_back({7.04,7.18,27}); // 0.67
-            DetailedLayer.push_back({7.50,7.64,27});
+            DetailedLayer2016.push_back({7.04,7.18,27}); // 0.67
+            DetailedLayer2016.push_back({7.50,7.64,27});
         
 //             DetailedLayer.push_back({9.92,9.954,27}); // 0.63
 //             DetailedLayer.push_back({10.396,10.424,27});
-            DetailedLayer.push_back({9.90,10.06,27}); // 0.63
-            DetailedLayer.push_back({10.38,10.54,27});
+            DetailedLayer2016.push_back({9.90,10.06,27}); // 0.63
+            DetailedLayer2016.push_back({10.38,10.54,27});
 //$$
 
             //TIB
 //$$
 //             DetailedLayer.push_back({23.5,24.8,66});  // 1.0
 //$$
-            DetailedLayer.push_back({23.4,24.8,66});  // 1.0
-            DetailedLayer.push_back({26.9,27.85,66}); // 1.2
-            DetailedLayer.push_back({31.85,33.2,66}); // 1.1
-            DetailedLayer.push_back({35,36.2,66});    // 1.2
-            DetailedLayer.push_back({39.9,40.86,66});   // 4.0
-            DetailedLayer.push_back({43.05,44.02,66});
-            DetailedLayer.push_back({47.85,48.79,66});// 4.0
-            DetailedLayer.push_back({51.00,51.95,66}); 
+            DetailedLayer2016.push_back({23.4,24.8,66});  // 1.0
+            DetailedLayer2016.push_back({26.9,27.85,66}); // 1.2
+            DetailedLayer2016.push_back({31.85,33.2,66}); // 1.1
+            DetailedLayer2016.push_back({35,36.2,66});    // 1.2
+            DetailedLayer2016.push_back({39.9,40.86,66});   // 4.0
+            DetailedLayer2016.push_back({43.05,44.02,66});
+            DetailedLayer2016.push_back({47.85,48.79,66});// 4.0
+            DetailedLayer2016.push_back({51.00,51.95,66}); 
 
             //TOB ( only TOB layer 1) 
-            DetailedLayer.push_back({58.44,58.63,107});  // 4.5
-            DetailedLayer.push_back({59.525,59.705,107});
-            DetailedLayer.push_back({61.64,61.82,107});
-            DetailedLayer.push_back({62.725,62.9,107});
+            DetailedLayer2016.push_back({58.44,58.63,107});  // 4.5
+            DetailedLayer2016.push_back({59.525,59.705,107});
+            DetailedLayer2016.push_back({61.64,61.82,107});
+            DetailedLayer2016.push_back({62.725,62.9,107});
 
             //abs(Zminus) - abs(Zplus) - Rminus - Rplus  .... 
             //PXF
-            DetailedDisk.push_back({33,38,5.8,14.5});
+            DetailedDisk2016.push_back({33,38,5.8,14.5});
 //$$
-//             DetailedDisk.push_back({46.,51,5.8,14.5}); // 5.4
-            DetailedDisk.push_back({46,51.4,5.8,14.5}); // 5.4 // according to 2016 data
+//             DetailedDisk2016.push_back({46.,51,5.8,14.5}); // 5.4
+            DetailedDisk2016.push_back({46,51.4,5.8,14.5}); // 5.4 // according to 2016 data
 //$$
 
             //TID
-            DetailedDisk.push_back({74.38,76.82,38.5,51}); // 6.2
-            DetailedDisk.push_back({77.67,80.5,22.,35});
-            DetailedDisk.push_back({81.18,84.01,31.5,42});   // 4.0
-            DetailedDisk.push_back({87.3,89.8,38.5,51});     // 6.2
-            DetailedDisk.push_back({90.6,93.5,22,35});
-            DetailedDisk.push_back({94.1,97,31.5,42});       // 3.2
-            DetailedDisk.push_back({100.27,102.77,38.5,51}); // 5.9
-            DetailedDisk.push_back({103.57,106.4,22.5,35});
-            DetailedDisk.push_back({107.06,109.92,31.5,42});  // 2.1
+            DetailedDisk2016.push_back({74.38,76.82,38.5,51}); // 6.2
+            DetailedDisk2016.push_back({77.67,80.5,22.,35});
+            DetailedDisk2016.push_back({81.18,84.01,31.5,42});   // 4.0
+            DetailedDisk2016.push_back({87.3,89.8,38.5,51});     // 6.2
+            DetailedDisk2016.push_back({90.6,93.5,22,35});
+            DetailedDisk2016.push_back({94.1,97,31.5,42});       // 3.2
+            DetailedDisk2016.push_back({100.27,102.77,38.5,51}); // 5.9
+            DetailedDisk2016.push_back({103.57,106.4,22.5,35});
+            DetailedDisk2016.push_back({107.06,109.92,31.5,42});  // 2.1
 
             //TEC
-            DetailedDisk.push_back({126.42,127.45,60,71}); // 5.7
-            DetailedDisk.push_back({126.42,127.45,22.5,32.5});
-            DetailedDisk.push_back({127.15,127.65,40,50.5});
-            DetailedDisk.push_back({129.65,130.2,50,62});
-            DetailedDisk.push_back({129.87,130.57,31.5,41});
-            DetailedDisk.push_back({133.6,134.6,60,71});
-            DetailedDisk.push_back({136.85,137.34,50,62});
-            DetailedDisk.push_back({134.3,134.8,40,50.5});
-            DetailedDisk.push_back({137.02,137.37,31.5,42});
-            DetailedDisk.push_back({134.3,134.62,22,32});
+            DetailedDisk2016.push_back({126.42,127.45,60,71}); // 5.7
+            DetailedDisk2016.push_back({126.42,127.45,22.5,32.5});
+            DetailedDisk2016.push_back({127.15,127.65,40,50.5});
+            DetailedDisk2016.push_back({129.65,130.2,50,62});
+            DetailedDisk2016.push_back({129.87,130.57,31.5,41});
+            DetailedDisk2016.push_back({133.6,134.6,60,71});
+            DetailedDisk2016.push_back({136.85,137.34,50,62});
+            DetailedDisk2016.push_back({134.3,134.8,40,50.5});
+            DetailedDisk2016.push_back({137.02,137.37,31.5,42});
+            DetailedDisk2016.push_back({134.3,134.62,22,32});
 
-            DetailedDisk.push_back({140.42,141.45,60,71}); // 5.7
-            DetailedDisk.push_back({140.42,141.45,22.5,32.5});
-            DetailedDisk.push_back({141.15,141.66,40,50.5});
-            DetailedDisk.push_back({143.65,144.2,50,62});
-            DetailedDisk.push_back({143.87,144.9,31.5,41});
-            DetailedDisk.push_back({147.6,148.6,60,71});
-            DetailedDisk.push_back({150.85,151.34,50,62});
-            DetailedDisk.push_back({148.3,148.7,40,50.5});
-            DetailedDisk.push_back({151.04,151.38,32,40});
-            DetailedDisk.push_back({148.3,148.81,22,32});
+            DetailedDisk2016.push_back({140.42,141.45,60,71}); // 5.7
+            DetailedDisk2016.push_back({140.42,141.45,22.5,32.5});
+            DetailedDisk2016.push_back({141.15,141.66,40,50.5});
+            DetailedDisk2016.push_back({143.65,144.2,50,62});
+            DetailedDisk2016.push_back({143.87,144.9,31.5,41});
+            DetailedDisk2016.push_back({147.6,148.6,60,71});
+            DetailedDisk2016.push_back({150.85,151.34,50,62});
+            DetailedDisk2016.push_back({148.3,148.7,40,50.5});
+            DetailedDisk2016.push_back({151.04,151.38,32,40});
+            DetailedDisk2016.push_back({148.3,148.81,22,32});
 
-            DetailedDisk.push_back({154.42,155.45,60,70}); // 5.7
-            DetailedDisk.push_back({154.42,155.45,22.5,32.5});
-            DetailedDisk.push_back({155.15,155.7,40,50.5});
-            DetailedDisk.push_back({157.65,158.2,50,62});
-            DetailedDisk.push_back({157.87,158.57,32,41});
-            DetailedDisk.push_back({161.6,162.6,60,71});
-            DetailedDisk.push_back({164.85,165.4,50,62});
-            DetailedDisk.push_back({162.3,162.8,40,50.5});
-            DetailedDisk.push_back({165.05,165.38,32,41});
-            DetailedDisk.push_back({162.3,162.6,22.5,32.5});
+            DetailedDisk2016.push_back({154.42,155.45,60,70}); // 5.7
+            DetailedDisk2016.push_back({154.42,155.45,22.5,32.5});
+            DetailedDisk2016.push_back({155.15,155.7,40,50.5});
+            DetailedDisk2016.push_back({157.65,158.2,50,62});
+            DetailedDisk2016.push_back({157.87,158.57,32,41});
+            DetailedDisk2016.push_back({161.6,162.6,60,71});
+            DetailedDisk2016.push_back({164.85,165.4,50,62});
+            DetailedDisk2016.push_back({162.3,162.8,40,50.5});
+            DetailedDisk2016.push_back({165.05,165.38,32,41});
+            DetailedDisk2016.push_back({162.3,162.6,22.5,32.5});
 
-            DetailedDisk.push_back({168.42,169.45,60,71}); // 5.7
-            DetailedDisk.push_back({169.15,169.7,40,50.5});
-            DetailedDisk.push_back({171.65,172.2,50,62});
-            DetailedDisk.push_back({171.87,172.57,32,41});
-            DetailedDisk.push_back({175.6,176.6,60,71});
-            DetailedDisk.push_back({178.85,179.4,50,62});
-            DetailedDisk.push_back({176.3,176.7,40,50.5});
-            DetailedDisk.push_back({179.04,179.38,32,41});
+            DetailedDisk2016.push_back({168.42,169.45,60,71}); // 5.7
+            DetailedDisk2016.push_back({169.15,169.7,40,50.5});
+            DetailedDisk2016.push_back({171.65,172.2,50,62});
+            DetailedDisk2016.push_back({171.87,172.57,32,41});
+            DetailedDisk2016.push_back({175.6,176.6,60,71});
+            DetailedDisk2016.push_back({178.85,179.4,50,62});
+            DetailedDisk2016.push_back({176.3,176.7,40,50.5});
+            DetailedDisk2016.push_back({179.04,179.38,32,41});
 
-            DetailedDisk.push_back({182.42,183.45,60,71}); // 5.7
-            DetailedDisk.push_back({183.15,183.7,40,50.5});
-            DetailedDisk.push_back({185.65,186.2,50,62});
-            DetailedDisk.push_back({185.87,186.57,32,41});
-            DetailedDisk.push_back({189.6,190.6,60,71});
-            DetailedDisk.push_back({192.85,193.4,50,62});
-            DetailedDisk.push_back({190.3,190.7,40,50.5});
-            DetailedDisk.push_back({193,193.7,33,40});
+            DetailedDisk2016.push_back({182.42,183.45,60,71}); // 5.7
+            DetailedDisk2016.push_back({183.15,183.7,40,50.5});
+            DetailedDisk2016.push_back({185.65,186.2,50,62});
+            DetailedDisk2016.push_back({185.87,186.57,32,41});
+            DetailedDisk2016.push_back({189.6,190.6,60,71});
+            DetailedDisk2016.push_back({192.85,193.4,50,62});
+            DetailedDisk2016.push_back({190.3,190.7,40,50.5});
+            DetailedDisk2016.push_back({193,193.7,33,40});
 
-            DetailedDisk.push_back({199.9,201.45,60,71});
-            DetailedDisk.push_back({201.15,201.7,40,50.5});
-            DetailedDisk.push_back({203.65,204.2,50,62});
-            DetailedDisk.push_back({203.87,204.57,32,41});
-            DetailedDisk.push_back({207.08,207.82,60,71});
-            DetailedDisk.push_back({210.85,211.4,50,62});
-            DetailedDisk.push_back({208.3,208.7,40,50.5});
-            DetailedDisk.push_back({211,211.7,32,41});
-          }
+            DetailedDisk2016.push_back({199.9,201.45,60,71});
+            DetailedDisk2016.push_back({201.15,201.7,40,50.5});
+            DetailedDisk2016.push_back({203.65,204.2,50,62});
+            DetailedDisk2016.push_back({203.87,204.57,32,41});
+            DetailedDisk2016.push_back({207.08,207.82,60,71});
+            DetailedDisk2016.push_back({210.85,211.4,50,62});
+            DetailedDisk2016.push_back({208.3,208.7,40,50.5});
+            DetailedDisk2016.push_back({211,211.7,32,41});
+          
 
       }
 
-      // Needed Initialisation of the Tracker DAtaBase. The radius and the uncertainties are computed from the first hit of the tracks in RECO dataTier.
+      // Initialisation of the Tracker DAtaBase. The radius and the uncertainties are computed from the first hit of the tracks in RECO dataTier.
       // The standard deviation is also available 
       // stereo means second layer of a given hitpattern
       //Destructor
@@ -394,19 +352,36 @@ class PropaHitPattern{
 
       //-------Main Method--------//
       //Basic3DVector<float> is a frame independant object, however, both vectors have to be given in the same Frame (In this case, IT HAS TO BE GLOBAL)
-      std::pair<int,GloballyPositioned<float>::PositionType> Main(uint16_t firsthit, AnalyticalPropagator* Prop,TrajectoryStateOnSurface tsos, float eta, float phi, float vz,Basic3DVector<float> PV,Basic3DVector<float> p )
+      std::pair<int,GloballyPositioned<float>::PositionType> Main(int year, uint16_t firsthit, AnalyticalPropagator* Prop,TrajectoryStateOnSurface tsos, float eta, float phi, float vz,Basic3DVector<float> PV,Basic3DVector<float> p )
         {
           std::pair<int,GloballyPositioned<float>::PositionType> FHPosition;
-          if (firsthit==1288 || firsthit==1296 || firsthit==1304 || firsthit==1544 || firsthit==1548 || firsthit==1552 || firsthit==1556 || firsthit==1560 || firsthit==1564 || firsthit==1800 || firsthit==1804 || firsthit==1808 || firsthit==1812 || firsthit==1816 || firsthit==1820 || firsthit==1824 || firsthit==1828 || firsthit==1832 || firsthit==1836 || firsthit==1840 ||firsthit== 1844 || firsthit==1848)//supposed to be plane
+          if (year >2016)
             {
-              FHPosition = make_pair(1,PropagateToDisk( firsthit, eta, phi, vz, PV, p ));
-              return FHPosition;
+              if (firsthit==1288 || firsthit==1296 || firsthit==1304 || firsthit==1544 || firsthit==1548 || firsthit==1552 || firsthit==1556 || firsthit==1560 || firsthit==1564 || firsthit==1800 || firsthit==1804 || firsthit==1808 || firsthit==1812 || firsthit==1816 || firsthit==1820 || firsthit==1824 || firsthit==1828 || firsthit==1832 || firsthit==1836 || firsthit==1840 ||firsthit== 1844 || firsthit==1848)//supposed to be plane
+                {
+                  FHPosition = make_pair(1,PropagateToDisk( firsthit, eta, phi, vz, PV, p ));
+                  return FHPosition;
+                }
+              else
+                {
+                  FHPosition = make_pair(0,PropagateToCylinder( firsthit, Prop, tsos, eta, phi, vz ));
+                  return FHPosition;
+                }
             }
           else
             {
-              FHPosition = make_pair(0,PropagateToCylinder( firsthit, Prop, tsos, eta, phi, vz ));
-              return FHPosition;
+              if (firsthit==1288 || firsthit==1296 || firsthit==1304 || firsthit==1544 || firsthit==1548 || firsthit==1552 || firsthit==1556 || firsthit==1560 || firsthit==1564 || firsthit==1800 || firsthit==1804 || firsthit==1808 || firsthit==1812 || firsthit==1816 || firsthit==1820 || firsthit==1824 || firsthit==1828 || firsthit==1832 || firsthit==1836 || firsthit==1840 ||firsthit== 1844 || firsthit==1848)//supposed to be plane
+                {
+                  FHPosition = make_pair(1,PropagateToDisk2016( firsthit, eta, phi, vz, PV, p ));
+                  return FHPosition;
+                }
+              else
+                {
+                  FHPosition = make_pair(0,PropagateToCylinder2016( firsthit, Prop, tsos, eta, phi, vz ));
+                  return FHPosition;
+                }
             }
+
         }
 
       //-------Propagators---------//
@@ -451,6 +426,46 @@ class PropaHitPattern{
             return GloballyPositioned<float>::PositionType (-1000.,-1000.,-1000.);
         }
 
+      GloballyPositioned<float>::PositionType PropagateToDisk2016(uint16_t firsthit,const float eta,const float phi, const float vz,Basic3DVector<float> PV,Basic3DVector<float> p )
+        {
+          float zlayers=0;
+          std::pair<bool,Basic3DVector<float>> spairPlane;
+          TkRotation<float> rot(1,0,0,0,1,0,0,0,1);//Cylinder/Plane are already well-orientated => along/normal to the z-axis
+          float theta=2*atan(exp(-eta));//=> needed for propagation
+          for (int i=0; i<22;i++)
+            {
+              if (Disk2016[i].first==firsthit)
+                {
+                  zlayers = Disk2016[i].second;
+                  if (p.z()<0){zlayers=-zlayers;}//wih eta, THis is possibliy wrong. For 100 events, 1604 tracks in the disks: 2 wrong z
+                  GloballyPositioned<float>::PositionType P3D_(0.,0.,zlayers);
+                  Plane P(P3D_,rot);
+                  StraightLinePlaneCrossing SLPC(PV,p);//Define the initial state
+                  spairPlane = SLPC.position(P);//"Propagation" 
+                  Basic3DVector<float> sPlane(-1000.,-1000.,-1000.);
+                  if (spairPlane.first)//Check for validity
+                    { 
+                      sPlane = spairPlane.second;
+                      return GloballyPositioned<float>::PositionType (sPlane.x(),sPlane.y(),sPlane.z());
+                    }
+                  else// It may happen that the propagation fails, so we use geometry
+                    {
+                      float R = (zlayers-vz)*tan(theta);
+                      float x0 = R*cos(phi); 
+                      float y0 = R*sin(phi);
+                      return GloballyPositioned<float>::PositionType (x0,y0,zlayers);
+                    }
+                }
+              else
+                {
+                  continue;
+                }
+            }
+            //This return never happens, just needed for compilation
+            return GloballyPositioned<float>::PositionType (-1000.,-1000.,-1000.);
+        }
+
+
       //Cylinder
       GloballyPositioned<float>::PositionType  PropagateToCylinder(uint16_t firsthit, AnalyticalPropagator* Prop, TrajectoryStateOnSurface tsos,const float eta, const float phi,const float vz) 
        {
@@ -463,6 +478,43 @@ class PropaHitPattern{
               if (Layer[i].first==firsthit )
                 {
                     rad = Layer[i].second;
+                    Cylinder Cylind(rad);
+                    PropTSOS = Prop->propagate(tsos,Cylind);
+                    if (PropTSOS.isValid())//Propagator 
+                      {
+                        return GloballyPositioned<float>::PositionType (PropTSOS.globalPosition().x(),PropTSOS.globalPosition().y(),PropTSOS.globalPosition().z());
+                      }
+                    else //Propagator can fail => use geometry
+                      {
+                        float z0 = (rad+vz*tan(theta))/tan(theta);
+                        float x0 = rad*cos(phi);
+                        float y0 = rad*sin(phi); 
+                        return GloballyPositioned<float>::PositionType (x0,y0,z0);
+                      }
+                }
+              else 
+                {
+                  continue;
+                }
+            }
+             
+            //This return never happens, just needed for compilation
+            return GloballyPositioned<float>::PositionType (-1000.,-1000.,-1000.);
+        }
+
+
+      //Cylinder
+      GloballyPositioned<float>::PositionType  PropagateToCylinder2016(uint16_t firsthit, AnalyticalPropagator* Prop, TrajectoryStateOnSurface tsos,const float eta, const float phi,const float vz) 
+       {
+          float rad = 0;
+          TrajectoryStateOnSurface PropTSOS;//TSOS for the Barrel
+          TkRotation<float> rot(1,0,0,0,1,0,0,0,1);//Cylinder/Plane are already well-orientated => along/normal to the z-axis
+          float theta=2*atan(exp(-eta));//=> needed for propagation
+          for (int i=0; i<11;i++)
+            {
+              if (Layer2016[i].first==firsthit )
+                {
+                    rad = Layer2016[i].second;
                     Cylinder Cylind(rad);
                     PropTSOS = Prop->propagate(tsos,Cylind);
                     if (PropTSOS.isValid())//Propagator 
@@ -543,10 +595,10 @@ class PropaHitPattern{
       //The following method is a more detailed mapping of the cms tracker (not complete atm) => until TOB L1 and TEC Wheel5
       int VertexBelongsToTracker(float VTX_r, float VTX_z, int year)
         {
-          std::vector<std::vector<float> > disk = this->diskDDB();
-          float* stdisk_Exp = this->stddiskDDB_Exp();
-          std::vector<std::vector<float> > cyl = this->CylDDB();
-          float* stdcyl_Exp = this->stdCylDDB_Exp();
+          std::vector<std::vector<float> > disk = this->diskDDB(year);
+          float* stdisk_Exp = this->stddiskDDB_Exp(year);
+          std::vector<std::vector<float> > cyl = this->CylDDB(year);
+          float* stdcyl_Exp = this->stdCylDDB_Exp(year);
           int IsInTracker = 0;
           int nBarrelLayer = 24;
           int nDiskLayer = 69;
@@ -585,13 +637,15 @@ class PropaHitPattern{
       float* stddiskDB(){return stddisk;}
       float* stdCylDB_Exp(){return stdCyl_Exp;}
       float* stddiskDB_Exp(){return stddisk_Exp;}
-      float* stdCylDDB_Exp(){return stdDCyl_Exp;}
-      float* stddiskDDB_Exp(){return stdDdisk_Exp;}
+      float* stdCylDDB_Exp(int year){ if (year == 2016) {return stdDCyl_Exp2016 ;} else return stdDCyl_Exp;}
+      float* stddiskDDB_Exp(int year){if (year == 2016) {return stdDdisk_Exp2016;} else return stdDdisk_Exp;}
       float* Cyl_ThickDB(){return Cyl_thick; }
       float* disk_ThickDB(){return Disk_thick; }
 
-      std::vector<std::vector<float> > CylDDB(){return DetailedLayer; }//Detailed DataBase :)
-      std::vector<std::vector<float> > diskDDB(){return DetailedDisk; }
+      std::vector<std::vector<float> > CylDDB(int year){ if (year == 2016) {return DetailedLayer2016;} else return  DetailedLayer;}//Detailed DataBase :)
+      std::vector<std::vector<float> > diskDDB(int year){if (year == 2016) {return DetailedDisk2016;} else return  DetailedDisk;}
+
+
 
 
    private:
@@ -637,11 +691,20 @@ class PropaHitPattern{
         float stdDCyl_Exp[24]={0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.12,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,3.,3.,3.,3.}; // detailed
         float stdDdisk_Exp[69]={1.0,1.0,1.0,1.0,1.0,1.0,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.}; // detailed
 
+        float stdDCyl_Exp2016[18]={0.12,0.12,0.12,0.12,0.12,0.12,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,3.,3.,3.,3.}; // detailed
+        float stdDdisk_Exp2016[65]={1.0,1.0,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.,5.}; // detailed
+
         std::vector<std::pair<uint16_t,float> > Layer;
         std::vector<std::pair<uint16_t,float> > Disk;
 
+        std::vector<std::pair<uint16_t,float> > Layer2016;
+        std::vector<std::pair<uint16_t,float> > Disk2016;
+
         std::vector<std::vector<float> > DetailedLayer;
         std::vector<std::vector<float> > DetailedDisk;
+
+        std::vector<std::vector<float> > DetailedLayer2016;
+        std::vector<std::vector<float> > DetailedDisk2016;
         
 
         //#########################################################//
