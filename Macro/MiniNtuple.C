@@ -49,6 +49,15 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
    TH1F* hData_njetNOmu_FilterSameSign = new TH1F("hData_njetNOmu_FilterSameSign","",31,-0.5,30.5);
    TH1F* hData_njetNOmu = new TH1F("hData_njetNOmu","",31,-0.5,30.5);
 
+//$$
+   TH1F* hData_nPV          = new TH1F("hData_nPV","",81,-0.5,80.5);
+   TH1F* hTk_MVA            = new TH1F("hTk_MVA","",200,-1.,1.);
+   TH1F* hData_Hemi         = new TH1F("hData_Hemi","",2,0.5,2.5);
+   TH1F* hData_Hemi_stepGE1 = new TH1F("hData_Hemi_stepGE1","",2,0.5,2.5);
+   TH1F* hData_Hemi_step12  = new TH1F("hData_Hemi_step12","",2,0.5,2.5);
+//$$
+
+
    std::vector<int>    minirunNumber;
    std::vector<int>    minieventNumber;
    std::vector<int>    minilumiBlock;
@@ -614,7 +623,7 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
    std::cout<<"// "<<Production<<" : "<<sample<<"  //"<<std::endl;
    std::cout<<"//-------------------------//"<<std::endl;
 
-   bool debug = true;
+   bool debug = false;
    if (fChain == 0) return;
 
    Long64_t nentries = fChain->GetEntriesFast();
@@ -635,15 +644,15 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
 
       // if (Cut(ientry) < 0) continue;
       if ( jentry%1000 == 0 ) std::cout << "events : " << jentry << std::endl;
-      if (jentry==0.1*nentries) {std::cout<<"10/100 :"<<std::endl;}
-      if (jentry==0.2*nentries) {std::cout<<"20/100 :"<<std::endl;}
-      if (jentry==0.3*nentries) {std::cout<<"30/100 :"<<std::endl;}
-      if (jentry==0.4*nentries) {std::cout<<"40/100 :"<<std::endl;}
-      if (jentry==0.5*nentries) {std::cout<<"50/100 :"<<std::endl;}
-      if (jentry==0.6*nentries) {std::cout<<"60/100 :"<<std::endl;}
-      if (jentry==0.7*nentries) {std::cout<<"70/100 :"<<std::endl;}
-      if (jentry==0.8*nentries) {std::cout<<"80/100 :"<<std::endl;}
-      if (jentry==0.9*nentries) {std::cout<<"90/100 :"<<std::endl;}
+      // if (jentry==0.1*nentries) {std::cout<<"10/100 :"<<std::endl;}
+      // if (jentry==0.2*nentries) {std::cout<<"20/100 :"<<std::endl;}
+      // if (jentry==0.3*nentries) {std::cout<<"30/100 :"<<std::endl;}
+      // if (jentry==0.4*nentries) {std::cout<<"40/100 :"<<std::endl;}
+      // if (jentry==0.5*nentries) {std::cout<<"50/100 :"<<std::endl;}
+      // if (jentry==0.6*nentries) {std::cout<<"60/100 :"<<std::endl;}
+      // if (jentry==0.7*nentries) {std::cout<<"70/100 :"<<std::endl;}
+      // if (jentry==0.8*nentries) {std::cout<<"80/100 :"<<std::endl;}
+      // if (jentry==0.9*nentries) {std::cout<<"90/100 :"<<std::endl;}
 
       //----------------------//
       //        Event         //
@@ -709,9 +718,11 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
          }
 
 
-
-
-
+      minitree_Filter.push_back(tree_Filter);
+      minitree_FilterSameSign.push_back(tree_FilterSameSign);
+      //$$
+      if ( tree_Filter && tree_njetNOmu > 0 ) hData_nPV->Fill( tree_nPV );
+//$$
       // -------------- ----------------------------------------------------------------------//
       // ------------------------------------------------------------------------------------//
       if ( !((tree_Filter || tree_FilterSameSign) && tree_njetNOmu>0) && !Signal)  continue;
@@ -737,8 +748,6 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
       miniPU_events.push_back(PU_events);
       // miniAllPU_events_weight.push_back(AllPU_events_weight);
 
-      minitree_Filter.push_back(tree_Filter);
-      minitree_FilterSameSign.push_back(tree_FilterSameSign);
 
       if (Signal)
          {
@@ -862,13 +871,21 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
             minitree_muon_jet_dRmax.push_back(tree_muon_jet_dRmax->at(0) );
          }
 
-
+      // sALUT DADA, JE SUIS TON ESPRIT. NOUBLIE PAS DE BIEN PRENDRE SOIN DE TON PAUL, CET ETRE PRECIEUX
       // depends on the decay channel :(
       // minitree_elemu_jet_dRmin.push_back(tree_elemu_jet_dRmin->at(0) );
       // minitree_elemu_jet_dRmax.push_back( tree_elemu_jet_dRmax->at(0));
       // minitree_ele_jet_dRmin.push_back( tree_ele_jet_dRmin->at(0)); // empty, usefull ???
       // minitree_ele_jet_dRmax.push_back( tree_ele_jet_dRmax->at(0)); // empty, usefull ???
 
+//$$
+      if (debug)  {std::cout<<"Tracks "<<std::endl;}
+      if ( tree_Filter && tree_njetNOmu>0 )
+        for (unsigned int i = 0; i < tree_track_pt->size(); i++)
+         {
+            hTk_MVA->Fill( tree_track_MVAval->at(i) );
+         }
+//$$
       // std::cout<<tree_Filter.capacity()<<std::endl;
       if (debug)  {std::cout<<"Event"<<std::endl;}
       for (unsigned int i = 0; i < tree_event_nVtx->size(); i++)
@@ -1010,6 +1027,13 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
             minitree_Hemi_Vtx_MVAval_Loose.push_back(tree_Hemi_Vtx_MVAval_Loose->at(i));
             minitree_Hemi_Vtx_MVAval_Tight.push_back(tree_Hemi_Vtx_MVAval_Tight->at(i));
 
+//$$
+            if ( tree_Filter && tree_njetNOmu > 0 ) {
+              hData_Hemi->Fill( tree_Hemi->at(i) );
+              if ( tree_Hemi_Vtx_step->at(i) >= 1 ) hData_Hemi_stepGE1->Fill( tree_Hemi->at(i) );
+              if ( tree_Hemi_Vtx_step->at(i) >= 1 && tree_Hemi_Vtx_step->at(i) <= 2 ) hData_Hemi_step12->Fill( tree_Hemi->at(i) );
+            }
+//$$
          }
 
 
@@ -1353,6 +1377,14 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
    hData_njetNOmu_Filter -> Draw(); 
    hData_njetNOmu_FilterSameSign -> Draw(); 
    hData_njetNOmu -> Draw(); 
+
+   //$$
+   hData_nPV -> Draw();
+   hTk_MVA -> Draw();
+   hData_Hemi -> Draw();
+   hData_Hemi_stepGE1 -> Draw();
+   hData_Hemi_step12 -> Draw();
+//$$
 
    myFile->Write();
    delete myFile;
