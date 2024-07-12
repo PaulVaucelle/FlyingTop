@@ -2,15 +2,27 @@ import FWCore.ParameterSet.Config as cms
 from Configuration.Eras.Era_Run2_2018_cff import Run2_2018
 process = cms.Process("FlyingTop",Run2_2018)
 
+# from Configuration.Eras.Era_Run2_2017_cff import Run2_2017
+# process = cms.Process('FlyingTop',Run2_2017)
+
+# from Configuration.Eras.Era_Run2_2017_cff import Run2_2016
+# process = cms.Process('FlyingTop',Run2_2016)
+
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+# process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 ##----------------------paul--------------------------##
 process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
 process.load("Configuration.Geometry.GeometryRecoDB_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
-
-#$$
+## JeC JER for systematics ###########################
+process.load("JetMETCorrections.Configuration.JetCorrectors_cff")
+process.load("JetMETCorrections.Modules.JetResolutionESProducer_cfi")
+process.load("JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff")
+from CondCore.CondDB.CondDB_cfi import *
+######################################################""
+#$$CondCore.CondDB.CondDB_cfi
 process.load("Geometry.CaloEventSetup.CaloTowerConstituents_cfi")
 
 # https://twiki.cern.ch/twiki/bin/view/CMS/TopPtReweighting#TOP_PAG_corrections_based_on_dat 
@@ -30,18 +42,18 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 #  datapufile = cms.string("MyDataPileupHistogram_bin100.root"),
 
 
-isPostAPV = True
+isPostAPV = False
 ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2018UL.txt"
 EGERA = '2018-UL'
 GT = '106X_upgrade2018_realistic_v16_L1v1'
 TIGHTJETIDERA = 'RUN2ULCHS'  #NOTE: Use "RUN2UL16CHS" for UL2016 eras
 L1PREFERA = '20172018'
-DATAPUFILE = 'MyDataPileupHistogram2018.root'
-MCPUFILE   = 'Pileup_MC2018UL_bin100.root'
-SHIFT_X = 0
-SHIFT_Y = 0
-SHIFTBP_X = 0
-SHIFTBP_Y = 0
+DATAPUFILE = '/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/MyDataPileupHistogram2018.root'
+DATAPUFILEUP = '/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/PileupHistogram-goldenJSON-13tev-2018-72400ub-100bins.root'
+DATAPUFILEDOWN = '/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/PileupHistogram-goldenJSON-13tev-2018-66000ub-100bins.root'
+MCPUFILE   = '/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/Pileup_MC2018UL_bin100.root'
+
+
 
 if year == 2018 :
     ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2018UL.txt"
@@ -49,11 +61,8 @@ if year == 2018 :
     EGERA = '2018-UL'
     TIGHTJETIDERA = 'RUN2ULCHS'
     L1PREFERA = '20172018'
-    SHIFT_X = -0.09
-    SHIFT_Y = 0.12
-    SHIFTBP_X = -0.18
-    SHIFTBP_Y = 0.19
-if year == 2017 :
+
+if year == 2017 or year == 2016:
     ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2017UL.txt"
     GT = '106X_mc2017_realistic_v10'
     EGERA = '2017-UL'
@@ -61,33 +70,24 @@ if year == 2017 :
     L1PREFERA = '20172018'
     DATAPUFILE = 'MyDataPileupHistogram2017.root'
     MCPUFILE   = 'Pileup_MC2017UL_bin100.root'
-    SHIFT_X = 0
-    SHIFT_Y = 0
-    SHIFTBP_X = 0
-    SHIFTBP_Y = 0
-if year == 2016 :
-    TIGHTJETIDERA = 'RUN2UL16CHS'  #NOTE: Use "RUN2UL16CHS" for UL2016 eras
-    DATAPUFILE = 'MyDataPileupHistogram2016.root'
-    MCPUFILE   = 'Pileup_MC2016UL_bin100.root'
-    if isPostAPV :
-        ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2016aUL.txt"
-        GT = '106X_mcRun2_asymptotic_preVFP_v11'
-        EGERA = '2016-UL'
-        L1PREFERA = '2016'
-        SHIFT_X = 0
-        SHIFT_Y = 0
-        SHIFTBP_X = 0
-        SHIFTBP_Y = 0
+
+# if year == 2016 :
+#     TIGHTJETIDERA = 'RUN2UL16CHS'  #NOTE: Use "RUN2UL16CHS" for UL2016 eras
+#     DATAPUFILE = 'MyDataPileupHistogram2016.root'
+#     MCPUFILE   = 'Pileup_MC2016UL_bin100.root'
+#     if isPostAPV :
+#         ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2016aUL.txt"
+#         GT = '106X_mcRun2_asymptotic_preVFP_v11'
+#         EGERA = '2016-UL'
+#         L1PREFERA = '2016'
+
         
-    else :
-        ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2016bUL.txt"
-        GT = '106X_mcRun2_asymptotic_v17'
-        EGERA = '2016-UL'
-        L1PREFERA = '2016'
-        SHIFT_X = 0
-        SHIFT_Y = 0
-        SHIFTBP_X = 0
-        SHIFTBP_Y = 0
+#     else :
+#         ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2016bUL.txt"
+#         GT = '106X_mcRun2_asymptotic_v17'
+#         EGERA = '2016-UL'
+#         L1PREFERA = '2016'
+
 
 if IsMC:                                                                                                                                                                                     
     process.GlobalTag = GlobalTag(process.GlobalTag, GT, '')##106X_upgrade2018_realistic_v16_L1v1 default one signal sample                               
@@ -101,7 +101,7 @@ else:
 # FlyingTopAnalyzer                                                                                          
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 process.GoodVertexFilter = cms.EDFilter("VertexSelector",
                                         src = cms.InputTag("offlineSlimmedPrimaryVertices"),
@@ -136,7 +136,7 @@ process.source = cms.Source("PoolSource",
     #    'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau70_smu250_snu200/MINIAODSIM_v16_L1v1_10.root'
 
 
-       'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau100/MINIAODSIM_v16_L1v1_1.root',
+       'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_1.root',
 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_2.root',
 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_3.root',
 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_4.root',
@@ -275,7 +275,7 @@ process.source = cms.Source("PoolSource",
     # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/F8DA96F9-7958-AB44-87AF-914D435896CA.root',
     # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/FB2A28D0-3315-EE42-A78D-DC38DA4B4B2E.root'
 
-# 'file:./MCTTTo2L2Nu/00000/04A0B676-D63A-6D41-B47F-F4CF8CBE7DB8.root',
+'file:./MCTTTo2L2Nu/00000/04A0B676-D63A-6D41-B47F-F4CF8CBE7DB8.root',
 # 'file:./MCTTTo2L2Nu/00000/093341BD-F5AE-404D-BF2C-157BAF2B9AC5.root',
 # 'file:./MCTTTo2L2Nu/00000/0B7957F4-6494-7B4C-BD85-E682DA1EFA4F.root',
 # 'file:./MCTTTo2L2Nu/00000/0C6623EF-B101-694A-8904-D7578B1093C8.root',
@@ -504,36 +504,22 @@ process.source = cms.Source("PoolSource",
 #  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/5CCCF4E1-81E7-8445-9173-9AA6FA3A8F52.root',
 #  'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_20_FLY/src/FlyingTop/FlyingTop/test/MC/5EE47880-81FA-CD42-A9E7-FC556E8CC9E1.root'
                            
+    # 'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/MCTTTo2L2Nu/00000/0B7957F4-6494-7B4C-BD85-E682DA1EFA4F.root',
+    # 'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/MCTTTo2L2Nu/00000/0C6623EF-B101-694A-8904-D7578B1093C8.root',
+    # 'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/MCTTTo2L2Nu/00000/0CA220FA-8ED3-824A-8445-0599C8754362.root',
+    # 'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/MCTTTo2L2Nu/00000/2B6DCD9D-A589-0F48-91D5-06C355FFBDA1.root',
+    # 'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/MCTTTo2L2Nu/00000/2CF51C43-067F-3A4C-A47E-508DB497B5C8.root',
+    # 'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/MCTTTo2L2Nu/00000/3BA34C6E-E559-DE49-AFC2-C52294644E27.root',
+    # 'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/MCTTTo2L2Nu/00000/3BBDC332-6E2D-EB4F-896E-C49B3485DB78.root',
+    # 'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/MCTTTo2L2Nu/00000/3D051F63-4F6D-D147-8367-3054535A1766.root',
+    # 'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/MCTTTo2L2Nu/00000/3EE11089-6746-7049-A5B3-6F66A5162607.root',
+    # 'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/MCTTTo2L2Nu/00000/04A0B676-D63A-6D41-B47F-F4CF8CBE7DB8.root'
 )
 )
 
-# DY1JetsToLL_M-10to50_MatchEWPDG20_TuneCP5_13TeV-madgraphMLM-pythia8
-# DY1JetsToLL_M-50_MatchEWPDG20_TuneCP5_13TeV-madgraphMLM-pythia8
-# DY2JetsToLL_M-10to50_MatchEWPDG20_TuneCP5_13TeV-madgraphMLM-pythia8
-# DY2JetsToLL_M-50_MatchEWPDG20_TuneCP5_13TeV-madgraphMLM-pythia8
-# DY3JetsToLL_M-10to50_MatchEWPDG20_TuneCP5_13TeV-madgraphMLM-pythia8
-# DY3JetsToLL_M-50_MatchEWPDG20_TuneCP5_13TeV-madgraphMLM-pythia8
-# DY4JetsToLL_M-10to50_MatchEWPDG20_TuneCP5_13TeV-madgraphMLM-pythia8
-# DY4JetsToLL_M-50_MatchEWPDG20_TuneCP5_13TeV-madgraphMLM-pythia8
-# DYBJetsToLL_M-50_Zpt-100to200_TuneCP5_13TeV-madgraphMLM-pythia8
-# DYBJetsToLL_M-50_Zpt-200toInf_TuneCP5_13TeV-madgraphMLM-pythia8
-# TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8
-# TTJets_DiLept_genMET-150_TuneCP5_13TeV-madgraphMLM-pythia8
-# TTJets_HT-1200to2500_TuneCP5_13TeV-madgraphMLM-pythia8
-# TTJets_HT-2500toInf_TuneCP5_13TeV-madgraphMLM-pythia8
-# TTJets_HT-600to800_TuneCP5_13TeV-madgraphMLM-pythia8
-# TTJets_HT-800to1200_TuneCP5_13TeV-madgraphMLM-pythia8
-# TTJets_SingleLeptFromT_TuneCP5_13TeV-madgraphMLM-pythia8
-# TTJets_SingleLeptFromT_genMET-150_TuneCP5_13TeV-madgraphMLM-pythia8
-# TTJets_SingleLeptFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8
-# TTJets_SingleLeptFromTbar_genMET-150_TuneCP5_13TeV-madgraphMLM-pythia8
-# TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8
 
 
-# //btagging
-# from PhysicsTools.PatAlgos.tools.helpers import getPatAlgosToolsTask
-# patAlgosToolsTask = getPatAlgosToolsTask(process)
-# process.outpath = cms.EndPath(process, patAlgosToolsTask)
+
 
 from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
 setupEgammaPostRecoSeq(process,
@@ -542,20 +528,6 @@ setupEgammaPostRecoSeq(process,
                        era=EGERA
 )    
 
-
-#from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
-#setupEgammaPostRecoSeq(process,era='2018-UL')  
-
-# from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
-# updateJetCollection(
-#     process,
-#     jetSource = cms.InputTag('slimmedJets'),
-#     jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
-# #$$$$    btagDiscriminators = ['pfDeepCSVJetTags:probb','pfDeepCSVJetTags:probc','pfDeepCSVJetTags:probudsg','pfDeepCSVJetTags:probbb','pfDeepFlavourJetTags:probb'], ## to add discriminators
-#     btagDiscriminators = ['pfDeepCSVJetTags:probb','pfDeepCSVJetTags:probbb',
-#                           'pfDeepFlavourJetTags:probb','pfDeepFlavourJetTags:probbb','pfDeepFlavourJetTags:problepb'], ## to add discriminators
-#     btagPrefix = 'TEST'
-# )
 
 ##########################################################
 #
@@ -629,7 +601,30 @@ process.updatedJetsWithUserData = cms.EDProducer("PATJetUserDataEmbedder",
     ),
 )
 
+################################################""
+# process.jer = cms.ESSource("PoolDBESSource",
+#         CondDBSetup,
+#         toGet = cms.VPSet(
+#             # Resolution
+#             cms.PSet(
+#                 record = cms.string('JetResolutionRcd'),
+#                 # JR_dataRun2_25nsV1b_V3b_V7b_106X_DATA_SF_AK4PF
+#                 # JR_dataRun2_25nsV1b_V3b_V7b_106X_DATA_PtResolution_AK4PF
+#                 # JR_Summer15_25nsV6_MC_PtResolution_AK4PF
+#                 tag    = cms.string('JR_Summer15_25nsV6_MC_PtResolution_AK4PFchs'),
+#                 label  = cms.untracked.string('AK4PFchs_pt')
+#                 ),
 
+#             # Scale factors
+#             cms.PSet(
+#                 record = cms.string('JetResolutionScaleFactorRcd'),
+#                 tag    = cms.string('JR_Summer15_25nsV6_MC_SF_AK4PFchs'),
+#                 label  = cms.untracked.string('AK4PFchs')
+#                 ),
+#             ),
+#         connect = cms.string('sqlite:Summer16_25nsV1b_DATA.db')
+#         )
+################################################""
 
 from PhysicsTools.PatUtils.l1PrefiringWeightProducer_cfi import l1PrefiringWeightProducer
 process.prefiringweight = l1PrefiringWeightProducer.clone(
@@ -644,18 +639,17 @@ process.prefiringweight = l1PrefiringWeightProducer.clone(
 
 
 
+
 process.options = cms.untracked.PSet( )
 process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
                                 #    RochString = cms.string("./FlyingTop/FlyingTop/test/"), 
                                 #    Roccor = cms.FileInPath("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"),
+                                    DATASET = cms.untracked.vstring(process.source.fileNames),
                                     isMC =cms.bool(IsMC), 
                                     YEAR = cms.int32(year),
-                                    SHIFT_X = cms.double(-0.09),   
-                                    SHIFT_Y = cms.double(0.12), 
-                                    SHIFTBP_X = cms.double(-0.18), 
-                                    SHIFTBP_Y = cms.double(0.19),
+                                    ERA2016 = cms.bool(isPostAPV),
                                     RochString = cms.string(ROCCORPATH),
-                                    weightFileMVA = cms.untracked.string( "BDT_TRK_CTAU10cm_vs_TT.xml"),#track selection => previous :BDT_TRK_ALLSIGvsDYTT_30_01_2024.xml/ BDT_TRK_ALLSIGvsALLBKG.xml // TMVAClassification_BDTG_TRKSEL_.weights.xml
+                                    weightFileMVA = cms.untracked.string( "BDT_TRK_240510_ctau100vsEMUdata_NOchi2NOdxyNOdz.xml"),#track selection => previous :BDT_TRK_CTAU10cm_vs_TT.xml //BDT_TRK_ALLSIGvsDYTT_30_01_2024.xml/ BDT_TRK_ALLSIGvsALLBKG.xml // TMVAClassification_BDTG_TRKSEL_.weights.xml
                                     weightFileMVA_EVTS = cms.untracked.string("BDT_EVT_ALLSIGvsALLBKG.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
                                     weightFileMVA_EVTSDY = cms.untracked.string("BDT_EVT_ALLSIGvsDYM50.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
                                     weightFileMVA_EVTSTT = cms.untracked.string("BDT_EVT_ALLSIGvsTTTo2L2Nu.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
@@ -665,11 +659,13 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
                                     # weightFileMVA_HEMI2 = cms.untracked.string("BDT_HEMI2_ALLSIGvsALLBKG.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
                                     # weightFileMVA_HEMI2DY = cms.untracked.string("BDT_HEMI2_ALLSIGvsDYM50.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
                                     # weightFileMVA_HEMI2TT = cms.untracked.string("BDT_HEMI2_ALLSIGvsTTTo2L2Nu.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
-                                    weightFileMVA_VTX = cms.untracked.string("BDT_VTX_ALLSTEPS_ALLSignal.xml"),#vtx selection : TMVAClassification_BDTG_VTXSEL_.weights.xml
-                                    weightFileMVA_VTX_step1 = cms.untracked.string("BDT_VTX_STEPS12_ALLSignal.xml"),#vtx selection :  TMVAClassification_BDTG_VTXSel_TIGHTWP.weights.xml
-                                    mcpufile = cms.string("Pileup_MC2018UL_bin100.root"),
+                                    weightFileMVA_VTX = cms.untracked.string("BDT_VTX_ALLSTEPS.xml"),#vtx selection : TMVAClassification_BDTG_VTXSEL_.weights.xml
+                                    weightFileMVA_VTX_step1 = cms.untracked.string("BDT_VTX_STEP12.xml"),#vtx selection :  TMVAClassification_BDTG_VTXSel_TIGHTWP.weights.xml
+                                    mcpufile = cms.string(MCPUFILE),
                                     mcpupath = cms.string("pileup"),
-                                    datapufile = cms.string("MyDataPileupHistogram_bin100.root"),
+                                    datapufile = cms.string(DATAPUFILE),
+                                    datapileupfileup = cms.string(DATAPUFILEUP),
+                                    datapileupfiledown = cms.string(DATAPUFILEDOWN),
                                     datapupath = cms.string("pileup"),
                                 #    muoneps1file   = cms.string("NUM_TightID_DEN_TrackerMuons_abseta_pt.root"),
                                 #    muoneps1path   = cms.string("NUM_TightID_DEN_TrackerMuons_abseta_pt"),
@@ -715,10 +711,13 @@ process.p = cms.Path(
     process.egammaPostRecoSeq*
     process.FlyingTop
 )
-
+# //jet energy corrections
+from PhysicsTools.PatAlgos.tools.helpers  import getPatAlgosToolsTask
+process.patAlgosToolsTask = getPatAlgosToolsTask(process)
+process.pathRunPatAlgos = cms.Path(process.patAlgosToolsTask)
 ########## output of ntuple
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string("NtupleTest.root") )
+process.TFileService = cms.Service("TFileService", fileName = cms.string("Ntuple_Test.root") )
 
 process.options.numberOfThreads=cms.untracked.uint32(4)
 
