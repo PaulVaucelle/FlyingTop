@@ -25,5 +25,16 @@
 <use name="RecoTracker/TransientTrackingRecHit"/>
 <use name="roottmva"/>
 <use name="RecoVertex/AdaptiveVertexFit"/>
+<use name="CondFormats/DataRecord"/>
+<use name="CondFormats/JetMETObjects"/>
+<use name="JetMETCorrections/Modules"/>
+<use name="JetMETCorrections/Objects"/>
+<use name="Geometry/GEMGeometryBuilder"/>
+<use   name="Geometry/Records"/>
+<use   name="Geometry/GEMGeometry"/>
+
 <flags EDM_PLUGIN="1"/>
-<Flags CXXFLAGS="-g"/> 
+<flags CXXFLAGS="-g"/> 
+
+
+
