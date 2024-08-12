@@ -188,16 +188,6 @@
 #include "GeneratorInterface/LHEInterface/interface/LHERunInfo.h"
 #include "SimDataFormats/GeneratorProducts/interface/PdfInfo.h"
 
-//--------------------------JEC---------------//
-#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
-#include "CondFormats/DataRecord/interface/JetCorrectorParametersRecord.h"
-#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
-#include "JetMETCorrections/Modules/interface/JetResolution.h"
-#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
-
-//------------------------------------------//
-
-
 //-------------------------Top pt reweighting ---------------------//
 // https://twiki.cern.ch/twiki/bin/view/CMS/TopPtReweighting#TOP_PAG_corrections_based_on_dat
 // #include "AnalysisDataFormats/TopObjects/interface/TtGenEvent.h"
@@ -226,19 +216,18 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     virtual void beginJob() override;
     virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
     virtual void endJob() override;
-    
 
     // ----------member data ---------------------------
 
     void clearVariables();
 
     RoccoR rc;
-    
+  
     std::vector<std::string> inputFileNames_;
     bool isMC_;
     int YEAR_ ;
     bool ERA2016_;
-    std::string RochString;
+    string RochString;
     std::string weightFile_;
     std::string weightFileEVTS_;
     std::string weightFileEVTSDY_ ;
@@ -251,7 +240,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::string weightFileHEMI2TT_;
     std::string weightFileVtx_;
     std::string weightFileVtxStep1_;
-    std::string mcPileupFile_, dataPileupFile_, dataPileupFileUp_ ,dataPileupFileDown_ ;
+    std::string mcPileupFile_, dataPileupFile_;
     std::string mcPileupPath_, dataPileupPath_;
     std::string MuonEps1File_ ;
     std::string MuonEps1Path_ ;
@@ -274,8 +263,6 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     edm::EDGetTokenT<pat::PackedCandidateCollection>      lostpcToken_; //LOST
 
     reweight::LumiReWeighting* lumiWeights_;
-    reweight::LumiReWeighting* lumiWeightsUp_;
-    reweight::LumiReWeighting* lumiWeightsDown_;
 
   ///////////////
   // Ntuple info
@@ -305,14 +292,12 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
 
     int runNumber, eventNumber, lumiBlock;
     double PUweight;
-    double PUweight_Up;
-    double PUweight_Down;
     int PU_events;// AllPU_events_weight;
     double Prefweight;
-    bool tree_only_tigger_filter;
-    bool tree_Filter;
-    bool tree_FilterSameSign;
-    bool tree_Good_PV;
+    bool tree_only_tigger_filter = false;
+    bool tree_Filter = false;//= false
+    bool tree_FilterSameSign = false ;//= false
+    bool tree_Good_PV = false;//= false
     int tree_muon_GenRecoTriggerMatched;
     int  tree_nTracks, tree_nLostTracks, tree_TRACK_SIZE; 
     int  tree_nFromC = 0, tree_nFromB = 0; 
@@ -493,8 +478,8 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     float drSig_Cut = 5; // default 5. 
    //  ---------------------------------------------------------------- //
 
-     std::vector<float> tree_LHE_Weights;
-    float tree_MCEvt_weight;
+  //    std::vector<float> tree_LHE_Weights;
+  // float tree_MCEvt_weight;
 
     float tree_Evts_MVAval;
     float tree_Evts_MVAvalDY;
@@ -665,12 +650,6 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     int tree_njet; 
     int tree_njetNOmu; // only for counting jets without prompt muon inside !
     std::vector<float> tree_jet_pt;
-    std::vector<float> tree_jet_pt_jecUp;
-    std::vector<float> tree_jet_pt_jecDown;
-    std::vector<float> tree_jet_pt_res;
-    std::vector<float> tree_jet_pt_res_sf;
-    std::vector<float> tree_jet_pt_res_sf_up;
-    std::vector<float> tree_jet_pt_res_sf_down;
     std::vector<float> tree_jet_eta;
     std::vector<float> tree_jet_phi;
     std::vector<float> tree_jet_px;
@@ -1281,8 +1260,6 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     weightFileVtxStep1_( iConfig.getUntrackedParameter<std::string>("weightFileMVA_VTX_step1") ),
     mcPileupFile_	( iConfig.getParameter<std::string>( "mcpufile" ) ),
     dataPileupFile_	( iConfig.getParameter<std::string>( "datapufile" ) ),
-    dataPileupFileUp_	( iConfig.getParameter<std::string>( "datapileupfileup" ) ),
-    dataPileupFileDown_	( iConfig.getParameter<std::string>( "datapileupfiledown" ) ),
     mcPileupPath_	( iConfig.getParameter<std::string>( "mcpupath" ) ),
     dataPileupPath_	( iConfig.getParameter<std::string>( "datapupath" ) ),
     // MuonEps1File_ (iConfig.getParameter<std::string>( "muoneps1file" ) ),
@@ -1322,10 +1299,6 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
 
     rc.init(edm::FileInPath(RochString).fullPath());
     lumiWeights_ = new reweight::LumiReWeighting( mcPileupFile_, dataPileupFile_, mcPileupPath_, dataPileupPath_ );
-    std::cout<<"here"<<std::endl;
-    lumiWeightsUp_ = new reweight::LumiReWeighting( mcPileupFile_, dataPileupFileUp_, mcPileupPath_, dataPileupPath_ );
-    std::cout<<"here2"<<std::endl;
-    lumiWeightsDown_ = new reweight::LumiReWeighting( mcPileupFile_, dataPileupFileDown_, mcPileupPath_, dataPileupPath_ );
 
     smalltree = fs->make<TTree>("ttree", "ttree");
     
@@ -1333,19 +1306,17 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("runNumber",        &runNumber,  "runNumber/I");
     smalltree->Branch("eventNumber",      &eventNumber,"eventNumber/I");
     smalltree->Branch("lumiBlock"  ,      &lumiBlock,  "lumiBlock/I");
-    smalltree->Branch("tree_LHE_Weights", &tree_LHE_Weights);
-    smalltree->Branch("tree_MCEvt_weight", &tree_MCEvt_weight, "tree_MCEvt_weight/F");
+    //smalltree->Branch("tree_LHE_Weights", &tree_LHE_Weights);
+    //smalltree->Branch("tree_MCEvt_weight", &tree_MCEvt_weight, "tree_MCEvt_weight/F");
     
-    hEvents = fs->make<TH1D>("hEvents","hEvents",100,0,100);
+    hEvents = fs->make<TH1D>("hEvents","hEvents",3,0,3);
     hEvents_with_gen_wt = fs->make<TH1D>("hEvents_with_gen_wt","hEvents_with_gen_wt",2,0,2);
     
     smalltree->Branch("tree_only_gen_wt",&tree_only_gen_wt,"tree_only_gen_wt/D");
     smalltree->Branch("tree_event_weight",&tree_event_weight,"tree_event_weight/D");
     smalltree->Branch("tree_genTop_Weight",&tree_genTop_Weight,"tree_genTop_Weight/D");
     
-    smalltree->Branch("PUweight",         &PUweight,      "PUweight/D");
-    smalltree->Branch("PUweight_Up",      &PUweight_Up,   "PUweight_Up/D");
-    smalltree->Branch("PUweight_Down",    &PUweight_Down, "PUweight_Down/D");
+    smalltree->Branch("PUweight",         &PUweight, "PUweight/D");
     smalltree->Branch("Prefweight",       &Prefweight, "Prefweight/D");
     smalltree->Branch("PU_events", &PU_events, "PU_events/I");
     //smalltree->Branch("AllPU_events_weight", &AllPU_events_weight, "AllPU_events_weight/I");
@@ -1501,12 +1472,6 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_njet"  ,                &tree_njet);
     smalltree->Branch("tree_njetNOmu"  ,            &tree_njetNOmu);
     smalltree->Branch("tree_jet_pt"  ,              &tree_jet_pt);
-    smalltree->Branch("tree_jet_pt_jecUp",          &tree_jet_pt_jecUp);
-    smalltree->Branch("tree_jet_pt_jecDown",        &tree_jet_pt_jecDown);
-    smalltree->Branch("tree_jet_pt_res",            &tree_jet_pt_res);
-    smalltree->Branch("tree_jet_pt_res_sf",         &tree_jet_pt_res_sf);
-    smalltree->Branch("tree_jet_pt_res_sf_up",      &tree_jet_pt_res_sf_up);
-    smalltree->Branch("tree_jet_pt_res_sf_down",    &tree_jet_pt_res_sf_down);
     smalltree->Branch("tree_jet_eta" ,              &tree_jet_eta);
     smalltree->Branch("tree_jet_phi" ,              &tree_jet_phi);
     smalltree->Branch("tree_jet_px"  ,              &tree_jet_px);
@@ -2208,6 +2173,7 @@ bool FlyingTopAnalyzer::isAncestor(const reco::Candidate* ancestor, const reco::
   return false;
 }
 
+
 //
 // member functions
 //
@@ -2250,15 +2216,11 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   tree_only_gen_wt=1.0;
   
   PUweight = 1;
-  PUweight_Up = 1;
-  PUweight_Down = 1;
   Prefweight = 1;
   tree_genTop_Weight = 1;
   using namespace edm;
   using namespace reco;
   using namespace pat;
-  using namespace JME;
-  // using namespace JetCorrectionUncertainty;
   
   //LHE/gen infos
 
@@ -2279,7 +2241,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
   edm::Handle<edm::View<reco::GenJet>> genJets;
   if ( isMC_ ) iEvent.getByToken(genJetToken_, genJets);
-// https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1PrefiringWeightRecipe 
+
   if ( isMC_ ) {
     edm::Handle< double > theprefweight;
     iEvent.getByToken(prefweight_token, theprefweight ) ;
@@ -2345,26 +2307,6 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
   Handle<double> hRho;
   iEvent.getByToken(rho_token_,hRho);
-
-//-------------JEC---------------------//
-  edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
-  iSetup.get<JetCorrectionsRecord>().get("AK4PF",JetCorParColl);//JetCorrectorParametersRecord JetCorrectionsRecord
-  JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
-  JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(JetCorPar);
-
-  //------------------JER------------------//
-
-  JME::JetResolution resolution = JME::JetResolution::get(iSetup, "AK4PF_pt");
-  JME::JetResolutionScaleFactor resolution_sf = JME::JetResolutionScaleFactor::get(iSetup, "AK4PF");
-
-//--------------------------------------//
-
-  reweight::PoissonMeanShifter PShiftUp_;
-  reweight::PoissonMeanShifter PShiftDown_;
-  PShiftDown_ = reweight::PoissonMeanShifter(-0.5);
-  PShiftUp_ = reweight::PoissonMeanShifter(0.5);
-//----------------------------------------//
-
   // float topweight = 1.0;
   // if ( isMC_ )
   //   {
@@ -2380,7 +2322,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
    hEvents_with_gen_wt->Fill(1,genEventInfo->weight());
    tree_only_gen_wt=genEventInfo->weight();
   }
-//  https://twiki.cern.ch/twiki/bin/view/CMS/PileupMCReweightingUtilities 
+ 
   if ( isMC_ ) 
   {
     int TruePUI = -99;
@@ -2395,12 +2337,8 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
         TruePUI = PVI->getTrueNumInteractions();
         continue;
       }
-    } // Pileup info loop ends		
-
+    } // Pileup info loop ends																				    
     PUweight = lumiWeights_->weight(TruePUI);
-    PUweight_Up = lumiWeightsUp_->weight(TruePUI);
-    PUweight_Down = lumiWeightsDown_->weight(TruePUI);
-
     PU_events = float(TruePUI);
 
     //  cout<<" pile up weight ="<<PUweight<<endl;
@@ -3084,19 +3022,6 @@ bool blind = false;
   //////////////////////////////////
   //////////////////////////////////
 
-// //$$
-//  if ( tree_Filter || tree_FilterSameSign ) {
-// //$$
-
-
-  ///////////////////////////////////////////////
-  /////////    lepton informations    ///////////
-  ///////////////////////////////////////////////
-
-  // if ( !tree_Filter && tree_FilterSameSign ) {
-  //   imu1 = imu1_SS;
-  //   imu2 = imu2_SS;
-  // }
 
   TLorentzVector Vlep1, Vlep2, vll;
   float lep1_pt=0, lep2_pt=0, lep1_eta=0, lep2_eta=0, lep1_phi=0, lep2_phi=0;
@@ -3238,38 +3163,33 @@ bool blind = false;
   //////////////////////////////////
   //////////////////////////////////
 
-  if ( isMC_ )
-  {
-    std::vector<double> evtWeights = genEventInfo->weights();
-    // std::cout<<"genEventInfo : "<<genEventInfo->weight()<<std::endl;
-    // std::cout<<"LHEEventInfo : "<< lheEventProduct->originalXWGTUP()<<std::endl;
-    // std::cout<<"LHEEvetnweight 0 : "<<lheEventProduct->weights()[0].wgt<<std::endl;
-    // tree_MCEvt_weight = lheEventProduct->weights()[0].wgt/lheEventProduct->originalXWGTUP();//LHEEventProduct not aviaalble
-//     const gen::PdfInfo *PDF = genEventInfo->pdf();
-//     // std::cout<<"scalePDF : "<<PDF->scalePDF<<std::endl;
-//     int id1 = PDF->id.first ;// [-4,-3,-2,-1,1,2,3,4]
-//     int id2 = PDF->id.second;
-//     // std::cout<<"id1 and id2 : "<<id1<<"//"<<id2<<std::endl;
-// 
-//     double x1 = PDF->x.first;
-//     double x2 = PDF->x.second;
-//     //  std::cout<<"x1 and x2 : "<<x1<<"//"<<x2<<std::endl;
-// 
-//     double xPDF1 = PDF->xPDF.first;//==0
-//     double xPDF2 = PDF->xPDF.second;//==0
-//     //  std::cout<<"xPDF1 and xPDF2 : "<<xPDF1<<"//"<<xPDF2<<std::endl;
-// 
-//     unsigned int ProcID = genEventInfo->signalProcessID();//9999
-// 	  // double qscale = genEventInfo->qScale();//sameasPDFscale
-//     double alphaqcd = genEventInfo->alphaQCD();
-//     // std::cout<<"ProcID and qscale and alphaqcd : "<<ProcID<<"//"<<" alphaqcd : "<<alphaqcd<<std::endl;
+//   if ( isMC_ )
+//   {
+//     std::vector<double> evtWeights = genEventInfo->weights();
+//     tree_MCEvt_weight = genEventInfo->weight();
 
-    for (unsigned int k = 0 ; k<evtWeights.size() ; k++)
-      {
-        tree_LHE_Weights.push_back(evtWeights[k]);
-      }
+// //     const gen::PdfInfo *PDF = genEventInfo->pdf();
+// //     // std::cout<<"scalePDF : "<<PDF->scalePDF<<std::endl;
+// //     int id1 = PDF->id.first ;// [-4,-3,-2,-1,1,2,3,4]
+// //     int id2 = PDF->id.second;
+// //     // std::cout<<"id1 and id2 : "<<id1<<"//"<<id2<<std::endl;
+// // 
+// //     double x1 = PDF->x.first;
+// //     double x2 = PDF->x.second;
+// //     //  std::cout<<"x1 and x2 : "<<x1<<"//"<<x2<<std::endl;
+// // 
+// //     double xPDF1 = PDF->xPDF.first;//==0
+// //     double xPDF2 = PDF->xPDF.second;//==0
+// //     //  std::cout<<"xPDF1 and xPDF2 : "<<xPDF1<<"//"<<xPDF2<<std::endl;
+// // 
+// //     unsigned int ProcID = genEventInfo->signalProcessID();//9999
+// // 	  // double qscale = genEventInfo->qScale();//sameasPDFscale
+// //     double alphaqcd = genEventInfo->alphaQCD();
+// //     // std::cout<<"ProcID and qscale and alphaqcd : "<<ProcID<<"//"<<" alphaqcd : "<<alphaqcd<<std::endl;
 
-  }
+//     for (unsigned int k = 0 ; k<evtWeights.size() ; k++)
+//       tree_LHE_Weights.push_back(evtWeights[k]);
+//   }
 
 
   //////////////////////////////////
@@ -3363,7 +3283,7 @@ bool blind = false;
         // }
       }
       // Computation of Top SF 
-// https://twiki.cern.ch/twiki/bin/view/CMS/TopPtReweighting 
+      // https://twiki.cern.ch/twiki/bin/view/CMS/TopPtReweighting 
       if (ID == 6)
         {
           if (genIt.isLastCopy())//required by the Top PAG
@@ -4211,9 +4131,6 @@ bool blind = false;
   float jet2_eta = 0; 
   float jet2_phi = -10;
 
-  int JEC = 0;
-  int JER = 0;
-
   for (const pat::Jet &jet : *jets) 
   {
     if ( jet.pt() < jet_pt_min ) continue;
@@ -4271,168 +4188,13 @@ bool blind = false;
     if ( indjet == 1 ) {jet2_pt = jet.pt(); jet2_eta = jet.eta();jet2_phi=jet.phi();}
     if (jet1_pt < jet2_pt){float tempjetpt = jet2_pt; jet2_pt = jet1_pt; jet1_pt = tempjetpt; }
     if (indjet==1 && showlog){std::cout<<"delta R between leading and subleadingjet : "<< Deltar(jet1_eta,jet1_phi,jet2_eta,jet2_phi) <<std::endl;}
-
-
-    //JetEnergy scale
-    
-    float jetpt = jet.pt();
-    jecUnc->setJetEta(jet.eta());
-    jecUnc->setJetPt(jet.pt()); // here you must use the CORRECTED jet pt (Correction are applied in the python file, no worries L1L2L3 etc) 
-
-    //-------------//
-    double unc = 1.;
-    if (isMC_)
-      { 
-        unc = jecUnc->getUncertainty(true);
-      }
-    
-    // std::cout<<"jetUnc : "<<jecUnc->JetCorrectionUncertainty::getUncertainty(true)<<std::endl;
-    double ptCor_shifted_down = jetpt-unc;
-    double ptCor_shifted_up = jetpt+unc;
-    tree_jet_pt_jecUp.push_back(ptCor_shifted_up);
-    tree_jet_pt_jecDown.push_back(ptCor_shifted_down);
-    //Jet energy Resolution
-    JME::JetParameters Para;
-
-    float r = 1.0;
-    if (isMC_)
-      {
-        Para.setJetPt(jet.pt());
-        Para.setJetEta(jet.eta());
-        Para.setRho(rho_val);
-        r = resolution.getResolution(Para);
-      }
-
-    // jet resolution SF
-    float jet_resolution_sf = 1.;
-    float jet_resolution_sf_up = 1.;
-    float jet_resolution_sf_down = 1.;
-
-    JME::JetParameters SFPara ;
-    // SFPara.setJetEta(jet.eta());
-    // SFPara.setRho(rho_val);
-
-    if (isMC_)
-      {
-        SFPara.set(JME::Binning::JetPt,jet.pt());
-        SFPara.set(JME::Binning::JetEta,jet.eta());
-        SFPara.set(JME::Binning::Rho, rho_val);
-        jet_resolution_sf = resolution_sf.getScaleFactor(SFPara);
-        jet_resolution_sf_up = resolution_sf.getScaleFactor(SFPara, Variation::UP);
-        jet_resolution_sf_down = resolution_sf.getScaleFactor(SFPara, Variation::DOWN);
-      }
-
-
-    tree_jet_pt_res.push_back(r);
-    tree_jet_pt_res_sf.push_back(jet_resolution_sf);
-    tree_jet_pt_res_sf_up.push_back(jet_resolution_sf_up);
-    tree_jet_pt_res_sf_down.push_back(jet_resolution_sf_down);
-    
-    float Jet_pt_cor = jet.pt();
-    if( JEC == 1 )
-      {
-        Jet_pt_cor = ptCor_shifted_up;
-      } 
-    else if ( JEC == -1 )
-      {
-        Jet_pt_cor = ptCor_shifted_down;
-      }
-
-    //add smearing of MC jets here
-    // https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution#Smearing_procedures
-    // First,  matchign has to be performed between the gen level jets and the reco jets following a criteria of dR and pt
-    // then the hybrid method is applied to the reco jets as mentioned in hte link
-        float smear = 1.;
-        float smear_up = 1.;
-        float smear_down = 1.;
-        if (isMC_)
-          {
-            for (auto const & genJet : *genJets)
-              {
-                if ( genJet.pt() < GenPtMin ) continue;
-                if (Deltar( jet.eta(), jet.phi(), genJet.eta(), genJet.phi() ) < 0.2 && abs(Jet_pt_cor-genJet.pt()) < 3*Jet_pt_cor*r)
-                  {
-                    smear_up = 1+(jet_resolution_sf_up-1)*(Jet_pt_cor-genJet.pt())/Jet_pt_cor;
-                    smear_down = 1+(jet_resolution_sf_down-1)*(Jet_pt_cor-genJet.pt())/Jet_pt_cor;
-                    smear = 1+(jet_resolution_sf-1)*(Jet_pt_cor-genJet.pt())/Jet_pt_cor;
-                  }
-                else 
-                  {
-                    float sigma = std::max(sqrt(jet_resolution_sf*jet_resolution_sf-1),0.0f);
-                    float sigma_up =std::max(sqrt(jet_resolution_sf_up*jet_resolution_sf_up-1),0.0f);
-                    float sigma_down = std::max(sqrt(jet_resolution_sf_down*jet_resolution_sf_down-1),0.0f);
-                    smear = 1+gRandom->Gaus(0,r)*sigma;
-                    smear_up = 1+gRandom->Gaus(0,r)*sigma_up;
-                    smear_down = 1+gRandom->Gaus(0,r)*sigma_down;
-                  }
-              }
-          }
-
-
-    TLorentzVector TempJet4VUp(jet.px(),jet.py(),jet.pz(),jet.energy());
-    TLorentzVector TempJet4VDown(jet.px(),jet.py(),jet.pz(),jet.energy());
-    TLorentzVector TempJet4V(jet.px(),jet.py(),jet.pz(),jet.energy());
-    TempJet4V = smear*TempJet4V;
-    TempJet4VUp = smear_up*TempJet4VUp;
-    TempJet4VDown = smear_down*TempJet4VDown;
-
-    float jet_pt_jerUp = sqrt(TempJet4VUp.Px()*TempJet4VUp.Px()+TempJet4VUp.Py()*TempJet4VUp.Py());
-    float jet_pt_jerDown = sqrt(TempJet4VDown.Px()*TempJet4VDown.Px()+TempJet4VDown.Py()*TempJet4VDown.Py());
-    float jet_pt_jer = sqrt(TempJet4V.Px()*TempJet4V.Px()+TempJet4V.Py()*TempJet4V.Py());
-
-    float jet_px_jerUp = TempJet4VUp.Px();
-    float jet_py_jerUp = TempJet4VUp.Py();
-    float jet_pz_jerUp = TempJet4VUp.Pz();
-    float jet_E_jerUp = TempJet4VUp.E();
-
-    float jet_px_jerDown = TempJet4VDown.Px();
-    float jet_py_jerDown = TempJet4VDown.Py();
-    float jet_pz_jerDown = TempJet4VDown.Pz();
-    float jet_E_jerDown = TempJet4VDown.E();
-
-    float jet_px_jer = TempJet4V.Px();
-    float jet_py_jer = TempJet4V.Py();
-    float jet_pz_jer = TempJet4V.Pz();
-    float jet_E_jer = TempJet4V.E();
-
-    float jet_px = jet.px();
-    float jet_py = jet.py();
-    float jet_pz = jet.pz();
-    float jet_E = jet.energy();
-
-    if (JER == 1)
-      {
-        Jet_pt_cor = jet_pt_jerUp;
-        jet_px = jet_px_jerUp;
-        jet_py = jet_py_jerUp;
-        jet_pz = jet_pz_jerUp;
-        jet_E = jet_E_jerUp;
-      }
-    else if (JER == 0)
-      {
-        Jet_pt_cor = jet_pt_jer;
-        jet_px = jet_px_jer;
-        jet_py = jet_py_jer;
-        jet_pz = jet_pz_jer;
-        jet_E = jet_E_jer;
-      }
-    else if (JER == -1)
-      {
-        Jet_pt_cor = jet_pt_jerDown;
-        jet_px = jet_px_jerDown;
-        jet_py = jet_py_jerDown;
-        jet_pz = jet_pz_jerDown;
-        jet_E = jet_E_jerDown;
-      }
-    //-----------------//
-
-    tree_jet_pt.push_back(Jet_pt_cor);
+    tree_jet_pt.push_back(jet.pt());
     tree_jet_eta.push_back(jet.eta());
     tree_jet_phi.push_back(jet.phi());
-    tree_jet_px.push_back(jet_px);
-    tree_jet_py.push_back(jet_py);
-    tree_jet_pz.push_back(jet_pz);
-    tree_jet_E.push_back(jet_E);
+    tree_jet_px.push_back(jet.px());
+    tree_jet_py.push_back(jet.py());
+    tree_jet_pz.push_back(jet.pz());
+    tree_jet_E.push_back(jet.energy());
     // std::cout<<" jet.n90() : "<<jet.n90()<<" and  n60: "<<jet.n60()<<std::endl;
 
     tree_jet_HadronFlavour.push_back(jet.hadronFlavour());
@@ -4451,7 +4213,7 @@ bool blind = false;
     tree_jet_btag_DeepCSV.push_back( DeepCSV );
     tree_jet_btag_DeepJet.push_back( DeepJet );
 
-    if ( abs(jet.eta()) < 2.4 ) HT_val += Jet_pt_cor;
+    if ( abs(jet.eta()) < 2.4 ) HT_val += jet.pt();
     if (DeepJet > MediumWP && nmu>=1 )
     {
       tree_jet_leadingMuon_dR.push_back(              Deltar( jet.eta(), jet.phi(), lep1_eta, lep1_phi ));
@@ -6461,7 +6223,7 @@ bool blind = false;
     double bdtcut = 0.94; //Tight WP      // ttbar ~ 1E-3 : selection efficiency
 //$$
     double bdtcut_step2 = 0.0; //Loose WP // ttbar ~ 1E-2
-    if (YEAR_ == 2018 || YEAR_ == 2017)
+        if (YEAR_ == 2018 || YEAR_ == 2017)
       {
         bdtcut = 0.94;
       }
@@ -6473,7 +6235,7 @@ bool blind = false;
       {
         bdtcut = 0.93;
       }
-
+ 
     //---------------------------//
 
     for (int counter_track = 0; counter_track < tree_nTracks; counter_track++) 
@@ -6702,6 +6464,10 @@ bool blind = false;
     // tree_Hemi2_MVAvalDY = HEMI2_BDTvalDY;
     // tree_Hemi2_MVAvalTT = HEMI2_BDTvalTT;
 
+
+    //---------------------------------------------------------------//
+    //----------- STORE TRACKS FROM V0s (AND SEC. INT.) -------------//
+    //---------------------------------------------------------------//
 
     int countV0 = 0;
     for (unsigned int ipc = 0; ipc < TRACK_SIZE; ipc++) {
@@ -7368,6 +7134,8 @@ bool blind = false;
           }
       }
 
+   // float Vtx1Mass = TMath::Max(Vtx1Vector.Mag(),0.);
+    // tree_Hemi_Vtx_Mass.push_back(Vtx1Mass);
 
   //------------------------------------------------------------------------------------------------//
   //------------------------------------------------------------------------------------------------//
@@ -7413,7 +7181,7 @@ bool blind = false;
         Vtx_z = VtxHemi1->z();
         Vtx_chi = VtxHemi1->chi2();
       }
-      float Vtx1Mass = TMath::Max(Vtx1Vector.Mag(),0.);
+            float Vtx1Mass = TMath::Max(Vtx1Vector.Mag(),0.);
 
     if (blind && Vtx_step>=1 && Vtx_step<=2 && vaxis1.Pt()>80 )
       {
@@ -7461,30 +7229,27 @@ bool blind = false;
         tree_Hemi_Vtx_SumtrackWeight.push_back(SumWeight);
         tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
       }
+ //   tree_Hemi_Vtx_step.push_back(Vtx_step);
+ //   tree_Hemi_Vtx_isTight.push_back(TightVertex);
+ //   tree_Hemi_Vtx_NChi2.push_back(Vtx_chi);
+  //  tree_Hemi_Vtx_nTrks.push_back(Vtx_ntk);
+ //   tree_Hemi_Vtx_nTrks_sig.push_back(nTrks_axis1_sig_mva);
+ //   tree_Hemi_Vtx_nTrks_bad.push_back(nTrks_axis1_bad_mva);
+  //  tree_Hemi_Vtx_x.push_back(Vtx_x);
+ //   tree_Hemi_Vtx_y.push_back(Vtx_y);
+ //   tree_Hemi_Vtx_r.push_back(sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y));
+  //  tree_Hemi_Vtx_z.push_back(Vtx_z);
+  //  tree_Hemi_Vtx_xError.push_back(Vtx1posError.cxx());
+ //   tree_Hemi_Vtx_yError.push_back(Vtx1posError.cyy());
+ //   tree_Hemi_Vtx_zError.push_back(Vtx1posError.czz());
 
-    // float Vtx1Mass = TMath::Max(Vtx1Vector.Mag(),0.);
-    // tree_Hemi_Vtx_Mass.push_back(Vtx1Mass);
-    // tree_Hemi_Vtx_step.push_back(Vtx_step);
-    // tree_Hemi_Vtx_isTight.push_back(TightVertex);
-    // tree_Hemi_Vtx_NChi2.push_back(Vtx_chi);
-    // tree_Hemi_Vtx_nTrks.push_back(Vtx_ntk);
-    // tree_Hemi_Vtx_nTrks_sig.push_back(nTrks_axis1_sig_mva);
-    // tree_Hemi_Vtx_nTrks_bad.push_back(nTrks_axis1_bad_mva);
-    // tree_Hemi_Vtx_x.push_back(Vtx_x);
-    // tree_Hemi_Vtx_y.push_back(Vtx_y);
-    // tree_Hemi_Vtx_r.push_back(sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y));
-    // tree_Hemi_Vtx_z.push_back(Vtx_z);
-    // tree_Hemi_Vtx_xError.push_back(Vtx1posError.cxx());
-    // tree_Hemi_Vtx_yError.push_back(Vtx1posError.cyy());
-    // tree_Hemi_Vtx_zError.push_back(Vtx1posError.czz());
-
-    // recX = Vtx_x - tree_PV_x;
-    // recY = Vtx_y - tree_PV_y;
-    // recZ = Vtx_z - tree_PV_z;
-    // recD = TMath::Sqrt(recX*recX + recY*recY + recZ*recZ);
-    // tree_Hemi_Vtx_dist.push_back( recD );
-    // tree_Hemi_Vtx_SumtrackWeight.push_back(SumWeight);
-    // tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
+  //  recX = Vtx_x - tree_PV_x;
+  //  recY = Vtx_y - tree_PV_y;
+ //   recZ = Vtx_z - tree_PV_z;
+ //   recD = TMath::Sqrt(recX*recX + recY*recY + recZ*recZ);
+ //   tree_Hemi_Vtx_dist.push_back( recD );
+ //   tree_Hemi_Vtx_SumtrackWeight.push_back(SumWeight);
+ //   tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
 
     int nVertex = 0;
     if ( Vtx_step>0 && Vtx_chi<10 && Vtx_chi>0 ) nVertex++;
@@ -7706,7 +7471,8 @@ if ( LLP2_mother * lep1_Q < 0 ) {
           }
       }
 
-
+    //float Vtx2Mass = TMath::Max(Vtx2Vector.Mag(),0.);
+    //tree_Hemi_Vtx_Mass.push_back(Vtx2Mass);
 
   //------------------------------------------------------------------------------------------------//
   //------------------------------------------------------------------------------------------------//
@@ -7774,7 +7540,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
         tree_Hemi_Vtx_SumtrackWeight.push_back(0);
         tree_Hemi_Vtx_track_MeanDCA_d.push_back(0);
       }
-  else
+        else
     {
         
         tree_Hemi_Vtx_Mass.push_back(Vtx2Mass);
@@ -7800,7 +7566,27 @@ if ( LLP2_mother * lep1_Q < 0 ) {
         tree_Hemi_Vtx_SumtrackWeight.push_back(SumWeight);
         tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
     }
-
+  //tree_Hemi_Vtx_step.push_back(Vtx_step);
+  //tree_Hemi_Vtx_isTight.push_back(TightVertex);
+  //tree_Hemi_Vtx_NChi2.push_back(Vtx_chi);
+ // tree_Hemi_Vtx_nTrks.push_back(Vtx_ntk);
+  //tree_Hemi_Vtx_nTrks_sig.push_back(nTrks_axis2_sig_mva);
+  //tree_Hemi_Vtx_nTrks_bad.push_back(nTrks_axis2_bad_mva);
+  //tree_Hemi_Vtx_x.push_back(Vtx_x);
+  //tree_Hemi_Vtx_y.push_back(Vtx_y);
+  //tree_Hemi_Vtx_r.push_back(sqrt(Vtx_x*Vtx_x+Vtx_y*Vtx_y));
+  //tree_Hemi_Vtx_z.push_back(Vtx_z);
+  //tree_Hemi_Vtx_xError.push_back(Vtx2posError.cxx());
+  //tree_Hemi_Vtx_yError.push_back(Vtx2posError.cyy());
+  //tree_Hemi_Vtx_zError.push_back(Vtx2posError.czz());
+  
+  //recX = Vtx_x - tree_PV_x;
+  //recY = Vtx_y - tree_PV_y;
+  ////recZ = Vtx_z - tree_PV_z;
+  //recD = TMath::Sqrt(recX*recX + recY*recY + recZ*recZ);
+  //tree_Hemi_Vtx_dist.push_back( recD );
+  //tree_Hemi_Vtx_SumtrackWeight.push_back(SumWeight);
+  //tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
 
   if ( Vtx_step>0 && Vtx_chi<10 && Vtx_chi>0 ) nVertex++;
 
@@ -8452,9 +8238,9 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                             } // endif SecVtx is valid
 
                         //---------Merged Vertex-----//
-                        if (blind )
+                                                if (blind )
                           {
-                            if  (  MergeStep>= 1 && MergeStep<=2 && ((MergeHemi==1 &&  vaxis1.Pt()>80 ) || (MergeHemi==2 &&  vaxis2.Pt()>80 )))
+                            if  (  MergeStep>= 1 && MergeStep<=2 && ((MergeHemi==1 &&  vaxis1.Pt()>80 ) || (MergeHemi==2 &&  vaxis2.Pt()>80 ) || (vaxis2.Pt()>80 && vaxis1.Pt()>80)))
                               {
                                 tree_Hemi_SecVtx.push_back(0);
                                 tree_Hemi_SecVtx_step.push_back(0);
@@ -8470,7 +8256,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                                 tree_Hemi_SecVtx_Mass.push_back(0);
                                 tree_Hemi_SecVtx_dR.push_back(0);
                               }
-                            else
+                             else
                               {
                                 tree_Hemi_SecVtx.push_back(MergeHemi);
                                 tree_Hemi_SecVtx_step.push_back(MergeStep);
@@ -8486,8 +8272,8 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                                 tree_Hemi_SecVtx_Mass.push_back(MergedVtxMass);
                                 tree_Hemi_SecVtx_dR.push_back(dRmerge);
                               }
-
-                              if ( SecStep>= 1 && SecStep<=2 && ((SecHemi==1 &&  vaxis1.Pt()>80 ) || (SecHemi==2 &&  vaxis2.Pt()>80 )) )
+                            
+                              if ( SecStep>= 1 && SecStep<=2 && ((SecHemi==1 &&  vaxis1.Pt()>80 ) || (SecHemi==2 &&  vaxis2.Pt()>80 ) || (vaxis2.Pt()>80 && vaxis1.Pt()>80)) )
                                 {
                                   tree_Hemi_SecVtx.push_back(0);
                                   tree_Hemi_SecVtx_step.push_back(0);
@@ -8512,12 +8298,11 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                                   tree_Hemi_SecVtx_nTrks.push_back(SecVtx_ntk);
                                   tree_Hemi_SecVtx_NChi2.push_back(SecVtx_chi);
                                 }
-
-                          }
+                                                          }
 
                         else
                           {
-                            tree_Hemi_SecVtx.push_back(MergeHemi);
+                                                        tree_Hemi_SecVtx.push_back(MergeHemi);
                             tree_Hemi_SecVtx_step.push_back(MergeStep);
                             tree_Hemi_SecVtx_x.push_back(Mergedx);
                             tree_Hemi_SecVtx_y.push_back(Mergedy);
@@ -8542,36 +8327,38 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                             tree_Hemi_SecVtx_nTrks.push_back(SecVtx_ntk);
                             tree_Hemi_SecVtx_NChi2.push_back(SecVtx_chi);
                           }
-                        // tree_Hemi_SecVtx.push_back(MergeHemi);
-                        // tree_Hemi_SecVtx_step.push_back(MergeStep);
-                        // tree_Hemi_SecVtx_x.push_back(Mergedx);
-                        // tree_Hemi_SecVtx_y.push_back(Mergedy);
-                        // tree_Hemi_SecVtx_z.push_back(Mergedz);
-                        // tree_Hemi_SecVtx_r.push_back(Mergedr);
-                        // tree_Hemi_SecVtx_nTrks.push_back(MergeVtx_ntk);
-                        // tree_Hemi_SecVtx_NChi2.push_back(MergeVtx_chi);
-                        // tree_Hemi_SecVtx_dist.push_back( recD );
-                        // tree_Hemi_SecVtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
-                        // tree_Hemi_SecVtx_SumtrackWeight.push_back(SumWeight);         
-                        // tree_Hemi_SecVtx_Mass.push_back(MergedVtxMass);
-                        // tree_Hemi_SecVtx_dR.push_back(dRmerge); 
 
-                        // //-------New secondary vertex---//
+
+                        //tree_Hemi_SecVtx.push_back(MergeHemi);
+                         //tree_Hemi_SecVtx_step.push_back(MergeStep);
+                        // tree_Hemi_SecVtx_x.push_back(Mergedx);
+                         //tree_Hemi_SecVtx_y.push_back(Mergedy);
+                         //tree_Hemi_SecVtx_z.push_back(Mergedz);
+                         // //tree_Hemi_SecVtx_r.push_back(Mergedr);
+                         //tree_Hemi_SecVtx_nTrks.push_back(MergeVtx_ntk);
+                         //tree_Hemi_SecVtx_NChi2.push_back(MergeVtx_chi);
+                         //tree_Hemi_SecVtx_dist.push_back( recD );
+                         //tree_Hemi_SecVtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
+                         //tree_Hemi_SecVtx_SumtrackWeight.push_back(SumWeight);         
+                         //tree_Hemi_SecVtx_Mass.push_back(MergedVtxMass);
+                         //tree_Hemi_SecVtx_dR.push_back(dRmerge); 
+
+                        //-------New secondary vertex---//
                         // SecHemi = 2;
-		                    // if ( MergeHemi == 2 ) SecHemi = 1;
-                        // tree_Hemi_SecVtx.push_back(SecHemi);
-                        // tree_Hemi_SecVtx_step.push_back(SecStep);
+		                     //if ( MergeHemi == 2 ) SecHemi = 1;
+                         //tree_Hemi_SecVtx.push_back(SecHemi);
+                         //tree_Hemi_SecVtx_step.push_back(SecStep);
                         // tree_Hemi_SecVtx_x.push_back(SecVtx_x);
-                        // tree_Hemi_SecVtx_y.push_back(SecVtx_y);
-                        // tree_Hemi_SecVtx_z.push_back(SecVtx_z);
-                        // tree_Hemi_SecVtx_r.push_back(sqrt(SecVtx_x*SecVtx_x+SecVtx_y*SecVtx_y));
-                        // tree_Hemi_SecVtx_nTrks.push_back(SecVtx_ntk);
-                        // tree_Hemi_SecVtx_NChi2.push_back(SecVtx_chi);
-                        //                         // std::cout<<"SecVtx_chi: "<<SecVtx_chi<<std::endl;
-                        // // recX = SecVtx_x - tree_PV_x;
-                        // // recY = SecVtx_y - tree_PV_y;
-                        // // recZ = SecVtx_z - tree_PV_z;
-                        // // recD = TMath::Sqrt(recX*recX + recY*recY + recZ*recZ);
+                         //tree_Hemi_SecVtx_y.push_back(SecVtx_y);
+                         //tree_Hemi_SecVtx_z.push_back(SecVtx_z);
+                         //tree_Hemi_SecVtx_r.push_back(sqrt(SecVtx_x*SecVtx_x+SecVtx_y*SecVtx_y));
+                         //tree_Hemi_SecVtx_nTrks.push_back(SecVtx_ntk);
+                         //tree_Hemi_SecVtx_NChi2.push_back(SecVtx_chi);
+                                                // std::cout<<"SecVtx_chi: "<<SecVtx_chi<<std::endl;
+                        // recX = SecVtx_x - tree_PV_x;
+                        // recY = SecVtx_y - tree_PV_y;
+                        // recZ = SecVtx_z - tree_PV_z;
+                        // recD = TMath::Sqrt(recX*recX + recY*recY + recZ*recZ);
                         float theta_SecVtx = TMath::ATan2(sqrt(SecrecX*SecrecX+SecrecY*SecrecY),abs(SecrecZ)) ;
                         float eta_SecVtx = -TMath::Log(tan(theta_SecVtx/2));
                         if ( SecVtx_z < 0 ) eta_SecVtx = -eta_SecVtx;
@@ -8906,7 +8693,7 @@ if ( mva_V1_NChi2 >0 && mva_V1_NChi2 < 10 )
   tree_Hemi_Vtx_BDT_MeanDCA.push_back(mva_V_MeanDCA);
   tree_Hemi_Vtx_MVAval_Tight.push_back(Vtx2_bdtVal_Step1);
 
-    //$$
+//$$
   } // endif tree_njetNOmu > 0
 } // endif tree_Filter
 //$$
@@ -8951,7 +8738,7 @@ DEFINE_FWK_MODULE(FlyingTopAnalyzer);
 
 void FlyingTopAnalyzer::clearVariables() {
 
-  tree_LHE_Weights.clear();
+  //tree_LHE_Weights.clear();
     
     tree_muon_isPrompt.clear();
     tree_muon_pt.clear();
@@ -9054,12 +8841,6 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_electron_gen.clear();
 
     tree_jet_pt.clear();
-    tree_jet_pt_jecUp.clear();
-    tree_jet_pt_jecDown.clear();
-    tree_jet_pt_res.clear();
-    tree_jet_pt_res_sf.clear();
-    tree_jet_pt_res_sf_up.clear();
-    tree_jet_pt_res_sf_down.clear();
     tree_jet_eta.clear();
     tree_jet_phi.clear();
     tree_jet_px.clear();
