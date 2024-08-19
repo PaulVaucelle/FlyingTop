@@ -8,13 +8,14 @@ std::vector<float> DiLeptonMass(bool SSLep, int nLep, int nAllLepton, std::vecto
         int imu1_SS = -1, imu2_SS = -1;
         int Q1 = 0, Q2 = 0;
         float mupt1, mueta1, muphi1, mupt2, mueta2, muphi2;
-        if (nLep >= 2 ) 
+//$$$$        if (nLep >= 2 ) 
+        if ( nAllLepton >= 2 ) 
             {
                 for (int mu = 0; mu < nAllLepton - 1; mu++) {
 
                     if (!ID[index[mu]]) continue;
                     if (!ISO[index[mu]]) continue;
-                    if (!isPrompt[index[mu]]) continue;
+                    // if (!isPrompt[index[mu]]) continue;
                     mupt1 = PT[index[mu]];
                     if (mupt1 < 25.) continue;
                     mueta1 = ETA[index[mu]];
@@ -23,7 +24,7 @@ std::vector<float> DiLeptonMass(bool SSLep, int nLep, int nAllLepton, std::vecto
                     Q1 = CHARGE[index[mu]];
 
                     for (int mu2 = mu + 1; mu2 < nAllLepton; mu2++) {
-                        if (!isPrompt[index[mu2]]) continue;
+                        // if (!isPrompt[index[mu2]]) continue;
                         if (!ID[index[mu2]]) continue;
                         if (!ISO[index[mu2]]) continue;
                         mupt2 = PT[index[mu2]];
@@ -71,7 +72,8 @@ std::vector<float> DiLeptonMass(bool SSLep, int nLep, int nAllLepton, std::vecto
         int jmu1_SS = -1, jmu2_SS = -1;
         int Q1 = 0, Q2 = 0;
         float mupt1, mueta1, muphi1, mupt2, mueta2, muphi2;
-        if (nLep >= 1 && nLep2 >= 1 ) 
+//$$$$        if (nLep >= 1 && nLep2 >= 1 ) 
+        if ( nAllLepton >= 1 && nAllLepton2 >= 1 ) 
             {
                 for (int mu = 0; mu < nAllLepton; mu++) {
                     // if (!isPrompt[index[mu]]) continue;
@@ -79,8 +81,8 @@ std::vector<float> DiLeptonMass(bool SSLep, int nLep, int nAllLepton, std::vecto
                     if (!ISO[index[mu]]) continue;
                     // if (!isPrompt[index[mu]]) continue;
                     mupt1 = PT[index[mu]];
-                    if (mupt1 < 25.) continue;
-		            mueta1 = ETA[index[mu]]; 
+                    // if (mupt1 < 25.) continue;
+	            mueta1 = ETA[index[mu]]; 
                     muphi1 = PHI[index[mu]];
                     v1.SetPtEtaPhiM(mupt1, mueta1, muphi1, Lepmass[0]);
                     Q1 = CHARGE[index[mu]];
@@ -88,8 +90,10 @@ std::vector<float> DiLeptonMass(bool SSLep, int nLep, int nAllLepton, std::vecto
                     for (int mu2 = 0; mu2 < nAllLepton2; mu2++) {
                         // if (!isPrompt2[index2[mu2]]) continue;
                         if (!ID2[index2[mu2]]) continue;
-			            mupt2 = PT2[index2[mu2]];
-                        if (mupt2 < 14.) continue;
+	                mupt2 = PT2[index2[mu2]];
+                        // if (mupt2 < 14.) continue;
+                        if (mupt1 > mupt2 && (mupt1 < 25. || mupt2 < 14.)) continue;
+                        if (mupt2 > mupt1 && (mupt2 < 25. || mupt1 < 14.)) continue;
                         Q2 = CHARGE2[index2[mu2]];
                         if (Q1 == Q2 && !SSLep) continue;
                         mueta2 = ETA2[index2[mu2]];
