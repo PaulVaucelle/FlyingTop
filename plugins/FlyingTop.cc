@@ -2238,13 +2238,21 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   float x_bmp = 0., y_bmp = 0.;
   float x_det = 0., y_det = 0.;
 //$$$$
-//   if ( !isMC_ ) {
-//     if ( YEAR_ == 2018 ) {
-//       x_bmp =  0.18; y_bmp = -0.19;
-//       x_det =  0.09; y_det = -0.12;
-//     }
-//     if(showlog){std::cout<<x_bmp<<" "<<y_bmp<<" "<<x_det<<" "<<y_det<<std::endl;}
-//   }
+  if ( !isMC_ ) {
+    if ( YEAR_ == 2022 ) {
+      x_bmp =  0.17; y_bmp = -0.17;
+      x_det =  0.08; y_det = -0.17;
+    }
+    if ( YEAR_ == 2023 ) {
+      x_bmp =  0.16; y_bmp = -0.18;
+      x_det =  0.08; y_det = -0.18;
+    }
+    if ( YEAR_ == 2024 ) {
+      x_bmp =  0.18; y_bmp = -0.17;
+      x_det =  0.07; y_det = -0.18;
+    }
+    if(showlog){std::cout<<x_bmp<<" "<<y_bmp<<" "<<x_det<<" "<<y_det<<std::endl;}
+  }
 //$$$$
 
 
@@ -4224,8 +4232,8 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     }
     tree_jet_TightJetIDLepVeto.push_back(TightJetIDLepVeto);
     tree_jet_TightJetID.push_back(TightJetID);
-    tree_jet_tightid.push_back(jet.userInt("tightId"));
-    tree_jet_tightid_LepVeto.push_back(jet.userInt("tightLepVetoId"));
+    // tree_jet_tightid.push_back(jet.userInt("tightId"));
+    // tree_jet_tightid_LepVeto.push_back(jet.userInt("tightLepVetoId"));
 
     if ( indjet == 0 ) {jet1_pt = jet.pt(); jet1_eta = jet.eta();jet1_phi=jet.phi();}
     if ( indjet == 1 ) {jet2_pt = jet.pt(); jet2_eta = jet.eta();jet2_phi=jet.phi();}
@@ -4241,7 +4249,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     // std::cout<<" jet.n90() : "<<jet.n90()<<" and  n60: "<<jet.n60()<<std::endl;
 
     tree_jet_HadronFlavour.push_back(jet.hadronFlavour());
-    tree_jet_pileupID.push_back(jet.userFloat("pileupJetId:fullDiscriminant"));
+    // tree_jet_pileupID.push_back(jet.userFloat("pileupJetId:fullDiscriminant"));
 
     // btag infos :
     // WorkingPoints : https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation102X
