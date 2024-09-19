@@ -2506,21 +2506,21 @@ TString Dataset[2] = {
             };
 
 bool blind = false;
-  for (unsigned int i = 0; i < inputFileNames_.size(); i++)
-    {
+  // for (unsigned int i = 0; i < inputFileNames_.size(); i++)
+  //   {
 
-          TString temp = inputFileNames_[0];
-          for (unsigned int j =0 ; j < 2; j++)
-            {
-              if (temp.Contains(Dataset[j]))
-              {
-                blind = true;
-                // if (blind ) 
-                // std::cout<<"BLIND = "<<blind<<std::endl;
-                break;
-              }
-            }
-    }
+  //         TString temp = inputFileNames_[0];
+  //         for (unsigned int j =0 ; j < 2; j++)
+  //           {
+  //             if (temp.Contains(Dataset[j]))
+  //             {
+  //               blind = true;
+  //               // if (blind ) 
+  //               // std::cout<<"BLIND = "<<blind<<std::endl;
+  //               break;
+  //             }
+  //           }
+  //   }
 
   //////////////////////////////////
   //////////////////////////////////
@@ -2556,7 +2556,7 @@ bool blind = false;
   const double rho_val = *(hRho.product());                                                                                                                                                                  
   Rho = rho_val; // note that this has nothing to do with tree_PV_rho !
 
-  bool tree_Good_PV = false;
+  tree_Good_PV = false;
   if ( tree_PV_ndf > 4 && abs(tree_PV_z) < 24. && abs(tree_PV_rho) < 2. ) 
     tree_Good_PV = true;
 
@@ -7448,7 +7448,7 @@ if (YEAR_ >= 2017)
       }
       float Vtx1Mass = TMath::Max(Vtx1Vector.Mag(),0.);
 
-    if (blind && Vtx_step>=1 && Vtx_step<=2 && vaxis1.Pt()>80 )
+    if ( Vtx_step>=1 && Vtx_step<=2 && vaxis1.Pt()>80 )
       {
         tree_Hemi_Vtx_Mass.push_back(0);
         tree_Hemi_Vtx_step.push_back(0);
@@ -7786,7 +7786,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
         Vtx_chi = VtxHemi2->chi2();
       }
   float Vtx2Mass = TMath::Max(Vtx2Vector.Mag(),0.);
-      if (blind && Vtx_step>=1 && Vtx_step<=2 && vaxis2.Pt()>80)
+      if (Vtx_step>=1 && Vtx_step<=2 && vaxis2.Pt()>80)
       {
 
         tree_Hemi_Vtx_Mass.push_back(0);
