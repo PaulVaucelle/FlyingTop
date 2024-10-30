@@ -5,8 +5,8 @@
 // found on file: Ntuple_cms.root
 //////////////////////////////////////////////////////////
 
-#ifndef MiniNtuple_h
-#define MiniNtuple_h
+#ifndef MiniSecIntNtuple_h
+#define MiniSecIntNtuple_h
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -15,12 +15,12 @@
 // Header file for the classes stored in the TTree if any.
 #include "vector"
 #include <TMath.h>
-
 using namespace std;
 
 
 
-class MiniNtuple {
+
+class MiniSecIntNtuple {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
@@ -35,8 +35,6 @@ public :
    Double_t        tree_event_weight;
    Double_t        tree_genTop_Weight;
    Double_t        PUweight;
-   Double_t        PUweight_Up;
-   Double_t        PUweight_Down;
    Double_t        Prefweight;
    Int_t           PU_events;
    Bool_t          tree_only_tigger_filter;
@@ -653,8 +651,6 @@ public :
    TBranch        *b_tree_event_weight;   //!
    TBranch        *b_tree_genTop_Weight;   //!
    TBranch        *b_PUweight;   //!
-   TBranch        *b_PUweight_Up;   //!
-   TBranch        *b_PUweight_Down;   //!
    TBranch        *b_Prefweight;   //!
    TBranch        *b_PU_events;   //!
    TBranch        *b_tree_only_tigger_filter;   //!
@@ -1261,8 +1257,8 @@ TBranch        *b_HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v;   //!
    TBranch        *b_HLT_IsoMu27_v;   //!
    TBranch        *b_HLT_IsoTkMu24_v;   //!
 
-   MiniNtuple(TTree *tree=0);
-   virtual ~MiniNtuple();
+   MiniSecIntNtuple(TTree *tree=0);
+   virtual ~MiniSecIntNtuple();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
@@ -1274,8 +1270,8 @@ TBranch        *b_HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v;   //!
 
 #endif
 
-#ifdef MiniNtuple_cxx
-MiniNtuple::MiniNtuple(TTree *tree) : fChain(0) 
+#ifdef MiniSecIntNtuple_cxx
+MiniSecIntNtuple::MiniSecIntNtuple(TTree *tree) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
@@ -1291,19 +1287,19 @@ MiniNtuple::MiniNtuple(TTree *tree) : fChain(0)
    Init(tree);
 }
 
-MiniNtuple::~MiniNtuple()
+MiniSecIntNtuple::~MiniSecIntNtuple()
 {
    if (!fChain) return;
    delete fChain->GetCurrentFile();
 }
 
-Int_t MiniNtuple::GetEntry(Long64_t entry)
+Int_t MiniSecIntNtuple::GetEntry(Long64_t entry)
 {
 // Read contents of entry.
    if (!fChain) return 0;
    return fChain->GetEntry(entry);
 }
-Long64_t MiniNtuple::LoadTree(Long64_t entry)
+Long64_t MiniSecIntNtuple::LoadTree(Long64_t entry)
 {
 // Set the environment to read one entry
    if (!fChain) return -5;
@@ -1316,7 +1312,7 @@ Long64_t MiniNtuple::LoadTree(Long64_t entry)
    return centry;
 }
 
-void MiniNtuple::Init(TTree *tree)
+void MiniSecIntNtuple::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -1859,8 +1855,6 @@ tree_gen_top_pt = 0;
    fChain->SetBranchAddress("tree_event_weight", &tree_event_weight, &b_tree_event_weight);
    fChain->SetBranchAddress("tree_genTop_Weight", &tree_genTop_Weight, &b_tree_genTop_Weight);
    fChain->SetBranchAddress("PUweight", &PUweight, &b_PUweight);
-   fChain->SetBranchAddress("PUweight_Up", &PUweight_Up, &b_PUweight_Up);
-   fChain->SetBranchAddress("PUweight_Down", &PUweight_Down, &b_PUweight_Down);
    fChain->SetBranchAddress("Prefweight", &Prefweight, &b_Prefweight);
    fChain->SetBranchAddress("PU_events", &PU_events, &b_PU_events);
    fChain->SetBranchAddress("tree_only_tigger_filter", &tree_only_tigger_filter, &b_tree_only_tigger_filter);
@@ -2469,7 +2463,7 @@ fChain->SetBranchAddress("HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v",
    Notify();
 }
 
-Bool_t MiniNtuple::Notify()
+Bool_t MiniSecIntNtuple::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
@@ -2480,14 +2474,14 @@ Bool_t MiniNtuple::Notify()
    return kTRUE;
 }
 
-void MiniNtuple::Show(Long64_t entry)
+void MiniSecIntNtuple::Show(Long64_t entry)
 {
 // Print contents of entry.
 // If entry is not specified, print current entry
    if (!fChain) return;
    fChain->Show(entry);
 }
-Int_t MiniNtuple::Cut(Long64_t entry)
+Int_t MiniSecIntNtuple::Cut(Long64_t entry)
 {
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
@@ -2509,4 +2503,4 @@ double DeltaPhi(double phi1, double phi2) {
   }
   return DeltaPhi;
 }
-#endif // #ifdef MiniNtuple_cxx
+#endif // #ifdef MiniSecIntNtuple_cxx

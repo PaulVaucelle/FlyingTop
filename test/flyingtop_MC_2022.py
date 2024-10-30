@@ -2,8 +2,11 @@ import FWCore.ParameterSet.Config as cms
 from Configuration.Eras.Era_Run3_2023_cff import Run3_2023
 process = cms.Process("FlyingTop",Run3_2023)
 
-# https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVRun3Analysis#Prompt_Reco
+# from Configuration.Eras.Era_Run2_2017_cff import Run2_2017
+# process = cms.Process('FlyingTop',Run2_2017)
 
+# from Configuration.Eras.Era_Run2_2017_cff import Run2_2016
+# process = cms.Process('FlyingTop',Run2_2016)
 
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
@@ -12,37 +15,11 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 ##----------------------paul--------------------------##
 process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
 process.load("Configuration.Geometry.GeometryRecoDB_cff")
-# process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
-
-
-# process.load("Geometry.GEMGeometryBuilder.gemGeometryDB_cfi")
-# process.load("Geometry.MuonNumbering.muonNumberingInitialization_cfi")
-
-# process.es_prefer_GEMGeometry = cms.ESPrefer("GEMGeometryESModule", "gemGeometry")
-
-# process.load("Geometry.MuonCommonData.muonIdealGeometryXML_cfi")
-
-# process.load("Geometry.MuonNumbering.muonNumberingInitialization_cfi")
-
-# process.load("Alignment.MuonAlignment.muonGeometryDBConverter_cfi")
-
-# process.load('Configuration.StandardSequences.Services_cff')
-# process.load('JetMETCorrections.Configuration.JetCorrectors_cff')
-# process.load("FWCore.MessageService.MessageLogger_cfi")
-# process.load("Configuration.StandardSequences.MagneticField_cff")
-# process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
-# process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
-# process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-# process.load('Configuration.StandardSequences.Reconstruction_cff')
-# process.load('RecoTracker.Configuration.RecoTracker_cff')
-# process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff')
-
-
 ## JeC JER for systematics ###########################
 process.load("JetMETCorrections.Configuration.JetCorrectors_cff")
 process.load("JetMETCorrections.Modules.JetResolutionESProducer_cfi")
-## !! process.load("JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff") Not available for Run3
+# process.load("JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff")
 from CondCore.CondDB.CondDB_cfi import *
 ######################################################""
 #$$CondCore.CondDB.CondDB_cfi
@@ -51,7 +28,7 @@ process.load("Geometry.CaloEventSetup.CaloTowerConstituents_cfi")
 # https://twiki.cern.ch/twiki/bin/view/CMS/TopPtReweighting#TOP_PAG_corrections_based_on_dat 
 ###--------------------------
 IsMC=True
-year = 2018
+year = 2022
 from Configuration.AlCa.GlobalTag import GlobalTag
 # Global Tags:
 
@@ -64,16 +41,17 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 # mcpufile = cms.string("Pileup_MC2018UL_bin100.root"),
 #  datapufile = cms.string("MyDataPileupHistogram_bin100.root"),
 
-isPost = False
+
+isPost = True
 ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2018UL.txt" # No Rochester correction for Run 3 
 EGERA = '2022-Prompt'
 GT = '140X_mcRun3_2024_realistic_v14'
 TIGHTJETIDERA = 'RUN3CHSruns2022FGruns2023CD'  #NOTE: RUN3CHSrunsBCDEprompt, RUN3CHSruns2022FGruns2023CD, RUN2ULCHS
 L1PREFERA = '20172018'
-DATAPUFILE = '/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_14_0_8_FLY/src/FlyingTop/FlyingTop/test/pileupHistogram-Cert_Collisions2023_366442_370790_GoldenJson-13p6TeV-69200ub-99bins.root'
-DATAPUFILEUP = '/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_14_0_8_FLY/src/FlyingTop/FlyingTop/test/pileupHistogram-Cert_Collisions2022_355100_362760_GoldenJson-13p6TeV-72400ub-99bins.root'
-DATAPUFILEDOWN = '/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_14_0_8_FLY/src/FlyingTop/FlyingTop/test/pileupHistogram-Cert_Collisions2022_355100_362760_GoldenJson-13p6TeV-66000ub-99bins.root'
-MCPUFILE   = '/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_14_0_8_FLY/src/FlyingTop/FlyingTop/test/Pileup_MC2018UL_bin100.root'
+DATAPUFILE = 'pileupHistogram-Cert_Collisions2023_366442_370790_GoldenJson-13p6TeV-69200ub-100bins.root'
+DATAPUFILEUP = 'pileupHistogram-Cert_Collisions2022_355100_362760_GoldenJson-13p6TeV-72400ub-100bins.root'
+DATAPUFILEDOWN = 'pileupHistogram-Cert_Collisions2022_355100_362760_GoldenJson-13p6TeV-66000ub-100bins.root'
+MCPUFILE   = 'PU_Run2022EE_MC.root'
 
 if year == 2022 :
     ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2018UL.txt"
@@ -82,7 +60,7 @@ if year == 2022 :
     TIGHTJETIDERA = 'RUN3CHSruns2022FGruns2023CD'
     L1PREFERA = '20172018'
     MCPUFILE   = 'PU_Run2022EE_MC.root'
-    if isPost:
+    if isPost :
         MCPUFILE   = 'PU_Run2022_MC.root'
 
 if year == 2023 :
@@ -91,31 +69,23 @@ if year == 2023 :
     EGERA = '2022-Prompt'
     TIGHTJETIDERA = 'RUN3CHSrunsBCDEprompt' 
     L1PREFERA = '20172018'
-    DATAPUFILE = '/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_14_0_8_FLY/src/FlyingTop/FlyingTop/test/pileupHistogram-Cert_Collisions2023_366442_370790_GoldenJson-13p6TeV-69200ub-99bins.root'
-    DATAPUFILEUP = '/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_14_0_8_FLY/src/FlyingTop/FlyingTop/test/pileupHistogram-Cert_Collisions2023_366442_370790_GoldenJson-13p6TeV-72400ub-99bins.root'
-    DATAPUFILEDOWN = '/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_14_0_8_FLY/src/FlyingTop/FlyingTop/test/pileupHistogram-Cert_Collisions2023_366442_370790_GoldenJson-13p6TeV-66000ub-99bins.root'
-    MCPUFILE   = 'PU_Run2023EE_BPix_MC.root'
-    if isPost:
-        MCPUFILE   = 'PU_Run2023_MC.root'
+    DATAPUFILE = 'MyDataPileupHistogram2017.root'
+    MCPUFILE   = 'Pileup_MC2017UL_bin100.root'
 
-    if year == 2024 :
+if year == 2024 :
     ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2017UL.txt"
     GT = '140X_mcRun3_2024_realistic_v14'
     EGERA = '2022-Prompt'
     TIGHTJETIDERA = 'RUN3CHSrunsBCDEprompt' 
     L1PREFERA = '20172018'
     DATAPUFILE = 'MyDataPileupHistogram2017.root'
-    MCPUFILE   = 'PU_Run2023_MC.root'
-    DATAPUFILEUP = '/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_14_0_8_FLY/src/FlyingTop/FlyingTop/test/pileupHistogram-Cert_Collisions2023_366442_370790_GoldenJson-13p6TeV-72400ub-99bins.root'
-    DATAPUFILEDOWN = '/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_14_0_8_FLY/src/FlyingTop/FlyingTop/test/pileupHistogram-Cert_Collisions2023_366442_370790_GoldenJson-13p6TeV-66000ub-99bins.root'
-
-
+    MCPUFILE   = 'Pileup_MC2017UL_bin100.root'
 
 
 if IsMC:                                                                                                                                                                                     
-    process.GlobalTag = GlobalTag(process.GlobalTag, '140X_mcRun3_2024_realistic_v14', '')##106X_upgrade2018_realistic_v16_L1v1 default one signal sample                               
+    process.GlobalTag = GlobalTag(process.GlobalTag, GT, '')##106X_upgrade2018_realistic_v16_L1v1 default one signal sample                               
 else:
-    process.GlobalTag = GlobalTag(process.GlobalTag, '140X_dataRun3_v3', '') ## for 2018 MuonEG    
+    process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_Sep2018Rereco_v1', '') ## for 2018 MuonEG    
     
 #process.GlobalTag = GlobalTag(process.GlobalTag, '106X_upgrade2018_realistic_v16_L1v1','')                                                                                              
 
@@ -123,8 +93,8 @@ else:
 ## 102X_dataRun2_Sep2018Rereco_v1 => /MuonEG/Run2018B-17Sep2018-v1/MINIAOD                                                                                                                
 # FlyingTopAnalyzer                                                                                          
 
-# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 process.GoodVertexFilter = cms.EDFilter("VertexSelector",
                                         src = cms.InputTag("offlineSlimmedPrimaryVertices"),
@@ -141,51 +111,24 @@ process.source = cms.Source("PoolSource",
                                 # '/store/mc/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/2430000/03B96C60-30E8-A449-BF9B-7D4BF8E11222.root'
                                 #'/store/data/Run2018D/SingleMuon/MINIAOD/22Jan2019-v2/110000/03549C1A-345E-8244-9D47-19752B13FAC8.root'
                                 #'/store/data/Run2018B/MuonEG/MINIAOD/17Sep2018-v1/00000/1044E92E-2236-7547-A380-E4E28961E076.root'
-                                #'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/564C53A2-0646-A24D-B580-AEBF43B22A7B.root'
+                                # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC/RunIISummer20UL18MiniAODv2/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v16_L1v1-v2/50000/564C53A2-0646-A24D-B580-AEBF43B22A7B.root'
                                 #$$
                                 #       'file:MINIAODSIM_v16_L1v1.root'
                                 # 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/CMSSW_10_6_20/UDD_bgctau50_smu275_snu225/MINIAODSIM_v16_L1v1_1.root'
-# 'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_14_0_8_FLY/src/FlyingTop/FlyingTop/test/TTTo2L2Nu_2024.root'
-'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_14_0_8_FLY/src/FlyingTop/FlyingTop/test/TTTo2L2Nu_2023.root'
-# 'file:/store/mc/Run3Summer23MiniAODv4/TTto2L2Nu_TuneCP5CR1_13p6TeV_powheg-pythia8/MINIAODSIM/130X_mcRun3_2023_realistic_v14-v2/2560000/08d7e38d-8b18-4f25-822b-92c92d8f6a73.root'
 
-#        'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_1.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_2.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_3.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_4.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_5.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_6.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_7.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_9.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_8.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_9.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2018/RPV_2018_smu300_neu200_ctau010/MINIAODSIM_v16_L1v1_10.root'
-
-
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2017/RPV_2017_smu200_neu180_ctau010/MINIAODSIM_1.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2017/RPV_2017_smu200_neu180_ctau010/MINIAODSIM_2.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2017/RPV_2017_smu200_neu180_ctau010/MINIAODSIM_3.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2017/RPV_2017_smu200_neu180_ctau010/MINIAODSIM_4.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2017/RPV_2017_smu200_neu180_ctau010/MINIAODSIM_5.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2017/RPV_2017_smu200_neu180_ctau010/MINIAODSIM_6.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2017/RPV_2017_smu200_neu180_ctau010/MINIAODSIM_7.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2017/RPV_2017_smu200_neu180_ctau010/MINIAODSIM_8.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2017/RPV_2017_smu200_neu180_ctau010/MINIAODSIM_9.root',
-# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2017/RPV_2017_smu200_neu180_ctau010/MINIAODSIM_10.root',
-
+                           
 )
 )
 
 
-# !! from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
-# from EgammaPostRecoTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
+
+
+
+# from RecoEgamma.EgammaTools.EgammaPostRecoTools import setupEgammaPostRecoSeq
 # setupEgammaPostRecoSeq(process,
 #                        runEnergyCorrections=True,
 #                        runVID=False, #saves CPU time by not needlessly re-running VID, if you want the Fall17V2 IDs, set this to True or remove (default is True)
 #                        era=EGERA
-#                         ,eleIDModules=[ 'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_RunIIIWinter22_iso_V1_cff',
-#                         'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_RunIIIWinter22_noIso_V1_cff',
-#                         'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Winter22_122X_V1_cff']
 # )    
 
 
@@ -198,7 +141,7 @@ process.source = cms.Source("PoolSource",
 # Setup JEC factors
 #
 from PhysicsTools.PatAlgos.recoLayer0.jetCorrFactors_cfi import *
-process.jetCorrFactors = patJetCorrFactors.clone(src='slimmedJets',
+process.jetCorrFactors = patJetCorrFactors.clone(src='slimmedJetsPuppi',
     levels = cms.vstring('L1FastJet',
         'L2Relative',
         'L3Absolute',
@@ -211,7 +154,7 @@ process.jetCorrFactors = patJetCorrFactors.clone(src='slimmedJets',
 from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cfi import *
 process.updatedJets = updatedPatJets.clone(
     addBTagInfo=False,
-    jetSource='slimmedJets',
+    jetSource='slimmedJetsPuppi',
     jetCorrFactorsSource=cms.VInputTag(cms.InputTag("jetCorrFactors") ),
 )
 #
@@ -234,15 +177,17 @@ process.tightLepVetoJetId = cms.EDProducer("PatJetIDValueMapProducer",
 )
 #
 # Module to calculate Pileup Jet ID
-# Might not be useful for RUn 3 since we have PUPPI jets
-# !!  from RecoJets.JetProducers.PileupJetID_cfi import _chsalgos_140X_23
+# _chsalgos_106X_UL16
+# _chsalgos_106X_UL17
+# _chsalgos_106X_UL18
+# from RecoJets.JetProducers.PileupJetID_cfi import _chsalgos_106X_UL18
 # process.load("RecoJets.JetProducers.PileupJetID_cfi")
 # process.pileupJetIdUpdated = process.pileupJetId.clone(
 #     jets=cms.InputTag("updatedJets"),# JEC corrected jets
 #     inputIsCorrected=True,
 #     applyJec=False,
 #     vertexes=cms.InputTag("offlineSlimmedPrimaryVertices"),
-#     algos = cms.VPSet(_chsalgos_140X_23),
+#     algos = cms.VPSet(_chsalgos_106X_UL18),
 # )
 #
 # Embed the Jet ID and Pileup Jet ID variables in the jets.
@@ -319,11 +264,11 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
                                     # weightFileMVA_HEMI2TT = cms.untracked.string("BDT_HEMI2_ALLSIGvsTTTo2L2Nu.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
                                     weightFileMVA_VTX = cms.untracked.string("BDT_VTX_ALLSTEPS.xml"),#vtx selection : TMVAClassification_BDTG_VTXSEL_.weights.xml
                                     weightFileMVA_VTX_step1 = cms.untracked.string("BDT_VTX_STEP12.xml"),#vtx selection :  TMVAClassification_BDTG_VTXSel_TIGHTWP.weights.xml
-                                    mcpufile = cms.string("Pileup_MC2018UL_bin100.root"),
+                                    mcpufile = cms.string(MCPUFILE),
                                     mcpupath = cms.string("pileup"),
-                                    datapufile = cms.string("MyDataPileupHistogram2018.root"),
-                                    # # # datapileupfileup = cms.string(DATAPUFILEUP),
-                                    # # # datapileupfiledown = cms.string(DATAPUFILEDOWN),
+                                    datapufile = cms.string(DATAPUFILE),
+                                    datapileupfileup = cms.string(DATAPUFILEUP),
+                                    datapileupfiledown = cms.string(DATAPUFILEDOWN),
                                     datapupath = cms.string("pileup"),
                                 #    muoneps1file   = cms.string("NUM_TightID_DEN_TrackerMuons_abseta_pt.root"),
                                 #    muoneps1path   = cms.string("NUM_TightID_DEN_TrackerMuons_abseta_pt"),
@@ -363,10 +308,10 @@ process.p = cms.Path(
     process.updatedJets*
     process.tightJetId*
     process.tightLepVetoJetId *
-    # !!  process.pileupJetIdUpdated* # Using Puppi jets so not needed
+    # process.pileupJetIdUpdated*
     process.updatedJetsWithUserData*
-    # !! process.prefiringweight* # I have to figure out why it is not working for run 3
-    # !! process.egammaPostRecoSeq* #I have to figure out why it is not working for run 3
+    # process.prefiringweight*
+    # process.egammaPostRecoSeq*
     process.FlyingTop
 )
 # //jet energy corrections
