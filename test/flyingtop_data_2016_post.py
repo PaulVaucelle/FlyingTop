@@ -60,6 +60,7 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 #DATAPUFILE = 'MyDataPileupHistogram2018.root'
 #MCPUFILE   = 'Pileup_MC2018UL_bin100.root'
 
+
 if year == 2018 :
     ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2018UL.txt"
     GT = '106X_dataRun2_v37'
@@ -68,8 +69,10 @@ if year == 2018 :
     L1PREFERAECAL = 'None'
     L1PREFERAMUON= '20172018'
     #chsalgos_106X_UL = _chsalgos_106X_UL18
-    MCPUFILE   = "/opt/sbg/cms/ui2_data1/mmeena/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/PU/MC/2016/Pileup_MC2018UL_bin100.root"
-    DATAPUFILE = "/opt/sbg/cms/ui2_data1/mmeena/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/PU/Data/2018/MyDataPileupHistogram2018_bin100.root"
+    MCPUFILE   = "Pileup_MC2018UL_bin100.root"
+    DATAPUFILE = "MyDataPileupHistogram2018.root"
+    DATAPUFILEUP = 'PileupHistogram-goldenJSON-13tev-2018-72400ub-100bins.root'
+    DATAPUFILEDOWN = 'PileupHistogram-goldenJSON-13tev-2018-66000ub-100bins.root'
 if year == 2017 :
     ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2017UL.txt"
     GT = '106X_dataRun2_v37'
@@ -77,21 +80,25 @@ if year == 2017 :
     TIGHTJETIDERA = 'RUN2ULCHS' 
     L1PREFERAECAL = 'UL2017BtoF'
     L1PREFERAMUON= '20172018'
-    MCPUFILE   = "/opt/sbg/cms/ui2_data1/mmeena/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/PU/MC/2017/Pileup_MC2017UL_bin100.root"
-    DATAPUFILE = "/opt/sbg/cms/ui2_data1/mmeena/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/PU/Data/2017/MyDataPileupHistogram2017.root"
+    MCPUFILE   = "Pileup_MC2017UL_bin100.root"
+    DATAPUFILE = "MyDataPileupHistogram2017.root"
+    DATAPUFILEUP = 'PileupHistogram-goldenJSON-13tev-2017-72400ub-100bins.root'
+    DATAPUFILEDOWN = 'PileupHistogram-goldenJSON-13tev-2017-66000ub-100bins.root'
 if year == 2016 :
     TIGHTJETIDERA = 'RUN2UL16CHS'  #NOTE: Use "RUN2UL16CHS" for UL2016 eras
-    MCPUFILE   = "/opt/sbg/cms/ui2_data1/mmeena/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/PU/MC/2016/Pileup_MC2016UL_bin100.root"
-    DATAPUFILE = "/opt/sbg/cms/ui2_data1/mmeena/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/PU/Data/2016/MyDataPileupHistogram2016.root"
+    MCPUFILE   = "Pileup_MC2016UL_bin100.root"
+    DATAPUFILE = "MyDataPileupHistogram2016.root"
+    DATAPUFILEUP = 'PileupHistogram-goldenJSON-13tev-2016-72400ub-100bins.root'
+    DATAPUFILEDOWN = 'PileupHistogram-goldenJSON-13tev-2016-66000ub-100bins.root'
     if isPostAPV :
-        ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2016bUL.txt"
+        ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2016aUL.txt"
         GT = '106X_dataRun2_v37'
         EGERA = '2016postVFP-UL'
         L1PREFERAECAL = 'UL2016postVFP'
         L1PREFERAMUON= '2016postVFP'
         #chsalgos_106X_UL = _chsalgos_106X_UL16
     else :
-        ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2016aUL.txt"
+        ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2016bUL.txt"
         GT = '106X_dataRun2_v37'
         EGERA = '2016preVFP-UL'
         L1PREFERAECAL = 'UL2016preVFP'
@@ -112,9 +119,12 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
                             #'/store/data/Run2016B/MuonEG/MINIAOD/ver1_HIPM_UL2016_MiniAODv2-v2/120000/229FBC5A-7299-8642-881A-D7DE49FE5AF3.root' #pre VFP
-                                '/store/data/Run2016H/MuonEG/MINIAOD/UL2016_MiniAODv2-v2/140000/11B2462D-A84A-7944-9880-5DBEE38EF19B.root'       # post VFP
+                                # '/store/data/Run2016H/MuonEG/MINIAOD/UL2016_MiniAODv2-v2/140000/11B2462D-A84A-7944-9880-5DBEE38EF19B.root'       # post VFP
                                 #'/store/data/Run2017B/MuonEG/MINIAOD/UL2017_MiniAODv2-v1/270000/17AB9CA6-CD61-1149-B492-A487F2B570B9.root'        #2017                          
                                 #'/store/data/Run2018A/MuonEG/MINIAOD/UL2018_MiniAODv2-v1/100000/05BD6361-1727-7248-B956-62956572AE23.root'      # 2018
+                                # '/SingleMuon/Run2018D-UL2018_MiniAODv2-v3/MINIAOD',
+                                '/DoubleMuon/Run2018A-UL2018_MiniAODv2-v1/MINIAOD'
+
                             )
                         )
 
@@ -236,10 +246,12 @@ process.options = cms.untracked.PSet( )
 process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
                                    #    RochString = cms.string("./FlyingTop/FlyingTop/test/"), 
                                    #    Roccor = cms.FileInPath("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"),
+                                   DATASET = cms.untracked.vstring(process.source.fileNames),
                                    isMC =cms.bool(IsMC), 
                                    YEAR = cms.int32(year),
+                                   ERA2016 = cms.bool(isPostAPV),
                                    RochString = cms.string(ROCCORPATH),
-                                   weightFileMVA = cms.untracked.string( "BDT_TRK_240510_ctau100vsEMUdata_NOchi2NOdxyNOdz.xml"),#track selection => previous :BDT_TRK_ALLSIGvsDYTT_30_01_2024.xml/ BDT_TRK_ALLSIGvsALLBKG.xml // TMVAClassification_BDTG_TRKSEL_.weights.xml
+                                   weightFileMVA = cms.untracked.string( "BDT_TRK_240603_2016post_ctau100vsEMUdata.xml"),#track selection => previous :BDT_TRK_ALLSIGvsDYTT_30_01_2024.xml/ BDT_TRK_ALLSIGvsALLBKG.xml // TMVAClassification_BDTG_TRKSEL_.weights.xml
                                    weightFileMVA_EVTS = cms.untracked.string("BDT_EVT_ALLSIGvsALLBKG.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
                                    weightFileMVA_EVTSDY = cms.untracked.string("BDT_EVT_ALLSIGvsDYM50.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
                                    weightFileMVA_EVTSTT = cms.untracked.string("BDT_EVT_ALLSIGvsTTTo2L2Nu.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
@@ -261,6 +273,8 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
                                    #datapufile = cms.string("MyDataPileupHistogram2017.root"),
                                    mcpupath = cms.string("pileup"),
                                    datapupath = cms.string("pileup"),
+                                   datapileupfileup = cms.string(DATAPUFILEUP),
+                                   datapileupfiledown = cms.string(DATAPUFILEDOWN),
                                    #DATAPUFILE = '/opt/sbg/cms/ui2_data1/mmeena/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/PU/Data/2017/MyDataPileupHistogram2017.root'
                                    #MCPUFILE   = '/opt/sbg/cms/ui2_data1/mmeena/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/PU/MC/2017/Pileup_MC2017UL_bin100.root'
                                    

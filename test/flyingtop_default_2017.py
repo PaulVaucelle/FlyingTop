@@ -17,6 +17,13 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
 process.load("Configuration.Geometry.GeometryRecoDB_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
+## JeC JER for systematics ###########################
+process.load("JetMETCorrections.Configuration.JetCorrectors_cff")
+process.load("JetMETCorrections.Modules.JetResolutionESProducer_cfi")
+process.load("JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff")
+from CondCore.CondDB.CondDB_cfi import *
+######################################################""
+#$$CondCore.CondDB.CondDB_cfi
 process.load("Geometry.CaloEventSetup.CaloTowerConstituents_cfi")
 
 from Configuration.AlCa.GlobalTag import GlobalTag
@@ -28,6 +35,40 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 #     MC 2016: 106X_mcRun2_asymptotic_v17
 #     MC 2017: 106X_mc2017_realistic_v10
 #     MC 2018: 106X_upgrade2018_realistic_v16_L1v1 
+# /opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/PU/MC/2016
+# mcpufile = cms.string("Pileup_MC2018UL_bin100.root"),
+#  datapufile = cms.string("MyDataPileupHistogram_bin100.root"),
+
+
+isPostAPV = False
+ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2017UL.txt"
+GT = '106X_mc2017_realistic_v10'
+EGERA = '2017-UL'
+TIGHTJETIDERA = 'RUN2ULCHS' 
+L1PREFERA = '20172018'
+DATAPUFILE = 'MyDataPileupHistogram2017.root'
+MCPUFILE   = 'Pileup_MC2017UL_bin100.root'
+DATAPUFILEUP = '/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/PileupHistogram-goldenJSON-13tev-2017-72400ub-100bins.root'
+DATAPUFILEDOWN = '/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/PileupHistogram-goldenJSON-13tev-2017-66000ub-100bins.root'
+
+
+# if year == 2016 :
+#     TIGHTJETIDERA = 'RUN2UL16CHS'  #NOTE: Use "RUN2UL16CHS" for UL2016 eras
+#     DATAPUFILE = 'MyDataPileupHistogram2016.root'
+#     MCPUFILE   = 'Pileup_MC2016UL_bin100.root'
+#     if isPostAPV :
+#         ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2016aUL.txt"
+#         GT = '106X_mcRun2_asymptotic_preVFP_v11'
+#         EGERA = '2016-UL'
+#         L1PREFERA = '2016'
+
+        
+#     else :
+#         ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2016bUL.txt"
+#         GT = '106X_mcRun2_asymptotic_v17'
+#         EGERA = '2016-UL'
+#         L1PREFERA = '2016'
+
 
 if IsMC:                                                                                                                                                                                     
     process.GlobalTag = GlobalTag(process.GlobalTag, '106X_mc2017_realistic_v6', '') ## 106X_upgrade2018_realistic_v16_L1v1 default one signal sample                               
@@ -161,15 +202,17 @@ process.prefiringweight = l1PrefiringWeightProducer.clone(
     PrefiringRateSystematicUnctyECAL = cms.double(0.2),
     PrefiringRateSystematicUnctyMuon = cms.double(0.2)
 )
-
+isPostAPV = False
 process.options = cms.untracked.PSet( )
 process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
                                 #    RochString = cms.string("./FlyingTop/FlyingTop/test/"), 
                                 #    Roccor = cms.FileInPath("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"),
-                                    isMC = cms.bool(IsMC), 
+                                    DATASET = cms.untracked.vstring(process.source.fileNames),
+                                    isMC =cms.bool(IsMC), 
                                     YEAR = cms.int32(year),
+                                    ERA2016 = cms.bool(isPostAPV),
                                     RochString = cms.string("FlyingTop/FlyingTop/data/RoccoR2017UL.txt"),
-                                    weightFileMVA = cms.untracked.string("BDT_TRK_CTAU10cm_vs_TT.xml"),#track selection => previous : TMVAClassification_BDTG_TRKSEL_.weights.xml or BDT_TRK_ALLSIGvsALLBKG.xml
+                                    weightFileMVA = cms.untracked.string("BDT_TRK_240522_2017_ctau100vsEMUdata_NOchi2NOdxyNOdz.xml"),#track selection => previous : TMVAClassification_BDTG_TRKSEL_.weights.xml or BDT_TRK_ALLSIGvsALLBKG.xml
                                     weightFileMVA_EVTS = cms.untracked.string("BDT_EVT_ALLSIGvsALLBKG.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
                                     weightFileMVA_EVTSDY = cms.untracked.string("BDT_EVT_ALLSIGvsDYM50.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
                                     weightFileMVA_EVTSTT = cms.untracked.string("BDT_EVT_ALLSIGvsTTTo2L2Nu.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
@@ -179,11 +222,13 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
                                     # weightFileMVA_HEMI2 = cms.untracked.string("BDT_HEMI2_ALLSIGvsALLBKG.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
                                     # weightFileMVA_HEMI2DY = cms.untracked.string("BDT_HEMI2_ALLSIGvsDYM50.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
                                     # weightFileMVA_HEMI2TT = cms.untracked.string("BDT_HEMI2_ALLSIGvsTTTo2L2Nu.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
-                                    weightFileMVA_VTX = cms.untracked.string("BDT_VTX_ALLSTEPS_ALLSignal.xml"),#vtx selection : TMVAClassification_BDTG_VTXSEL_.weights.xml
-                                    weightFileMVA_VTX_step1 = cms.untracked.string("BDT_VTX_STEPS12_ALLSignal.xml"),#vtx selection :  TMVAClassification_BDTG_VTXSel_TIGHTWP.weights.xml
-                                   mcpufile = cms.string("Pileup_MC2018UL_bin100.root"),
+                                    weightFileMVA_VTX = cms.untracked.string("BDT_VTX_ALLSTEPS.xml"),#vtx selection : TMVAClassification_BDTG_VTXSEL_.weights.xml
+                                    weightFileMVA_VTX_step1 = cms.untracked.string("BDT_VTX_STEP12.xml"),#vtx selection :  TMVAClassification_BDTG_VTXSel_TIGHTWP.weights.xml
+                                   mcpufile = cms.string("Pileup_MC2017UL_bin100.root"),
                                    mcpupath = cms.string("pileup"),
-                                   datapufile = cms.string("MyDataPileupHistogram_bin100.root"),
+                                   datapufile = cms.string("MyDataPileupHistogram2017.root"),
+                                    datapileupfileup = cms.string(DATAPUFILEUP),
+                                    datapileupfiledown = cms.string(DATAPUFILEDOWN),
                                    datapupath = cms.string("pileup"),
                                 #    muoneps1file   = cms.string("NUM_TightID_DEN_TrackerMuons_abseta_pt.root"),
                                 #    muoneps1path   = cms.string("NUM_TightID_DEN_TrackerMuons_abseta_pt"),
@@ -227,8 +272,10 @@ process.p = cms.Path(
     process.egammaPostRecoSeq*
     process.FlyingTop
 )
-#$$
-
+# //jet energy corrections
+from PhysicsTools.PatAlgos.tools.helpers  import getPatAlgosToolsTask
+process.patAlgosToolsTask = getPatAlgosToolsTask(process)
+process.pathRunPatAlgos = cms.Path(process.patAlgosToolsTask)
 ########## output of ntuple
 #$$
 process.TFileService = cms.Service("TFileService", fileName = cms.string("inputFile.root") )
