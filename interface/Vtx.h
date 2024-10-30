@@ -380,32 +380,73 @@ class Vtx {
                                       Vtx_z     = tempz;
                                       // Vtx_step  = 1;
                                       GlobalPoint RECOvtxPos(Vtx_x, Vtx_y, Vtx_z);
+                                      
                                       DCA_VTX_Meand = 0;
                                       for (int k = 0; k< Vtx_ntk; k++)
                                         {
                                             TrajectoryStateClosestToPoint DCA_Vtx = vTT[k].trajectoryStateClosestToPoint(RECOvtxPos);
+                                            TrajectoryStateClosestToPoint DCA_PV = vTT[k].trajectoryStateClosestToPoint(*PV);
                                             if ( DCA_Vtx.isValid() ) // Be careful, all tracks are considered when looking at the DCA,
-                                            //but one could look of the wieghts of the track at the same time
-                                            { // The positions are given in the Global frame
-                                                float pca_Vtx_x = DCA_Vtx.position().x();
-                                                float pca_Vtx_y = DCA_Vtx.position().y();
-                                                float pca_Vtx_z = DCA_Vtx.position().z();
-                                                float refPoint_x = DCA_Vtx.referencePoint().x();
-                                                float refPoint_y = DCA_Vtx.referencePoint().y();
-                                                float refPoint_z = DCA_Vtx.referencePoint().z();
-                                                float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
-                                                float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
-                                                float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
-                                                // float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
-                                                float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
-                                                DCA_VTX_Meand+=DCA_VTX_d;
+                                              //but one could look of the wieghts of the track at the same time
+                                              { // The positions are given in the Global frame
+                                                  float pca_Vtx_x = DCA_Vtx.position().x();
+                                                  float pca_Vtx_y = DCA_Vtx.position().y();
+                                                  float pca_Vtx_z = DCA_Vtx.position().z();
+                                                  
+                                                  //---//
+                                                  GlobalVector tracks_momentum = DCA_Vtx.momentum();
 
-                                                // tree_Hemi_Vtx_track_DCA_x.push_back(DCA_Vtx_x);
-                                                // tree_Hemi_Vtx_track_DCA_y.push_back(DCA_Vtx_y);
-                                                // tree_Hemi_Vtx_track_DCA_z.push_back(DCA_Vtx_z);
-                                                // tree_Hemi_Vtx_track_DCA_r.push_back(DCA_VTX_r);
-                                                // tree_Hemi_Vtx_track_DCA_d.push_back(DCA_VTX_d);
-                                            }
+                                                  Tracks_pt.push_back(DCA_Vtx.pt());//ok
+                                                  Tracks_px.push_back(tracks_momentum.x());//TSCP momentum method
+                                                  Tracks_py.push_back(tracks_momentum.y());//TSCP momentum method
+                                                  Tracks_pz.push_back(tracks_momentum.z());//TSCP momentum method
+                                                  Tracks_eta.push_back(tracks_momentum.eta());//TSCP momentum method
+                                                  Tracks_phi.push_back(tracks_momentum.phi());//TSCP momentum method
+
+                                                  //--//
+
+                                                  float refPoint_x = DCA_Vtx.referencePoint().x();
+                                                  float refPoint_y = DCA_Vtx.referencePoint().y();
+                                                  float refPoint_z = DCA_Vtx.referencePoint().z();
+                                                  float DCA_Vtx_x = refPoint_x-pca_Vtx_x;
+                                                  float DCA_Vtx_y = refPoint_y-pca_Vtx_y;
+                                                  float DCA_Vtx_z = refPoint_z-pca_Vtx_z;
+                                                  float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
+                                                  Tracks_d0.push_back(DCA_VTX_r);// !!
+                                                  Tracks_dz.push_back(abs(refPoint_z-pca_Vtx_z));// !!
+                                                  // float DCA_VTX_r = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y);
+                                                  float DCA_VTX_d = sqrt(DCA_Vtx_x*DCA_Vtx_x+DCA_Vtx_y*DCA_Vtx_y+DCA_Vtx_z*DCA_Vtx_z);
+                                                  DCA_VTX_Meand+=DCA_VTX_d;
+
+                                              }
+                                            if ( DCA_PV.isValid() )
+                                              {
+                                                  float pca_Vtx_x = DCA_PV.position().x();
+                                                  float pca_Vtx_y = DCA_PV.position().y();
+                                                  float pca_Vtx_z = DCA_PV.position().z();
+                                                  
+                                                  //---//
+                                                  GlobalVector tracks_momentum = DCA_PV.momentum();
+
+                                                  OldTracks_pt.push_back(DCA_PV.pt());//ok
+                                                  OldTracks_px.push_back(tracks_momentum.x());//TSCP momentum method
+                                                  OldTracks_py.push_back(tracks_momentum.y());//TSCP momentum method
+                                                  OldTracks_pz.push_back(tracks_momentum.z());//TSCP momentum method
+                                                  OldTracks_eta.push_back(tracks_momentum.eta());//TSCP momentum method
+                                                  OldTracks_phi.push_back(tracks_momentum.phi());//TSCP momentum method
+
+                                                  //--//
+
+                                                  float refPoint_x = DCA_PV.referencePoint().x();
+                                                  float refPoint_y = DCA_PV.referencePoint().y();
+                                                  float refPoint_z = DCA_PV.referencePoint().z();
+                                                  float DCA_PV_x = refPoint_x-pca_Vtx_x;
+                                                  float DCA_PV_y = refPoint_y-pca_Vtx_y;
+                                                  float DCA_PV_z = refPoint_z-pca_Vtx_z;
+                                                  float DCA_PV_r = sqrt(DCA_PV_x*DCA_PV_x+DCA_PV_y*DCA_PV_y);
+                                                  OldTracks_d0.push_back(DCA_PV_r);// !!
+                                                  OldTracks_dz.push_back(abs(DCA_PV_z));// !!
+                                              }
                                         }
                                         DCA_VTX_Meand = DCA_VTX_Meand/(float)(Vtx_ntk);
                                         Tracks = vTT;
@@ -473,6 +514,25 @@ class Vtx {
       float SumWeight(){return MeanWeight;}
       std::vector<TransientTrack> GetTTracks(){return Tracks;}
       GlobalError Vtx_PosErr(){return posError;}
+      std::vector<GlobalPoint> tracks_DCA(){return Tracks_DCA;}
+
+      std::vector<float> tracks_pt() {return Tracks_pt;}//TSCP momentum method
+      std::vector<float> tracks_px() {return Tracks_px;}//TSCP momentum method
+      std::vector<float> tracks_py() {return Tracks_py;}//TSCP momentum method
+      std::vector<float> tracks_pz() {return Tracks_pz;}//TSCP momentum method
+      std::vector<float> tracks_eta(){return Tracks_eta;}//TSCP momentum method
+      std::vector<float> tracks_phi(){return Tracks_phi;}//TSCP momentum method
+      std::vector<float> tracks_d0(){return Tracks_d0;}//PerigeeTrajectoryParameters method
+      std::vector<float> tracks_dz(){return Tracks_dz;}//PerigeeTrajectoryParameters method
+
+      std::vector<float> oldtracks_pt() {return OldTracks_pt;}//TSCP momentum method
+      std::vector<float> oldtracks_px() {return OldTracks_px;}//TSCP momentum method
+      std::vector<float> oldtracks_py() {return OldTracks_py;}//TSCP momentum method
+      std::vector<float> oldtracks_pz() {return OldTracks_pz;}//TSCP momentum method
+      std::vector<float> oldtracks_eta(){return OldTracks_eta;}//TSCP momentum method
+      std::vector<float> oldtracks_phi(){return OldTracks_phi;}//TSCP momentum method
+      std::vector<float> oldtracks_d0(){return OldTracks_d0;}//PerigeeTrajectoryParameters method
+      std::vector<float> oldtracks_dz(){return OldTracks_dz;}//PerigeeTrajectoryParameters method
       
    private:
          // ----------member data ---------------------------
@@ -501,6 +561,24 @@ class Vtx {
         std::vector<float> Vtx_Weights;
         std::vector<unsigned int> Vtx_index;
         std::vector<TransientTrack> Tracks;
+        std::vector<float> Tracks_px;//TSCP momentum method
+        std::vector<float> Tracks_py;//TSCP momentum method
+        std::vector<float> Tracks_pz;//TSCP momentum method
+        std::vector<float> Tracks_pt;//TSCP momentum method
+        std::vector<float> Tracks_eta;//TSCP momentum method
+        std::vector<float> Tracks_phi;//TSCP momentum method
+        std::vector<float> Tracks_d0;//PerigeeTrajectoryParameters method
+        std::vector<float> Tracks_dz;//PerigeeTrajectoryParameters method
+
+        std::vector<float> OldTracks_px;//TSCP momentum method
+        std::vector<float> OldTracks_py;//TSCP momentum method
+        std::vector<float> OldTracks_pz;//TSCP momentum method
+        std::vector<float> OldTracks_pt;//TSCP momentum method
+        std::vector<float> OldTracks_eta;//TSCP momentum method
+        std::vector<float> OldTracks_phi;//TSCP momentum method
+        std::vector<float> OldTracks_d0;//PerigeeTrajectoryParameters method
+        std::vector<float> OldTracks_dz;//PerigeeTrajectoryParameters method
+        std::vector<GlobalPoint> Tracks_DCA;
         //-----------------//
 
         // vector<std::pair<float, TLorentzVector > > TrackInfo_Hemi1_mva to compute the mass
