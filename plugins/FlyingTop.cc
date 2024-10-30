@@ -253,7 +253,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::string weightFileHEMI2TT_;
     std::string weightFileVtx_;
     std::string weightFileVtxStep1_;
-    std::string mcPileupFile_, dataPileupFile_;
+    std::string mcPileupFile_, dataPileupFile_, dataPileupFileUp_ ,dataPileupFileDown_ ;
     std::string mcPileupPath_, dataPileupPath_;
     std::string MuonEps1File_ ;
     std::string MuonEps1Path_ ;
@@ -276,6 +276,8 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     edm::EDGetTokenT<pat::PackedCandidateCollection>      lostpcToken_; //LOST
 
     reweight::LumiReWeighting* lumiWeights_;
+    reweight::LumiReWeighting* lumiWeightsUp_;
+    reweight::LumiReWeighting* lumiWeightsDown_;
 
   ///////////////
   // Ntuple info
@@ -305,16 +307,16 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
 
     int runNumber, eventNumber, lumiBlock;
     double PUweight;
+    double PUweight_Up;
+    double PUweight_Down;
     int PU_events;// AllPU_events_weight;
     double Prefweight;
-    bool tree_only_tigger_filter;
-//$$$$
+    bool tree_only_tigger_filter = false;
     bool tree_trigger_doublelepton;
     bool tree_trigger_singlelepton;
-//$$$$
-    bool tree_Filter;
-    bool tree_FilterSameSign;
-    bool tree_Good_PV;
+    bool tree_Filter = false;//= false
+    bool tree_FilterSameSign = false ;//= false
+    bool tree_Good_PV = false;//= false
     int tree_muon_GenRecoTriggerMatched;
     int  tree_nTracks, tree_nLostTracks, tree_TRACK_SIZE; 
     int  tree_nFromC = 0, tree_nFromB = 0; 
@@ -380,6 +382,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     float  mva_Evts_TightAxes;
     float  mva_Evts_Mmumu;
     float  mva_Evts_all_muon;
+
 
     TMVA::Reader *readerEvts = new TMVA::Reader("!Color:Silent");
     // TMVA::Reader *readerHemi1 = new TMVA::Reader("!Color:Silent");
@@ -447,9 +450,9 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     bool showlog            = false;
     
 //$$$$$$$$
-    bool MuonChannel        = false;
+    bool MuonChannel        = true;
     bool ElChannel          = false;
-    bool EMuChannel         = true;
+    bool EMuChannel         = false;
 //$$$$$$$$
 
     bool AllowDiLeptonSameSign = true;
@@ -517,6 +520,7 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     double tree_only_gen_wt;
     double tree_event_weight;
     double tree_genTop_Weight;
+
 
     //--------------------------------
     // primary vertex infos -------
@@ -591,6 +595,9 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
   std::vector<float> tree_trig_electron_leadingeta2;
   std::vector<float> tree_trig_muon_leadingphi;
   std::vector<float> tree_trig_electron_leadingphi2;
+  std::vector<float> tree_lepton_b4trigger_leadingpt;
+  std::vector<float> tree_lepton_b4trigger_leadingpt2;
+
 
   std::vector<float> tree_reco_lepton_leadingpt;
   std::vector<float> tree_reco_lepton_leadingpt2;
@@ -612,12 +619,10 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
     std::vector<float> tree_lepton_leadingeta2;
     std::vector<float> tree_lepton_leadingphi;
     std::vector<float> tree_lepton_leadingphi2;
-//$$$$
     std::vector<float> tree_lepton_leadingdxy;
     std::vector<float> tree_lepton_leadingdxy2;
     std::vector<float> tree_lepton_leadingdz;
     std::vector<float> tree_lepton_leadingdz2;
-//$$$$
 
     std::vector<float> tree_lepton_lepton_dR;
     std::vector<float> tree_lepton_lepton_dPhi;
@@ -1198,30 +1203,31 @@ class FlyingTopAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>
 
   // Used triggers
   // ---------------- Trigger IsoMu -------------
-  bool HLT_IsoMu24_v;	  // USED in all years // but not for 2017 ?
-  bool HLT_IsoTkMu24_v;   // USED in 2016 only, but useful ?
-  bool HLT_IsoMu27_v;	  // USED in 2017, but useful ?
+  bool HLT_IsoMu24_v;	    // USED in all years // !!! but need to check for 2017 !!!
+  bool HLT_IsoTkMu24_v;   // USED in 2016
+  bool HLT_IsoMu27_v;	    // USED in 2017 C-F
 
   // ---------------- Trigger MuMu -------------
-  bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v;                   // prescaled..., added if _DZ not in MC 2016
-  bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v;                // USED in 2016 only
-  bool HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v;                 // prescaled...
-  bool HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v;              // USED in 2016 only
-  bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v;          // USED if >= 2017
-  bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v;        // USED if >= 2017
+  bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v;                   // prescaled in 2016, but added because _DZ not in MC 2016
+  bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v;                // USED in 2016
+  bool HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v;                 // prescaled
+  bool HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v;              // USED in 2016
+  bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v;          // USED in 2017-2018
+  bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v;        // USED in 2017-2018
 
   // ---------------- Trigger MuEl -------------
-  bool HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v;     // USED in 2016 only
-  bool HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v;     // USED in 2016 only
-  bool HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v;  // USED in all years
-  bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v; // USED if all years
-//$$$$
-  bool HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v;    // USED in 2016 only
-  bool HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v;     // USED in 2016 only
-  bool HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ_v;  // USED in 2016 only
-//$$$$
-  bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v;    // USED in all years
-  bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v; // USED if >= 2017
+  bool HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v;     // USED in 2016,     but at 0 in Fpost
+  bool HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v;     // USED in 2016 B-G, but at 1 in H
+  bool HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v;  // USED in 2016 Fpre-H, 2017 and 2018, but at 1 in 2016B-E
+  bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v; // prescaled
+  bool HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v;    // USED in 2016,     but at 0 in Fpost
+  bool HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v;     // USED in 2016 B-G, but at 1 in H
+  bool HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ_v;  // USED in 2016 H,   but at 1 in B-G
+  bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v;    // USED in 2016 Fpre-H, 2017 C-F and 2018
+  bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v; // USED in 2017-2018
+
+  bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v;
+
 
   // ---------------- Trigger IsoEl ------------- (not updated)
   bool HLT_Ele27_WPTight_Gsf_v;                     // USED in 2016
@@ -1293,6 +1299,8 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     weightFileVtxStep1_( iConfig.getUntrackedParameter<std::string>("weightFileMVA_VTX_step1") ),
     mcPileupFile_	( iConfig.getParameter<std::string>( "mcpufile" ) ),
     dataPileupFile_	( iConfig.getParameter<std::string>( "datapufile" ) ),
+    dataPileupFileUp_	( iConfig.getParameter<std::string>( "datapileupfileup" ) ),
+    dataPileupFileDown_	( iConfig.getParameter<std::string>( "datapileupfiledown" ) ),
     mcPileupPath_	( iConfig.getParameter<std::string>( "mcpupath" ) ),
     dataPileupPath_	( iConfig.getParameter<std::string>( "datapupath" ) ),
     // MuonEps1File_ (iConfig.getParameter<std::string>( "muoneps1file" ) ),
@@ -1332,6 +1340,8 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
 
     rc.init(edm::FileInPath(RochString).fullPath());
     lumiWeights_ = new reweight::LumiReWeighting( mcPileupFile_, dataPileupFile_, mcPileupPath_, dataPileupPath_ );
+    lumiWeightsUp_ = new reweight::LumiReWeighting( mcPileupFile_, dataPileupFileUp_, mcPileupPath_, dataPileupPath_ );
+    lumiWeightsDown_ = new reweight::LumiReWeighting( mcPileupFile_, dataPileupFileDown_, mcPileupPath_, dataPileupPath_ );
 
     smalltree = fs->make<TTree>("ttree", "ttree");
     
@@ -1342,22 +1352,22 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     //smalltree->Branch("tree_LHE_Weights", &tree_LHE_Weights);
     //smalltree->Branch("tree_MCEvt_weight", &tree_MCEvt_weight, "tree_MCEvt_weight/F");
     
-    hEvents = fs->make<TH1D>("hEvents","hEvents",100,0,100);
+    hEvents = fs->make<TH1D>("hEvents","hEvents",3,0,3);
     hEvents_with_gen_wt = fs->make<TH1D>("hEvents_with_gen_wt","hEvents_with_gen_wt",2,0,2);
     
     smalltree->Branch("tree_only_gen_wt",&tree_only_gen_wt,"tree_only_gen_wt/D");
     smalltree->Branch("tree_event_weight",&tree_event_weight,"tree_event_weight/D");
     smalltree->Branch("tree_genTop_Weight",&tree_genTop_Weight,"tree_genTop_Weight/D");
     
-    smalltree->Branch("PUweight",         &PUweight, "PUweight/D");
+    smalltree->Branch("PUweight",         &PUweight,      "PUweight/D");
+    smalltree->Branch("PUweight_Up",      &PUweight_Up,   "PUweight_Up/D");
+    smalltree->Branch("PUweight_Down",    &PUweight_Down, "PUweight_Down/D");
     smalltree->Branch("Prefweight",       &Prefweight, "Prefweight/D");
     smalltree->Branch("PU_events", &PU_events, "PU_events/I");
     //smalltree->Branch("AllPU_events_weight", &AllPU_events_weight, "AllPU_events_weight/I");
     smalltree->Branch("tree_only_tigger_filter", &tree_only_tigger_filter);
-//$$$$
     smalltree->Branch("tree_trigger_doublelepton", &tree_trigger_doublelepton);
     smalltree->Branch("tree_trigger_singlelepton", &tree_trigger_singlelepton);
-//$$$$
     smalltree->Branch("tree_Filter",        &tree_Filter);
     smalltree->Branch("tree_FilterSameSign",&tree_FilterSameSign);
     smalltree->Branch("tree_Good_PV",       &tree_Good_PV);
@@ -1434,12 +1444,16 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_reco_muon_leadingphi",&tree_reco_muon_leadingphi);
     smalltree->Branch("tree_reco_electron_leadingphi2",&tree_reco_electron_leadingphi2);
 
+
     smalltree->Branch("tree_trig_muon_leadingpt",&tree_trig_muon_leadingpt);
     smalltree->Branch("tree_trig_electron_leadingpt2",&tree_trig_electron_leadingpt2);
     smalltree->Branch("tree_trig_muon_leadingeta",&tree_trig_muon_leadingeta);
     smalltree->Branch("tree_trig_electron_leadingeta2",&tree_trig_electron_leadingeta2);
     smalltree->Branch("tree_trig_muon_leadingphi",&tree_trig_muon_leadingphi);
     smalltree->Branch("tree_trig_electron_leadingphi2",&tree_trig_electron_leadingphi2);
+
+  smalltree->Branch("tree_lepton_b4trigger_leadingpt",&tree_lepton_b4trigger_leadingpt);
+  smalltree->Branch("tree_lepton_b4trigger_leadingpt2",&tree_lepton_b4trigger_leadingpt2);
 
     smalltree->Branch("tree_reco_lepton_leadingpt",&tree_reco_lepton_leadingpt);
     smalltree->Branch("tree_reco_lepton_leadingpt2",&tree_reco_lepton_leadingpt2);
@@ -1461,12 +1475,10 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("tree_lepton_leadingeta2",&tree_lepton_leadingeta2);
     smalltree->Branch("tree_lepton_leadingphi",&tree_lepton_leadingphi);
     smalltree->Branch("tree_lepton_leadingphi2",&tree_lepton_leadingphi2);
-//$$$$
     smalltree->Branch("tree_lepton_leadingdxy",&tree_lepton_leadingdxy);
     smalltree->Branch("tree_lepton_leadingdxy2",&tree_lepton_leadingdxy2);
     smalltree->Branch("tree_lepton_leadingdz",&tree_lepton_leadingdz);
     smalltree->Branch("tree_lepton_leadingdz2",&tree_lepton_leadingdz2);
-//$$$$
 
     smalltree->Branch("tree_lepton_lepton_dR",&tree_lepton_lepton_dR);
     smalltree->Branch("tree_lepton_lepton_dPhi",&tree_lepton_lepton_dPhi);
@@ -2012,23 +2024,26 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("HLT_IsoMu24_v",&HLT_IsoMu24_v);
     smalltree->Branch("HLT_IsoMu27_v",&HLT_IsoMu27_v);
     smalltree->Branch("HLT_IsoTkMu24_v", &HLT_IsoTkMu24_v);
-
     smalltree->Branch("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v",&HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v);
     smalltree->Branch("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v", &HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v);
     smalltree->Branch("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v",&HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v);
     smalltree->Branch("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v", &HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v);
     smalltree->Branch("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v",&HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v);
     smalltree->Branch("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v",&HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v);
-//$$$$
+
     smalltree->Branch("HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v",&HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v);
-//$$$$
+    smalltree->Branch("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v",&HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v);
     smalltree->Branch("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v",&HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v);
     smalltree->Branch("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v",&HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v);
     smalltree->Branch("HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v",&HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v);
+//$$$$
+    smalltree->Branch("HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v",&HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v);
+    smalltree->Branch("HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v",&HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v);
+    smalltree->Branch("HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ_v",&HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ_v);
+//$$$$
     smalltree->Branch("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v",&HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v);
-//$$$$
     smalltree->Branch("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",&HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v);
-//$$$$
+
 
     smalltree->Branch("HLT_Ele27_WPTight_Gsf_v",&HLT_Ele27_WPTight_Gsf_v);
     smalltree->Branch("HLT_Ele32_WPTight_Gsf_v",&HLT_Ele32_WPTight_Gsf_v);
@@ -2043,6 +2058,8 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     smalltree->Branch("HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v",&HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v);
     smalltree->Branch("HLT_PFMET250_HBHECleaned_v",&HLT_PFMET250_HBHECleaned_v);
     smalltree->Branch("HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v",&HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v);
+
+
 
 
     //----------------------------------------
@@ -2139,7 +2156,6 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
 //     reader->AddVariable( "mva_track_dR",      &dR);
 //     reader->AddVariable( "mva_track_dRmax",   &dRmax);
 //     reader->AddVariable(" mva_track_lost", &isLost);
-
     // updated 240510:
     reader->AddVariable( "mva_track_pt",      &pt );
     reader->AddVariable( "mva_track_eta",     &eta );
@@ -2196,6 +2212,8 @@ FlyingTopAnalyzer::FlyingTopAnalyzer(const edm::ParameterSet& iConfig):
     readerVtxStep1->AddVariable(" mva_Vtx_MeanDCA",  &mva_V_MeanDCA);
 
     readerVtxStep1->BookMVA("BDTG",weightFileVtxStep1_);
+
+
 }
 
 
@@ -2265,6 +2283,8 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   tree_only_gen_wt=1.0;
   
   PUweight = 1;
+  PUweight_Up = 1;
+  PUweight_Down = 1;
   Prefweight = 1;
   tree_genTop_Weight = 1;
   using namespace edm;
@@ -2388,6 +2408,9 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       }
     } // Pileup info loop ends																				    
     PUweight = lumiWeights_->weight(TruePUI);
+    PUweight_Up = lumiWeightsUp_->weight(TruePUI);
+    PUweight_Down = lumiWeightsDown_->weight(TruePUI);
+
     PU_events = float(TruePUI);
 
     //  cout<<" pile up weight ="<<PUweight<<endl;
@@ -2408,39 +2431,40 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   {
     TName=triggerNames.triggerName(i);
     TriggerCheck.push_back(TName);
+if (strstr(TName.c_str(),"HLT_IsoMu24_v") && triggerH->accept(i)){HLT_IsoMu24_v = true;} else if (strstr(TName.c_str(),"HLT_IsoMu24_v") &&!triggerH->accept(i)){HLT_IsoMu24_v = false;};
+    if (strstr(TName.c_str(),"HLT_IsoTkMu24_v") && triggerH->accept(i)){HLT_IsoTkMu24_v = true;} else if (strstr(TName.c_str(),"HLT_IsoTkMu24_v") &&!triggerH->accept(i)){HLT_IsoTkMu24_v = false;};
+    if (strstr(TName.c_str(),"HLT_IsoMu27_v") && triggerH->accept(i)){HLT_IsoMu27_v = true;} else if (strstr(TName.c_str(),"HLT_IsoMu27_v") &&!triggerH->accept(i)){HLT_IsoMu27_v = false;};
     if (strstr(TName.c_str(),"HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v") &&  triggerH->accept(i)){HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v = true;} else if (strstr(TName.c_str(),"HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v") && !triggerH->accept(i)){HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v = false;};//std::cout<<"triggerName / prescale : "<<TName<<" / "<<prescale->getPrescaleForInder(i)<<std::endl;
     if (strstr(TName.c_str(),"HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v") &&  triggerH->accept(i)){HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v = true;} else if (strstr(TName.c_str(),"HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v")&& !triggerH->accept(i)){HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v = false;};//std::cout<<"triggerName / prescale : "<<TName<<" / "<<prescale->getPrescaleForInder(i)<<std::endl;    
-    
-    if(strstr(TName.c_str(),"HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v") &&  triggerH->accept(i)){HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v = true;} else if (strstr(TName.c_str(),"HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v")&& !triggerH->accept(i)){HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v = false;};
-    if(strstr(TName.c_str(),"HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v") &&  triggerH->accept(i)){HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v = true;} else if (strstr(TName.c_str(),"HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v")&& !triggerH->accept(i)){HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v = false;};
-
+    if (strstr(TName.c_str(),"HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v") &&  triggerH->accept(i)){HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v = true;} else if (strstr(TName.c_str(),"HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v")&& !triggerH->accept(i)){HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v = false;};
+    if (strstr(TName.c_str(),"HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v") &&  triggerH->accept(i)){HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v = true;} else if (strstr(TName.c_str(),"HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v")&& !triggerH->accept(i)){HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v = false;};
     if (strstr(TName.c_str(),"HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v") &&  triggerH->accept(i)){HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v = true;} else if (strstr(TName.c_str(),"HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v") && !triggerH->accept(i)){HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v = false;};
     if (strstr(TName.c_str(),"HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v") &&  triggerH->accept(i)){HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v = true;} else if (strstr(TName.c_str(),"HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v") && !triggerH->accept(i)){HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v = false;};
-//$$$$
+
     if (strstr(TName.c_str(),"HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v") &&  triggerH->accept(i)){HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v = true;} else if (strstr(TName.c_str(),"HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v") && !triggerH->accept(i)){HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v = false;};
-//$$$$
     if (strstr(TName.c_str(),"HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v") &&  triggerH->accept(i)){HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v = true;} else if (strstr(TName.c_str(),"HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v") && !triggerH->accept(i)){HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v = false;};
     if (strstr(TName.c_str(),"HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v") &&  triggerH->accept(i)){HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v = true;} else if (strstr(TName.c_str(),"HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v") && !triggerH->accept(i)){HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v = false;};
     if (strstr(TName.c_str(),"HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v") &&  triggerH->accept(i)){HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v = true;} else if (strstr(TName.c_str(),"HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v") && !triggerH->accept(i)){HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v = false;};
+//$$$$
+    if (strstr(TName.c_str(),"HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v") &&  triggerH->accept(i)){HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v = true;} else if (strstr(TName.c_str(),"HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v") && !triggerH->accept(i)){HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v = false;};
+    if (strstr(TName.c_str(),"HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v") &&  triggerH->accept(i)){HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v = true;} else if (strstr(TName.c_str(),"HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v") && !triggerH->accept(i)){HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v = false;};
+    if (strstr(TName.c_str(),"HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ_v") &&  triggerH->accept(i)){HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ_v = true;} else if (strstr(TName.c_str(),"HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ_v") && !triggerH->accept(i)){HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ_v = false;};
+//$$$$
     if (strstr(TName.c_str(),"HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v") &&  triggerH->accept(i)){HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v = true;} else if (strstr(TName.c_str(),"HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v") && !triggerH->accept(i)){HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v = false;};
-//$$$$
     if (strstr(TName.c_str(),"HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v") &&  triggerH->accept(i)){HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v = true;} else if (strstr(TName.c_str(),"HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v") && !triggerH->accept(i)){HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v = false;};
-//$$$$
+
     if (strstr(TName.c_str(),"HLT_Ele27_WPTight_Gsf_v") &&  triggerH->accept(i)){HLT_Ele27_WPTight_Gsf_v = true;} else if (strstr(TName.c_str(),"HLT_Ele27_WPTight_Gsf_v") && !triggerH->accept(i)){HLT_Ele27_WPTight_Gsf_v = false;};
     if (strstr(TName.c_str(),"HLT_Ele32_WPTight_Gsf_v") &&  triggerH->accept(i)){HLT_Ele32_WPTight_Gsf_v = true;} else if (strstr(TName.c_str(),"HLT_Ele32_WPTight_Gsf_v") && !triggerH->accept(i)){HLT_Ele32_WPTight_Gsf_v = false;};
     if (strstr(TName.c_str(),"HLT_Ele35_WPTight_Gsf_v") &&  triggerH->accept(i)){HLT_Ele35_WPTight_Gsf_v = true;} else if (strstr(TName.c_str()," HLT_Ele35_WPTight_Gsf_v") && !triggerH->accept(i)){HLT_Ele35_WPTight_Gsf_v = false;};
     if (strstr(TName.c_str(),"HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v") &&  triggerH->accept(i)){HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v = true;} else if (strstr(TName.c_str(),"HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v") && !triggerH->accept(i)){HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v = false;};
     if (strstr(TName.c_str(),"HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v") &&  triggerH->accept(i)){HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v = true;} else if (strstr(TName.c_str(),"HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v") && !triggerH->accept(i)){HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v = false;};
+
     if (strstr(TName.c_str(),"HLT_PFMET120_PFMHT120_IDTight_PFHT60_v") &&  triggerH->accept(i)){HLT_PFMET120_PFMHT120_IDTight_PFHT60_v = true;} else if (strstr(TName.c_str(),"HLT_PFMET120_PFMHT120_IDTight_PFHT60_v") && !triggerH->accept(i)){HLT_PFMET120_PFMHT120_IDTight_PFHT60_v = false;};
     if (strstr(TName.c_str(),"HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60_v") &&  triggerH->accept(i)){HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60_v = true;} else if (strstr(TName.c_str(),"HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60_v") && !triggerH->accept(i)){HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60_v = false;};
     if (strstr(TName.c_str(),"HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v") &&  triggerH->accept(i)){HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v = true;} else if (strstr(TName.c_str(),"HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v") && !triggerH->accept(i)){HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v = false;};
     if (strstr(TName.c_str(),"HLT_PFMET250_HBHECleaned_v") &&  triggerH->accept(i)){HLT_PFMET250_HBHECleaned_v = true;} else if (strstr(TName.c_str(),"HLT_PFMET250_HBHECleaned_v") && !triggerH->accept(i)){HLT_PFMET250_HBHECleaned_v = false;};
     if (strstr(TName.c_str(),"HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v") &&  triggerH->accept(i)){HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v = true;} else if (strstr(TName.c_str(),"HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v") && !triggerH->accept(i)){HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v = false;};
-    if (strstr(TName.c_str(),"HLT_IsoMu24_v") && triggerH->accept(i)){HLT_IsoMu24_v = true;} else if (strstr(TName.c_str(),"HLT_IsoMu24_v") &&!triggerH->accept(i)){HLT_IsoMu24_v = false;};
-    if (strstr(TName.c_str(),"HLT_IsoTkMu24_v") && triggerH->accept(i)){HLT_IsoTkMu24_v = true;} else if (strstr(TName.c_str(),"HLT_IsoTkMu24_v") &&!triggerH->accept(i)){HLT_IsoTkMu24_v = false;};
-    if (strstr(TName.c_str(),"HLT_IsoMu27_v") && triggerH->accept(i)){HLT_IsoMu27_v = true;} else if (strstr(TName.c_str(),"HLT_IsoMu27_v") &&!triggerH->accept(i)){HLT_IsoMu27_v = false;};
-  }
-
+      }
 
   //////////////////////////////////////
   //////////////////////////////////////
@@ -2455,20 +2479,21 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
             };
 
   bool blind = false;
-  for (unsigned int i = 0; i < inputFileNames_.size(); i++)
-    {
-          TString temp = inputFileNames_[0];
-          for (unsigned int j =0 ; j < 2; j++)
-            {
-              if (temp.Contains(Dataset[j]))
-              {
-                blind = true;
-                // if (blind ) 
-                std::cout<<"BLIND = "<<blind<<std::endl;
-                break;
-              }
-            }
-    }
+  // for (unsigned int i = 0; i < inputFileNames_.size(); i++)
+  //   {
+
+  //         TString temp = inputFileNames_[0];
+  //         for (unsigned int j =0 ; j < 2; j++)
+  //           {
+  //             if (temp.Contains(Dataset[j]))
+  //             {
+  //               blind = true;
+  //               // if (blind ) 
+  //               std::cout<<"BLIND = "<<blind<<std::endl;
+  //               break;
+  //             }
+  //           }
+  //   }
 
 
   //////////////////////////////////
@@ -2505,7 +2530,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   const double rho_val = *(hRho.product());                                                                                                                                                                  
   Rho = rho_val; // note that this has nothing to do with tree_PV_rho !
 
-  bool tree_Good_PV = false;
+  tree_Good_PV = false;
   if ( tree_PV_ndf > 4 && abs(tree_PV_z) < 24. && abs(tree_PV_rho) < 2. ) 
     tree_Good_PV = true;
   if (showlog){std::cout<<"tree_Good_PV = "<<tree_Good_PV<<std::endl;}
@@ -2575,7 +2600,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     float  smearedPt = 0.;
     int isGen = 0;
     if ( !isMC_ ) 
-      correction = rc.kScaleDT( mu.charge(), mu.pt(), mu.eta(), mu.phi(), 0, 0 );
+      correction = 1; // No rochester Correction  for Run 3 yet  // rc.kScaleDT( mu.charge(), mu.pt(), mu.eta(), mu.phi(), 0, 0 );
     if ( isMC_ ) 
     {
       for (size_t i=0; i<pruned->size(); i++)
@@ -2595,7 +2620,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
         float deta = abs( Gen_eta - mu.eta() );
         float dphi = abs( Deltaphi( Gen_phi, mu.phi() ) );
         if ( abs(deta) < 0.1 && abs(dphi) < 0.1 && abs(dpt) < 0.1 ) {
-          correction = rc.kSpreadMC( mu.charge(), mu.pt(), mu.eta(), mu.phi(), Gen_pt, 0, 0 );
+          correction =  1; // No rochester Correction  for Run 3 yet rc.kSpreadMC( mu.charge(), mu.pt(), mu.eta(), mu.phi(), Gen_pt, 0, 0 );
           isGen = 1;
           int motherPdgId = 0;
           const Candidate * mom   = genIt.mother();
@@ -2606,7 +2631,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
         } // muon matching																						      
         if ( isGen != 0 ) break;
       } //  end loop on generated muons 																						      
-      if  ( isGen == 0 ) correction = rc.kSmearMC(mu.charge(), mu.pt(), mu.eta(), mu.phi(), mu.innerTrack()->hitPattern().trackerLayersWithMeasurement(), gRandom->Rndm(), 0, 0);
+      if  ( isGen == 0 ) correction =  1; // No rochester Correction  for Run 3 yetrc.kSmearMC(mu.charge(), mu.pt(), mu.eta(), mu.phi(), mu.innerTrack()->hitPattern().trackerLayersWithMeasurement(), gRandom->Rndm(), 0, 0);
     } // endif MC 
     																					    
     smearedPt = mu.pt() * correction;
@@ -2904,7 +2929,6 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   tree_MmumuSameSign = 0.;
   
   //------ Dimuon Channel ------//
-//$$$$  if ( nmu >= 2 && MuonChannel ) 
   if ( allnmu >= 2 && MuonChannel ) 
   {
     // Find the function in ../interface/Filter.h
@@ -2920,7 +2944,6 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   }
 
   //---------- Dielectron Channel ----------//
-//$$$$  if ( nEl >= 2 && ElChannel ) 
   if ( tree_all_nel >= 2 && ElChannel ) 
   {
     // Find the function in ../interface/Filter.h
@@ -2937,12 +2960,11 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
   //----------   EleMu Channel  ----------//
   bool LeadingMuon = true;
-//$$$$  if( nmu >=1 && nEl >=1 && EMuChannel )
-  if( allnmu >= 1 && tree_all_nel >= 1 && EMuChannel )
+if( allnmu >= 1 && tree_all_nel >= 1 && EMuChannel )//CHanger les sélections
   {
     // Find the function in ../interface/Filter.h
     std::vector<float> DiLeptonData = EMuMass(AllowDiLeptonSameSign,
-    nmu,tree_all_nmu,tree_muon_isTight,tree_muon_MiniIsoLoose,tree_muon_isPrompt,
+    nmu,tree_all_nmu,tree_muon_isTight,tree_muon_PFIsoTight,tree_muon_isPrompt,
     tree_muon_pt,tree_muon_eta,tree_muon_phi,tree_muon_charge,index_muon,
      nEl,tree_all_nel,tree_electron_IsTight,tree_electron_IsTight,tree_electron_isPrompt,
     tree_electron_pt,tree_electron_eta,tree_electron_phi,tree_electron_charge,index_el,
@@ -2954,6 +2976,8 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     imu2 = DiLeptonData[3];
     imu1_SS = DiLeptonData[4];
     imu2_SS = DiLeptonData[5];
+
+
   }// end of Emu Channel
 
 
@@ -2970,10 +2994,10 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   //////////////////////////////////
 
   tree_only_tigger_filter = false;
-//$$$$
+//!! Becarful, set to true to do some tests but should be set to false
   tree_trigger_doublelepton = false;
   tree_trigger_singlelepton = false;
-//$$$$
+// !! 
   tree_Filter = false;
   tree_FilterSameSign = false;
   tree_nTracks = 0;
@@ -2991,10 +3015,10 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     }
     if( EMuChannel ) {
       if ( HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v || HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v || HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v || HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v ) tree_trigger_doublelepton = true;
-      if ( HLT_IsoMu24_v ) tree_trigger_singlelepton = true; 
+      if ( HLT_IsoMu24_v || HLT_Ele35_WPTight_Gsf_v) tree_trigger_singlelepton = true; 
     }
   }
-  else if (YEAR_ == 2022 || YEAR_ == 2023)
+  else if (YEAR_ == 2023 )
   {
     if( MuonChannel ) {
       if ( HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v || HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v ) tree_trigger_doublelepton = true;
@@ -3002,9 +3026,21 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     }
     if( EMuChannel ) {
       if ( HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v || HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v || HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v ) tree_trigger_doublelepton = true;
-      if ( HLT_IsoMu24_v ) tree_trigger_singlelepton = true;
+      if ( HLT_IsoMu24_v || HLT_Ele35_WPTight_Gsf_v ) tree_trigger_singlelepton = true;
     }
   }
+  else if (YEAR_ == 2022 )
+  {
+    if( MuonChannel ) {
+      if ( HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_v || HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8_v ) tree_trigger_doublelepton = true;
+      if ( HLT_IsoMu24_v ) tree_trigger_singlelepton = true; 
+    }
+    if( EMuChannel ) {
+      if ( HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v || HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v || HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v ) tree_trigger_doublelepton = true;
+      if ( HLT_IsoMu24_v || HLT_Ele35_WPTight_Gsf_v) tree_trigger_singlelepton = true;
+    }
+  }
+
 
   if ( tree_trigger_doublelepton || tree_trigger_singlelepton ) tree_only_tigger_filter = true;
 
@@ -3021,6 +3057,10 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     tree_FilterSameSign = false;
   }
 
+if ( !tree_Filter && tree_FilterSameSign ) {
+    imu1 = imu1_SS;
+    imu2 = imu2_SS;
+  }
 
   //////////////////////////////////
   //////////////////////////////////
@@ -3046,10 +3086,8 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   float lep1_pt=0, lep2_pt=0, lep1_eta=0, lep2_eta=0, lep1_phi=0, lep2_phi=0;
   int lep1_Q =0; int lep2_Q =0;
   float lep1_mass=-1, lep2_mass=-1;
-//$$$$
   float lep1_dxy=0, lep2_dxy=0, lep1_dz=0, lep2_dz=0;
-//$$$$
-  if (showlog){std::cout<<"lep1_pt = "<<lep1_pt<<" lep2_pt = "<<lep2_pt<<" lep1_eta = "<<lep1_eta<<" lep2_eta = "<<lep2_eta<<" lep1_phi = "<<lep1_phi<<" lep2_phi = "<<lep2_phi<<" lep1_Q = "<<lep1_Q<<" lep2_Q = "<<lep2_Q<<" lep1_mass = "<<lep1_mass<<" lep2_mass = "<<lep2_mass<<std::endl;}
+
   if ( imu1 >= 0 && imu2 >= 0 ) {
   if ( MuonChannel ) {
     lep1_pt  = tree_muon_pt[imu1];
@@ -3062,12 +3100,10 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     lep2_Q   = tree_muon_charge[imu2];
     lep1_mass = mu_mass;
     lep2_mass = mu_mass;
-//$$$$
     lep1_dxy  = tree_muon_dxy[imu1];
     lep2_dxy  = tree_muon_dxy[imu2];
     lep1_dz   = tree_muon_dz[imu1];
     lep2_dz   = tree_muon_dz[imu2];
-//$$$$
   }
   if ( ElChannel ) {
     lep1_pt  = tree_electron_pt[imu1];
@@ -3080,12 +3116,10 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     lep2_Q   = tree_electron_charge[imu2];
     lep1_mass = el_mass;
     lep2_mass = el_mass;
-//$$$$
     lep1_dxy  = tree_electron_dxy[imu1];
     lep2_dxy  = tree_electron_dxy[imu2];
     lep1_dz   = tree_electron_dz[imu1];
     lep2_dz   = tree_electron_dz[imu2];
-//$$$$
   }
   if ( EMuChannel ) {
     if (tree_Good_PV) {
@@ -3115,12 +3149,10 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     lep2_Q   = tree_electron_charge[imu2];
     lep1_mass = mu_mass;
     lep2_mass = el_mass;
-//$$$$
     lep1_dxy  = tree_muon_dxy[imu1];
     lep2_dxy  = tree_electron_dxy[imu2];
     lep1_dz   = tree_muon_dz[imu1];
     lep2_dz   = tree_electron_dz[imu2];
-//$$$$
     if ( tree_electron_pt[imu2] > tree_muon_pt[imu1] ) LeadingMuon = false;
 
     Evts_muon1_pt    = lep1_pt;
@@ -3150,6 +3182,9 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       } // end trigger check																		  
     }// Good PV 
   }
+
+  tree_lepton_b4trigger_leadingpt.push_back(lep1_pt);
+  tree_lepton_b4trigger_leadingpt2.push_back(lep2_pt);
 
   Vlep1.SetPtEtaPhiM(lep1_pt,lep1_eta,lep1_phi,lep1_mass);
   Vlep2.SetPtEtaPhiM(lep2_pt,lep2_eta,lep2_phi,lep2_mass);
@@ -3182,10 +3217,10 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   /////////    lepton informations    ///////////
   ///////////////////////////////////////////////
 
-  if ( !tree_Filter && tree_FilterSameSign ) {
-    imu1 = imu1_SS;
-    imu2 = imu2_SS;
-  }
+  //  if ( !tree_Filter && tree_FilterSameSign ) {
+    //  imu1 = imu1_SS;
+    //  imu2 = imu2_SS;
+  //}
   mva_Evts_Mmumu = tree_Mmumu;
 
 
@@ -6033,11 +6068,11 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       uint16_t firsthit = hp.getHitPattern(HitPattern::HitCategory::TRACK_HITS,0);
  
       // Approximation for the lostTrack since the hitpattern information is not available (only 1160, tracking POG knows about it but do not seem to care)      
-      if ( ipc >= pc->size() ) {
-        if ( abs(tk_eta) < 1. && YEAR_ >= 2017)     firsthit = 1184; // PIXBL4 in barrel
-        else if (abs(tk_eta) < 1. && YEAR_ == 2016) firsthit = 1176;
-        else                                        firsthit = 1296; // PIXFD2 in forward
-      }      
+      // if ( ipc >= pc->size() ) {
+      //   if ( abs(tk_eta) < 1. && YEAR_ >= 2017)     firsthit = 1184; // PIXBL4 in barrel
+      //   else if (abs(tk_eta) < 1. && YEAR_ == 2016) firsthit = 1176;
+      //   else                                        firsthit = 1296; // PIXFD2 in forward
+      // }      
  
       tree_track_firstHit.push_back(firsthit);
 
@@ -6595,11 +6630,11 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       uint16_t firsthit = hp.getHitPattern(HitPattern::HitCategory::TRACK_HITS,0);
  
       // Approximation for the lostTrack since the hitpattern information is not available (only 1160, tracking POG knows about it but do not seem to care)      
-      if ( ipc >= pc->size() ) {
-        if ( abs(tk_eta) < 1. && YEAR_ >= 2017) firsthit = 1184; // PIXBL4 in barrel
-        else if (abs(tk_eta) < 1. && YEAR_ == 2016) firsthit = 1176;
-        else		      firsthit = 1296; // PIXFD2 in forward
-      }      
+      // if ( ipc >= pc->size() ) {
+      //   if ( abs(tk_eta) < 1. && YEAR_ >= 2017) firsthit = 1184; // PIXBL4 in barrel
+      //   else if (abs(tk_eta) < 1. && YEAR_ == 2016) firsthit = 1176;
+      //   else		      firsthit = 1296; // PIXFD2 in forward
+      // }      
       tree_V0_track_firstHit.push_back(firsthit);
 
       //---Creating State to propagate from  TT---//
@@ -7098,7 +7133,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     //  Warning :  Sorry for the people reading the vertexing code (Vtx.h), it's not easy to read and to understand. I hope that the comments will be good enough :D
     // If you want to complain about this code, please contact : "Paul Vaucelle" <paul.vaucelle@cern.ch>.
     // If you come from Brittany (West of France), your remarks have higher chances of being accepted, thanks!
-
+// Comments from Jérémy Andrea won't be accepted
     //--------------------------- FIRST HEMISPHERE WITH MVA -------------------------------------//
 
     //------------------------------------------------------------------------------------------------//
@@ -7241,29 +7276,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       }
             float Vtx1Mass = TMath::Max(Vtx1Vector.Mag(),0.);
 
-    if (blind && Vtx_step>=1 && Vtx_step<=2 && vaxis1.Pt()>80 )
-      {
-        tree_Hemi_Vtx_Mass.push_back(0);
-        tree_Hemi_Vtx_step.push_back(0);
-        tree_Hemi_Vtx_isTight.push_back(0);
-        tree_Hemi_Vtx_NChi2.push_back(0);
-        tree_Hemi_Vtx_nTrks.push_back(0);
-        tree_Hemi_Vtx_nTrks_sig.push_back(0);
-        tree_Hemi_Vtx_nTrks_bad.push_back(0);
-        tree_Hemi_Vtx_x.push_back(0);
-        tree_Hemi_Vtx_y.push_back(0);
-        tree_Hemi_Vtx_r.push_back(0);
-        tree_Hemi_Vtx_z.push_back(0);
-        tree_Hemi_Vtx_xError.push_back(0);
-        tree_Hemi_Vtx_yError.push_back(0);
-        tree_Hemi_Vtx_zError.push_back(0);
-        tree_Hemi_Vtx_dist.push_back( 0);
-        tree_Hemi_Vtx_SumtrackWeight.push_back(0);
-        tree_Hemi_Vtx_track_MeanDCA_d.push_back(0);
-      }
-    else
-      {
-        
+       
         tree_Hemi_Vtx_Mass.push_back(Vtx1Mass);
         tree_Hemi_Vtx_step.push_back(Vtx_step);
         tree_Hemi_Vtx_isTight.push_back(TightVertex);
@@ -7286,7 +7299,7 @@ void FlyingTopAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
         tree_Hemi_Vtx_dist.push_back( recD );
         tree_Hemi_Vtx_SumtrackWeight.push_back(SumWeight);
         tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
-      }
+      
  //   tree_Hemi_Vtx_step.push_back(Vtx_step);
  //   tree_Hemi_Vtx_isTight.push_back(TightVertex);
  //   tree_Hemi_Vtx_NChi2.push_back(Vtx_chi);
@@ -7576,30 +7589,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
         Vtx_chi = VtxHemi2->chi2();
       }
   float Vtx2Mass = TMath::Max(Vtx2Vector.Mag(),0.);
-      if (blind && Vtx_step>=1 && Vtx_step<=2 && vaxis2.Pt()>80)
-      {
 
-        tree_Hemi_Vtx_Mass.push_back(0);
-        tree_Hemi_Vtx_step.push_back(0);
-        tree_Hemi_Vtx_isTight.push_back(0);
-        tree_Hemi_Vtx_NChi2.push_back(0);
-        tree_Hemi_Vtx_nTrks.push_back(0);
-        tree_Hemi_Vtx_nTrks_sig.push_back(0);
-        tree_Hemi_Vtx_nTrks_bad.push_back(0);
-        tree_Hemi_Vtx_x.push_back(0);
-        tree_Hemi_Vtx_y.push_back(0);
-        tree_Hemi_Vtx_r.push_back(0);
-        tree_Hemi_Vtx_z.push_back(0);
-        tree_Hemi_Vtx_xError.push_back(0);
-        tree_Hemi_Vtx_yError.push_back(0);
-        tree_Hemi_Vtx_zError.push_back(0);
-
-        tree_Hemi_Vtx_dist.push_back(0 );
-        tree_Hemi_Vtx_SumtrackWeight.push_back(0);
-        tree_Hemi_Vtx_track_MeanDCA_d.push_back(0);
-      }
-        else
-    {
         
         tree_Hemi_Vtx_Mass.push_back(Vtx2Mass);
         tree_Hemi_Vtx_step.push_back(Vtx_step);
@@ -7623,7 +7613,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
         tree_Hemi_Vtx_dist.push_back( recD );
         tree_Hemi_Vtx_SumtrackWeight.push_back(SumWeight);
         tree_Hemi_Vtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
-    }
+    
   //tree_Hemi_Vtx_step.push_back(Vtx_step);
   //tree_Hemi_Vtx_isTight.push_back(TightVertex);
   //tree_Hemi_Vtx_NChi2.push_back(Vtx_chi);
@@ -8295,71 +8285,9 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                             tree_event_MergedVtx_Vtx_step.push_back(eventNewStep);
                             } // endif SecVtx is valid
 
-                        //---------Merged Vertex-----//
-                                                if (blind )
-                          {
-                            if  (  MergeStep>= 1 && MergeStep<=2 && ((MergeHemi==1 &&  vaxis1.Pt()>80 ) || (MergeHemi==2 &&  vaxis2.Pt()>80 ) || (vaxis2.Pt()>80 && vaxis1.Pt()>80)))
-                              {
-                                tree_Hemi_SecVtx.push_back(0);
-                                tree_Hemi_SecVtx_step.push_back(0);
-                                tree_Hemi_SecVtx_x.push_back(0);
-                                tree_Hemi_SecVtx_y.push_back(0);
-                                tree_Hemi_SecVtx_z.push_back(0);
-                                tree_Hemi_SecVtx_r.push_back(0);
-                                tree_Hemi_SecVtx_nTrks.push_back(0);
-                                tree_Hemi_SecVtx_NChi2.push_back(0);
-                                tree_Hemi_SecVtx_dist.push_back( 0);
-                                tree_Hemi_SecVtx_track_MeanDCA_d.push_back(0);
-                                tree_Hemi_SecVtx_SumtrackWeight.push_back(0);         
-                                tree_Hemi_SecVtx_Mass.push_back(0);
-                                tree_Hemi_SecVtx_dR.push_back(0);
-                              }
-                             else
-                              {
-                                tree_Hemi_SecVtx.push_back(MergeHemi);
-                                tree_Hemi_SecVtx_step.push_back(MergeStep);
-                                tree_Hemi_SecVtx_x.push_back(Mergedx);
-                                tree_Hemi_SecVtx_y.push_back(Mergedy);
-                                tree_Hemi_SecVtx_z.push_back(Mergedz);
-                                tree_Hemi_SecVtx_r.push_back(Mergedr);
-                                tree_Hemi_SecVtx_nTrks.push_back(MergeVtx_ntk);
-                                tree_Hemi_SecVtx_NChi2.push_back(MergeVtx_chi);
-                                tree_Hemi_SecVtx_dist.push_back( recD );
-                                tree_Hemi_SecVtx_track_MeanDCA_d.push_back(DCA_VTX_Meand);
-                                tree_Hemi_SecVtx_SumtrackWeight.push_back(SumWeight);         
-                                tree_Hemi_SecVtx_Mass.push_back(MergedVtxMass);
-                                tree_Hemi_SecVtx_dR.push_back(dRmerge);
-                              }
-                            
-                              if ( SecStep>= 1 && SecStep<=2 && ((SecHemi==1 &&  vaxis1.Pt()>80 ) || (SecHemi==2 &&  vaxis2.Pt()>80 ) || (vaxis2.Pt()>80 && vaxis1.Pt()>80)) )
-                                {
-                                  tree_Hemi_SecVtx.push_back(0);
-                                  tree_Hemi_SecVtx_step.push_back(0);
-                                  tree_Hemi_SecVtx_x.push_back(0);
-                                  tree_Hemi_SecVtx_y.push_back(0);
-                                  tree_Hemi_SecVtx_z.push_back(0);
-                                  tree_Hemi_SecVtx_r.push_back(0);
-                                  tree_Hemi_SecVtx_nTrks.push_back(0);
-                                  tree_Hemi_SecVtx_NChi2.push_back(0);
-                                }
-                              else
-                                {
-                                  //-------New secondary vertex---//
-                                  SecHemi = 2;
-                                  if ( MergeHemi == 2 ) SecHemi = 1;
-                                  tree_Hemi_SecVtx.push_back(SecHemi);
-                                  tree_Hemi_SecVtx_step.push_back(SecStep);
-                                  tree_Hemi_SecVtx_x.push_back(SecVtx_x);
-                                  tree_Hemi_SecVtx_y.push_back(SecVtx_y);
-                                  tree_Hemi_SecVtx_z.push_back(SecVtx_z);
-                                  tree_Hemi_SecVtx_r.push_back(sqrt(SecVtx_x*SecVtx_x+SecVtx_y*SecVtx_y));
-                                  tree_Hemi_SecVtx_nTrks.push_back(SecVtx_ntk);
-                                  tree_Hemi_SecVtx_NChi2.push_back(SecVtx_chi);
-                                }
-                                                          }
+                        //---------Merged Vertex-----//                                                          
 
-                        else
-                          {
+
                                                         tree_Hemi_SecVtx.push_back(MergeHemi);
                             tree_Hemi_SecVtx_step.push_back(MergeStep);
                             tree_Hemi_SecVtx_x.push_back(Mergedx);
@@ -8384,7 +8312,7 @@ if ( LLP2_mother * lep1_Q < 0 ) {
                             tree_Hemi_SecVtx_r.push_back(sqrt(SecVtx_x*SecVtx_x+SecVtx_y*SecVtx_y));
                             tree_Hemi_SecVtx_nTrks.push_back(SecVtx_ntk);
                             tree_Hemi_SecVtx_NChi2.push_back(SecVtx_chi);
-                          }
+                          
 
 
                         //tree_Hemi_SecVtx.push_back(MergeHemi);
@@ -8859,18 +8787,19 @@ void FlyingTopAnalyzer::clearVariables() {
     tree_trig_lepton_leadingphi.clear();
     tree_trig_lepton_leadingphi2.clear();
 
+  tree_lepton_b4trigger_leadingpt.clear();
+  tree_lepton_b4trigger_leadingpt2.clear();
+
     tree_lepton_leadingpt.clear();
     tree_lepton_leadingpt2.clear();
     tree_lepton_leadingeta.clear();
     tree_lepton_leadingeta2.clear();
     tree_lepton_leadingphi.clear();
     tree_lepton_leadingphi2.clear();
-//$$$$
     tree_lepton_leadingdxy.clear();
     tree_lepton_leadingdxy2.clear();
     tree_lepton_leadingdz.clear();
     tree_lepton_leadingdz2.clear();
-//$$$$
 
     tree_lepton_lepton_dR.clear();
     tree_lepton_lepton_dPhi.clear();
