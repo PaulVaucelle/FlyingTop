@@ -14,8 +14,8 @@ void RunPlot_Var() {
     TString CTAU [7] = {"001","003","010","030","100","300","1000"};
 
     for (unsigned int n = 0; n < 1; ++n) {// 7 
-        for (unsigned int i = 0; i < 5; ++i) {//CHoice
-            for (unsigned int j = 0; j < 2; ++j) {//Var : 26
+        for (unsigned int i = 0; i < 1; ++i) {//CHoice
+            for (unsigned int j = 0; j < 28; ++j) {//Var : 26
 
                 plot(i,j, CTAU[n]);
 

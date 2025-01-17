@@ -24,7 +24,9 @@ void plot(int choice , int VAR , TString CT) {
     int CHOICE = choice;
     int var = VAR;
     TString CTAU =  CT;
-
+    int Channel = 2;// 1 = EMu and 2 = MuMu
+    double yMin = 0.0;
+    float fac = 1.2;
     if (CHOICE == 0)
         {
             fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_ctau001.root");
@@ -117,10 +119,26 @@ void plot(int choice , int VAR , TString CT) {
             Legheader= "#Delta M_{#tilde{#mu}-#tilde{#chi}} = 20 GeV, c#tau = 0.1 cm";
             extraTXT = "_DM20_ctau"+CTAU+"_";
         }
-    else if  (CHOICE == 4) 
+    else if  (CHOICE == 5) 
         {
-            fileNames.push_back("../Signal_2018/TrackAna_DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.root");
-            fileNames.push_back("../Signal_2018/TrackAna_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.root");
+            if (Channel == 1)
+                {
+                    fileNames.push_back("../Signal_2018/TrackAna_EMU_DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.root");
+                    fileNames.push_back("../Signal_2018/TrackAna_EMU_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.root");
+
+                }
+            else if(Channel == 2)
+                {
+                    fileNames.push_back("../Signal_2018/TrackAna_DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.root");
+                    fileNames.push_back("../Signal_2018/TrackAna_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.root");
+
+                }
+            else // Mumu by default
+                {
+                    fileNames.push_back("../Signal_2018/TrackAna_DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.root");
+                    fileNames.push_back("../Signal_2018/TrackAna_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.root");
+
+                }
             fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu300_neu280.root");
             fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu400_neu300.root");
             fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu500_neu300.root");
@@ -202,12 +220,13 @@ void plot(int choice , int VAR , TString CT) {
             ytitle = "a.u";
             xtitle="trk #eta ";
             histName = "tree_track_eta";
+            fac= 1.8;
         }
     else if (var == 11)  
         {
             ytitle = "a.u";
             xtitle="trk nHits ";
-            histName = "tree_track_nhits";
+            histName = "tree_track_nHit";
         }
     else if (var == 12)  
         {
@@ -249,25 +268,19 @@ void plot(int choice , int VAR , TString CT) {
         {
             ytitle = "a.u";
             xtitle="Trk InJet ";
-            histName = "tree_track_IsInJet";
+            histName = "tree_track_isInJet";
         }
     else if (var == 19)  
         {
             ytitle = "a.u";
             xtitle="Hemi-track #Delta R_{min}";
-            histName = "tree_track_dR";
+            histName = "tree_track_Hemi_dR";
         }
     else if (var == 20)  
         {
             ytitle = "a.u";
             xtitle="Hemi-track #Delta R_{max}";
-            histName = "tree_track_dRmax";
-        }
-    else if (var == 21)  
-        {
-            ytitle = "a.u";
-            xtitle="Trk isLost";
-            histName = "tree_track_isLost";
+            histName = "tree_track_Hemi_dRmax";
         }
     else if (var == 21)  
         {
@@ -280,26 +293,43 @@ void plot(int choice , int VAR , TString CT) {
             ytitle = "a.u";
             xtitle="TRK BDT Score";
             histName = "tree_track_MVAval";
+            logy = 1;
+            yMin = 0.0001;
         }
     else if (var == 23)  
         {
-            ytitle = "a.u";
-            xtitle="TRK BDT Signal Efficiency";
+            ytitle = "Signal Efficiency";
+            xtitle="TRK BDT Score ";
             histName = "hSignalEff";
         }
     else if (var == 24)  
         {
-            ytitle = "a.u";
-            xtitle="TRK BDT BKG Efficiency";
+            ytitle = "BKG Efficiency";
+            xtitle="TRK BDT Score";
             histName = "hBkgEff";
         }
     else if (var == 25)  
         {
-            ytitle = "a.u";
-            xtitle="TRK BDT BKG Efficiency";
+            ytitle = "Significance";
+            xtitle="TRK BDT Score";
             histName = "h_sig";
         }
-            
+    else if (var == 26)  
+        {
+            ytitle = "a.u";
+            xtitle="Trk Weight";
+            histName = "hData_Hemi_Vtx_trackWeight";
+            logy = 1;
+            yMin = 0.0001;
+        }  
+    else if (var == 27)  
+        {
+            ytitle = "a.u";
+            xtitle="Sum Trk Weight";
+            histName = "hData_Hemi_Vtx_SumtrackWeight";
+            logy = 1;
+            yMin = 0.0001;
+        }      
     gStyle->SetOptDate(0);
     gStyle->SetStatColor(0);
     gStyle->SetTitleFont(62);
@@ -320,9 +350,6 @@ void plot(int choice , int VAR , TString CT) {
     gStyle->SetStatH(0.2);
     gStyle->SetOptFit(0);
     }
-
-
-
 
     // Vecteur pour stocker les histogrammes
     std::vector<TH1*> histograms;
@@ -423,8 +450,8 @@ Int_t ColorLightBlue = color10.GetNumber();
         histograms.push_back(hist);
 
         // Appliquer une couleur à l'histogramme
-        int color = colors[i % colors.size()];
-        hist->SetLineColor(color);
+
+        hist->SetLineColor(colors[i]);
 
         file->Close();
     }
@@ -443,9 +470,11 @@ Int_t ColorLightBlue = color10.GetNumber();
 
     gPad->SetLeftMargin(0.15);
     gPad->SetBottomMargin(0.15);
+
+    
     // Trouver les limites pour l'axe Y
     double yMax = 0.0;
-
+ 
     // Dessiner les histogrammes sur le même canvas
     for (size_t i = 0; i < histograms.size(); ++i) {
         
@@ -476,6 +505,7 @@ Int_t ColorLightBlue = color10.GetNumber();
             histograms[i]->GetYaxis()->SetTitle(ytitle);
             histograms[i]->Draw("HIST"); // Le premier histogramme
             yMax = histograms[i]->GetMaximum();
+            
 
         } else {
 
@@ -491,10 +521,35 @@ Int_t ColorLightBlue = color10.GetNumber();
             if (histMax > yMax) yMax = histMax;
         }
     }
+    histograms[0]->SetMinimum(yMin);
+    
+    gPad->SetLogy(logy);
     std::cout<<"ymax : _"<<yMax<<std::endl;
-    histograms[0]->SetMaximum(1.2 * yMax); // Ajouter un peu de marge
+    histograms[0]->SetMaximum(fac * yMax); // Ajouter un peu de marge
     // Ajouter une légende
-    TLegend* legend = new TLegend(0.5, 0.6, 0.8, 0.85);
+
+    TLegend* legend;
+    if (var == 4 || var == 6 || var == 8 || var == 11  || var == 20)
+        {
+            legend = new TLegend(0.2, 0.6, 0.5, 0.85);
+        } 
+    else if ( var == 21 )
+        {
+            legend = new TLegend(0.55, 0.6, 0.8, 0.85);
+        }
+    else if ( var == 18)
+        {
+            legend = new TLegend(0.17, 0.6, 0.45, 0.85);
+        }  
+    else if ( (var == 23 || var == 25) && choice == 0)
+        {
+            legend = new TLegend(0.35, 0.3, 0.65, 0.55);
+        } 
+    else 
+        {
+            legend = new TLegend(0.5, 0.6, 0.8, 0.85);
+        }
+
     legend->SetHeader(Legheader);
     legend->SetBorderSize(0);
     legend->SetFillStyle(0);
