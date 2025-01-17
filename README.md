@@ -119,16 +119,3 @@ To merge the outputfiles, use the haddWithWeights.py macro:
 
 Please check the paths so that they correspond to your envrionment
 
-python haddWithWeights.py <work_directory>/
-
-Please do not forget the "/" after <work_directory>
-To run TreeReader.C (current version gives efficiencies for the different selections and the reconstruction of vertices + a txt file to summarize it)
-You have to create an outputroot directory in the test directory if not already done
-
-root
-
-.L TreeReader.C+
-If the message "creating library " appears, you can try :
-
-.L runTreeReader.C
-Else (it somehow happens that the command above crashes) copy paste the macro in the root terminal :)
