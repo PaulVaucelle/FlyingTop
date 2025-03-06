@@ -20,12 +20,18 @@ float hmaxBD = 1E6;
 TString extension = SYST;
 TFile * theoutputfile = new TFile( "./SYST/"+SYST+"_SYST.root" , "UPDATE");
 
+float tt_rescale = 0.0954031129 ; //13791474/1.4456*10^{8} = smallnentries/norm * nentries/small nentries
+ // = nentries/norm where norm = number of evetn sin Ntuple et nentries = number of events in MiniNtuple
+
+
  TFile* f1_DY  = new TFile("../../MC_EMU_03_02_2025/DATAMC_DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8.root");
  TFile* f2_DY  = new TFile("../../MC_EMU_03_02_2025/DATAMC_DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.root");
  TFile* f1_TT  = new TFile("../../MC_EMU_03_02_2025/DATAMC_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.root");
  TFile* f2_TT  = new TFile("../../MC_EMU_03_02_2025/DATAMC_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8.root");
  TFile* f1_ST  = new TFile("../../MC_EMU_03_02_2025/DATAMC_ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8.root");
  TFile* f2_ST  = new TFile("../../MC_EMU_03_02_2025/DATAMC_ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8.root");
+ TFile* f3_ST  = new TFile("../../MC_EMU_03_02_2025/DATAMC_ST_t-channel_top_5f_InclusiveDecays_TuneCP5_13TeV-powheg-pythia8.root");
+ TFile* f4_ST  = new TFile("../../MC_EMU_03_02_2025/DATAMC_ST_t-channel_antitop_5f_InclusiveDecays_TuneCP5_13TeV-powheg-pythia8.root");
  TFile* f1_TTV = new TFile("../../MC_EMU_03_02_2025/DATAMC_ttWJetsToLNu_5f_EWK_TuneCP5_13TeV_amcatnlo-pythia8.root");
  TFile* f2_TTV = new TFile("../../MC_EMU_03_02_2025/DATAMC_TTZToLL_5f_TuneCP5_13TeV-madgraphMLM-pythia8.root");
  TFile* f3_TTV = new TFile("../../MC_EMU_03_02_2025/DATAMC_TTWW_TuneCP5_13TeV-madgraph-pythia8.root");
@@ -33,7 +39,7 @@ TFile * theoutputfile = new TFile( "./SYST/"+SYST+"_SYST.root" , "UPDATE");
  TFile* f2_VV  = new TFile("../../MC_EMU_03_02_2025/DATAMC_WZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8.root");
  TFile* f3_VV  = new TFile("../../MC_EMU_03_02_2025/DATAMC_ZZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8.root");
  
- TString MCFILE[12] = {
+ TString MCFILE[14] = {
                   "DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8_",
                   "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_",
                   "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_",
@@ -45,7 +51,10 @@ TFile * theoutputfile = new TFile( "./SYST/"+SYST+"_SYST.root" , "UPDATE");
                   "TTWW_TuneCP5_13TeV-madgraph-pythia8_",
                   "WWTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_",
                   "WZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8_",
-                  "ZZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8_"
+                  "ZZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8_",
+                  "ST_t-channel_top_5f_InclusiveDecays_TuneCP5_13TeV-powheg-pythia8_",
+                  "ST_t-channel_antitop_5f_InclusiveDecays_TuneCP5_13TeV-powheg-pythia8_"
+
 };
 
 // extension is <SYST>Up or <SYST>Down
@@ -54,6 +63,7 @@ TString EXTRA = "";
   else if (SYST == "JECDown") EXTRA = "_JECDown";
   else if (SYST == "JERUp" ) EXTRA = "_JERUp";
   else if (SYST == "JERDown" ) EXTRA = "_JERDown";
+  else if (SYST == "RoccorDown") EXTRA = "_RoccorDown";
 
 
   TFile* f1_DY_SYST  = new TFile("../../MC_EMU_03_02_2025"+EXTRA+"/DATAMC_DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8_"+extension+".root");
@@ -62,15 +72,18 @@ TString EXTRA = "";
  TFile* f2_TT_SYST  = new TFile("../../MC_EMU_03_02_2025"+EXTRA+"/DATAMC_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_"+extension+".root");
  TFile* f1_ST_SYST  = new TFile("../../MC_EMU_03_02_2025"+EXTRA+"/DATAMC_ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8_"+extension+".root");
  TFile* f2_ST_SYST  = new TFile("../../MC_EMU_03_02_2025"+EXTRA+"/DATAMC_ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8_"+extension+".root");
+ TFile* f3_ST_SYST  = new TFile("../../MC_EMU_03_02_2025"+EXTRA+"/DATAMC_ST_t-channel_top_5f_InclusiveDecays_TuneCP5_13TeV-powheg-pythia8_"+extension+".root");
+ TFile* f4_ST_SYST  = new TFile("../../MC_EMU_03_02_2025"+EXTRA+"/DATAMC_ST_t-channel_antitop_5f_InclusiveDecays_TuneCP5_13TeV-powheg-pythia8_"+extension+".root");
  TFile* f1_TTV_SYST = new TFile("../../MC_EMU_03_02_2025"+EXTRA+"/DATAMC_ttWJetsToLNu_5f_EWK_TuneCP5_13TeV_amcatnlo-pythia8_"+extension+".root");
  TFile* f2_TTV_SYST = new TFile("../../MC_EMU_03_02_2025"+EXTRA+"/DATAMC_TTZToLL_5f_TuneCP5_13TeV-madgraphMLM-pythia8_"+extension+".root");
  TFile* f3_TTV_SYST = new TFile("../../MC_EMU_03_02_2025"+EXTRA+"/DATAMC_TTWW_TuneCP5_13TeV-madgraph-pythia8_"+extension+".root");
  TFile* f1_VV_SYST  = new TFile("../../MC_EMU_03_02_2025"+EXTRA+"/DATAMC_WWTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_"+extension+".root");
  TFile* f2_VV_SYST  = new TFile("../../MC_EMU_03_02_2025"+EXTRA+"/DATAMC_WZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8_"+extension+".root");
  TFile* f3_VV_SYST  = new TFile("../../MC_EMU_03_02_2025"+EXTRA+"/DATAMC_ZZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8_"+extension+".root");
+ 
 
 
-TString MCFILE_SYST[12] = {
+TString MCFILE_SYST[14] = {
                   "DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8_"+extension+"_",
                   "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_"+extension+"_",
                   "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_"+extension+"_",
@@ -82,7 +95,9 @@ TString MCFILE_SYST[12] = {
                   "TTWW_TuneCP5_13TeV-madgraph-pythia8_"+extension+"_",
                   "WWTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_"+extension+"_",
                   "WZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8_"+extension+"_",
-                  "ZZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8_"+extension+"_"
+                  "ZZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8_"+extension+"_",
+                  "ST_t-channel_top_5f_InclusiveDecays_TuneCP5_13TeV-powheg-pythia8_"+extension+"_",
+                  "ST_t-channel_antitop_5f_InclusiveDecays_TuneCP5_13TeV-powheg-pythia8_"+extension+"_"
 };
 
 
@@ -200,34 +215,34 @@ int Method = method;
         nbin1 = 2; 
         xmin1 = 0.;
         xmax1 =  2;
-        // HeaderA = "TT + 20<pt<80";
+
         // HeaderNVtx = "2 Vtx"; 
         xtitle1 = "Filter";
 
-        htitleB = "Vertices_NoSel";
-        nbin2 = 100; 
-        xmin2 = 0;
-        xmax2 =  100;
-        // HeaderA = "TT + 20<pt<80";
-        // HeaderNVtx = "2 Vtx All"; 
-        xtitle2 = "nVtx";
 
-        htitleC = "Vertices_filtercut_";
+        htitleB = "Tree_Mumu_nosel";
+        nbin2 = 150; 
+        xmin2 = 0;
+        xmax2 = 600;
+        // HeaderA = "TT + 20<pt<80";
+        // HeaderNVtx = "2 VtxAll";
+        xtitle2 = "M_{e#mu}";
+
+        htitleC = "Vertices_NoSel";
         nbin3 = 100; 
         xmin3 = 0;
-        xmax3 = 100;
+        xmax3 =  100;
         // HeaderA = "TT + 20<pt<80";
-        // HeaderNVtx = "2 VtxAll";
+        // HeaderNVtx = "2 Vtx All"; 
         xtitle3 = "nVtx";
 
-
-        htitleD = "Tree_Mumu_nosel";
-        nbin4 = 150; 
+        htitleD = "Vertices_filtercut_";
+        nbin4 = 100; 
         xmin4 = 0;
-        xmax4 = 600;
+        xmax4 = 100;
         // HeaderA = "TT + 20<pt<80";
         // HeaderNVtx = "2 VtxAll";
-        xtitle4 = "M_{e#mu}";
+        xtitle4 = "nVtx_{AfterFilter}";
       }
 
 
@@ -336,32 +351,35 @@ int Method = method;
         xmax2 = 5;
         xtitle2 = "jet_{#eta}";
 
-        htitleC = "hData_jet_btag_Deepjet_";
-        nbin3 = 50;
-        xmin3 = 0;
-        xmax3 = 1;
-        xtitle3 = "jet_{btag}";
 
-        htitleD = "hData_jet_HadronFlavour_";
-        nbin4 = 7;
-        xmin4 = -0.5;
-        xmax4 = 6.5;
-        xtitle4 = "jet_{HadronFlavour}";
+        htitleC = "njet_NoSel";
+        nbin3 = 20;
+        xmin3 = 0;
+        xmax3 = 20;
+        xtitle3 = "n_{jet}";
+
+        htitleD = "njetNOmu_NoSel";
+        nbin4 = 20;
+        xmin4 = 0;
+        xmax4 = 20;
+        xtitle4 = "n_{jet NoLepton}";
       }
 
     if (Method == 5)
       {
-        htitleA = "njet_NoSel";
-        nbin1 = 20;
-        xmin1 = 0;
-        xmax1 = 20;
-        xtitle1 = "n_{jet}";
 
-        htitleB = "njetNOmu_NoSel";
-        nbin2 = 20;
-        xmin2 = 0;
-        xmax2 = 20;
-        xtitle2 = "n_{jet NoLepton}";
+        htitleA = "Hemi_pt_";
+        nbin1 = 100;
+        xmin1 = 0;
+        xmax1 = 600;
+        xtitle1 = "Hemi_{pt}";
+
+        htitleB = "Hemi_eta_";
+        nbin2 = 55;
+        xmin2 = -2.5;
+        xmax2 = 2.5;
+        xtitle2 = "Hemi_{#eta}";
+
 
         htitleC = "Hemisphere_leadingpt_";
         nbin3 = 100;
@@ -408,29 +426,29 @@ int Method = method;
   // !!----------------------
     if (Method == 7)
       {
-        htitleA = "Nmu_";
-        nbin1 = 10;
+        htitleA = "muon_pt_NoSel";
+        nbin1 = 100;
         xmin1 = 0;
-        xmax1 = 10;
-        xtitle1 = "n_{#mu}";
+        xmax1 = 300;
+        xtitle1 = "#pt_{#mu}";
 
-        htitleB = "Muon_pt_";
-        nbin2 = 100;
-        xmin2 = 0;
-        xmax2 = 500;
-        xtitle2 = "#mu_{pt}";
+        htitleB = "muon_eta_NoSel";
+        nbin2 = 25;
+        xmin2 = -2.4;
+        xmax2 = 2.4;
+        xtitle2 = "#eta_{#mu}";
 
-        htitleC = "Muon_PFIsoLoose_";
-        nbin3 = 2;
+        htitleC = "electron_pt_NoSel";
+        nbin3 = 100;
         xmin3 = 0;
-        xmax3 = 2;
-        xtitle3 = "PFIsoLoose";
+        xmax3 = 300;
+        xtitle3 = "pt_{e}";
 
-        htitleD = "Muon_MiniIsoTight_";
-        nbin4 = 2;
-        xmin4 = 0;
-        xmax4 = 2;
-        xtitle4 = "MiniIsoTight";
+        htitleD = "electron_eta_NoSel";
+        nbin4 = 25;
+        xmin4 = -2.4;
+        xmax4 = 2.4;
+        xtitle4 = "#eta_{e}";
       }
 
   // !!----------------------
@@ -521,23 +539,23 @@ int Method = method;
     // !!----------------------
     if (Method == 11)
       {
-        htitleA = "Hemi_pt_";
-        nbin1 = 100;
+        htitleA = "Hemi_nTrks_";
+        nbin1 = 25;
         xmin1 = 0;
-        xmax1 = 600;
-        xtitle1 = "Hemi_{pt}";
+        xmax1 = 25;
+        xtitle1 = "Hemi_{nTrks}";
 
-        htitleB = "Hemi_eta_";
-        nbin2 = 55;
-        xmin2 = -2.5;
-        xmax2 = 2.5;
-        xtitle2 = "Hemi_{#eta}";
+        htitleB = "Hemi_Mass_";
+        nbin2 = 50;
+        xmin2 = 0;
+        xmax2 = 300;
+        xtitle2 = "Hemi_{Mass}";
 
         htitleC = "Hemi_nJet_";
         nbin3 = 10;
         xmin3 = 0;
         xmax3 = 10;
-        xtitle3 = "Hemi n{jet}";
+        xtitle3 = "Hemi n_{jet}";
 
         htitleD = "Hemi_nJetNoMu_";
         nbin4 = 10;
@@ -568,9 +586,9 @@ int Method = method;
         xtitle3 = "Hemi_{nTrks}";
 
         htitleD = "Hemi_Mass_";
-        nbin4 = 100;
+        nbin4 = 50;
         xmin4 = 0;
-        xmax4 = 500;
+        xmax4 = 300;
         xtitle4 = "Hemi_{Mass}";
       }
           // !!----------------------
@@ -583,9 +601,9 @@ int Method = method;
         xtitle1 = "K0_{mass}";
 
         htitleB = "K0_pt_";
-        nbin2 = 200;
+        nbin2 = 50;
         xmin2 = 0;
-        xmax2 = 200;
+        xmax2 = 50;
         xtitle2 = "K0_{pt}";
 
         htitleC = "Reco_K0_mass_";
@@ -595,9 +613,9 @@ int Method = method;
         xtitle3 = "RecoK0_{mass}";
 
         htitleD = "Reco_K0_pt_";
-        nbin4 = 200;
+        nbin4 = 50;
         xmin4 = 0;
-        xmax4 = 200;
+        xmax4 = 50;
         xtitle4 = "RecoK0_{pt}";
       }
   // !!----------------------
@@ -610,9 +628,9 @@ int Method = method;
         xtitle1 = "L0_{mass}";
 
         htitleB = "L0_pt_";
-        nbin2 = 200;
+        nbin2 = 500;
         xmin2 = 0;
-        xmax2 = 200;
+        xmax2 = 50;
         xtitle2 = "L0_{pt}";
 
         htitleC = "Reco_L0_mass_";
@@ -622,9 +640,9 @@ int Method = method;
         xtitle3 = "RecoL0_{mass}";
 
         htitleD = "Reco_L0_pt_";
-        nbin4 = 200;
+        nbin4 = 50;
         xmin4 = 0;
-        xmax4 = 200;
+        xmax4 = 50;
         xtitle4 = "RecoL0_{pt}";
       }
 
@@ -644,9 +662,9 @@ int Method = method;
         xtitle2 = "SecInt_{drSig}";
 
         htitleC = "SecInt_pt_Selec";
-        nbin3 = 2000;
+        nbin3 = 100;
         xmin3 = 0;
-        xmax3 = 4000;
+        xmax3 = 100;
         xtitle3 = "SecInt_{pt}";
 
         htitleD = "SecInt_dzSig_Selec";
@@ -672,9 +690,9 @@ int Method = method;
         xtitle2 = "SecInt IP_{dxy}";
 
         htitleC = "SecInt_pt_TrackerMatched";
-        nbin3 = 2000;
+        nbin3 = 100;
         xmin3 = 0;
-        xmax3 = 4000;
+        xmax3 = 100;
         xtitle3 = "SecInt_{pt}";
 
         htitleD = "SecInt_dzSig_TrackerMatched";
@@ -994,9 +1012,9 @@ int Method = method;
     if (Method == 28)
       {
         htitleA = "SecInt_r_Selec";
-        nbin1 = 400;
+        nbin1 = 200;
         xmin1 = 0;
-        xmax1 = 200;
+        xmax1 = 20;
         xtitle1 = "SecInt r_{cm}";
 
         htitleB = "SecInt_z_Selec";
@@ -1006,9 +1024,9 @@ int Method = method;
         xtitle2 = "SecInt z_{cm}";
 
         htitleC = "SecInt_pt_Selec";
-        nbin3 = 2000;
+        nbin3 = 100;
         xmin3 = 0;
-        xmax3 = 4000;
+        xmax3 = 100;
         xtitle3 = "SecInt p_{t} [GeV]";
 
         htitleD = "SecInt_dzSig_Selec";
@@ -1017,8 +1035,33 @@ int Method = method;
         xmax4 = 2000;
         xtitle4 = "SecInt dzSig";
       } 
+        // !!----------------------
+    if (Method == 29)
+      {
+        htitleA = "SecInt_r_TrackerMatched";
+        nbin1 = 200;
+        xmin1 = 0;
+        xmax1 = 20;
+        xtitle1 = "SecInt r_{cm}";
 
+        htitleB = "SecInt_z_TrackerMatched";
+        nbin2 = 800;
+        xmin2 = -200;
+        xmax2 = 200;
+        xtitle2 = "SecInt z_{cm}";
 
+        htitleC = "SecInt_pt_TrackerMatched";
+        nbin3 = 100;
+        xmin3 = 0;
+        xmax3 = 100;
+        xtitle3 = "SecInt p_{t} [GeV]";
+
+        htitleD = "SecInt_dzSig_TrackerMatched";
+        nbin4 = 200;
+        xmin4 = 0;
+        xmax4 = 2000;
+        xtitle4 = "SecInt dzSig";
+      } 
     //-----------------------------------------------------------//
 // xsec in rap1
 
@@ -1163,6 +1206,8 @@ gROOT->SetBatch(kTRUE);
  
 TH1F* g1_ST = (TH1F*)gROOT->FindObject(MCFILE[4]+htitleA);//ok
  TH1F* g2_ST = (TH1F*)gROOT->FindObject(MCFILE[5]+htitleA);//ok
+  TH1F* g3_ST = (TH1F*)gROOT->FindObject(MCFILE[12]+htitleA);//ok
+ TH1F* g4_ST = (TH1F*)gROOT->FindObject(MCFILE[13]+htitleA);//ok
  TH1F*  h_ST = new TH1F("h_ST","",nbin,xmin,xmax);
 
  TH1F* g1_TT = (TH1F*)gROOT->FindObject(MCFILE[2]+htitleA);//ok
@@ -1186,8 +1231,10 @@ TH1F* g1_ST = (TH1F*)gROOT->FindObject(MCFILE[4]+htitleA);//ok
  TH1F* g3_VV_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[11]+htitleA);//ok
  TH1F*  h_VV_SYST = new TH1F("h_VV_SYST","",nbin,xmin,xmax);
  
-TH1F* g1_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[4]+htitleA);//ok
+ TH1F* g1_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[4]+htitleA);//ok
  TH1F* g2_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[5]+htitleA);//ok
+ TH1F* g3_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[12]+htitleA);//ok
+ TH1F* g4_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[13]+htitleA);//ok
  TH1F*  h_ST_SYST = new TH1F("h_ST_SYST","",nbin,xmin,xmax);
 
  TH1F* g1_TT_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[2]+htitleA);//ok
@@ -1263,10 +1310,19 @@ TH1F* g1_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[4]+htitleA);//ok
  g2_ST = (TH1F*)gROOT->FindObject(MCFILE[5]+htitleA);
  h_ST->Add(g2_ST, h_ST, 1, 1);
 
+  f3_ST->cd();
+ g3_ST = (TH1F*)gROOT->FindObject(MCFILE[12]+htitleA);
+ h_ST->Add(g3_ST, h_ST, 1, 1);
+
+  f4_ST->cd();
+ g4_ST = (TH1F*)gROOT->FindObject(MCFILE[13]+htitleA);
+ h_ST->Add(g4_ST, h_ST, 1, 1);
+
+
  f1_TT->cd();
 g1_TT = (TH1F*)gROOT->FindObject(MCFILE[2]+htitleA);
  h_TT = new TH1F("h_TT","",nbin,xmin,xmax);
- h_TT->Add(g1_TT, h_TT, 0.5,0);
+ h_TT->Add(g1_TT, h_TT, 1*tt_rescale,0);
 
 f2_TT->cd();
  g2_TT = (TH1F*)gROOT->FindObject(MCFILE[3]+htitleA);
@@ -1351,10 +1407,18 @@ f2_TT->cd();
  g2_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[5]+htitleA);
  h_ST_SYST->Add(g2_ST_SYST, h_ST_SYST, 1, 1);
 
+   f3_ST_SYST->cd();
+ g3_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[12]+htitleA);
+ h_ST_SYST->Add(g3_ST_SYST, h_ST_SYST, 1, 1);
+
+  f4_ST_SYST->cd();
+ g4_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[13]+htitleA);
+ h_ST_SYST->Add(g4_ST_SYST, h_ST_SYST, 1, 1);
+
  f1_TT_SYST->cd();
 g1_TT_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[2]+htitleA);
  h_TT_SYST = new TH1F("h_TT_SYST","",nbin,xmin,xmax);
- h_TT_SYST->Add(g1_TT_SYST, h_TT_SYST, 0.5,0);
+ h_TT_SYST->Add(g1_TT_SYST, h_TT_SYST, 1*tt_rescale,0);
 
 f2_TT_SYST->cd();
  g2_TT_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[3]+htitleA);
@@ -1552,10 +1616,19 @@ g1_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[4]+htitleB);//ok
  g2_ST = (TH1F*)gROOT->FindObject(MCFILE[5]+htitleB);
  h_ST->Add(g2_ST, h_ST, 1, 1);
 
+  f3_ST->cd();
+ g3_ST = (TH1F*)gROOT->FindObject(MCFILE[12]+htitleB);
+ h_ST->Add(g3_ST, h_ST, 1, 1);
+
+  f4_ST->cd();
+ g4_ST = (TH1F*)gROOT->FindObject(MCFILE[13]+htitleB);
+ h_ST->Add(g4_ST, h_ST, 1, 1);
+
+
  f1_TT->cd();
 g1_TT = (TH1F*)gROOT->FindObject(MCFILE[2]+htitleB);
  h_TT = new TH1F("h_TT","",nbin,xmin,xmax);
- h_TT->Add(g1_TT, h_TT, 0.5,0);
+ h_TT->Add(g1_TT, h_TT, 1*tt_rescale,0);
 
 f2_TT->cd();
  g2_TT = (TH1F*)gROOT->FindObject(MCFILE[3]+htitleB);
@@ -1640,10 +1713,18 @@ f2_TT->cd();
  g2_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[5]+htitleB);
  h_ST_SYST->Add(g2_ST_SYST, h_ST_SYST, 1, 1);
 
+    f3_ST_SYST->cd();
+ g3_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[12]+htitleB);
+ h_ST_SYST->Add(g3_ST_SYST, h_ST_SYST, 1, 1);
+
+  f4_ST_SYST->cd();
+ g4_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[13]+htitleB);
+ h_ST_SYST->Add(g4_ST_SYST, h_ST_SYST, 1, 1);
+
  f1_TT_SYST->cd();
 g1_TT_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[2]+htitleB);
  h_TT_SYST = new TH1F("h_TT_SYST","",nbin,xmin,xmax);
- h_TT_SYST->Add(g1_TT_SYST, h_TT_SYST, 0.5,0);
+ h_TT_SYST->Add(g1_TT_SYST, h_TT_SYST, 1*tt_rescale,0);
 
 f2_TT_SYST->cd();
  g2_TT_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[3]+htitleB);
@@ -1843,10 +1924,18 @@ g1_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[4]+htitleC);//ok
  g2_ST = (TH1F*)gROOT->FindObject(MCFILE[5]+htitleC);
  h_ST->Add(g2_ST, h_ST, 1, 1);
 
+  f3_ST->cd();
+ g3_ST = (TH1F*)gROOT->FindObject(MCFILE[12]+htitleC);
+ h_ST->Add(g3_ST, h_ST, 1, 1);
+
+  f4_ST->cd();
+ g4_ST = (TH1F*)gROOT->FindObject(MCFILE[13]+htitleC);
+ h_ST->Add(g4_ST, h_ST, 1, 1);
+
  f1_TT->cd();
 g1_TT = (TH1F*)gROOT->FindObject(MCFILE[2]+htitleC);
  h_TT = new TH1F("h_TT","",nbin,xmin,xmax);
- h_TT->Add(g1_TT, h_TT, 0.5,0);
+ h_TT->Add(g1_TT, h_TT, 1*tt_rescale,0);
 
 f2_TT->cd();
  g2_TT = (TH1F*)gROOT->FindObject(MCFILE[3]+htitleC);
@@ -1931,10 +2020,18 @@ f2_TT->cd();
  g2_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[5]+htitleC);
  h_ST_SYST->Add(g2_ST_SYST, h_ST_SYST, 1, 1);
 
+   f3_ST_SYST->cd();
+ g3_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[12]+htitleC);
+ h_ST_SYST->Add(g3_ST_SYST, h_ST_SYST, 1, 1);
+
+  f4_ST_SYST->cd();
+ g4_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[13]+htitleC);
+ h_ST_SYST->Add(g4_ST_SYST, h_ST_SYST, 1, 1);
+
  f1_TT_SYST->cd();
 g1_TT_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[2]+htitleC);
  h_TT_SYST = new TH1F("h_TT_SYST","",nbin,xmin,xmax);
- h_TT_SYST->Add(g1_TT_SYST, h_TT_SYST, 0.5,0);
+ h_TT_SYST->Add(g1_TT_SYST, h_TT_SYST, 1*tt_rescale,0);
 
 f2_TT_SYST->cd();
  g2_TT_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[3]+htitleC);
@@ -2139,10 +2236,18 @@ g1_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[4]+htitleD);//ok
  g2_ST = (TH1F*)gROOT->FindObject(MCFILE[5]+htitleD);
  h_ST->Add(g2_ST, h_ST, 1, 1);
 
+   f3_ST->cd();
+ g3_ST = (TH1F*)gROOT->FindObject(MCFILE[12]+htitleD);
+ h_ST->Add(g3_ST, h_ST, 1, 1);
+
+  f4_ST->cd();
+ g4_ST = (TH1F*)gROOT->FindObject(MCFILE[13]+htitleD);
+ h_ST->Add(g4_ST, h_ST, 1, 1);
+
  f1_TT->cd();
 g1_TT = (TH1F*)gROOT->FindObject(MCFILE[2]+htitleD);
  h_TT = new TH1F("h_TT","",nbin,xmin,xmax);
- h_TT->Add(g1_TT, h_TT, 0.5,0);
+ h_TT->Add(g1_TT, h_TT, 1*tt_rescale,0);
 
 f2_TT->cd();
  g2_TT = (TH1F*)gROOT->FindObject(MCFILE[3]+htitleD);
@@ -2227,10 +2332,18 @@ f2_TT->cd();
  g2_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[5]+htitleD);
  h_ST_SYST->Add(g2_ST_SYST, h_ST_SYST, 1, 1);
 
+   f3_ST_SYST->cd();
+ g3_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[12]+htitleD);
+ h_ST_SYST->Add(g3_ST_SYST, h_ST_SYST, 1, 1);
+
+  f4_ST_SYST->cd();
+ g4_ST_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[13]+htitleD);
+ h_ST_SYST->Add(g4_ST_SYST, h_ST_SYST, 1, 1);
+
  f1_TT_SYST->cd();
 g1_TT_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[2]+htitleD);
  h_TT_SYST = new TH1F("h_TT_SYST","",nbin,xmin,xmax);
- h_TT_SYST->Add(g1_TT_SYST, h_TT_SYST, 0.5,0);
+ h_TT_SYST->Add(g1_TT_SYST, h_TT_SYST,1*tt_rescale,0);
 
 f2_TT_SYST->cd();
  g2_TT_SYST = (TH1F*)gROOT->FindObject(MCFILE_SYST[3]+htitleD);
@@ -2275,7 +2388,7 @@ htotMC_SYST->SetFillStyle(1001);
   leg->Draw();
 
 
-rap3->cd();
+rap4->cd();
 
  hRatio = new TH1F(htitleD+"_"+SYST,"",nbin,xmin,xmax);
 hRatio->Sumw2();
@@ -2324,6 +2437,8 @@ hRatio->SetMaximum(1.5);
  f2_TT->Close();  
  f1_ST->Close();  
  f2_ST->Close();  
+ f3_ST->Close();  
+ f4_ST->Close(); 
  f1_TTV->Close(); 
  f2_TTV->Close(); 
  f3_TTV->Close(); 
@@ -2337,6 +2452,8 @@ hRatio->SetMaximum(1.5);
  f2_TT_SYST->Close();  
  f1_ST_SYST->Close();  
  f2_ST_SYST->Close();  
+ f3_ST_SYST->Close();  
+ f4_ST_SYST->Close();  
  f1_TTV_SYST->Close(); 
  f2_TTV_SYST->Close(); 
  f3_TTV_SYST->Close(); 

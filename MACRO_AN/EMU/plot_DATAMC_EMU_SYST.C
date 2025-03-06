@@ -7,7 +7,7 @@ void plot(int method, TString Prod, TString Name, TString Year, TString Dmode, T
 {
 int stati=0;
 bool fit= 1;
-bool logy=1;
+bool logy=0;
 
 
 // number of vertices:
@@ -32,89 +32,150 @@ bool logy=1;
  if (Year == "2016POST") Yearcor = "2016";
 //MUMU
 TString extension = "_SYST";
-TFile* f1_Data_emu  = new TFile("../../DATA_EMU_"+Year+"_31_10_2024/DATAMC_MuonEG-UL2018_MiniAODv2_GT36-v1.root");
+TString COMPARE = "";
+TFile* f1_Data_emu  = new TFile("../../DATA_EMU_"+Year+"_31_10_2024/DATAMC_"+COMPARE+"MuonEG-UL2018_MiniAODv2_GT36-v1.root");
 
- TFile* f1_DY  = new TFile("../../MC_EMU_03_02_2025/DATAMC_DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8.root");
- TFile* f2_DY  = new TFile("../../MC_EMU_03_02_2025/DATAMC_DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.root");
- TFile* f1_TT  = new TFile("../../MC_EMU_03_02_2025/DATAMC_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.root");
- TFile* f2_TT  = new TFile("../../MC_EMU_03_02_2025/DATAMC_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8.root");
- TFile* f1_ST  = new TFile("../../MC_EMU_03_02_2025/DATAMC_ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8.root");
- TFile* f2_ST  = new TFile("../../MC_EMU_03_02_2025/DATAMC_ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8.root");
- TFile* f1_TTV = new TFile("../../MC_EMU_03_02_2025/DATAMC_ttWJetsToLNu_5f_EWK_TuneCP5_13TeV_amcatnlo-pythia8.root");
- TFile* f2_TTV = new TFile("../../MC_EMU_03_02_2025/DATAMC_TTZToLL_5f_TuneCP5_13TeV-madgraphMLM-pythia8.root");
- TFile* f3_TTV = new TFile("../../MC_EMU_03_02_2025/DATAMC_TTWW_TuneCP5_13TeV-madgraph-pythia8.root");
- TFile* f1_VV  = new TFile("../../MC_EMU_03_02_2025/DATAMC_WWTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.root");
- TFile* f2_VV  = new TFile("../../MC_EMU_03_02_2025/DATAMC_WZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8.root");
- TFile* f3_VV  = new TFile("../../MC_EMU_03_02_2025/DATAMC_ZZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8.root");
- 
+ TFile* f1_DY  = new TFile("../../MC_EMU_03_02_2025/DATAMC_"+COMPARE+"DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8.root");
+ TFile* f2_DY  = new TFile("../../MC_EMU_03_02_2025/DATAMC_"+COMPARE+"DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.root");
+ TFile* f1_TT  = new TFile("../../MC_EMU_03_02_2025/DATAMC_"+COMPARE+"TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.root");//DATAMC_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_woTopPt ,DATAMC_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8
+ TFile* f2_TT  = new TFile("../../MC_EMU_03_02_2025/DATAMC_"+COMPARE+"TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8.root");
+ TFile* f1_ST  = new TFile("../../MC_EMU_03_02_2025/DATAMC_"+COMPARE+"ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8.root");
+ TFile* f2_ST  = new TFile("../../MC_EMU_03_02_2025/DATAMC_"+COMPARE+"ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8.root");
+ TFile* f3_ST  = new TFile("../../MC_EMU_03_02_2025/DATAMC_"+COMPARE+"ST_t-channel_top_5f_InclusiveDecays_TuneCP5_13TeV-powheg-pythia8.root");
+ TFile* f4_ST  = new TFile("../../MC_EMU_03_02_2025/DATAMC_"+COMPARE+"ST_t-channel_antitop_5f_InclusiveDecays_TuneCP5_13TeV-powheg-pythia8.root");
+ TFile* f1_TTV = new TFile("../../MC_EMU_03_02_2025/DATAMC_"+COMPARE+"ttWJetsToLNu_5f_EWK_TuneCP5_13TeV_amcatnlo-pythia8.root");
+ TFile* f2_TTV = new TFile("../../MC_EMU_03_02_2025/DATAMC_"+COMPARE+"TTZToLL_5f_TuneCP5_13TeV-madgraphMLM-pythia8.root");
+ TFile* f3_TTV = new TFile("../../MC_EMU_03_02_2025/DATAMC_"+COMPARE+"TTWW_TuneCP5_13TeV-madgraph-pythia8.root");
+ TFile* f1_VV  = new TFile("../../MC_EMU_03_02_2025/DATAMC_"+COMPARE+"WWTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.root");
+ TFile* f2_VV  = new TFile("../../MC_EMU_03_02_2025/DATAMC_"+COMPARE+"WZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8.root");
+ TFile* f3_VV  = new TFile("../../MC_EMU_03_02_2025/DATAMC_"+COMPARE+"ZZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8.root");
+
 
  std::vector<TFile*> f_SYST_Up;
  std::vector<TFile*> f_SYST_Down;
 
-  bool WLepton = false;
-  std::vector<TString> SYSTNAME_UP = {"LumiUp","L1Up","TriggerUp","PUUp","JECUp","JERUp"};//,"LepIDUp","LepISOUp"
+  bool WLepton = true;
+  bool WGen = false;
+  std::vector<TString> SYSTNAME_UP = {"LumiUp","L1Up","TriggerUp","PUUp","SFEleUp","TopPtUp","JECUp","JERUp"}; //,,
 
-  std::vector<TString> SYSTNAME_DOWN = {"LumiDown","L1Down","TriggerDown","PUDown","JECDown","JERDown"};//"LepIDDown","LepISODown"
+  std::vector<TString> SYSTNAME_DOWN = {"LumiDown","L1Down","TriggerDown","PUDown","SFEleDown","TopPtDown","JECDown","JERDown"};//,,"RoccorDown",
+
+  if (WGen)
+    {
+      SYSTNAME_UP.push_back("PDFUp");
+      SYSTNAME_UP.push_back("ScaleUp");
+      SYSTNAME_DOWN.push_back("PDFDown");
+      SYSTNAME_DOWN.push_back("ScaleDown");
+    }
   if (WLepton)
     {
-      SYSTNAME_UP.push_back("LepIDUp");
-      SYSTNAME_UP.push_back("LepISOUp");
-      SYSTNAME_DOWN.push_back("LepIDDown");
-      SYSTNAME_DOWN.push_back("LepISODown");
+      
+      // SYSTNAME_UP.push_back("RoccorUp");
+      SYSTNAME_UP.push_back("MuonIDUp");
+      SYSTNAME_UP.push_back("MuonISOUp");
+      SYSTNAME_UP.push_back("EleIDUp");
+      SYSTNAME_UP.push_back("EleISOUp");
+      // SYSTNAME_DOWN.push_back("RoccorDown");
+      SYSTNAME_DOWN.push_back("MuonIDDown");
+      SYSTNAME_DOWN.push_back("MuonISODown");
+      SYSTNAME_DOWN.push_back("EleIDDown");
+      SYSTNAME_DOWN.push_back("EleISODown");
     }
 
   TFile* f_LumiUp  = new TFile("./SYST/LumiUp_SYST.root");
   TFile* f_L1Up  = new TFile("./SYST/L1Up_SYST.root");
   TFile* f_TriggerUp  = new TFile("./SYST/TriggerUp_SYST.root");
-  TFile* f_LepIDUp = new TFile("./SYST/LepIDUp_SYST.root");
-  TFile* f_LepISOUp = new TFile("./SYST/LepISOUp_SYST.root");
+  TFile* f_MuonIDUp = new TFile("./SYST/MuonIDUp_SYST.root");
+  TFile* f_MuonISOUp = new TFile("./SYST/MuonISOUp_SYST.root");
+  TFile* f_EleIDUp = new TFile("./SYST/EleIDUp_SYST.root");
+  TFile* f_EleISOUp = new TFile("./SYST/EleISOUp_SYST.root");
   TFile* f_PUUp  = new TFile("./SYST/PUUp_SYST.root");
-  TFile* f_JECUp = new TFile("./SYST/JECUp_SYST.root");
+  TFile* f_SFEleUp  = new TFile("./SYST/SFEleUp_SYST.root");
+  TFile* f_TopPtUp  = new TFile("./SYST/TopPtUp_SYST.root");
+  TFile* f_PDFUp  = new TFile("./SYST/PDFUp_SYST.root");
+  TFile* f_ScaleUp  = new TFile("./SYST/ScaleUp_SYST.root");
+    TFile* f_JECUp = new TFile("./SYST/JECUp_SYST.root");
   TFile* f_JERUp  = new TFile("./SYST/JERUp_SYST.root");
+  TFile* f_RoccorUp  = new TFile("./SYST/RoccorUp_SYST.root");
+
 
   TFile* f_LumiDown  = new TFile("./SYST/LumiDown_SYST.root");
   TFile* f_L1Down  = new TFile("./SYST/L1Down_SYST.root");
   TFile* f_TriggerDown = new TFile("./SYST/TriggerDown_SYST.root");
-  TFile* f_LepIDDown = new TFile("./SYST/LepIDDown_SYST.root");
-  TFile* f_LepISODown  = new TFile("./SYST/LepISODown_SYST.root");
+  TFile* f_MuonIDDown = new TFile("./SYST/MuonIDDown_SYST.root");
+  TFile* f_MuonISODown  = new TFile("./SYST/MuonISODown_SYST.root");
+  TFile* f_EleIDDown = new TFile("./SYST/EleIDDown_SYST.root");
+  TFile* f_EleISODown  = new TFile("./SYST/EleISODown_SYST.root");
   TFile* f_PUDown  = new TFile("./SYST/PUDown_SYST.root");
-  TFile* f_JECDown = new TFile("./SYST/JECDown_SYST.root");
+
+  TFile* f_SFEleDown  = new TFile("./SYST/SFEleDown_SYST.root");
+  TFile* f_TopPtDown  = new TFile("./SYST/TopPtDown_SYST.root");
+  TFile* f_PDFDown  = new TFile("./SYST/PDFDown_SYST.root");
+  TFile* f_ScaleDown  = new TFile("./SYST/ScaleDown_SYST.root");
+      TFile* f_JECDown = new TFile("./SYST/JECDown_SYST.root");
   TFile* f_JERDown  = new TFile("./SYST/JERDown_SYST.root");
+  TFile* f_RoccorDown  = new TFile("./SYST/RoccorDown_SYST.root");
+
 
 f_SYST_Up.push_back(f_LumiUp);
 f_SYST_Up.push_back(f_L1Up);
 f_SYST_Up.push_back(f_TriggerUp);
 f_SYST_Up.push_back(f_PUUp);
+f_SYST_Up.push_back(f_SFEleUp);
+f_SYST_Up.push_back(f_TopPtUp);
+
 f_SYST_Up.push_back(f_JECUp);
 f_SYST_Up.push_back(f_JERUp);
+// f_SYST_Up.push_back(f_RoccorUp);
+
+
+if (WGen)
+  {
+    f_SYST_Up.push_back(f_PDFUp);
+    f_SYST_Up.push_back(f_ScaleUp);
+  }
 if (WLepton)
   {
-    f_SYST_Up.push_back(f_LepIDUp);
-    f_SYST_Up.push_back(f_LepISOUp);
+    // f_SYST_Up.push_back(f_RoccorUp);
+    f_SYST_Up.push_back(f_MuonIDUp);
+    f_SYST_Up.push_back(f_MuonISOUp);
+    f_SYST_Up.push_back(f_EleIDUp);
+    f_SYST_Up.push_back(f_EleISOUp);
   }
-// f_SYST_Up.push_back(f_LepIDUp);
-// f_SYST_Up.push_back(f_LepISOUp);
 
 f_SYST_Down.push_back(f_LumiDown);
 f_SYST_Down.push_back(f_L1Down);
 f_SYST_Down.push_back(f_TriggerDown);
 f_SYST_Down.push_back(f_PUDown);
+f_SYST_Down.push_back(f_SFEleDown);
+f_SYST_Down.push_back(f_TopPtDown);
+
 f_SYST_Down.push_back(f_JECDown);
 f_SYST_Down.push_back(f_JERDown);
+// f_SYST_Down.push_back(f_RoccorDown);
+// f_SYST_Down.push_back(f_PDFDown);
+// f_SYST_Down.push_back(f_ScaleDown);
+if (WGen)
+  {
+    f_SYST_Down.push_back(f_PDFDown);
+    f_SYST_Down.push_back(f_ScaleDown);
+  }
 if (WLepton)
   {
-    f_SYST_Down.push_back(f_LepIDDown);
-    f_SYST_Down.push_back(f_LepISODown);
+    // f_SYST_Down.push_back(f_RoccorDown);
+    f_SYST_Down.push_back(f_MuonIDDown);
+    f_SYST_Down.push_back(f_MuonISODown);
+    f_SYST_Down.push_back(f_EleIDDown);
+    f_SYST_Down.push_back(f_EleISODown);
   }
-// f_SYST_Down.push_back(f_LepIDDown);
-// f_SYST_Down.push_back(f_LepISODown);
+
 
  TString DATAFILE[1] = {"MuonEG-UL2018_MiniAODv2_GT36-v1_"
 };
 if (Year == "2018") DATAFILE[0] = "MuonEG-UL2018_MiniAODv2_GT36-v1_";
 
 
-TString MCFILE[12] = {
+TString MCFILE[14] = {
                   "DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8_",
                   "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_",
                   "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_",
@@ -126,7 +187,9 @@ TString MCFILE[12] = {
                   "TTWW_TuneCP5_13TeV-madgraph-pythia8_",
                   "WWTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_",
                   "WZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8_",
-                  "ZZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8_"
+                  "ZZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8_",
+                  "ST_t-channel_top_5f_InclusiveDecays_TuneCP5_13TeV-powheg-pythia8_",
+                  "ST_t-channel_antitop_5f_InclusiveDecays_TuneCP5_13TeV-powheg-pythia8_"
 };
 
 
@@ -138,9 +201,9 @@ TString MCFILE[12] = {
 //$$
  TString HeaderCMS = "CMS";
 
- if (Year == "2016") HeaderCMS = "2016                            36.3 fb^{-1} (13 TeV)";
- if (Year == "2017") HeaderCMS = "2017                            41.5 fb^{-1} (13 TeV)";
- if (Year == "2018") HeaderCMS = "2018                            59.8 fb^{-1} (13 TeV)";
+ if (Year == "2016") HeaderCMS = "2016                                      36.3 fb^{-1} (13 TeV)";
+ if (Year == "2017") HeaderCMS = "2017                                      41.5 fb^{-1} (13 TeV)";
+ if (Year == "2018") HeaderCMS = "2018                                      59.8 fb^{-1} (13 TeV)";
 
 
     TString htitleA = "hData_EVT34_1Vtx_BDTvtx";
@@ -238,45 +301,55 @@ TColor color10 = TColor(310,r10, g10, b10);
 Int_t ColorLightBlue = color10.GetNumber();
     
  int Method = method;
-    if (Method == 0)
+    if (Method == 0) // !! OK
       {
+        
         htitleA = "Tree_filter_";
         nbin1 = 2; 
         xmin1 = 0.;
         xmax1 =  2;
-        // HeaderA = "TT + 20<pt<80";
+
         // HeaderNVtx = "2 Vtx"; 
         xtitle1 = "Filter";
 
-        htitleB = "Vertices_NoSel";
-        nbin2 = 100; 
-        xmin2 = 0;
-        xmax2 =  100;
-        // HeaderA = "TT + 20<pt<80";
-        // HeaderNVtx = "2 Vtx All"; 
-        xtitle2 = "nVtx";
 
-        htitleC = "Vertices_filtercut_";
+        htitleB = "Tree_Mumu_nosel";
+        nbin2 = 150; 
+        xmin2 = 0;
+        xmax2 = 600;
+        // HeaderA = "TT + 20<pt<80";
+        // HeaderNVtx = "2 VtxAll";
+        xtitle2 = "M_{e#mu}";
+
+        htitleC = "Vertices_NoSel";
         nbin3 = 100; 
         xmin3 = 0;
-        xmax3 = 100;
+        xmax3 =  100;
         // HeaderA = "TT + 20<pt<80";
-        // HeaderNVtx = "2 VtxAll";
+        // HeaderNVtx = "2 Vtx All"; 
         xtitle3 = "nVtx";
 
-
-        htitleD = "Tree_Mumu_nosel";
-        nbin4 = 150; 
+        htitleD = "Vertices_filtercut_";
+        nbin4 = 100; 
         xmin4 = 0;
-        xmax4 = 600;
+        xmax4 = 100;
         // HeaderA = "TT + 20<pt<80";
         // HeaderNVtx = "2 VtxAll";
-        xtitle4 = "M_{e#mu}";
+        xtitle4 = "nVtx_{AfterFilter}";
+
+
+        HeaderA = "";
+        HeaderB = " /"+std::to_string((xmax2-xmin2)/(float)nbin2)+" GeV ";
+        HeaderC = "";
+        HeaderD = "";
+
+
       }
 
 
-    if (Method == 1)
+    if (Method == 1) // !! OK
       {
+        return;
         htitleA = "Dilepton_pt_NoSel";
         nbin1 = 100; 
         xmin1 = 0;
@@ -309,9 +382,14 @@ Int_t ColorLightBlue = color10.GetNumber();
         // HeaderA = "TT + 20<pt<80";
         // HeaderNVtx = "2 VtxAll";
         xtitle4 = "M_{ll}";
+
+        HeaderA = " /"+std::to_string((xmax1-xmin1)/(float)nbin1)+" GeV ";
+        HeaderB = "";
+        HeaderC = "";
+        HeaderD = " /"+std::to_string((xmax4-xmin4)/(float)nbin4)+" GeV ";
       }
 
-    if (Method == 2)
+    if (Method == 2) // !! OK
       {
         htitleA = "leading_muon_pt_reco";
         nbin1 = 100;
@@ -336,9 +414,14 @@ Int_t ColorLightBlue = color10.GetNumber();
         xmin4 = -2.4;
         xmax4 = 2.4;
         xtitle4 = "#eta_{e}";
+
+        HeaderA = " /"+std::to_string((xmax1-xmin1)/(float)nbin1)+" GeV ";
+        HeaderB = " /"+std::to_string((xmax2-xmin2)/(float)nbin2)+" GeV ";
+        HeaderC = "";
+        HeaderD = "";
       }
 
-    if (Method == 3)
+    if (Method == 3) // !! OK
       {
         htitleA = "leading_muon_dxy_reco";
         nbin1 = 40;
@@ -363,10 +446,17 @@ Int_t ColorLightBlue = color10.GetNumber();
         xmin4 = -1;
         xmax4 = 1;
         xtitle4 = "dz_{e}";
+
+        logy = 1;
+
+        HeaderA = "";
+        HeaderB = "";
+        HeaderC = "";
+        HeaderD = "";
       }
 
 
-    if (Method == 4)
+    if (Method == 4) // !! OK
       {
         htitleA = "hData_jet_pt_";
         nbin1 = 100;
@@ -380,32 +470,41 @@ Int_t ColorLightBlue = color10.GetNumber();
         xmax2 = 5;
         xtitle2 = "jet_{#eta}";
 
-        htitleC = "hData_jet_btag_Deepjet_";
-        nbin3 = 50;
-        xmin3 = 0;
-        xmax3 = 1;
-        xtitle3 = "jet_{btag}";
 
-        htitleD = "hData_jet_HadronFlavour_";
-        nbin4 = 7;
-        xmin4 = -0.5;
-        xmax4 = 6.5;
-        xtitle4 = "jet_{HadronFlavour}";
+        htitleC = "njet_NoSel";
+        nbin3 = 20;
+        xmin3 = 0;
+        xmax3 = 20;
+        xtitle3 = "N_{jet}";
+
+        htitleD = "njetNOmu_NoSel";
+        nbin4 = 20;
+        xmin4 = 0;
+        xmax4 = 20;
+        xtitle4 = "N_{jet NoLepton}";
+
+        HeaderA = " /"+std::to_string((xmax1-xmin1)/(float)nbin1)+" GeV ";
+        HeaderB = "";
+        HeaderC = "";
+        HeaderD = "";
       }
 
-    if (Method == 5)
+    if (Method == 5) // !! OK
       {
-        htitleA = "njet_NoSel";
-        nbin1 = 20;
-        xmin1 = 0;
-        xmax1 = 20;
-        xtitle1 = "n_{jet}";
 
-        htitleB = "njetNOmu_NoSel";
-        nbin2 = 20;
-        xmin2 = 0;
-        xmax2 = 20;
-        xtitle2 = "n_{jet NoLepton}";
+
+        htitleA = "Hemi_pt_";
+        nbin1 = 100;
+        xmin1 = 0;
+        xmax1 = 600;
+        xtitle1 = "Hemi_{pt}";
+
+        htitleB = "Hemi_eta_";
+        nbin2 = 55;
+        xmin2 = -2.5;
+        xmax2 = 2.5;
+        xtitle2 = "Hemi_{#eta}";
+
 
         htitleC = "Hemisphere_leadingpt_";
         nbin3 = 100;
@@ -418,10 +517,15 @@ Int_t ColorLightBlue = color10.GetNumber();
         xmin4 = 0;
         xmax4 = 500;
         xtitle4 = "Hemi_{pt_{2}}";
+
+        HeaderA = " /"+std::to_string((xmax1-xmin1)/(float)nbin1)+" GeV ";
+        HeaderB = "";
+        HeaderC = " /"+std::to_string((xmax3-xmin3)/(float)nbin3)+" GeV ";
+        HeaderD = " /"+std::to_string((xmax4-xmin4)/(float)nbin4)+" GeV ";
       }
 
 // !!----------------------
-    if (Method == 6)
+    if (Method == 6) // !! OK
       {
         htitleA = "leading_jet_pt_";
         nbin1 = 100;
@@ -446,39 +550,49 @@ Int_t ColorLightBlue = color10.GetNumber();
         xmin4 = -2.5;
         xmax4 = 2.5;
         xtitle4 = "jet^{2}_{#eta}";
+
+        HeaderA = " /"+std::to_string((xmax1-xmin1)/(float)nbin1)+" GeV ";
+        HeaderB = "";
+        HeaderC = " /"+std::to_string((xmax3-xmin3)/(float)nbin3)+" GeV ";
+        HeaderD = "";
       }
 
 
 // !!----------------------
-    if (Method == 7)
+    if (Method == 7) // !! OK
       {
-        htitleA = "Nmu_";
-        nbin1 = 10;
+        htitleA = "muon_pt_NoSel";
+        nbin1 = 100;
         xmin1 = 0;
-        xmax1 = 10;
-        xtitle1 = "n_{#mu}";
+        xmax1 = 300;
+        xtitle1 = "#pt_{#mu}";
 
-        htitleB = "Muon_pt_";
-        nbin2 = 100;
-        xmin2 = 0;
-        xmax2 = 500;
-        xtitle2 = "#mu_{pt}";
+        htitleB = "muon_eta_NoSel";
+        nbin2 = 25;
+        xmin2 = -2.4;
+        xmax2 = 2.4;
+        xtitle2 = "#eta_{#mu}";
 
-        htitleC = "Muon_PFIsoLoose_";
-        nbin3 = 2;
+        htitleC = "electron_pt_NoSel";
+        nbin3 = 100;
         xmin3 = 0;
-        xmax3 = 2;
-        xtitle3 = "PFIsoLoose";
+        xmax3 = 300;
+        xtitle3 = "pt_{e}";
 
-        htitleD = "Muon_MiniIsoTight_";
-        nbin4 = 2;
-        xmin4 = 0;
-        xmax4 = 2;
-        xtitle4 = "MiniIsoTight";
+        htitleD = "electron_eta_NoSel";
+        nbin4 = 25;
+        xmin4 = -2.4;
+        xmax4 = 2.4;
+        xtitle4 = "#eta_{e}";
+
+        HeaderA = "";
+        HeaderB = " /"+std::to_string((xmax2-xmin2)/(float)nbin2)+" GeV ";
+        HeaderC = " /"+std::to_string((xmax3-xmin3)/(float)nbin3)+" GeV ";
+        HeaderD = "";
       }
 
 // !!----------------------
-    if (Method == 8)
+    if (Method == 8)// !! OK
       {
         htitleA = "LeadingLeptons_dR_";
         nbin1 = 50;
@@ -503,11 +617,16 @@ Int_t ColorLightBlue = color10.GetNumber();
         xmin4 = 0;
         xmax4 = 3.5;
         xtitle4 = "#Delta #Phi_{j_{1}j_{2}}";
+
+                HeaderA = std::to_string((xmax1-xmin1)/(float)nbin1);
+        HeaderB = std::to_string((xmax2-xmin2)/(float)nbin2);
+        HeaderC = std::to_string((xmax3-xmin3)/(float)nbin3);
+        HeaderD = std::to_string((xmax4-xmin4)/(float)nbin4);
       }
 
 
     // !!----------------------
-    if (Method == 9)
+    if (Method == 9) // !! OK
       {
         htitleA = "LeadingLeptonJet_dRmax_";
         nbin1 = 50;
@@ -532,10 +651,15 @@ Int_t ColorLightBlue = color10.GetNumber();
         xmin4 = 0;
         xmax4 = 5;
         xtitle4 = "#Delta R_{Hemi-OpMu}";
+
+                HeaderA = std::to_string((xmax1-xmin1)/(float)nbin1);
+        HeaderB = std::to_string((xmax2-xmin2)/(float)nbin2);
+        HeaderC = std::to_string((xmax3-xmin3)/(float)nbin3);
+        HeaderD = std::to_string((xmax4-xmin4)/(float)nbin4);
         
       }
     // !!----------------------
-    if (Method == 10)
+    if (Method == 10) // !! OK
       {
         htitleA = "HT_";
         nbin1 = 200;
@@ -553,45 +677,55 @@ Int_t ColorLightBlue = color10.GetNumber();
         nbin3 = 100;
         xmin3 = 0;
         xmax3 = 100;
-        xtitle3 = "n_{TRK}";
+        xtitle3 = "N_{TRK}";
 
         htitleD = "nLostTracks_";
         nbin4 = 25;
         xmin4 = 0;
         xmax4 = 25;
-        xtitle4 = "n_{LostTRK}";
+        xtitle4 = "N_{LostTRK}";
+
+        HeaderA = " /"+std::to_string((xmax1-xmin1)/(float)nbin1)+" GeV ";
+        HeaderB = " /"+std::to_string((xmax2-xmin2)/(float)nbin2)+" GeV ";
+        HeaderC = "";
+        HeaderD = "";
       }
 
     // !!----------------------
-    if (Method == 11)
+    if (Method == 11)  // !! OK
       {
-        htitleA = "Hemi_pt_";
-        nbin1 = 100;
+        htitleA = "Hemi_nTrks_";
+        nbin1 = 25;
         xmin1 = 0;
-        xmax1 = 600;
-        xtitle1 = "Hemi_{pt}";
+        xmax1 = 25;
+        xtitle1 = "Hemi_{nTrks}";
 
-        htitleB = "Hemi_eta_";
-        nbin2 = 55;
-        xmin2 = -2.5;
-        xmax2 = 2.5;
-        xtitle2 = "Hemi_{#eta}";
+        htitleB = "Hemi_Mass_";
+        nbin2 = 50;
+        xmin2 = 0;
+        xmax2 = 300;
+        xtitle2 = "Hemi_{Mass}";
 
         htitleC = "Hemi_nJet_";
         nbin3 = 10;
         xmin3 = 0;
         xmax3 = 10;
-        xtitle3 = "Hemi n{jet}";
+        xtitle3 = "Hemi N_{jet}";
 
         htitleD = "Hemi_nJetNoMu_";
         nbin4 = 10;
         xmin4 = 0;
         xmax4 = 10;
-        xtitle4 = "Hemi n_{jetNoMu}";
+        xtitle4 = "Hemi N_{jetNoMu}";
+
+        HeaderA = "";
+        HeaderB = " /"+std::to_string((xmax2-xmin2)/(float)nbin2)+" GeV ";
+        HeaderC = "";
+        HeaderD = "";
       }
 
     // !!----------------------
-    if (Method == 12)
+    if (Method == 12) // We don't car eanymore
       {
         htitleA = "HemiMu_pt_";
         nbin1 = 100;
@@ -612,13 +746,18 @@ Int_t ColorLightBlue = color10.GetNumber();
         xtitle3 = "Hemi_{nTrks}";
 
         htitleD = "Hemi_Mass_";
-        nbin4 = 100;
+        nbin4 = 50;
         xmin4 = 0;
-        xmax4 = 500;
+        xmax4 = 300;
         xtitle4 = "Hemi_{Mass}";
+
+        HeaderA = " /"+std::to_string((xmax1-xmin1)/(float)nbin1)+" GeV ";
+        HeaderB = " /"+std::to_string((xmax2-xmin2)/(float)nbin2)+" GeV ";
+        HeaderC = "";
+        HeaderD = " /"+std::to_string((xmax4-xmin4)/(float)nbin4)+" GeV ";
       }
           // !!----------------------
-    if (Method == 13)
+    if (Method == 13) // !! OK 
       {
         htitleA = "K0_mass_";
         nbin1 = 202;
@@ -627,9 +766,9 @@ Int_t ColorLightBlue = color10.GetNumber();
         xtitle1 = "K0_{mass}";
 
         htitleB = "K0_pt_";
-        nbin2 = 200;
+        nbin2 = 50;
         xmin2 = 0;
-        xmax2 = 200;
+        xmax2 = 50;
         xtitle2 = "K0_{pt}";
 
         htitleC = "Reco_K0_mass_";
@@ -639,13 +778,18 @@ Int_t ColorLightBlue = color10.GetNumber();
         xtitle3 = "RecoK0_{mass}";
 
         htitleD = "Reco_K0_pt_";
-        nbin4 = 200;
+        nbin4 = 50;
         xmin4 = 0;
-        xmax4 = 200;
+        xmax4 = 50;
         xtitle4 = "RecoK0_{pt}";
+
+        HeaderA = " /"+std::to_string((xmax1-xmin1)/(float)nbin1)+" GeV ";
+        HeaderB = " /"+std::to_string((xmax2-xmin2)/(float)nbin2)+" GeV ";
+        HeaderC = " /"+std::to_string((xmax3-xmin3)/(float)nbin3)+" GeV ";
+        HeaderD = " /"+std::to_string((xmax4-xmin4)/(float)nbin4)+" GeV ";
       }
   // !!----------------------
-    if (Method == 14)
+    if (Method == 14) // !! OK
       {
         htitleA = "L0_mass_";
         nbin1 = 202;
@@ -654,9 +798,9 @@ Int_t ColorLightBlue = color10.GetNumber();
         xtitle1 = "L0_{mass}";
 
         htitleB = "L0_pt_";
-        nbin2 = 200;
+        nbin2 = 500;
         xmin2 = 0;
-        xmax2 = 200;
+        xmax2 = 50;
         xtitle2 = "L0_{pt}";
 
         htitleC = "Reco_L0_mass_";
@@ -666,14 +810,19 @@ Int_t ColorLightBlue = color10.GetNumber();
         xtitle3 = "RecoL0_{mass}";
 
         htitleD = "Reco_L0_pt_";
-        nbin4 = 200;
+        nbin4 = 50;
         xmin4 = 0;
-        xmax4 = 200;
+        xmax4 = 50;
         xtitle4 = "RecoL0_{pt}";
+
+        HeaderA = " /"+std::to_string((xmax1-xmin1)/(float)nbin1)+" GeV ";
+        HeaderB = " /"+std::to_string((xmax2-xmin2)/(float)nbin2)+" GeV ";
+        HeaderC = " /"+std::to_string((xmax3-xmin3)/(float)nbin3)+" GeV ";
+        HeaderD = " /"+std::to_string((xmax4-xmin4)/(float)nbin4)+" GeV ";
       }
 
   // !!----------------------
-    if (Method == 15)
+    if (Method == 15) // !! OK
       {
         htitleA = "SecInt_mass_Selec";
         nbin1 = 20;
@@ -688,9 +837,9 @@ Int_t ColorLightBlue = color10.GetNumber();
         xtitle2 = "SecInt_{drSig}";
 
         htitleC = "SecInt_pt_Selec";
-        nbin3 = 2000;
+        nbin3 = 100;
         xmin3 = 0;
-        xmax3 = 4000;
+        xmax3 = 100;
         xtitle3 = "SecInt_{pt}";
 
         htitleD = "SecInt_dzSig_Selec";
@@ -698,10 +847,15 @@ Int_t ColorLightBlue = color10.GetNumber();
         xmin4 = 0;
         xmax4 = 2000;
         xtitle4 = "SecInt_dzSig";
+
+        HeaderA = " /"+std::to_string((xmax1-xmin1)/(float)nbin1)+" GeV ";
+        HeaderB = "";
+        HeaderC = " /"+std::to_string((xmax3-xmin3)/(float)nbin3)+" GeV ";
+        HeaderD = "";
       }
  
         // !!----------------------
-    if (Method == 16)
+    if (Method == 16) // !! OK
       {
         htitleA = "SecInt_mass_TrackerMatched";
         nbin1 = 20;
@@ -716,20 +870,25 @@ Int_t ColorLightBlue = color10.GetNumber();
         xtitle2 = "SecInt IP_{dxy}";
 
         htitleC = "SecInt_pt_TrackerMatched";
-        nbin3 = 2000;
+        nbin3 = 100;
         xmin3 = 0;
-        xmax3 = 4000;
+        xmax3 = 100;
         xtitle3 = "SecInt_{pt}";
 
         htitleD = "SecInt_dzSig_TrackerMatched";
         nbin4 = 200;
         xmin4 = 0;
         xmax4 = 2000;
-        xtitle4 = "SecInt IP_{dz}";
+        xtitle4 = "SecInt IP_{dz}";       
+        
+        HeaderA = " /"+std::to_string((xmax1-xmin1)/(float)nbin1)+" GeV ";
+        HeaderB = "";
+        HeaderC = " /"+std::to_string((xmax3-xmin3)/(float)nbin3)+" GeV ";
+        HeaderD = "";
       }                                                      
                                                             
         // !!----------------------
-    if (Method == 17)
+    if (Method == 17) // !! OK
       {
         htitleA = "Vtx_NChi2_";
         nbin1 = 15;
@@ -754,10 +913,15 @@ Int_t ColorLightBlue = color10.GetNumber();
         xmin4 = 0;
         xmax4 = 100;
         xtitle4 = "Vtx_{dist}";
+
+        HeaderA = "";
+        HeaderB = "";
+        HeaderC = " /"+std::to_string((xmax3-xmin3)/(float)nbin3)+" GeV ";
+        HeaderD = " /"+std::to_string((xmax4-xmin4)/(float)nbin4)+" cm ";
       }      
 
         // !!----------------------
-    if (Method == 18)
+    if (Method == 18) // !! OK
       {
         htitleA = "SecVtx_NChi2_";
         nbin1 = 15;
@@ -783,6 +947,11 @@ Int_t ColorLightBlue = color10.GetNumber();
         xmax4 = 100;
         xtitle4 = "SecVtx_{dist}";
         hmax = 1E3;
+
+        HeaderA = "";
+        HeaderB = "";
+        HeaderC = " /"+std::to_string((xmax3-xmin3)/(float)nbin3)+" GeV ";
+        HeaderD = " /"+std::to_string((xmax4-xmin4)/(float)nbin4)+" cm ";
       }   
 
         // !!----------------------
@@ -811,10 +980,14 @@ Int_t ColorLightBlue = color10.GetNumber();
         xmin4 = 0;
         xmax4 = 5;
         xtitle4 = "SecVtx_{#Delta R}";
+        HeaderA = "";
+        HeaderB = "";
+        HeaderC = "";
+        HeaderD = "";
       }  
 
         // !!----------------------
-    if (Method == 20)
+    if (Method == 20) // !! OK
       {
         htitleA = "FinalVtx_nTrks_";
         nbin1 = 40;
@@ -839,10 +1012,15 @@ Int_t ColorLightBlue = color10.GetNumber();
         xmin4 = 0;
         xmax4 = 500;
         xtitle4 = "FinalVtx_{Hmass}";
+
+        HeaderA = "";
+        HeaderB = "";
+        HeaderC = "";
+        HeaderD = "";
       }  
 //--------------------------------------------
 
-    if (Method == 21)
+    if (Method == 21) // !! OK
       {
         htitleA = "track_nHitTIB_TRK";
         nbin1 = 15;
@@ -867,10 +1045,15 @@ Int_t ColorLightBlue = color10.GetNumber();
         xmin4 = 0;
         xmax4 = 15;
         xtitle4 = "track_{nHitPXB}";
+
+        HeaderA = "";
+        HeaderB = "";
+        HeaderC = "";
+        HeaderD = "";
       }
 
 
-    if (Method == 22)
+    if (Method == 22) // !! OK
       {
         htitleA = "track_nHitPixel_TRK";
         nbin1 = 15;
@@ -895,9 +1078,13 @@ Int_t ColorLightBlue = color10.GetNumber();
         xmin4 = 0;
         xmax4 = 20;
         xtitle4 = "track_{nLayers}";
+        HeaderA = "";
+        HeaderB = "";
+        HeaderC = "";
+        HeaderD = "";
     }
 
-    if  (Method == 23)
+    if  (Method == 23) // !! OK
     {
       htitleA = "track_pt_TRK";
       nbin1 = 300;
@@ -922,10 +1109,15 @@ Int_t ColorLightBlue = color10.GetNumber();
       xmin4 = 0;
       xmax4 = 40;
       xtitle4 = "track_{nhits}";
+
+        HeaderA = " /"+std::to_string((xmax1-xmin1)/(float)nbin1)+" GeV ";
+        HeaderB = "";
+        HeaderC = "";
+        HeaderD = "";
     }
 
 
-    if  (Method == 24)
+    if  (Method == 24) // !! OK
     {
       htitleA = "track_ntrk10_TRK";
       nbin1 = 100;
@@ -950,9 +1142,14 @@ Int_t ColorLightBlue = color10.GetNumber();
       xmin4 = 0;
       xmax4 = 100;
       xtitle4 = "track_{ntrk40}";
+
+        HeaderA = "";
+        HeaderB = "";
+        HeaderC = "";
+        HeaderD = "";
     }
 
-    if  (Method == 25)
+    if  (Method == 25) // !! OK
     {
       htitleA = "track_Hemi_TRK";//empty => normal
       nbin1 = 6;
@@ -977,10 +1174,15 @@ Int_t ColorLightBlue = color10.GetNumber();
       xmin4 = -100;
       xmax4 = 100;
       xtitle4 = "track_{dz}";
+
+        HeaderA = "";
+        HeaderB = "";
+        HeaderC = "";
+        HeaderD = "";
     }
 
 
-    if  (Method == 26)
+    if  (Method == 26) // !! OK
     {
       htitleA = "track_iJet_TRK";
       nbin1 = 22;
@@ -1005,9 +1207,14 @@ Int_t ColorLightBlue = color10.GetNumber();
       xmin4 = 0;
       xmax4 = 5;
       xtitle4 = "track_{track_Hemi_dR}";
+
+        HeaderA = "";
+        HeaderB = "";
+        HeaderC = "";
+        HeaderD = "";
     }
 
-    if  (Method == 27)
+    if  (Method == 27) 
     {
       htitleA = "track_track_Hemi_dRmax_TRK";
       nbin1 = 50;
@@ -1032,27 +1239,32 @@ Int_t ColorLightBlue = color10.GetNumber();
       xmin4 = 0.;
       xmax4 = 4000;
       xtitle4 = "track_{Track_firstHit}";
+
+        HeaderA = "";
+        HeaderB = "";
+        HeaderC = "";
+        HeaderD = "";
     }
 
         // !!----------------------
-    if (Method == 28)
+    if (Method == 28) // !! OK
       {
         htitleA = "SecInt_r_Selec";
-        nbin1 = 400;
+        nbin1 = 200;
         xmin1 = 0;
-        xmax1 = 200;
-        xtitle1 = "SecInt r_{cm}";
+        xmax1 = 20;
+        xtitle1 = "SecInt r [cm]";
 
         htitleB = "SecInt_z_Selec";
         nbin2 = 800;
         xmin2 = -200;
         xmax2 = 200;
-        xtitle2 = "SecInt z_{cm}";
+        xtitle2 = "SecInt z [cm]";
 
         htitleC = "SecInt_pt_Selec";
-        nbin3 = 2000;
+        nbin3 = 100;
         xmin3 = 0;
-        xmax3 = 4000;
+        xmax3 = 100;
         xtitle3 = "SecInt p_{t} [GeV]";
 
         htitleD = "SecInt_dzSig_Selec";
@@ -1060,8 +1272,43 @@ Int_t ColorLightBlue = color10.GetNumber();
         xmin4 = 0;
         xmax4 = 2000;
         xtitle4 = "SecInt dzSig";
-      } 
 
+        HeaderA = " /"+std::to_string((xmax1-xmin1)/(float)nbin1)+" cm ";
+        HeaderB =  " /"+std::to_string((xmax2-xmin2)/(float)nbin2)+" cm ";
+        HeaderC = " /"+std::to_string((xmax3-xmin3)/(float)nbin3)+" GeV ";
+        HeaderD = "";
+      } 
+    if (Method == 29) // !! OK
+      {
+        htitleA = "SecInt_r_TrackerMatched";
+        nbin1 = 200;
+        xmin1 = 0;
+        xmax1 = 20;
+        xtitle1 = "SecInt  r [cm]";
+
+        htitleB = "SecInt_z_TrackerMatched";
+        nbin2 = 800;
+        xmin2 = -200;
+        xmax2 = 200;
+        xtitle2 = "SecInt z [cm]";
+
+        htitleC = "SecInt_pt_TrackerMatched";
+        nbin3 = 100;
+        xmin3 = 0;
+        xmax3 = 100;
+        xtitle3 = "SecInt p_{t} [GeV]";
+
+        htitleD = "SecInt_dzSig_TrackerMatched";
+        nbin4 = 200;
+        xmin4 = 0;
+        xmax4 = 2000;
+        xtitle4 = "SecInt dzSig";
+
+        HeaderA = " /"+std::to_string((xmax1-xmin1)/(float)nbin1)+" cm ";
+        HeaderB =  " /"+std::to_string((xmax2-xmin2)/(float)nbin2)+" cm ";
+        HeaderC = " /"+std::to_string((xmax3-xmin3)/(float)nbin3)+" GeV ";
+        HeaderD = "";
+      } 
 
     //-----------------------------------------------------------//
 // xsec in rap1
@@ -1207,6 +1454,8 @@ gROOT->SetBatch(kTRUE);
  
 TH1F* g1_ST = (TH1F*)gROOT->FindObject(MCFILE[4]+htitleA);//ok
  TH1F* g2_ST = (TH1F*)gROOT->FindObject(MCFILE[5]+htitleA);//ok
+ TH1F* g3_ST = (TH1F*)gROOT->FindObject(MCFILE[12]+htitleA);//ok
+ TH1F* g4_ST = (TH1F*)gROOT->FindObject(MCFILE[13]+htitleA);//ok
  TH1F*  h_ST = new TH1F("h_ST","",nbin,xmin,xmax);
 
  TH1F* g1_TT = (TH1F*)gROOT->FindObject(MCFILE[2]+htitleA);//ok
@@ -1329,20 +1578,28 @@ TH1F* hDataMC = new TH1F("hDataMC","",nbin,xmin,xmax);
  h_ST = new TH1F("h_ST","",nbin,xmin,xmax);
  f1_ST->cd();
  g1_ST = (TH1F*)gROOT->FindObject(MCFILE[4]+htitleA);
-//  g1_ST->Sumw2();
  h_ST->Add(g1_ST, h_ST, 1,0);
 
  f2_ST->cd();
- 
  g2_ST = (TH1F*)gROOT->FindObject(MCFILE[5]+htitleA);
-//  g2_ST->Sumw2();
  h_ST->Add(g2_ST, h_ST, 1, 1);
+
+  f3_ST->cd();
+ g3_ST = (TH1F*)gROOT->FindObject(MCFILE[12]+htitleA);
+ h_ST->Add(g3_ST, h_ST, 1, 1);
+
+  f4_ST->cd();
+ g4_ST = (TH1F*)gROOT->FindObject(MCFILE[13]+htitleA);
+ h_ST->Add(g4_ST, h_ST, 1, 1);
+
+ float rescale = 0.0954031129 ; //13791474/1.4456*10^{8} = smallnentries/norm * nentries/small nentries
+ // = nentries/norm where norm = number of evetn sin Ntuple et nentries = number of events in MiniNtuple
 
  f1_TT->cd();
 g1_TT = (TH1F*)gROOT->FindObject(MCFILE[2]+htitleA);
 //  g1_TT->Sumw2();
  h_TT = new TH1F("h_TT","",nbin,xmin,xmax);
- h_TT->Add(g1_TT, h_TT, 0.5,0);
+ h_TT->Add(g1_TT, h_TT, 1*rescale,0);
 
 f2_TT->cd();
  g2_TT = (TH1F*)gROOT->FindObject(MCFILE[3]+htitleA);
@@ -1367,8 +1624,8 @@ f2_TT->cd();
 
  htotMC->Draw("HE"); 
   htotMC->SetFillStyle(1001);
- htotMC->SetFillColorAlpha(ColorNeutral, 1);
- htotMC->SetLineColor(ColorNeutral);
+ htotMC->SetFillColorAlpha(ColorBlue, 1);
+ htotMC->SetLineColor(ColorBlue);
  htotMC->SetLineStyle(1);
  htotMC->SetLineWidth(1);
  htotMC->SetTickLength(0.03, "YZ");
@@ -1383,11 +1640,11 @@ f2_TT->cd();
  htotMC->SetTitleOffset(1.3,"Y");
  htotMC->GetXaxis()->SetTitle(xtitle);
  htotMC->GetXaxis()->SetTitleColor(1);
- htotMC->GetYaxis()->SetTitle(ytitle);
+ htotMC->GetYaxis()->SetTitle(ytitle + HeaderA );
  htotMC->GetYaxis()->SetTitleColor(1);
  htotMC->SetNdivisions(509,"XYZ");
- htotMC->SetMinimum(hmin); 
- htotMC->SetMaximum(hmax); 
+ htotMC->SetMinimum(1); 
+ htotMC->SetMaximum(htotMC->GetMaximum()*2); 
 //  htotMC->SetMarkerStyle(20);
 //  htotMC->SetMarkerSize(1);
 
@@ -1398,8 +1655,8 @@ f2_TT->cd();
  h_VV->SetLineWidth(3);
 
  h_TTV->Draw("HEsame"); 
- h_TTV->SetFillColorAlpha(ColorRed, 1);
- h_TTV->SetLineColor(ColorRed);
+ h_TTV->SetFillColorAlpha(ColorNeutral, 1);
+ h_TTV->SetLineColor(ColorNeutral);
  h_TTV->SetLineStyle(1);
  h_TTV->SetLineWidth(3);
 
@@ -1410,8 +1667,8 @@ f2_TT->cd();
  h_ST->SetLineWidth(3);
 
  h_TT->Draw("HEsame"); 
- h_TT->SetFillColorAlpha(ColorBlue, 1);
- h_TT->SetLineColor(ColorBlue);
+ h_TT->SetFillColorAlpha(ColorRed, 1);
+ h_TT->SetLineColor(ColorRed);
  h_TT->SetLineStyle(1);
  h_TT->SetLineWidth(3);
  h_TT->SetTickLength(0.03, "YZ");
@@ -1439,7 +1696,7 @@ htotData->SetLineWidth(1);
   leg->SetTextFont(42);
   leg->SetTextSize(0.035);
   leg->SetMargin(0.2);
-  leg->AddEntry(htotData, " e#mu data","PE1");
+  leg->AddEntry(htotData, " #mu#mu data","PE1");
     leg->AddEntry(h_TT, " t#bar{t}","F");
     leg->AddEntry(htotMC, " DY","F");
   leg->AddEntry(h_VV, " WW, WZ, ZZ","F");
@@ -1520,27 +1777,25 @@ for (unsigned int b = 1 ; b < hRatio->GetNbinsX(); b++)
 
 }
 
-hRatioUp->Draw("HISTsame");
-// hRatioUp->SetFillColorAlpha(ColorBlue, 0.5);
-// hRatioDown->SetFillColor(ColorBlue);
-//  hRatioDown->SetFillStyle(3001);
-// hRatioUp->SetTickLength(0.03, "YZ");
-// hRatioUp->SetTickLength(0.03,"X");
+hRatioUp->Draw("E3same");//HISTSAME
+hRatioUp->SetFillColor(kGray+2);
+hRatioUp->SetFillStyle(3001);
+hRatioUp->SetFillColorAlpha(kGray+2, 0.9);
+
+
   hRatioUp->SetLineStyle(1);
   hRatioUp->SetLineWidth(1);
-  hRatioUp->SetLineColor(ColorBlue);
-  hRatioUp->SetLineColorAlpha(ColorBlue,0.8);
+  // hRatioUp->SetLineColor(ColorBlue);
+  // hRatioUp->SetLineColorAlpha(ColorBlue,0.8);
 
-hRatioDown->Draw("HISTsame");
-hRatioDown->SetLineColor(ColorRed);
-hRatioDown->SetLineColorAlpha(ColorRed,0.8);
+hRatioDown->Draw("E3same");//HISTSAME
+// hRatioDown->SetLineColor(ColorRed);
+// hRatioDown->SetLineColorAlpha(ColorRed,0.8);
 hRatioDown->SetLineStyle(1);
 hRatioDown->SetLineWidth(1);
-// hRatioDown->SetFillColorAlpha(kGray+2, 1);
-// hRatioDown->SetTickLength(0.03, "YZ");
-// hRatioDown->SetTickLength(0.03,"X");
-// hRatioDown->SetFillColor(kGray+2);
-//  hRatioDown->SetFillStyle(3001); 
+hRatioDown->SetFillColorAlpha(kGray+2, 0.9);
+hRatioDown->SetFillColor(kGray+2);
+ hRatioDown->SetFillStyle(3001); 
 
 // !! --------------------------- PAD 2 --------------------------------------  !! //
   pad2->cd();
@@ -1561,6 +1816,8 @@ hRatioDown->SetLineWidth(1);
  
 g1_ST = (TH1F*)gROOT->FindObject(MCFILE[4]+htitleB);//ok
  g2_ST = (TH1F*)gROOT->FindObject(MCFILE[5]+htitleB);//ok
+ g3_ST = (TH1F*)gROOT->FindObject(MCFILE[12]+htitleB);//ok
+ g4_ST = (TH1F*)gROOT->FindObject(MCFILE[13]+htitleB);//ok
   h_ST = new TH1F("h_ST","",nbin,xmin,xmax);
 
  g1_TT = (TH1F*)gROOT->FindObject(MCFILE[2]+htitleB);//ok
@@ -1689,11 +1946,19 @@ hDataMC = new TH1F("hDataMC","",nbin,xmin,xmax);
 //  g2_ST->Sumw2();
  h_ST->Add(g2_ST, h_ST, 1, 1);
 
+  f3_ST->cd();
+ g3_ST = (TH1F*)gROOT->FindObject(MCFILE[12]+htitleB);
+ h_ST->Add(g3_ST, h_ST, 1, 1);
+
+  f4_ST->cd();
+ g4_ST = (TH1F*)gROOT->FindObject(MCFILE[13]+htitleB);
+ h_ST->Add(g4_ST, h_ST, 1, 1);
+
  f1_TT->cd();
 g1_TT = (TH1F*)gROOT->FindObject(MCFILE[2]+htitleB);
 //  g1_TT->Sumw2();
  h_TT = new TH1F("h_TT","",nbin,xmin,xmax);
- h_TT->Add(g1_TT, h_TT, 0.5,0);
+ h_TT->Add(g1_TT, h_TT, 1*rescale,0);
 
 f2_TT->cd();
  g2_TT = (TH1F*)gROOT->FindObject(MCFILE[3]+htitleB);
@@ -1718,8 +1983,8 @@ f2_TT->cd();
 
  htotMC->Draw("HE"); 
   htotMC->SetFillStyle(1001);
- htotMC->SetFillColorAlpha(ColorNeutral, 1);
- htotMC->SetLineColor(ColorNeutral);
+ htotMC->SetFillColorAlpha(ColorBlue, 1);
+ htotMC->SetLineColor(ColorBlue);
  htotMC->SetLineStyle(1);
  htotMC->SetLineWidth(1);
  htotMC->SetTickLength(0.03, "YZ");
@@ -1734,11 +1999,11 @@ f2_TT->cd();
  htotMC->SetTitleOffset(1.3,"Y");
  htotMC->GetXaxis()->SetTitle(xtitle);
  htotMC->GetXaxis()->SetTitleColor(1);
- htotMC->GetYaxis()->SetTitle(ytitle);
+ htotMC->GetYaxis()->SetTitle(ytitle+ HeaderB);
  htotMC->GetYaxis()->SetTitleColor(1);
  htotMC->SetNdivisions(509,"XYZ");
- htotMC->SetMinimum(hmin); 
- htotMC->SetMaximum(hmax); 
+ htotMC->SetMinimum(1); 
+ htotMC->SetMaximum(htotMC->GetMaximum()*2); 
 //  htotMC->SetMarkerStyle(20);
 //  htotMC->SetMarkerSize(1);
 
@@ -1750,8 +2015,8 @@ f2_TT->cd();
  h_VV->SetLineWidth(3);
 
  h_TTV->Draw("HEsame"); 
- h_TTV->SetFillColorAlpha(ColorRed, 1);
- h_TTV->SetLineColor(ColorRed);
+ h_TTV->SetFillColorAlpha(ColorNeutral, 1);
+ h_TTV->SetLineColor(ColorNeutral);
  h_TTV->SetLineStyle(1);
  h_TTV->SetLineWidth(3);
 
@@ -1762,8 +2027,8 @@ f2_TT->cd();
  h_ST->SetLineWidth(3);
 
  h_TT->Draw("HEsame"); 
- h_TT->SetFillColorAlpha(ColorBlue, 1);
- h_TT->SetLineColor(ColorBlue);
+ h_TT->SetFillColorAlpha(ColorRed, 1);
+ h_TT->SetLineColor(ColorRed);
  h_TT->SetLineStyle(1);
  h_TT->SetLineWidth(3);
  h_TT->SetTickLength(0.03, "YZ");
@@ -1791,7 +2056,7 @@ htotData->SetLineWidth(1);
   leg->SetTextFont(42);
   leg->SetTextSize(0.035);
   leg->SetMargin(0.2);
-  leg->AddEntry(htotData, " e#mu data","PE1");
+  leg->AddEntry(htotData, " #mu#mu data","PE1");
     leg->AddEntry(h_TT, " t#bar{t}","F");
     leg->AddEntry(htotMC, " DY","F");
   leg->AddEntry(h_VV, " WW, WZ, ZZ","F");
@@ -1869,27 +2134,25 @@ for (unsigned int b = 1 ; b < hRatio->GetNbinsX(); b++)
 
 }
 
-hRatioUp->Draw("HISTsame");
-// hRatioUp->SetFillColorAlpha(ColorBlue, 0.5);
-// hRatioDown->SetFillColor(ColorBlue);
-//  hRatioDown->SetFillStyle(3001);
-// hRatioUp->SetTickLength(0.03, "YZ");
-// hRatioUp->SetTickLength(0.03,"X");
+hRatioUp->Draw("E3same");//HISTSAME
+hRatioUp->SetFillColor(kGray+2);
+hRatioUp->SetFillStyle(3001);
+hRatioUp->SetFillColorAlpha(kGray+2, 0.9);
+
+
   hRatioUp->SetLineStyle(1);
   hRatioUp->SetLineWidth(1);
-  hRatioUp->SetLineColor(ColorBlue);
-  hRatioUp->SetLineColorAlpha(ColorBlue,0.8);
+  // hRatioUp->SetLineColor(ColorBlue);
+  // hRatioUp->SetLineColorAlpha(ColorBlue,0.8);
 
-hRatioDown->Draw("HISTsame");
-hRatioDown->SetLineColor(ColorRed);
-hRatioDown->SetLineColorAlpha(ColorRed,0.8);
+hRatioDown->Draw("E3same");//HISTSAME
+// hRatioDown->SetLineColor(ColorRed);
+// hRatioDown->SetLineColorAlpha(ColorRed,0.8);
 hRatioDown->SetLineStyle(1);
 hRatioDown->SetLineWidth(1);
-// hRatioDown->SetFillColorAlpha(kGray+2, 1);
-// hRatioDown->SetTickLength(0.03, "YZ");
-// hRatioDown->SetTickLength(0.03,"X");
-// hRatioDown->SetFillColor(kGray+2);
-//  hRatioDown->SetFillStyle(3001); 
+hRatioDown->SetFillColorAlpha(kGray+2, 0.9);
+hRatioDown->SetFillColor(kGray+2);
+ hRatioDown->SetFillStyle(3001); 
 // // !! --------------------------- PAD 3 --------------------------------------  !! //
   pad3->cd();
    xtitle = xtitle3;
@@ -1909,6 +2172,8 @@ hRatioDown->SetLineWidth(1);
  
 g1_ST = (TH1F*)gROOT->FindObject(MCFILE[4]+htitleC);//ok
  g2_ST = (TH1F*)gROOT->FindObject(MCFILE[5]+htitleC);//ok
+ g3_ST = (TH1F*)gROOT->FindObject(MCFILE[12]+htitleC);//ok
+ g4_ST = (TH1F*)gROOT->FindObject(MCFILE[13]+htitleC);//ok
   h_ST = new TH1F("h_ST","",nbin,xmin,xmax);
 
  g1_TT = (TH1F*)gROOT->FindObject(MCFILE[2]+htitleC);//ok
@@ -2036,11 +2301,19 @@ hDataMC = new TH1F("hDataMC","",nbin,xmin,xmax);
 //  g2_ST->Sumw2();
  h_ST->Add(g2_ST, h_ST, 1, 1);
 
+  f3_ST->cd();
+ g3_ST = (TH1F*)gROOT->FindObject(MCFILE[12]+htitleC);
+ h_ST->Add(g3_ST, h_ST, 1, 1);
+
+  f4_ST->cd();
+ g4_ST = (TH1F*)gROOT->FindObject(MCFILE[13]+htitleC);
+ h_ST->Add(g4_ST, h_ST, 1, 1);
+
  f1_TT->cd();
 g1_TT = (TH1F*)gROOT->FindObject(MCFILE[2]+htitleC);
 //  g1_TT->Sumw2();
  h_TT = new TH1F("h_TT","",nbin,xmin,xmax);
- h_TT->Add(g1_TT, h_TT, 0.5,0);
+ h_TT->Add(g1_TT, h_TT, 1*rescale,0);
 
 f2_TT->cd();
  g2_TT = (TH1F*)gROOT->FindObject(MCFILE[3]+htitleC);
@@ -2065,8 +2338,8 @@ f2_TT->cd();
 
  htotMC->Draw("HE"); 
   htotMC->SetFillStyle(1001);
- htotMC->SetFillColorAlpha(ColorNeutral, 1);
- htotMC->SetLineColor(ColorNeutral);
+ htotMC->SetFillColorAlpha(ColorBlue, 1);
+ htotMC->SetLineColor(ColorBlue);
  htotMC->SetLineStyle(1);
  htotMC->SetLineWidth(1);
  htotMC->SetTickLength(0.03, "YZ");
@@ -2081,11 +2354,11 @@ f2_TT->cd();
  htotMC->SetTitleOffset(1.3,"Y");
  htotMC->GetXaxis()->SetTitle(xtitle);
  htotMC->GetXaxis()->SetTitleColor(1);
- htotMC->GetYaxis()->SetTitle(ytitle);
+ htotMC->GetYaxis()->SetTitle(ytitle+ HeaderC);
  htotMC->GetYaxis()->SetTitleColor(1);
  htotMC->SetNdivisions(509,"XYZ");
- htotMC->SetMinimum(hmin); 
- htotMC->SetMaximum(hmax); 
+ htotMC->SetMinimum(1); 
+ htotMC->SetMaximum(htotMC->GetMaximum()*2); 
 //  htotMC->SetMarkerStyle(20);
 //  htotMC->SetMarkerSize(1);
 
@@ -2097,8 +2370,8 @@ f2_TT->cd();
  h_VV->SetLineWidth(3);
 
  h_TTV->Draw("HEsame"); 
- h_TTV->SetFillColorAlpha(ColorRed, 1);
- h_TTV->SetLineColor(ColorRed);
+ h_TTV->SetFillColorAlpha(ColorNeutral, 1);
+ h_TTV->SetLineColor(ColorNeutral);
  h_TTV->SetLineStyle(1);
  h_TTV->SetLineWidth(3);
 
@@ -2109,8 +2382,8 @@ f2_TT->cd();
  h_ST->SetLineWidth(3);
 
  h_TT->Draw("HEsame"); 
- h_TT->SetFillColorAlpha(ColorBlue, 1);
- h_TT->SetLineColor(ColorBlue);
+ h_TT->SetFillColorAlpha(ColorRed, 1);
+ h_TT->SetLineColor(ColorRed);
  h_TT->SetLineStyle(1);
  h_TT->SetLineWidth(3);
  h_TT->SetTickLength(0.03, "YZ");
@@ -2138,7 +2411,7 @@ htotData->SetLineWidth(1);
   leg->SetTextFont(42);
   leg->SetTextSize(0.035);
   leg->SetMargin(0.2);
-  leg->AddEntry(htotData, " e#mu data","PE1");
+  leg->AddEntry(htotData, " #mu#mu data","PE1");
     leg->AddEntry(h_TT, " t#bar{t}","F");
     leg->AddEntry(htotMC, " DY","F");
   leg->AddEntry(h_VV, " WW, WZ, ZZ","F");
@@ -2215,27 +2488,25 @@ for (unsigned int b = 1 ; b < hRatio->GetNbinsX(); b++)
 
 }
 
-hRatioUp->Draw("HISTsame");
-// hRatioUp->SetFillColorAlpha(ColorBlue, 0.5);
-// hRatioDown->SetFillColor(ColorBlue);
-//  hRatioDown->SetFillStyle(3001);
-// hRatioUp->SetTickLength(0.03, "YZ");
-// hRatioUp->SetTickLength(0.03,"X");
+hRatioUp->Draw("E3same");//HISTSAME
+hRatioUp->SetFillColor(kGray+2);
+hRatioUp->SetFillStyle(3001);
+hRatioUp->SetFillColorAlpha(kGray+2, 0.9);
+
+
   hRatioUp->SetLineStyle(1);
   hRatioUp->SetLineWidth(1);
-  hRatioUp->SetLineColor(ColorBlue);
-  hRatioUp->SetLineColorAlpha(ColorBlue,0.8);
+  // hRatioUp->SetLineColor(ColorBlue);
+  // hRatioUp->SetLineColorAlpha(ColorBlue,0.8);
 
-hRatioDown->Draw("HISTsame");
-hRatioDown->SetLineColor(ColorRed);
-hRatioDown->SetLineColorAlpha(ColorRed,0.8);
+hRatioDown->Draw("E3same");//HISTSAME
+// hRatioDown->SetLineColor(ColorRed);
+// hRatioDown->SetLineColorAlpha(ColorRed,0.8);
 hRatioDown->SetLineStyle(1);
 hRatioDown->SetLineWidth(1);
-// hRatioDown->SetFillColorAlpha(kGray+2, 1);
-// hRatioDown->SetTickLength(0.03, "YZ");
-// hRatioDown->SetTickLength(0.03,"X");
-// hRatioDown->SetFillColor(kGray+2);
-//  hRatioDown->SetFillStyle(3001); 
+hRatioDown->SetFillColorAlpha(kGray+2, 0.9);
+hRatioDown->SetFillColor(kGray+2);
+ hRatioDown->SetFillStyle(3001); 
 // // *****************************************************************************
 // // !! --------------------------- PAD4 --------------------------------------  !! //
   pad4->cd();
@@ -2256,6 +2527,9 @@ hRatioDown->SetLineWidth(1);
  
 g1_ST = (TH1F*)gROOT->FindObject(MCFILE[4]+htitleD);//ok
  g2_ST = (TH1F*)gROOT->FindObject(MCFILE[5]+htitleD);//ok
+ g3_ST = (TH1F*)gROOT->FindObject(MCFILE[12]+htitleD);//ok
+ g4_ST = (TH1F*)gROOT->FindObject(MCFILE[13]+htitleD);//ok
+
   h_ST = new TH1F("h_ST","",nbin,xmin,xmax);
 
  g1_TT = (TH1F*)gROOT->FindObject(MCFILE[2]+htitleD);//ok
@@ -2383,18 +2657,26 @@ hDataMC = new TH1F("hDataMC","",nbin,xmin,xmax);
 //  g2_ST->Sumw2();
  h_ST->Add(g2_ST, h_ST, 1, 1);
 
+  f3_ST->cd();
+ g3_ST = (TH1F*)gROOT->FindObject(MCFILE[12]+htitleD);
+ h_ST->Add(g3_ST, h_ST, 1, 1);
+
+  f4_ST->cd();
+ g4_ST = (TH1F*)gROOT->FindObject(MCFILE[13]+htitleD);
+ h_ST->Add(g4_ST, h_ST, 1, 1);
+
  f1_TT->cd();
 g1_TT = (TH1F*)gROOT->FindObject(MCFILE[2]+htitleD);
 //  g1_TT->Sumw2();
  h_TT = new TH1F("h_TT","",nbin,xmin,xmax);
- h_TT->Add(g1_TT, h_TT, 0.5,0);
+ h_TT->Add(g1_TT, h_TT, 1*rescale,0);
 
 f2_TT->cd();
  g2_TT = (TH1F*)gROOT->FindObject(MCFILE[3]+htitleD);
  h_TT->Add(g2_TT, h_TT, 1,1);
 // std::cout<<"TT: "<<1<<"with norm "<<norm<<std::endl;
 // std::cout<<"tt itnegral "<<h_TT->Integral(0,80)<<std::endl;
-float rescale = 1.0;
+ rescale = 1.0;
  htotMC->Add(htotMC, h_DY, 1, rescale);
  htotMC->Add(htotMC, h_VV, 1, rescale);
  htotMC->Add(htotMC, h_TTV, 1, rescale);
@@ -2412,8 +2694,8 @@ float rescale = 1.0;
 
  htotMC->Draw("HE"); 
   htotMC->SetFillStyle(1001);
- htotMC->SetFillColorAlpha(ColorNeutral, 1);
- htotMC->SetLineColor(ColorNeutral);
+ htotMC->SetFillColorAlpha(ColorBlue, 1);
+ htotMC->SetLineColor(ColorBlue);
  htotMC->SetLineStyle(1);
  htotMC->SetLineWidth(1);
  htotMC->SetTickLength(0.03, "YZ");
@@ -2428,11 +2710,11 @@ float rescale = 1.0;
  htotMC->SetTitleOffset(1.3,"Y");
  htotMC->GetXaxis()->SetTitle(xtitle);
  htotMC->GetXaxis()->SetTitleColor(1);
- htotMC->GetYaxis()->SetTitle(ytitle);
+ htotMC->GetYaxis()->SetTitle(+ HeaderD);
  htotMC->GetYaxis()->SetTitleColor(1);
  htotMC->SetNdivisions(509,"XYZ");
- htotMC->SetMinimum(hmin); 
- htotMC->SetMaximum(hmax); 
+ htotMC->SetMinimum(1); 
+ htotMC->SetMaximum(htotMC->GetMaximum()*2); 
 //  htotMC->SetMarkerStyle(20);
 //  htotMC->SetMarkerSize(1);
 
@@ -2444,8 +2726,8 @@ float rescale = 1.0;
  h_VV->SetLineWidth(3);
 
  h_TTV->Draw("HEsame"); 
- h_TTV->SetFillColorAlpha(ColorRed, 1);
- h_TTV->SetLineColor(ColorRed);
+ h_TTV->SetFillColorAlpha(ColorNeutral, 1);
+ h_TTV->SetLineColor(ColorNeutral);
  h_TTV->SetLineStyle(1);
  h_TTV->SetLineWidth(3);
 
@@ -2456,8 +2738,8 @@ float rescale = 1.0;
  h_ST->SetLineWidth(3);
 
  h_TT->Draw("HEsame"); 
- h_TT->SetFillColorAlpha(ColorBlue, 1);
- h_TT->SetLineColor(ColorBlue);
+ h_TT->SetFillColorAlpha(ColorRed, 1);
+ h_TT->SetLineColor(ColorRed);
  h_TT->SetLineStyle(1);
  h_TT->SetLineWidth(3);
  h_TT->SetTickLength(0.03, "YZ");
@@ -2485,7 +2767,7 @@ htotData->SetLineWidth(1);
   leg->SetTextFont(42);
   leg->SetTextSize(0.035);
   leg->SetMargin(0.2);
-  leg->AddEntry(htotData, " e#mu data","PE1");
+  leg->AddEntry(htotData, " #mu#mu data","PE1");
   leg->AddEntry(h_TT, " t#bar{t}","F");
   leg->AddEntry(htotMC, " DY","F");
   leg->AddEntry(h_VV, " WW, WZ, ZZ","F");
@@ -2562,28 +2844,25 @@ for (unsigned int b = 1 ; b < hRatio->GetNbinsX(); b++)
 
 }
 
-hRatioUp->Draw("HISTsame");
-// hRatioUp->SetFillColorAlpha(ColorBlue, 0.5);
-// hRatioDown->SetFillColor(ColorBlue);
-//  hRatioDown->SetFillStyle(3001);
-// hRatioUp->SetTickLength(0.03, "YZ");
-// hRatioUp->SetTickLength(0.03,"X");
+hRatioUp->Draw("E3same");//HISTSAME
+hRatioUp->SetFillColor(kGray+2);
+hRatioUp->SetFillStyle(3001);
+hRatioUp->SetFillColorAlpha(kGray+2, 0.9);
+
+
   hRatioUp->SetLineStyle(1);
   hRatioUp->SetLineWidth(1);
-  hRatioUp->SetLineColor(ColorBlue);
-  hRatioUp->SetLineColorAlpha(ColorBlue,0.8);
+  // hRatioUp->SetLineColor(ColorBlue);
+  // hRatioUp->SetLineColorAlpha(ColorBlue,0.8);
 
-hRatioDown->Draw("HISTsame");
-hRatioDown->SetLineColor(ColorRed);
-hRatioDown->SetLineColorAlpha(ColorRed,0.8);
+hRatioDown->Draw("E3same");//HISTSAME
+// hRatioDown->SetLineColor(ColorRed);
+// hRatioDown->SetLineColorAlpha(ColorRed,0.8);
 hRatioDown->SetLineStyle(1);
 hRatioDown->SetLineWidth(1);
-// hRatioDown->SetFillColorAlpha(kGray+2, 1);
-// hRatioDown->SetTickLength(0.03, "YZ");
-// hRatioDown->SetTickLength(0.03,"X");
-// hRatioDown->SetFillColor(kGray+2);
-//  hRatioDown->SetFillStyle(3001); 
-
+hRatioDown->SetFillColorAlpha(kGray+2, 0.9);
+hRatioDown->SetFillColor(kGray+2);
+ hRatioDown->SetFillStyle(3001); 
 
 // //!!
 // // hRatio->SaveAs("./"+htitleD+".root");
@@ -2594,7 +2873,11 @@ hRatioDown->SetLineWidth(1);
   TString name = htitleA+"_TotalErr";
   if (WLepton)
     {
-      name = htitleA+"_TotalErr_WLepton";
+      name = name+"_WLepton";
+    }
+  if (WGen)
+    {
+      name = name+"_WGen";
     }
   c1->SaveAs("./"+name+".pdf");
 
@@ -2604,7 +2887,9 @@ hRatioDown->SetLineWidth(1);
  f1_TT->Close(); 
  f2_TT->Close();  
  f1_ST->Close();  
- f2_ST->Close();  
+ f2_ST->Close();
+ f3_ST->Close();
+ f4_ST->Close();  
  f1_TTV->Close(); 
  f2_TTV->Close(); 
  f3_TTV->Close(); 
