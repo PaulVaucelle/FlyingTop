@@ -34,7 +34,8 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 isPost = False
 ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2018UL.txt"
 EGERA = '2022-Prompt'
-GT = '140X_dataRun3_v3' 
+GT = '140X_dataRun3_v20' 
+#140X_dataRun3_v20 : https://twiki.cern.ch/twiki/bin/view/CMSPublic/GTsRun3
 TIGHTJETIDERA = 'RUN3CHSruns2022FGruns2023CD'  #NOTE: RUN3CHSrunsBCDEprompt, RUN3CHSruns2022FGruns2023CD, RUN2ULCHS
 L1PREFERA = '20172018'
 DATAPUFILE = 'pileupHistogram-Cert_Collisions2023_366442_370790_GoldenJson-13p6TeV-69200ub-100bins.root'

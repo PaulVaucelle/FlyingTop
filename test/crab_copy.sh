@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# List of work directories
+
+work_directories=(
+
+
+"DATA_MUMU_2022C_31_01_2025"
+"DATA_MUMU_2022D_04_02_2025"
+"DATA_MUMU_2022E_04_02_2025"
+"DATA_MUMU_2022F_04_02_2025"
+"DATA_MUMU_2022G_04_02_2025"
+
+"DATA_MUMU_2023C_Muon0v1_04_02_2025"
+"DATA_MUMU_2023C_Muon0v2_04_02_2025"
+"DATA_MUMU_2023C_Muon0v3_04_02_2025"
+"DATA_MUMU_2023C_Muon0v4_04_02_2025"
+"DATA_MUMU_2023C_Muon1v1_04_02_2025"
+"DATA_MUMU_2023C_Muon1v2_04_02_2025"
+"DATA_MUMU_2023C_Muon1v3_04_02_2025"
+"DATA_MUMU_2023C_Muon1v4_04_02_2025"
+"DATA_MUMU_2023D_Muon0v1_04_02_2025"
+"DATA_MUMU_2023D_Muon0v2_04_02_2025"
+"DATA_MUMU_2023D_Muon1v1_04_02_2025"
+"DATA_MUMU_2023D_Muon1v2_04_02_2025"
+
+"DATA_EMU_2022C_04_02_2025"
+"DATA_EMU_2022D_04_02_2025"
+"DATA_EMU_2022E_04_02_2025"
+"DATA_EMU_2022F_04_02_2025"
+"DATA_EMU_2022G_04_02_2025"
+"DATA_EMU_2023C_v1_04_02_2025"
+"DATA_EMU_2023C_v2_04_02_2025"
+"DATA_EMU_2023C_v3_04_02_2025"
+"DATA_EMU_2023C_v4_04_02_2025"
+"DATA_EMU_2023D_v1_04_02_2025"
+"DATA_EMU_2023D_v2_04_02_2025"
+
+ )
+
+# work_directories=("DATA_MUMU_2022_25_09_2024/Muon")
+
+# Loop over each directory
+for dir in "${work_directories[@]}"; do
+  echo "Copying: $dir"
+  mkdir -p $dir
+  cd $dir
+  gfal-copy -r davs://sbgdcache.in2p3.fr/cms/phedex/store/user/pvaucell/$dir ./
+  echo "Ended copy of $dir"
+  cd ..
+done
+
+
+

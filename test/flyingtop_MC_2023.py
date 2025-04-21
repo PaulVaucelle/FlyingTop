@@ -67,10 +67,10 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 #  datapufile = cms.string("MyDataPileupHistogram_bin100.root"),
 
 
-isPost = True
+isPost = False
 ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2018UL.txt"
 EGERA = '2022-Prompt'
-GT = '140X_mcRun3_2024_realistic_v14' #140X_mcRun3_2024_realistic_v14  130X_mcRun3_2023_realistic_v14-v2 106X_upgrade2018_realistic_v16_L1v1
+GT = '140X_mcRun3_2024_realistic_v26' #140X_mcRun3_2024_realistic_v14  130X_mcRun3_2023_realistic_v14-v2 106X_upgrade2018_realistic_v16_L1v1
 TIGHTJETIDERA = 'RUN3CHSruns2022FGruns2023CD'  #NOTE: RUN3CHSrunsBCDEprompt, RUN3CHSruns2022FGruns2023CD, RUN2ULCHS
 L1PREFERA = '20172018'
 DATAPUFILE = 'pileupHistogram-Cert_Collisions2023_366442_370790_GoldenJson-13p6TeV-69200ub-100bins.root'

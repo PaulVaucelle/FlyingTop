@@ -34,7 +34,8 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 isPost = True
 ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2018UL.txt"
 EGERA = '2022-Prompt'
-GT = '140X_dataRun3_v3' 
+GT = '140X_dataRun3_v20' 
+#140X_dataRun3_v17 : https://twiki.cern.ch/twiki/bin/view/CMSPublic/GTsRun3
 TIGHTJETIDERA = 'RUN3CHSruns2022FGruns2023CD'  #NOTE: RUN3CHSrunsBCDEprompt, RUN3CHSruns2022FGruns2023CD, RUN2ULCHS
 L1PREFERA = '20172018'
 DATAPUFILE = 'PU_Run2023_data.root'
@@ -81,7 +82,7 @@ process.source = cms.Source("PoolSource",
 # Setup JEC factors
 #
 from PhysicsTools.PatAlgos.recoLayer0.jetCorrFactors_cfi import *
-process.jetCorrFactors = patJetCorrFactors.clone(src='slimmedJetsPuppi',
+process.jetCorrFactors = patJetCorrFactors.clone(src='slimmedJets',
     levels = cms.vstring('L1FastJet',
         'L2Relative',
         'L3Absolute',
@@ -94,7 +95,7 @@ process.jetCorrFactors = patJetCorrFactors.clone(src='slimmedJetsPuppi',
 from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cfi import *
 process.updatedJets = updatedPatJets.clone(
     addBTagInfo=False,
-    jetSource='slimmedJetsPuppi',
+    jetSource='slimmedJets',
     jetCorrFactorsSource=cms.VInputTag(cms.InputTag("jetCorrFactors") ),
 )
 #

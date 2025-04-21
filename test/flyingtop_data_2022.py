@@ -34,11 +34,12 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 isPost = True
 ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2018UL.txt"
 EGERA = '2022-Prompt'
-GT = '140X_dataRun3_v3' # for periods C, D, E
+GT = '140X_dataRun3_v17' 
+#140X_dataRun3_v17 : https://twiki.cern.ch/twiki/bin/view/CMSPublic/GTsRun3
 #$$ GT = '130X_dataRun3_PromptAnalysis_v1' # for periods F, G
 TIGHTJETIDERA = 'RUN3CHSruns2022FGruns2023CD'  #NOTE: RUN3CHSrunsBCDEprompt, RUN3CHSruns2022FGruns2023CD, RUN2ULCHS
 L1PREFERA = '20172018'
-DATAPUFILE = 'PU_Run2022_data.root'
+DATAPUFILE = 'pileupHistogram-Cert_Collisions2022_355100_362760_GoldenJson-13p6TeV-69200ub-100bins.root'
 DATAPUFILEUP = 'pileupHistogram-Cert_Collisions2022_355100_362760_GoldenJson-13p6TeV-72400ub-100bins.root'
 DATAPUFILEDOWN = 'pileupHistogram-Cert_Collisions2022_355100_362760_GoldenJson-13p6TeV-66000ub-100bins.root'
 MCPUFILE   = 'PU_Run2022EE_MC.root'
@@ -83,7 +84,7 @@ process.source = cms.Source("PoolSource",
 # Setup JEC factors
 #
 from PhysicsTools.PatAlgos.recoLayer0.jetCorrFactors_cfi import *
-process.jetCorrFactors = patJetCorrFactors.clone(src='slimmedJetsPuppi',
+process.jetCorrFactors = patJetCorrFactors.clone(src='slimmedJets',
     levels = cms.vstring('L1FastJet',
         'L2Relative',
         'L3Absolute',
@@ -96,7 +97,7 @@ process.jetCorrFactors = patJetCorrFactors.clone(src='slimmedJetsPuppi',
 from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cfi import *
 process.updatedJets = updatedPatJets.clone(
     addBTagInfo=False,
-    jetSource='slimmedJetsPuppi',
+    jetSource='slimmedJets',
     jetCorrFactorsSource=cms.VInputTag(cms.InputTag("jetCorrFactors") ),
 )
 #
@@ -190,7 +191,7 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
            YEAR = cms.int32(year),
            ERA2016 = cms.bool(isPost),
            RochString = cms.string(ROCCORPATH),
-           weightFileMVA = cms.untracked.string( "BDT_TRK_240510_ctau100vsEMUdata_NOchi2NOdxyNOdz.xml"),#track selection => previous :BDT_TRK_CTAU10cm_vs_TT.xml //BDT_TRK_ALLSIGvsDYTT_30_01_2024.xml/ BDT_TRK_ALLSIGvsALLBKG.xml // TMVAClassification_BDTG_TRKSEL_.weights.xml
+           weightFileMVA = cms.untracked.string( "BDT_TRK_241028_2022A_ctau100vsEMUdata.xml"),#track selection => previous :BDT_TRK_CTAU10cm_vs_TT.xml //BDT_TRK_ALLSIGvsDYTT_30_01_2024.xml/ BDT_TRK_ALLSIGvsALLBKG.xml // TMVAClassification_BDTG_TRKSEL_.weights.xml
            weightFileMVA_EVTS = cms.untracked.string("BDT_EVT_ALLSIGvsALLBKG.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
            weightFileMVA_EVTSDY = cms.untracked.string("BDT_EVT_ALLSIGvsDYM50.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
            weightFileMVA_EVTSTT = cms.untracked.string("BDT_EVT_ALLSIGvsTTTo2L2Nu.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml

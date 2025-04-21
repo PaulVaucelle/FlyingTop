@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
-from Configuration.Eras.Era_Run3_2023_cff import Run3_2023
-process = cms.Process("FlyingTop",Run3_2023)
+from Configuration.Eras.Era_Run3_cff import Run3
+process = cms.Process("FlyingTop",Run3)
 
 # https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVRun3Analysis#Prompt_Reco
 
@@ -14,37 +14,65 @@ process.load("Configuration.Geometry.GeometryRecoDB_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Geometry.CaloEventSetup.CaloTowerConstituents_cfi")
 
-
 ## JeC JER for systematics ###########################
 process.load("JetMETCorrections.Configuration.JetCorrectors_cff")
 process.load("JetMETCorrections.Modules.JetResolutionESProducer_cfi")
 from CondCore.CondDB.CondDB_cfi import *
 
-
 # https://twiki.cern.ch/twiki/bin/view/CMS/TopPtReweighting#TOP_PAG_corrections_based_on_dat 
 ###--------------------------
-IsMC = False
 #$$
+IsMC = True
 year = 2022
 #$$
 
 from Configuration.AlCa.GlobalTag import GlobalTag
 # Global Tags:
 
-isPost = False
+#$$
+isPostEE = True
+#$$
 ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2018UL.txt"
 EGERA = '2022-Prompt'
-GT = '140X_dataRun3_v17' 
-#140X_dataRun3_v17 : https://twiki.cern.ch/twiki/bin/view/CMSPublic/GTsRun3
-#$$ GT = '130X_dataRun3_PromptAnalysis_v1' # for periods F, G
-TIGHTJETIDERA = 'RUN3CHSruns2022FGruns2023CD'  #NOTE: RUN3CHSrunsBCDEprompt, RUN3CHSruns2022FGruns2023CD, RUN2ULCHS
+#$$$$
+GT = '130X_mcRun3_2022_realistic_v5'
+#$$$$
+if isPostEE:
+    GT = '130X_mcRun3_2022_realistic_postEE_v6' # for periods F, G
+TIGHTJETIDERA = 'RUN3CHSrunsBCDEprompt'
+if isPostEE:
+    TIGHTJETIDERA = 'RUN3CHSruns2022FGruns2023CD'
 L1PREFERA = '20172018'
-DATAPUFILE = 'pileupHistogram-Cert_Collisions2023_366442_370790_GoldenJson-13p6TeV-69200ub-100bins.root'
-DATAPUFILEUP = 'pileupHistogram-Cert_Collisions2022_355100_362760_GoldenJson-13p6TeV-72400ub-100bins.root'
+DATAPUFILE =     'pileupHistogram-Cert_Collisions2022_355100_362760_GoldenJson-13p6TeV-69200ub-100bins.root'
+DATAPUFILEUP =   'pileupHistogram-Cert_Collisions2022_355100_362760_GoldenJson-13p6TeV-72400ub-100bins.root'
 DATAPUFILEDOWN = 'pileupHistogram-Cert_Collisions2022_355100_362760_GoldenJson-13p6TeV-66000ub-100bins.root'
-MCPUFILE   = 'PU_Run2022EE_MC.root'
-if isPost:
-    MCPUFILE   = 'PU_Run2022_MC.root'
+MCPUFILE   =     'PU_Run2022_MC.root' 
+
+ ## $$$$$
+# JETVETOMAP = './JECDatabase/jet_veto_maps/Summer22_23Sep2023/Summer22_23Sep2023_RunCD_v1.root'
+JECUNCDATA = 'Summer22_22Sep2023_RunCD_V2_DATA_Uncertainty_AK4PFchs.txt'
+JECUNCMC = 'Summer22_22Sep2023_V2_MC_Uncertainty_AK4PFchs.txt'
+
+JERMC = 'Summer22_22Sep2023_JRV1_MC_PtResolution_AK4PFchs.txt'
+JERSFMC = 'Summer22_22Sep2023_JRV1_MC_SF_AK4PFchs.txt'
+JERDATA = 'Summer22_22Sep2023_JRV1_DATA_PtResolution_AK4PFchs.txt'
+JERSFDATA = 'Summer22_22Sep2023_JRV1_DATA_SF_AK4PFchs.txt'
+ ## $$$$$
+if isPostEE:
+    MCPUFILE   = 'PU_Run2022EE_MC.root'
+
+     ## $$$$$
+    # JETVETOMAP = './JECDatabase/jet_veto_maps/Summer22EE_23Sep2023/Summer22EE_23Sep2023_RunEFG_v1.root'
+    JECUNCDATA = 'Summer22EE_22Sep2023_V2_MC_Uncertainty_AK4PFchs.txt' #Summer22EE_22Sep2023_RunF_V2_DATA_Uncertainty_AK4PFchs.txt
+    JECUNCMC = 'Summer22_22Sep2023_V2_MC_Uncertainty_AK4PFchs.txt'
+    #  ./JECDatabase/textFiles/Summer22EE_22Sep2023_RunF_V2_DATA/Summer22EE_22Sep2023_RunF_V2_DATA_Uncertainty_AK4PFchs.txt
+    #  ./JECDatabase/textFiles/Summer22EE_22Sep2023_RunG_V2_DATA/Summer22EE_22Sep2023_RunG_V2_DATA_Uncertainty_AK4PFchs.txt
+    JERMC = 'Summer22EE_22Sep2023_JRV1_MC_PtResolution_AK4PFPuppi.txt' #Summer22EE_22Sep2023_JRV1_MC_PtResolution_AK4PFchs.txt
+    JERSFMC = 'Summer22EE_22Sep2023_JRV1_MC_SF_AK4PFPuppi.txt' #Summer22EE_22Sep2023_JRV1_MC_SF_AK4PFchs.txt
+    JERDATA = 'Summer22EE_22Sep2023_JRV1_DATA_PtResolution_AK4PFchs.txt'
+    JERSFDATA = 'Summer22EE_22Sep2023_JRV1_DATA_SF_AK4PFPuppi.txt' #Summer22EE_22Sep2023_JRV1_DATA_SF_AK4PFchs.txt
+
+     ## $$$$$
 
 
 if IsMC:                                                                                                                                                                                     
@@ -52,10 +80,9 @@ if IsMC:
 else:
     process.GlobalTag = GlobalTag(process.GlobalTag, GT, '') 
 
-
 #$$
-# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 #$$
 
 process.GoodVertexFilter = cms.EDFilter("VertexSelector",
@@ -67,13 +94,21 @@ process.GoodVertexFilter = cms.EDFilter("VertexSelector",
 # Input source
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-  # 'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_14_0_8_FLY/src/FlyingTop/FlyingTop/test/TTTo2L2Nu_2024.root'
 #$$
-  '/store/data/Run2023C/MuonEG/MINIAOD/PromptReco-v1/000/367/112/00000/7d9bff86-5cd0-4b11-b42e-8f7a7949a028.root'
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2022B/inputFile/MINIAODSIM_1.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2022B/inputFile/MINIAODSIM_2.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2022B/inputFile/MINIAODSIM_3.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2022B/inputFile/MINIAODSIM_4.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2022B/inputFile/MINIAODSIM_5.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2022B/inputFile/MINIAODSIM_6.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2022B/inputFile/MINIAODSIM_7.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2022B/inputFile/MINIAODSIM_9.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2022B/inputFile/MINIAODSIM_8.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2022B/inputFile/MINIAODSIM_9.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2022B/inputFile/MINIAODSIM_10.root'
 #$$
 )
 )
-
 
 ##########################################################
 #
@@ -81,7 +116,7 @@ process.source = cms.Source("PoolSource",
 #
 ##########################################################
 #
-# Setup JEC factors
+# Setup JEC factors, see https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/NanoAOD/python/jetsAK4_Puppi_cff.py
 #
 from PhysicsTools.PatAlgos.recoLayer0.jetCorrFactors_cfi import *
 process.jetCorrFactors = patJetCorrFactors.clone(src='slimmedJets',
@@ -91,6 +126,7 @@ process.jetCorrFactors = patJetCorrFactors.clone(src='slimmedJets',
         'L2L3Residual'),
     primaryVertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
 )
+
 #
 # This module will take the JEC factors and update them on slimmedJets
 #
@@ -100,6 +136,7 @@ process.updatedJets = updatedPatJets.clone(
     jetSource='slimmedJets',
     jetCorrFactorsSource=cms.VInputTag(cms.InputTag("jetCorrFactors") ),
 )
+
 #
 #  Module to calculate JetID for "Tight" working point
 #
@@ -118,21 +155,7 @@ process.tightLepVetoJetId = cms.EDProducer("PatJetIDValueMapProducer",
   ),
   src = cms.InputTag("updatedJets")
 )
-#
-# Module to calculate Pileup Jet ID
-# Might not be useful for RUn 3 since we have PUPPI jets
-# !!  from RecoJets.JetProducers.PileupJetID_cfi import _chsalgos_140X_23
-# process.load("RecoJets.JetProducers.PileupJetID_cfi")
-# process.pileupJetIdUpdated = process.pileupJetId.clone(
-#     jets=cms.InputTag("updatedJets"),# JEC corrected jets
-#     inputIsCorrected=True,
-#     applyJec=False,
-#     vertexes=cms.InputTag("offlineSlimmedPrimaryVertices"),
-#     algos = cms.VPSet(_chsalgos_140X_23),
-# )
-#
-# Embed the Jet ID and Pileup Jet ID variables in the jets.
-#
+
 process.updatedJetsWithUserData = cms.EDProducer("PATJetUserDataEmbedder",
     src = cms.InputTag("updatedJets"),
     # userFloats = cms.PSet(
@@ -181,17 +204,14 @@ process.updatedJetsWithUserData = cms.EDProducer("PATJetUserDataEmbedder",
 #     PrefiringRateSystematicUnctyMuon = cms.double(0.2)
 # )
 
-
 process.options = cms.untracked.PSet( )
 process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
-       #    RochString = cms.string("./FlyingTop/FlyingTop/test/"), 
-       #    Roccor = cms.FileInPath("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_14_0_8_FLY/src/FlyingTop/FlyingTop/test/"),
            DATASET = cms.untracked.vstring(process.source.fileNames),
            isMC =cms.bool(IsMC), 
            YEAR = cms.int32(year),
-           ERA2016 = cms.bool(isPost),
+           ERA2016 = cms.bool(isPostEE),
            RochString = cms.string(ROCCORPATH),
-           weightFileMVA = cms.untracked.string( "BDT_TRK_240510_ctau100vsEMUdata_NOchi2NOdxyNOdz.xml"),#track selection => previous :BDT_TRK_CTAU10cm_vs_TT.xml //BDT_TRK_ALLSIGvsDYTT_30_01_2024.xml/ BDT_TRK_ALLSIGvsALLBKG.xml // TMVAClassification_BDTG_TRKSEL_.weights.xml
+           weightFileMVA = cms.untracked.string("BDT_TRK_241108_2022B_ctau100vsEMUdata.xml"),
            weightFileMVA_EVTS = cms.untracked.string("BDT_EVT_ALLSIGvsALLBKG.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
            weightFileMVA_EVTSDY = cms.untracked.string("BDT_EVT_ALLSIGvsDYM50.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
            weightFileMVA_EVTSTT = cms.untracked.string("BDT_EVT_ALLSIGvsTTTo2L2Nu.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
@@ -220,13 +240,15 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
            beamSpot    = cms.untracked.InputTag('offlineBeamSpot'),
            puCollection = cms.InputTag("slimmedAddPileupInfo"),
            rhoCollection = cms.InputTag("fixedGridRhoFastjetAll"),
+            # jetvetomap = cms.string(JETVETOMAP),
+            jetjecuncdata = cms.string(JECUNCDATA),
+            jetjecuncmc = cms.string(JECUNCMC),
+            jetjerdata = cms.string(JERDATA),
+            jetjersfdata = cms.string(JERSFDATA),
+            jetjermc = cms.string(JERMC),
+            jetjersfmc = cms.string(JERSFMC)
        )
 
-#process.tsk = cms.Task()
-#for mod in process.producers_().itervalues():
-#    process.tsk.add(mod)
-#    for mod in process.filters_().itervalues():
-#        process.tsk.add(mod)
 #-------------------------------------
 #process.p = cms.Path(process.prefiringweight* process.egammaPostRecoSeq* process.updatedPatJetsTransientCorrectedNewDFTraining* process.FlyingTop,process.tsk)
 process.p = cms.Path(
@@ -245,9 +267,11 @@ process.p = cms.Path(
 from PhysicsTools.PatAlgos.tools.helpers  import getPatAlgosToolsTask
 process.patAlgosToolsTask = getPatAlgosToolsTask(process)
 process.pathRunPatAlgos = cms.Path(process.patAlgosToolsTask)
-########## output of ntuple
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string("Ntuple.root") )
+########## output of ntuple
+#$$
+process.TFileService = cms.Service("TFileService", fileName = cms.string("inputFile.root") )
+#$$
 
 #$$
 process.options.numberOfThreads=cms.untracked.uint32(4)

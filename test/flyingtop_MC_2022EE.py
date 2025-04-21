@@ -42,10 +42,10 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 #  datapufile = cms.string("MyDataPileupHistogram_bin100.root"),
 
 
-isPost = False
+isPost = True
 ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2018UL.txt" # No Rochester correction for Run 3 
 EGERA = '2022-Prompt'
-GT = '140X_mcRun3_2024_realistic_v14'
+GT = '130X_mcRun3_2022_realistic_postEE_v6'
 TIGHTJETIDERA = 'RUN3CHSruns2022FGruns2023CD'  #NOTE: RUN3CHSrunsBCDEprompt, RUN3CHSruns2022FGruns2023CD, RUN2ULCHS
 L1PREFERA = '20172018'
 DATAPUFILE = 'pileupHistogram-Cert_Collisions2023_366442_370790_GoldenJson-13p6TeV-69200ub-100bins.root'
@@ -55,13 +55,13 @@ MCPUFILE   = 'PU_Run2022EE_MC.root'
 
 if year == 2022 :
     ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2018UL.txt"
-    GT = '140X_mcRun3_2024_realistic_v14'
+    GT = '130X_mcRun3_2022_realistic_postEE_v6'
     EGERA = '2022-Prompt'
     TIGHTJETIDERA = 'RUN3CHSruns2022FGruns2023CD'
     L1PREFERA = '20172018'
-    MCPUFILE   = 'PU_Run2022EE_MC.root'
+    MCPUFILE   = 'PU_Run2022_MC.root'
     if isPost:
-        MCPUFILE   = 'PU_Run2022_MC.root'
+        MCPUFILE   = 'PU_Run2022EE_MC.root'
 
 if year == 2023 :
     ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2017UL.txt"
