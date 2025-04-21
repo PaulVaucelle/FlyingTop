@@ -16,34 +16,9 @@
 #include "TTree.h"
 using namespace std;
 
-
-
-void MiniDATAMCNtuple::Loop(TString sample , TString Production,bool Signal )
+void MiniDATAMCNtuple::Loop(TString sample ,TString Production, bool Signal )
 {
-//   In a ROOT session, you can do:
-//      root> .L MiniDATAMCNtuple.C
-//      root> MiniDATAMCNtuple t
-//      root> t.GetEntry(12); // Fill t data members with entry number 12
-//      root> t.Show();       // Show values of entry 12
-//      root> t.Show(16);     // Read and show values of entry 16
-//      root> t.Loop();       // Loop on all entries
-//
-
-//     This is the loop skeleton where:
-//    jentry is the global entry number in the chain
-//    ientry is the entry number in the current Tree
-//  Note that the argument to GetEntry must be:
-//    jentry for TChain::GetEntry
-//    ientry for TTree::GetEntry and TBranch::GetEntry
-//
-//       To read only selected branches, Insert statements like:
-// METHOD1:
-//    fChain->SetBranchStatus("*",0);  // disable all branches
-//    fChain->SetBranchStatus("branchname",1);  // activate branchname
-// METHOD2: replace line
-//    fChain->GetEntry(jentry);       //read all branches
-//by  b_branchname->GetEntry(ientry); //read only this branch
-   TFile * myFile = new TFile( (Production+"/MiniDATAMC_"+sample+".root").Data(), "recreate");
+ TFile * myFile = new TFile( (Production+"/MiniDATAMC_"+sample+".root").Data(), "recreate");
    TTree *smalltree = new TTree("ttree", "summary information");
   
 
@@ -52,11 +27,13 @@ void MiniDATAMCNtuple::Loop(TString sample , TString Production,bool Signal )
 
    std::vector<double> minitree_gen_top_pt;
    std::vector<double> minitree_gen_top_rw_pt;
-
+   std::vector<float>  minitree_LHE_Weights;
    std::vector<double> miniPUweight;
    std::vector<double> miniPUweight_Up;
    std::vector<double> miniPUweight_Down;
    std::vector<double> miniPrefweight;
+   std::vector<double> miniPrefweight_Up;
+   std::vector<double> miniPrefweight_Down;
 
    std::vector<bool>   minitree_Filter;
    std::vector<bool>   minitree_FilterSameSign;
@@ -71,6 +48,8 @@ void MiniDATAMCNtuple::Loop(TString sample , TString Production,bool Signal )
    std::vector<float>  minitree_Mmumu;
    std::vector<float>  minitree_MmumuSameSign;
 
+   std::vector<float>  minitree_PFMet_et;
+   std::vector<float>  minitree_PFMet_pt;
    std::vector<float>  minitree_ll_pt;
    std::vector<float>  minitree_ll_eta;
    std::vector<float>  minitree_ll_phi;
@@ -302,11 +281,13 @@ void MiniDATAMCNtuple::Loop(TString sample , TString Production,bool Signal )
    smalltree->Branch("minitree_genTop_Weight",&minitree_genTop_Weight);
    smalltree->Branch("minitree_gen_top_pt",&minitree_gen_top_pt);
    smalltree->Branch("minitree_gen_top_rw_pt",&minitree_gen_top_rw_pt);
-
+   smalltree->Branch("minitree_LHE_Weights",&minitree_LHE_Weights);
    smalltree->Branch("miniPUweight",&miniPUweight);
    smalltree->Branch("miniPUweight_Up",&miniPUweight_Up);
    smalltree->Branch("miniPUweight_Down",&miniPUweight_Down);
    smalltree->Branch("miniPrefweight",&miniPrefweight);
+      smalltree->Branch("miniPrefweight_Up",&miniPrefweight_Up);
+   smalltree->Branch("miniPrefweight_Down",&miniPrefweight_Down);
 
    smalltree->Branch("minitree_Filter",        &minitree_Filter);
    smalltree->Branch("minitree_FilterSameSign",&minitree_FilterSameSign);
@@ -450,6 +431,8 @@ void MiniDATAMCNtuple::Loop(TString sample , TString Production,bool Signal )
    smalltree->Branch("minitree_HemiMuOp_dR",&minitree_HemiMuOp_dR);
    smalltree->Branch("minitree_Hemi_dR12",&minitree_Hemi_dR12);
 
+   smalltree->Branch("minitree_PFMet_et",&minitree_PFMet_et);
+   smalltree->Branch("minitree_PFMet_pt",&minitree_PFMet_pt);
    smalltree->Branch("minitree_ll_pt",&minitree_ll_pt);
    smalltree->Branch("minitree_ll_eta",&minitree_ll_eta);
    smalltree->Branch("minitree_ll_phi",&minitree_ll_phi);
@@ -565,27 +548,26 @@ void MiniDATAMCNtuple::Loop(TString sample , TString Production,bool Signal )
    bool debug = false;
    if (fChain == 0) return;
 
-   Long64_t nentries = fChain->GetEntries();
-   Long64_t nentries2 = fChain->GetEntriesFast();
+   Long64_t nentries = fChain->GetEntriesFast();
+   Long64_t nentries2 = fChain->GetEntries();
    std::cout << "Total Entries : " << nentries << std::endl;
    std::cout << "Total Entries2 : " << nentries2 << std::endl;
    Long64_t nbytes = 0, nb = 0;
-
    int allevents = 0;
    int itest = 0;
-
-   for (Long64_t jentry=0; jentry<nentries; jentry++) {
+   for (Long64_t jentry=0; jentry<nentries;jentry++) {
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
-
-      allevents++;
+      // if (Cut(ientry) < 0) continue;
+      // std::cout<<"jentry : "<<jentry<<std::endl;
+                  allevents++;
       // if ( allevents%10000 == 0 ) std::cout << "events : " << allevents << std::endl;
 
       // if (Cut(ientry) < 0) continue;
       if ( jentry%10000 == 0 ) std::cout << "events : " << jentry << std::endl;
       // if (jentry < 3300000) continue;
-      // std::cout<<"jentry : "<<jentry<<std::endl;
+
       // if (jentry==0.1*nentries) {std::cout<<"10/100 :"<<std::endl;}
       // if (jentry==0.2*nentries) {std::cout<<"20/100 :"<<std::endl;}
       // if (jentry==0.3*nentries) {std::cout<<"30/100 :"<<std::endl;}
@@ -605,16 +587,6 @@ void MiniDATAMCNtuple::Loop(TString sample , TString Production,bool Signal )
       //        Event         //
       //----------------------//
 
-
-
-   // if (tree_Mmumu >10)
-   //    {
-   //       minitree_lepton_b4trigger_leadingpt.push_back(tree_lepton_b4trigger_leadingpt->at(0));
-   //       minitree_lepton_b4trigger_leadingpt2.push_back(tree_lepton_b4trigger_leadingpt2->at(0));
-   //    }
-
-//$$
-   
     // -------------- --------------------------------------------------------------------//
     // -----------------------------------------------------------------------------------//
     if ( !((tree_Filter || tree_FilterSameSign) && tree_njetNOmu>0) && !Signal ) continue;
@@ -627,13 +599,15 @@ void MiniDATAMCNtuple::Loop(TString sample , TString Production,bool Signal )
 
       minitree_Good_PV.push_back(tree_Good_PV);
 
-      for(unsigned int ill = 0; ill <tree_ll_pt->size(); ill ++)//test                                                                                                        
-          {
-            minitree_ll_pt.push_back(tree_ll_pt->at(ill));
-            minitree_ll_eta.push_back(tree_ll_eta->at(ill));
-            minitree_ll_phi.push_back(tree_ll_phi->at(ill));
-            minitree_ll_mass.push_back(tree_ll_mass->at(ill));
-         }
+      minitree_PFMet_et.push_back(tree_PFMet_et);
+      minitree_PFMet_pt.push_back(tree_PFMet_pt);
+      // for(unsigned int ill = 0; ill <tree_ll_pt->size(); ill ++)//test                                                                                                        
+      //     {
+      //       minitree_ll_pt.push_back(tree_ll_pt->at(ill));
+      //       minitree_ll_eta.push_back(tree_ll_eta->at(ill));
+      //       minitree_ll_phi.push_back(tree_ll_phi->at(ill));
+      //       minitree_ll_mass.push_back(tree_ll_mass->at(ill));
+      //    }
          // std::cout<< "tracks   "<<std::endl;
       for(unsigned int iTrk = 0; iTrk <tree_track_MVAval->size(); iTrk ++)
          {
@@ -759,6 +733,10 @@ void MiniDATAMCNtuple::Loop(TString sample , TString Production,bool Signal )
             minitree_gen_top_rw_pt.push_back(tree_gen_top_rw_pt->at(0));
          }
 
+      for (unsigned int k = 0 ; k < tree_LHE_Weights->size(); k++)
+         {
+            minitree_LHE_Weights.push_back(tree_LHE_Weights->at(k));
+         }
       miniPUweight.push_back(PUweight);
       double PileUp_Up = 1;
       double PileUp_Down = 1;
@@ -769,6 +747,8 @@ void MiniDATAMCNtuple::Loop(TString sample , TString Production,bool Signal )
       miniPUweight_Up.push_back(PileUp_Up);
       miniPUweight_Down.push_back(PileUp_Down);
       miniPrefweight.push_back(Prefweight);
+      miniPrefweight_Up.push_back(Prefweight_Up);//Prefweight_Up
+      miniPrefweight_Down.push_back(Prefweight_Down);//Prefweight_Down
       // miniPU_events.push_back(PU_events);
       // miniAllPU_events_weight.push_back(AllPU_events_weight);
 
@@ -969,10 +949,13 @@ void MiniDATAMCNtuple::Loop(TString sample , TString Production,bool Signal )
       minitree_genTop_Weight.clear();
       minitree_gen_top_pt.clear();
       minitree_gen_top_rw_pt.clear();
+      minitree_LHE_Weights.clear();
       miniPUweight.clear();
       miniPUweight_Up.clear();
       miniPUweight_Down.clear();
       miniPrefweight.clear();
+      miniPrefweight_Up.clear();
+      miniPrefweight_Down.clear();
       minitree_Filter.clear();
       minitree_FilterSameSign.clear();
       minitree_nPV.clear();
@@ -1112,7 +1095,9 @@ void MiniDATAMCNtuple::Loop(TString sample , TString Production,bool Signal )
       // minitree_Evts_MVAval.clear();
       // minitree_Evts_MVAvalDY.clear();
       // minitree_Evts_MVAvalTT.clear();
-    
+      minitree_PFMet_et.clear();
+      minitree_PFMet_pt.clear();
+   
       minitree_ll_pt.clear();
       minitree_ll_eta.clear();
       minitree_ll_phi.clear();
@@ -1211,16 +1196,10 @@ void MiniDATAMCNtuple::Loop(TString sample , TString Production,bool Signal )
       minitree_Hemi_Vtx_BDT_step.clear();
       minitree_Hemi_Vtx_BDT_Mass.clear();
       minitree_Hemi_Vtx_BDT_HMass.clear();
-     
-   } // end loop on events 
-
-   std::cout << "number of events  "<< allevents << std::endl;
+   }
+         std::cout << "number of events  "<< allevents << std::endl;
 
 
    myFile->Write();
    delete myFile;
-
-   // HistogramManager h ;
-   // h.WriteAllHistogramsInFile((Production+"/Mini"+sample+".root").Data(),"recreate");
 }
-

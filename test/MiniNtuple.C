@@ -74,6 +74,8 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
    std::vector<double> miniPUweight_Up;
    std::vector<double> miniPUweight_Down;
    std::vector<double> miniPrefweight;
+   std::vector<double> miniPrefweight_Up;
+   std::vector<double> miniPrefweight_Down;
    std::vector<int>    miniPU_events;
    std::vector<int>    miniAllPU_events_weight;
    std::vector<bool>   minitree_Filter;
@@ -273,6 +275,9 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
     std::vector<float> minitree_Hemi_Vtx_dR;
     std::vector<float> minitree_Hemi_Vtx_SumtrackWeight;//Vertx selection variable for the BDT
     std::vector<float> minitree_Hemi_Vtx_Mass;
+    std::vector<float> minitree_Hemi_Vtx_pt;
+    std::vector<float> minitree_Hemi_Vtx_eta;
+    std::vector<float> minitree_Hemi_Vtx_phi;
     std::vector<float> minitree_Hemi_Vtx_track_MeanDCA_d;//Veertex selection BDT
     std::vector<float> minitree_Hemi_Vtx_dist;
     std::vector<int>   minitree_event_nVtx;
@@ -364,6 +369,8 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
    smalltree->Branch("miniPUweight_Up",&miniPUweight_Up);
    smalltree->Branch("miniPUweight_Down",&miniPUweight_Down);
    smalltree->Branch("miniPrefweight",&miniPrefweight);
+   smalltree->Branch("miniPrefweight_Up",&miniPrefweight_Up);
+   smalltree->Branch("miniPrefweight_Down",&miniPrefweight_Down);
    smalltree->Branch("miniPU_events",&miniPU_events);
    smalltree->Branch("miniAllPU_events_weight",&miniAllPU_events_weight);
    smalltree->Branch("minitree_Filter",        &minitree_Filter);
@@ -567,6 +574,9 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
    smalltree->Branch("minitree_Hemi_Vtx_SumtrackWeight",&minitree_Hemi_Vtx_SumtrackWeight);
    smalltree->Branch("minitree_Hemi_Vtx_track_MeanDCA_d",&minitree_Hemi_Vtx_track_MeanDCA_d);
    smalltree->Branch("minitree_Hemi_Vtx_Mass", &minitree_Hemi_Vtx_Mass);
+   smalltree->Branch("minitree_Hemi_Vtx_pt",&minitree_Hemi_Vtx_pt);
+   smalltree->Branch("minitree_Hemi_Vtx_eta",&minitree_Hemi_Vtx_eta);
+   smalltree->Branch("minitree_Hemi_Vtx_phi",&minitree_Hemi_Vtx_phi);
    smalltree->Branch("minitree_Hemi_Vtx_dist",  &minitree_Hemi_Vtx_dist);
    smalltree->Branch("minitree_event_nVtx",      &minitree_event_nVtx);
    smalltree->Branch("minitree_event_Vtx_Vtx_dr",&minitree_event_Vtx_Vtx_dr);
@@ -667,15 +677,6 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
 
       // if (Cut(ientry) < 0) continue;
       if ( jentry%10000 == 0 ) std::cout << "events : " << jentry << std::endl;
-      // if (jentry==0.1*nentries) {std::cout<<"10/100 :"<<std::endl;}
-      // if (jentry==0.2*nentries) {std::cout<<"20/100 :"<<std::endl;}
-      // if (jentry==0.3*nentries) {std::cout<<"30/100 :"<<std::endl;}
-      // if (jentry==0.4*nentries) {std::cout<<"40/100 :"<<std::endl;}
-      // if (jentry==0.5*nentries) {std::cout<<"50/100 :"<<std::endl;}
-      // if (jentry==0.6*nentries) {std::cout<<"60/100 :"<<std::endl;}
-      // if (jentry==0.7*nentries) {std::cout<<"70/100 :"<<std::endl;}
-      // if (jentry==0.8*nentries) {std::cout<<"80/100 :"<<std::endl;}
-      // if (jentry==0.9*nentries) {std::cout<<"90/100 :"<<std::endl;}
 
 //$$ 
       itest++;
@@ -692,12 +693,12 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
       if ( tree_Filter ) hData_njetNOmu_Filter->Fill( tree_njetNOmu );
       if ( tree_FilterSameSign ) hData_njetNOmu_FilterSameSign->Fill( tree_njetNOmu );
 
-   if (tree_lepton_b4trigger_leadingpt->size()>0)
-      {
-         minitree_lepton_b4trigger_leadingpt.push_back(tree_lepton_b4trigger_leadingpt->at(0));
-         minitree_lepton_b4trigger_leadingpt2.push_back(tree_lepton_b4trigger_leadingpt2->at(0));
-      }
-//$$
+//    if (tree_lepton_b4trigger_leadingpt->size()>0)
+//       {
+//          minitree_lepton_b4trigger_leadingpt.push_back(tree_lepton_b4trigger_leadingpt->at(0));
+//          minitree_lepton_b4trigger_leadingpt2.push_back(tree_lepton_b4trigger_leadingpt2->at(0));
+//       }
+// //$$
     // ----------------------------------------------------------------------------------//
     // -----------------------------------------------------------------------------------//
     if ( !((tree_Filter || tree_FilterSameSign) && tree_njetNOmu>0) && !Signal ) continue;
@@ -822,6 +823,8 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
       miniPUweight_Up.push_back(PileUp_Up);
       miniPUweight_Down.push_back(PileUp_Down);
       miniPrefweight.push_back(Prefweight);
+      miniPrefweight_Up.push_back(Prefweight_Up);
+      miniPrefweight_Down.push_back(Prefweight_Down);
       miniPU_events.push_back(PU_events);
       // miniAllPU_events_weight.push_back(AllPU_events_weight);
 
@@ -1063,6 +1066,9 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
             minitree_Hemi_Vtx_track_MeanDCA_d.push_back(tree_Hemi_Vtx_track_MeanDCA_d->at(i));
             minitree_Hemi_Vtx_Mass.push_back(tree_Hemi_Vtx_Mass->at(i));
             minitree_Hemi_Vtx_dist.push_back(tree_Hemi_Vtx_dist->at(i));
+            minitree_Hemi_Vtx_pt.push_back(tree_Hemi_Vtx_pt->at(i));
+            minitree_Hemi_Vtx_eta.push_back(tree_Hemi_Vtx_eta->at(i));
+            minitree_Hemi_Vtx_phi.push_back(tree_Hemi_Vtx_phi->at(i));
 
             minitree_Hemi_Vtx_BDT_nTrks.push_back(tree_Hemi_Vtx_BDT_nTrks->at(i));
             minitree_Hemi_Vtx_BDT_NChi2.push_back(tree_Hemi_Vtx_BDT_NChi2->at(i));
@@ -1130,6 +1136,8 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
       miniPUweight_Up.clear();
       miniPUweight_Down.clear();
       miniPrefweight.clear();
+      miniPrefweight_Up.clear();
+      miniPrefweight_Down.clear();
       miniPU_events.clear();
       miniAllPU_events_weight.clear();
       minitree_Filter.clear();
@@ -1332,6 +1340,9 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
       minitree_Hemi_Vtx_SumtrackWeight.clear();
       minitree_Hemi_Vtx_track_MeanDCA_d.clear();
       minitree_Hemi_Vtx_Mass.clear();
+      minitree_Hemi_Vtx_pt.clear();
+      minitree_Hemi_Vtx_eta.clear();
+      minitree_Hemi_Vtx_phi.clear();
       minitree_Hemi_Vtx_dist.clear();
 
       minitree_event_nVtx.clear();
