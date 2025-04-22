@@ -100,11 +100,13 @@ or (still working but not used, see next point "To run jobs")
 crab submit -c crab_config_mc_2018.py (use grid : don't forget the certificate)
 To run jobs :
 
-./multicrab --crabCmd submit (edit to choose the samples)
+python3 multicrab.py --crabCmd submit (edit to choose the samples)
 
-./multicrab --crabCmd status --workArea ./<work_directory> (work directory is the date of the launching of the jobs DD_MM_YYYY)
+python3 multicrab.py --crabCmd status --workArea ./<work_directory> (work directory is the date of the launching of the jobs DD_MM_YYYY)
 
-./multicrab --crabCmd getoutput --workArea ./<work_directory> --crabCmdOpts --checksum=no (to retrieve the root files)
+python3 multicrab/py --crabCmd getoutput --workArea ./<work_directory> --crabCmdOpts --checksum=no (to retrieve the root files)
+
+The change between 10_6_20 and 14_0_8(20) is due to th echange in version of python
 To merge the outputfiles, use the haddWithWeights.py macro:
 
 Please check the paths so that they correspond to your envrionment
