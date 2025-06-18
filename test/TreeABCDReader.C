@@ -9,12 +9,20 @@
 #include <chrono>
 #include <ctime> 
 #include "TTree.h"
-#include "../HistogramManager.h"
+#include "../../HistogramManager.h"
 #include "TLorentzVector.h"
 #include "TMath.h"
 #include "TH1F.h"
 #include <TDirectory.h>
 #include "/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/MCWeights.h"
+#include "/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/DATAMCREADER/EMU/PDFSCALEVar.h"
+
+// !! new 
+#include "TMVA/Tools.h"
+#include "TMVA/Reader.h"
+#include "TMVA/MethodCuts.h"
+
+// !! new 
 
 double TreeABCDReader::MeanGenWeight(TString thesample, TString Prod)
    {
@@ -50,7 +58,7 @@ double TreeABCDReader::MeanGenWeight(TString thesample, TString Prod)
       return ratio;
    }
 
-void TreeABCDReader::Loop(bool isMC, TString Prod, TString sample, bool Signal, bool SS, bool FWD, int Year, float mean, bool DoubleMuon, int mixing, int Channel,  bool isPostAPV)
+void TreeABCDReader::Loop(bool isMC, TString Prod, TString sample, bool Signal, bool SS, bool FWD, int Year, float mean, bool DoubleMuon, int mixing, int Channel,  bool isPostAPV, TString thesystlist)
 {
 
   TString thesample  = sample;
@@ -77,41 +85,21 @@ void TreeABCDReader::Loop(bool isMC, TString Prod, TString sample, bool Signal, 
       {
          CHANNEL = "SM";
       }
-double norm = 0.;
-   if (!Signal)
-      {
-         TString hNorma = "hEvents";
-         TFile* f1_DY= new TFile("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"+Prod+"/"+sample+".root");
-         f1_DY->cd("");
-         
-         TDirectory* dir = f1_DY->GetDirectory("FlyingTop");
-         if (dir) {
-            dir->cd();  // Change to this directory if needed
-            // Now you can access histograms, trees, etc. from the directory
-               TH1D*  e1_DY = (TH1D*)gROOT->FindObject(hNorma);
-         e1_DY->Sumw2();
-            if  ( e1_DY->GetEntries() > 0 ) norm =  e1_DY->GetEntries();
-         std::cout<<"norm : "<<norm<<std::endl;
-         }
-      }
+
 
    bool firstinit = false;
    TString samplename = thesample;
-   for(unsigned int i=0; i< systlist.size(); i++){
      
-     if( systlist[i]== "") samplename = thesample;
-     else                  samplename = thesample+"_"+systlist[i];
+     if( systlist== "") samplename = thesample;
+     else                  samplename = thesample+"_"+systlist;
      
      
       firstinit = true;
 
-   TFile * theoutputfile = new TFile( ("../"+Prod+"/histofile_"+CHANNEL+"_"+ADD_Text+"_"+samplename+".root").Data() , "recreate");
+   TFile * theoutputfile = new TFile( ("../../"+Prod+"/histofile_HT100_"+CHANNEL+"_"+ADD_Text+"_"+samplename+"_BDT100.root").Data() , "recreate");
    theoutputfile->cd();
    initializeHisto(samplename, firstinit);
    if (fChain == 0) return;
-
-
-
 
 
    Long64_t nentries = fChain->GetEntriesFast();
@@ -124,40 +112,528 @@ double norm = 0.;
    // int GoodNentries = Filtretest->GetEntries();
    // // std::cout<<"test nentries : "<<GoodNentries<<std::endl;
    
-// Normalisation factor (XS)
+  // !! -- Parameters -- !! //
+   // // std::cout<<"Mixing : "<<mixing<<std::endl;
+   // // std::cout<<"Msmuon : "<<MSmuon<<std::endl;
+   bool BlindSR = false;
+   float Nevent = 0;
+Nevent = nentries;
+   bool signal = Signal;
+   int allevents = 0;
+   double lowHpt = 30.;
+   double LT = 0.;
+   
+   double nFilterEvt = 0;
+   double nFilterJet = 0;
+   double nFilternHemi = 0;
+   double nFilterHpt = 0;
 
-  float XS = 1.;
-  float XS_up = 1.;
+   double nRecoVertex = 0;
+   double nReco1Vertex = 0;
+   double nReco1TightVertex = 0;
+   double nReco2Vertex = 0;
+   double nReco2TightVertex = 0;
+   double nRecoTightVertex = 0;
+   double nRecoLooseVertex = 0;
+
+   bool showoutput = false;
+  // !! -- END OF Parameters -- !! //
+  
+  // !! new Vertex BDT 
+   float mva_V_nTrks = 0 ;
+    float mva_V_chi = 0;
+    float mva_V_step = 0;
+    float mva_V_r= 0;
+    float mva_V_z = 0;
+    float mva_V_MTW = 0;
+    float mva_V_Mass =  0;
+    float mva_H_Mass = 0;
+    float mva_V_dist = 0;
+    float mva_V_ntrk10 = 0;
+    float mva_V_ntrk20 = 0 ;
+    float mva_V_MeanDCA = 0;
+
+
+      float mva_V1_nTrks = 0 ;
+      float mva_V1_chi = 0;
+      float mva_V1_step = 0;
+      float mva_V1_r= 0;
+      float mva_V1_z = 0;
+      float mva_V1_MTW = 0;
+      float mva_V1_Mass =  0;
+      float mva_V1_dist = 0;
+      float mva_V1_ntrk10 = 0;
+      float mva_V1_ntrk20 = 0 ;
+      float mva_V1_MeanDCA = 0;
+
+      float mva_V2_nTrks = 0 ;
+      float mva_V2_chi = 0;
+      float mva_V2_step = 0;
+      float mva_V2_r= 0;
+      float mva_V2_z = 0;
+      float mva_V2_MTW = 0;
+      float mva_V2_Mass =  0;
+      float mva_V2_dist = 0;
+      float mva_V2_ntrk10 = 0;
+      float mva_V2_ntrk20 = 0 ;
+      float mva_V2_MeanDCA = 0;
+    
+    
+   
+
+    TMVA::Reader *readerVtx = new TMVA::Reader( "!Color:Silent" );
+
+   // readerVtx->AddVariable( "mva_Vtx_nTrks",   &mva_V_nTrks);
+   readerVtx->AddVariable( "mva_Vtx_NChi2",   &mva_V_chi);
+   // readerVtx->AddVariable( "mva_Vtx_step",    &mva_V_step);
+   readerVtx->AddVariable( "mva_Vtx_r",       &mva_V_r);
+   readerVtx->AddVariable( "mva_Vtx_z",       &mva_V_z);
+   readerVtx->AddVariable( "mva_Vtx_MTW",     &mva_V_MTW);
+   readerVtx->AddVariable( "mva_Vtx_Mass",    &mva_V_Mass);
+   // readerVtx->AddVariable( "mva_Hemi_Mass",   &mva_H_Mass);
+   // readerVtx->AddVariable( "mva_Vtx_dist",     &mva_V_dist);
+   // readerVtx->AddVariable( "mva_Vtx_ntrk10",  &mva_V_ntrk10);
+   // readerVtx->AddVariable( "mva_Vtx_ntrk20",  &mva_V_ntrk20);
+   readerVtx->AddVariable( "mva_Vtx_MeanDCA", &mva_V_MeanDCA);
+
+   readerVtx->BookMVA( "BDTG", "/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/BDT_2VTX_18_06_2025_TrainingvF_ctau100.xml"); // root 6.14/09, care compatiblity of versions for tmva
+
+   // -----------------------
+    TMVA::Reader *readerVtx_EVT = new TMVA::Reader( "!Color:Silent" );
+   // readerVtx_EVT->AddVariable( "mva_Vtx1_step",    &mva_V1_step);
+   readerVtx_EVT->AddVariable( "mva_Vtx1_NChi2",   &mva_V1_chi);
+   readerVtx_EVT->AddVariable( "mva_Vtx1_r",       &mva_V1_r);
+   readerVtx_EVT->AddVariable( "mva_Vtx1_z",       &mva_V1_z);
+   readerVtx_EVT->AddVariable( "mva_Vtx1_MTW",     &mva_V1_MTW);
+   readerVtx_EVT->AddVariable( "mva_Vtx1_Mass",    &mva_V1_Mass);
+   readerVtx_EVT->AddVariable( "mva_Vtx1_MeanDCA", &mva_V1_MeanDCA);
+   // readerVtx_EVT->AddVariable( "mva_Vtx2_step",    &mva_V2_step);
+   readerVtx_EVT->AddVariable( "mva_Vtx2_NChi2",   &mva_V2_chi);
+   readerVtx_EVT->AddVariable( "mva_Vtx2_r",       &mva_V2_r);
+   readerVtx_EVT->AddVariable( "mva_Vtx2_z",       &mva_V2_z);
+   readerVtx_EVT->AddVariable( "mva_Vtx2_MTW",     &mva_V2_MTW);
+   readerVtx_EVT->AddVariable( "mva_Vtx2_Mass",    &mva_V2_Mass);
+   readerVtx_EVT->AddVariable( "mva_Vtx2_MeanDCA", &mva_V2_MeanDCA);
+
+   readerVtx_EVT->BookMVA( "BDTG", "/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/BDT_EVT2VTX_18_06_2025_TrainingvF_ctau100_NoStep.xml"); // root 6.14/09, care compatiblity of versions for tmva
+
+    
+           //---------------------------------------------------------------------------//
+      // !! ----------------------------- Scale Factors---------------------------------//
+      //---------------------------------------------------------------------------//
+
+     // Where L1 is always a muon and L2 is either a muon for the dimuon channel or a
+   // an electron for the Emu channel
+   TFile*            fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.root");
+   TFile*            fL1_ID_SF= new TFile("../../Scale_factors/Muon/Efficiencies_muon_generalTracks_Z_Run2018_UL_ID.root");
+   TFile*           fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Efficiencies_muon_generalTracks_Z_Run2018_UL_ISO.root");
+   TFile*           fL2_ISO_SF= new TFile("../../Scale_factors/Muon/Efficiencies_muon_generalTracks_Z_Run2018_UL_ISO.root");
+   // $$$$$ Changer les noms des fichiers
+   TFile*           fL2_Reco_SF= new TFile("../../Scale_factors/Electron/egammaEffi_ptAbove20.txt_EGM2D_UL2018.root");
+   TFile*            fL2_Reco_SF2= new TFile("../../Scale_factors/Electron/egammaEffi_ptBelow20.txt_EGM2D_UL2018.root");
+   TFile*            fL2_ID_SF= new TFile("../../Scale_factors/Electron/egammaEffi.txt_Ele_Tight_EGM2D_U18.root");
+   TFile*            fL1L2_TRG_SF= new TFile("../../Scale_factors/Electron/Top_trigger_group/TriggerSF_2018_ULv2.root");
+   TFile*            fL1_TRG_SF = new TFile("../../Scale_factors/Muon/DoubleMuon_2018/NUM_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_DEN_MiniIsoTight_and_TightID_abseta_pt.root");
+      
+   TFile*            fL1L2_TRG_SFerr = new TFile("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/Scale_factors/Trig_2018/trigSF_2Derr.root");
+
+   TFile*            fEle_SF = new TFile("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/DATAMCREADER/EMU/hRatioCor.root");
+   TH1F*             hEle_SF = (TH1F*)(fEle_SF->Get("hRatio"));
+
+   TFile*            fEle_2DSF = new TFile("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/DATAMCREADER/EMU/2DSFele.root");
+   TH2F*             hEle_2DSF = (TH2F*)(fEle_2DSF->Get("h_ratio"));
+
+
+fL1_Reco_SF->Close();
+fL1_ID_SF->Close();
+fL1_ISO_SF->Close();
+fL2_ISO_SF->Close();
+fL2_Reco_SF->Close();
+fL2_ID_SF->Close();
+fL1L2_TRG_SFerr->Close();
+fL1L2_TRG_SF->Close();
+
+   TH2F *fh2DL1_ID_SF1;//
+   TH2F *fh2DL2_ID_SF1;
+   TH2F *fh2DL1_ID_SF1err;//
+   TH2F *fh2DL2_ID_SF1err;
+
+
+   TH2F *fh2DL1_ISO_SF1;
+   TH2F *fh2DL2_ISO_SF1;
+   TH2F *fh2DL1_ISO_SF1err;
+   TH2F *fh2DL2_ISO_SF1err;
+TH2F *fh2DL2_Reco_SF1err;
+   TH2F *fh2DL1_Reco_SF1;
+   TH2F *fh2DL2_Reco_SF1;
+
+   
+   TH2F *fhL1L2_TRG_SF; // x- axiss pt and y axis pt  
+   TH2F *fhL1L2_TRG_SFerr; // x- axiss pt and y axis pt 
+
+
+   int MuMu = Channel; // Emu = 0 ; SingleMuon = 1; DiMuon = 2
+   
+
+   if (MuMu == 0 && isMC)
+      {
+         if (Year == 2018)
+            {
+               // cout<< " 2018 year="<<endl;
+               fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.root");
+               fL1_ID_SF= new TFile("../../Scale_factors/Muon/Run2018_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
+               fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Run2018_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
+
+               fL2_Reco_SF= new TFile("../../Scale_factors/Electron/egammaEffi_ptAbove20.txt_EGM2D_UL2018.root");
+               fL2_ISO_SF= new TFile("../../Scale_factors/Electron/egammaEffi_ptBelow20.txt_EGM2D_UL2018.root");
+               fL2_ID_SF= new TFile("../../Scale_factors/Electron/egammaEffi.txt_Ele_Tight_EGM2D_U18.root");
+
+               fL1L2_TRG_SF= new TFile("../../Scale_factors/Trig_2018/trigSF_2D.root");
+               fL1L2_TRG_SFerr = new TFile("../../Scale_factors/Trig_2018/trigSF_2Derr.root");
+
+            }
+         if(Year == 2017)
+            {
+               //cout<<" year 2017"<<endl;
+               fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.root");
+               fL1_ID_SF= new TFile("../../Scale_factors/Muon/Run2017_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
+               fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Run2017_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
+               
+               fL2_Reco_SF= new TFile("../../Scale_factors/Electron/egammaEffi_ptAbove20.txt_EGM2D_UL2017.root");
+               fL2_ISO_SF= new TFile("../../Scale_factors/Electron/egammaEffi_ptBelow20.txt_EGM2D_UL2017.root");
+               fL2_ID_SF= new TFile("../../Scale_factors/Electron/egammaEffi.txt_EGM2D_Tight_UL17.root");
+
+               // fL1L2_TRG_SF= new TFile("../Scale_factors/Electron/Top_trigger_group/TriggerSF_2018_ULv2.root");
+               fL1L2_TRG_SF= new TFile("../../Scale_factors/Trig_2018/trigSF_2D.root");
+               fL1L2_TRG_SFerr = new TFile("../../Scale_factors/Trig_2017/trigSF_2Derr.root");
+            }
+         if(Year == 2016)
+            {
+               if (isPostAPV){
+                  //cout<<" post 2016="<<endl;
+                  // fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2016postVFP_UL_trackerMuon.root");
+                  // fL1_ID_SF= new TFile("../../Scale_factors/Muon/Efficiencies_muon_generalTracks_Z_Run2016_UL_ID.root");
+                  // fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Efficiencies_muon_generalTracks_Z_Run2016_UL_ISO.root");
+
+                  fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2016postVFP_UL_trackerMuon.root");
+                  fL1_ID_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
+                  fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
+
+                  fL2_Reco_SF= new TFile("../../Scale_factors/Electron/egammaEffi_ptAbove20.txt_EGM2D_UL2016postVFP.root");
+                  fL2_ISO_SF= new TFile("../../Scale_factors/Electron/egammaEffi_ptBelow20.txt_EGM2D_UL2016postVFP.root");
+                  fL2_ID_SF= new TFile("../../Scale_factors/Electron/egammaEffi.txt_Ele_Tight_postVFP_EGM2D.root");
+
+
+                  // fL1L2_TRG_SF= new TFile("../Scale_factors/Electron/Top_trigger_group/TriggerSF_2016postVFP_ULv2.root");
+                  fL1L2_TRG_SF= new TFile("../../Scale_factors/Trig_2016/trigSF_2D.root");
+                  fL1L2_TRG_SFerr = new TFile("../../Scale_factors/Trig_2016/trigSF_2Derr.root");
+
+               }
+               else{
+                  // cout<<" pre  2016="<<endl;
+                  // fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2016preVFP_UL_trackerMuon.root");
+                  // fL1_ID_SF= new TFile("../../Scale_factors/Muon/Efficiencies_muon_generalTracks_Z_Run2016_UL_HIPM_ID.root");
+                  // fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Efficiencies_muon_generalTracks_Z_Run2016_UL_HIPM_ISO.root");
+
+                  fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2016preVFP_UL_trackerMuon.root");
+                  fL1_ID_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
+                  fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
+                  
+                  fL2_Reco_SF= new TFile("../../Scale_factors/Electron/egammaEffi_ptAbove20.txt_EGM2D_UL2016preVFP.root");
+                  fL2_ISO_SF= new TFile("../../Scale_factors/Electron/egammaEffi_ptBelow20.txt_EGM2D_UL2016preVFP.root");
+                  fL2_ID_SF= new TFile("../../Scale_factors/Electron/egammaEffi.txt_Ele_Tight_preVFP_EGM2D.root");
+
+
+                  // fL1L2_TRG_SF= new TFile("../Scale_factors/Electron/Top_trigger_group/TriggerSF_2016preVFP_ULv2.root");
+                  fL1L2_TRG_SF= new TFile("../../Scale_factors/Trig_2016/trigSF_2D.root");
+                  fL1L2_TRG_SFerr = new TFile("../../Scale_factors/Trig_2016/trigSF_2Derr.root");
+               }
+               
+            }// else 2016
+
+         fh2DL1_Reco_SF1 = (TH2F*)(fL1_Reco_SF->Get("NUM_TrackerMuons_DEN_genTracks"));
+         fh2DL1_ID_SF1 = (TH2F*)(fL1_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt"));//
+         
+         fh2DL1_ISO_SF1 = (TH2F*)(fL1_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt"));
+         //$$$$ 
+         fh2DL2_Reco_SF1 = (TH2F*)(fL2_Reco_SF->Get("EGamma_SF2D"));
+         fh2DL2_ISO_SF1 = (TH2F*)(fL2_ISO_SF->Get("EGamma_SF2D"));
+         fh2DL2_ID_SF1 = (TH2F*)(fL2_ID_SF->Get("EGamma_SF2D"));
+         
+         fh2DL1_ID_SF1err  = (TH2F*)(fL1_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt_combined_syst"));//
+         fh2DL1_ISO_SF1err  = (TH2F*)(fL1_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt_combined_syst"));
+         
+         fh2DL2_ID_SF1err  = (TH2F*)(fL2_ID_SF->Get("statMC"));
+         fh2DL2_ISO_SF1err  = (TH2F*)(fL2_ISO_SF->Get("statMC"));
+         fh2DL2_Reco_SF1err = (TH2F*)(fL2_Reco_SF->Get("statMC"));
+
+
+         // fhL1L2_TRG_SF = (TH2F*)(fL1L2_TRG_SF->Get("h2D_SF_emu_lepABpt_FullError")); // x- axiss pt and y axis pt 
+         TCanvas* c1 =  (TCanvas*)fL1L2_TRG_SF->Get("c1");
+         TCanvas* c2 = (TCanvas*)fL1L2_TRG_SFerr->Get("c1");
+
+
+         if (c1) {
+            // Récupérer le premier TPad (ou cherche un spécifique si tu connais son nom)
+            TPad *pad = (TPad*)c1->GetListOfPrimitives()->FindObject("pad1");
+
+            if (pad) {
+               // Récupérer le TH2F à l'intérieur du TPad
+               fhL1L2_TRG_SF = (TH2F*)pad->GetListOfPrimitives()->FindObject("hSF");
+               //  pad->ls();
+               if (fhL1L2_TRG_SF) {
+                     std::cout << "TH2F trouvé: " << fhL1L2_TRG_SF->GetName() << std::endl;
+                     // h2->Draw("COLZ");  // Exemple d'utilisation
+               } else {
+                     std::cout << "Aucun TH2F trouvé dans le TPad." << std::endl;
+               }
+            } else {
+               std::cout << "TPad introuvable dans le canvas." << std::endl;
+            }
+         } else {
+            std::cout << "Canvas introuvable." << std::endl;
+         }
+
+         if (c2) {
+            // Récupérer le premier TPad (ou cherche un spécifique si tu connais son nom)
+            TPad *pad = (TPad*)c2->GetListOfPrimitives()->FindObject("pad1");
+            // pad->ls();
+            if (pad) {
+               // Récupérer le TH2F à l'intérieur du TPad
+               fhL1L2_TRG_SFerr = (TH2F*)pad->GetListOfPrimitives()->FindObject("hSFerr");
+
+               if (fhL1L2_TRG_SFerr) {
+                     std::cout << "TH2F 2 trouvé: " << fhL1L2_TRG_SFerr->GetName() << std::endl;
+                     // h2->Draw("COLZ");  // Exemple d'utilisation
+               } else {
+                     std::cout << "Aucun TH2F trouvé dans le TPad2." << std::endl;
+               }
+            } else {
+               std::cout << "TPad2 introuvable dans le canvas2." << std::endl;
+            }
+         } else {
+            std::cout << "Canvas 2 introuvable." << std::endl;
+         }
+
+         // delete c1; delete c2;
+      }
+   else if (MuMu > 0 && isMC) // SingleMuon or DiMuon
+      {
+         if (Year == 2018)
+            {
+               //cout<< " 2018 year="<<endl;
+               fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.root");
+               fL1_ID_SF= new TFile("../../Scale_factors/Muon/Run2018_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
+               fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Run2018_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
+               
+               fL2_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.root");
+               fL2_ID_SF= new TFile("../../Scale_factors/Muon/Run2018_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
+               fL2_ISO_SF= new TFile("../../Scale_factors/Muon/Run2018_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
+
+               fL1L2_TRG_SF = new TFile("../../Scale_factors/Muon/Run2018_UL/NUM_Trigger_DEN_MiniIsoTight/NUM_Trigger_DEN_MiniIsoTight_abseta_pt.root");
+               fL1L2_TRG_SFerr = new TFile("../../Scale_factors/Muon/Run2018_UL/NUM_Trigger_DEN_MiniIsoTight/NUM_Trigger_DEN_MiniIsoTight_abseta_pt.root");
+
+               // histos associated to files
+               fh2DL1_Reco_SF1 = (TH2F*)(fL1_Reco_SF->Get("NUM_TrackerMuons_DEN_genTracks"));
+               fh2DL2_Reco_SF1 = (TH2F*)(fL2_Reco_SF->Get("NUM_TrackerMuons_DEN_genTracks"));
+
+               fh2DL1_ID_SF1 = (TH2F*)(fL1_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt"));//
+               fh2DL2_ID_SF1 = (TH2F*)(fL2_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt"));
+               fh2DL1_ID_SF1err  = (TH2F*)(fL1_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt_combined_syst"));//
+               fh2DL2_ID_SF1err  = (TH2F*)(fL2_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt_combined_syst"));
+
+
+               fh2DL1_ISO_SF1 = (TH2F*)(fL1_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt"));
+               fh2DL2_ISO_SF1 = (TH2F*)(fL2_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt"));
+               fh2DL1_ISO_SF1err  = (TH2F*)(fL1_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt_combined_syst"));
+               fh2DL2_ISO_SF1err  = (TH2F*)(fL2_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt_combined_syst"));
+         
+               fhL1L2_TRG_SF = (TH2F*)(fL1L2_TRG_SF->Get("NUM_Trigger_DEN_MiniIsoTight_abseta_pt")); // x- axiss pt and y axis pt 
+               fhL1L2_TRG_SFerr = (TH2F*)(fL1L2_TRG_SFerr->Get("NUM_Trigger_DEN_MiniIsoTight_abseta_pt_combined_syst"));
+
+            }
+         if(Year == 2017)
+            {
+               //cout<<" year 2017"<<endl;
+               fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.root");
+               fL1_ID_SF= new TFile("../../Scale_factors/Muon/Run2017_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
+               fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Run2017_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
+               
+               fL2_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.root");
+               fL2_ID_SF= new TFile("../../Scale_factors/Muon/Run2017_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
+               fL2_ISO_SF= new TFile("../../Scale_factors/Muon/Run2017_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
+
+               fL1L2_TRG_SF = new TFile("../../Scale_factors/Muon/Run2017_UL/NUM_Trigger_DEN_MiniIsoTight/NUM_Trigger_DEN_MiniIsoTight_abseta_pt.root");
+               fL1L2_TRG_SFerr = new TFile("../../Scale_factors/Muon/Run2017_UL/NUM_Trigger_DEN_MiniIsoTight/NUM_Trigger_DEN_MiniIsoTight_abseta_pt.root");
+               // histos associated to files
+
+               fh2DL1_Reco_SF1 = (TH2F*)(fL1_Reco_SF->Get("NUM_TrackerMuons_DEN_genTracks"));
+               fh2DL2_Reco_SF1 = (TH2F*)(fL2_Reco_SF->Get("NUM_TrackerMuons_DEN_genTracks"));
+
+               fh2DL1_ID_SF1 = (TH2F*)(fL1_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt"));//
+               fh2DL2_ID_SF1 = (TH2F*)(fL2_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt"));
+               fh2DL1_ID_SF1err  = (TH2F*)(fL1_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt_combined_syst"));//
+               fh2DL2_ID_SF1err  = (TH2F*)(fL2_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt_combined_syst"));
+
+               fh2DL1_ISO_SF1 = (TH2F*)(fL1_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt"));
+               fh2DL2_ISO_SF1 = (TH2F*)(fL2_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt"));
+               fh2DL1_ISO_SF1err  = (TH2F*)(fL1_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt_combined_syst"));
+               fh2DL2_ISO_SF1err  = (TH2F*)(fL2_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt_combined_syst"));
+
+               fhL1L2_TRG_SF = (TH2F*)(fL1L2_TRG_SF->Get("NUM_Trigger_DEN_MiniIsoTight_abseta_pt")); // x- axiss pt and y axis pt 
+               //$$$$ 
+
+               fhL1L2_TRG_SFerr = (TH2F*)(fL1L2_TRG_SFerr->Get("NUM_Trigger_DEN_MiniIsoTight_abseta_pt_combined_syst"));
+
+
+
+            }
+         if(Year == 2016)
+            {
+               if (isPostAPV){
+                  //cout<<" post 2016="<<endl;
+                  fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2016postVFP_UL_trackerMuon.root");
+                  fL1_ID_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
+                  fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
+                  
+                  fL2_Reco_SF =  new TFile("../../Scale_factors/Muon/Run2016_UL/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.root");
+                  fL2_ID_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
+                  fL2_ISO_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
+
+                  fL1L2_TRG_SF = new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_Trigger_DEN_MiniIsoTight/NUM_Trigger_DEN_MiniIsoTight_abseta_pt.root");
+                  fL1L2_TRG_SFerr = new TFile("../../Scale_factors/Muon/Run2017_UL/NUM_Trigger_DEN_MiniIsoTight/NUM_Trigger_DEN_MiniIsoTight_abseta_pt.root");
+
+
+
+               // histos associated to files
+
+               }
+               else{
+                  // cout<<" pre  2016="<<endl;
+                  fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2016preVFP_UL_trackerMuon.root");
+                  fL1_ID_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
+                  fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
+                  
+                  fL2_Reco_SF =  new TFile("../../Scale_factors/Muon/Run2016_UL/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.root");
+                  fL2_ID_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
+                  fL2_ISO_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
+
+                  fL1L2_TRG_SF = new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_Trigger_DEN_MiniIsoTight/NUM_Trigger_DEN_MiniIsoTight_abseta_pt.root");
+                  fL1L2_TRG_SFerr = new TFile("../../Scale_factors/Muon/Run2017_UL/NUM_Trigger_DEN_MiniIsoTight/NUM_Trigger_DEN_MiniIsoTight_abseta_pt.root");
+                  // histos associated to files
+
+               }
+               
+               // histos associated to files
+               fh2DL1_Reco_SF1 = (TH2F*)(fL1_Reco_SF->Get("NUM_TrackerMuons_DEN_genTracks"));
+               fh2DL2_Reco_SF1 = (TH2F*)(fL2_Reco_SF->Get("NUM_TrackerMuons_DEN_genTracks"));
+
+               fh2DL1_ID_SF1 = (TH2F*)(fL1_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt"));//
+               fh2DL2_ID_SF1 = (TH2F*)(fL2_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt"));
+               fh2DL1_ID_SF1err  = (TH2F*)(fL1_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt_combined_syst"));//
+               fh2DL2_ID_SF1err  = (TH2F*)(fL2_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt_combined_syst"));
+
+               fh2DL1_ISO_SF1 = (TH2F*)(fL1_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt"));
+               fh2DL2_ISO_SF1 = (TH2F*)(fL2_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt"));
+               fh2DL1_ISO_SF1err  = (TH2F*)(fL1_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt_combined_syst"));
+               fh2DL2_ISO_SF1err  = (TH2F*)(fL2_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt_combined_syst"));
+
+
+               fhL1L2_TRG_SF = (TH2F*)(fL1L2_TRG_SF->Get("NUM_Trigger_DEN_MiniIsoTight_abseta_pt")); // x- axiss pt and y axis pt 
+               fhL1L2_TRG_SFerr = (TH2F*)(fL1L2_TRG_SFerr->Get("NUM_Trigger_DEN_MiniIsoTight_abseta_pt_combined_syst"));
+               //$$$$ 
+            }// else 2016
+      }
+      //---------------------------------------------------------------------------//
+      // !! ----------------------------- End of Scale Factors---------------------------------//
+      //---------------------------------------------------------------------------//
+   double norm = 1.;
+   if (!Signal && isMC)
+      {
+         TString hNorma = "hEvents_with_gen_wt";
+         TFile* f1_DY= new TFile("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"+Prod+"/"+sample+".root");
+         f1_DY->cd("");
+         
+         TDirectory* dir = f1_DY->GetDirectory("FlyingTop");
+         if (dir) {
+            dir->cd();  // Change to this directory if needed
+            // Now you can access histograms, trees, etc. from the directory
+               TH1D*  e1_DY = (TH1D*)gROOT->FindObject(hNorma);
+            e1_DY->Sumw2();
+            if  ( e1_DY->GetEntries() > 0 ) norm =  e1_DY->GetEntries();
+         std::cout<<"norm : "<<norm<<std::endl;
+         }
+         f1_DY->Close();
+      }
+
+  Long64_t nbytes = 0, nb = 0;
+  cout<< "Line : "  << __LINE__ << " " << nentries2 << endl; 
+  // Normalisation factor (XS)
+
+   float XS = 1;
+   float XS_up = 1.;
    float XS_down = 1.;
-if (thesample.Contains("DYJetsToLL_M-10to50"))                     { XS = 22635;   }//15910
-if (thesample.Contains("DYJetsToLL_M-50"))                         { XS = 6225.4;      }//5379.0;   }
-if (thesample.Contains("ST_tW_antitop_5f_NoFullyHadronicDecays")) { XS = 21.6;   }//ok
-if (thesample.Contains("ST_tW_top_5f_NoFullyHadronicDecays"))     { XS = 21.6;   }//ok
-if (thesample.Contains("TTJets_DiLept"))                          { XS = 53.07;     }
-if (thesample.Contains("WWTo2L2Nu_MLL_200To600"))                 { XS = 11.09;     }//ok
-if (thesample.Contains("WWTo2L2Nu_MLL_600To1200"))                { XS = 11.09;     }//ok
-if (thesample.Contains("WWTo2L2Nu"))                              { XS = 11.09;     }//ok
-if (thesample.Contains("WZTo2Q2L_mllmin4p0"))                     { XS = 6.535;     }//ok
-if (thesample.Contains("ZZTo2Q2L_mllmin4p0"))                     { XS = 3.676;     }//ok
-if (thesample.Contains("TTTo2L2Nu"))                              { XS = 88.5;      }//ok
-if (thesample.Contains("ttWJetsToLNu_5f_EWK"))                    { XS = 0.290;     }//ok // not found on XSDB, no file on tier2...approximation
+
+   double NormFactor=1;
+   double top_pt_wt=1;
+   double Pref_PU_gen_wt=1;
+
+   double NormFactor_mu=1;
+   double NormFactor_mu2 =1;
+   double NormFactor_ele=1;
+
+   float NormFactorLumiUp = 1.;
+   float NormFactorLumi = 1.;
+   float NormFactorLumiDown = 1.;   
+
+   float NormFactorXSUp = 1.;
+   float NormFactorXS = 1.;
+   float NormFactorXSDown = 1.;
+
+   float Lumi = 59700.;
+   float LumiUp = 66000.0;
+   float LumiDown = 55000.0;
+
+   LumiWeights LUMI(Year);
+
+   // the year is taken into account at the creation of the instance of LumiWeights
+   // Uncertainties are taken year by year (and not for the full run 2, see LUMIPOG)
+   Lumi = LUMI.GetLumi();
+   LumiUp = LUMI.GetLumiUp();
+   LumiDown = LUMI.GetLumiDown();
+
+   int MSmuon = 0;
+   float FracEffEvent = 1.;
+   if (thesample.Contains("DYJetsToLL_M-10to50"))                     { XS = 22635; FracEffEvent = 1.;   }//ok : 15910 :https://doi.org/10.48550/arXiv.2402.08486
+   if (thesample.Contains("DYJetsToLL_M-50"))                         { XS = 6225.4;  FracEffEvent = 1.;     }//5379.0;  ok  }https://doi.org/10.48550/arXiv.2402.08486
+   if (thesample.Contains("ST_tW_antitop_5f_NoFullyHadronicDecays")) { XS = 21.6;  FracEffEvent = 1.;  }//21.6 ok
+   if (thesample.Contains("ST_tW_top_5f_NoFullyHadronicDecays"))     { XS = 21.6;  FracEffEvent = 1.;  }//21.6 ok
+   if (thesample.Contains("TTJets_DiLept"))                          { XS = 53.07;     }//don't care
+   if (thesample.Contains("TTJets"))                          { XS = 831.76;  FracEffEvent = 0.362;   }//don't care
+   if (thesample.Contains("TTTo2L2Nu"))                              { XS = 88.5;  FracEffEvent = 0.993;    }// TOP 20 -006 : 88.9
+   if (thesample.Contains("TTToSemiLeptonic") )                      { XS = 366.3;  FracEffEvent = 0.993;  }// TOP 20 -006 :366.6
+      if (thesample.Contains("TTToHadronic"))                           { XS = 378.9;     }// TOP 20 -006 :377.6
+   if (thesample.Contains("WWTo2L2Nu"))                              { XS = 11.09;  FracEffEvent = 0.997;    }
+   if (thesample.Contains("WZTo2Q2L_mllmin4p0"))                     { XS = 6.535;  FracEffEvent = 0.583;   }
+   if (thesample.Contains("ZZTo2Q2L_mllmin4p0"))                     { XS = 3.676;  FracEffEvent = 0.612;   }
+   if (thesample.Contains("ttWJetsToLNu_5f_EWK"))                    { XS = 0.290;  FracEffEvent = 0.551;   } // not found on XSDB, no file on tier2...approximation
       //Took 0.868 pb (CMS-TOP-21-011)
-     // as a starting point and then divided by 3 (lepton universality)
-if (thesample.Contains("TTZToLL_5f"))                             { XS = 0.05188;   }//ok//Not found on XSDB => used ana.py macro : 5.188e-02 +- 2.437e-04 pb
-if (thesample.Contains("TTToHadronic"))                           { XS = 377.9;     }//ok
-if (thesample.Contains("TTWW"))                                   { XS = 0.006992;  }//found on XSDB
-if (thesample.Contains("TTToSemiLeptonic")  )                      { XS = 365.34;    }//ok
-
-
-// float ReScaleXS = 1.0;
-//  float xsec_DY[2], xsec_TT[3], xsec_ST[2], xsec_TTV[3], xsec_VV[3]; 
-//  xsec_DY[0] = ReScaleXS*18610; xsec_DY[1] = ReScaleXS*6077.0;
-//  xsec_TT[0] = ReScaleXS*88.3; xsec_TT[1] = ReScaleXS*365.3; xsec_TT[2] = ReScaleXS*378.0;
-//  xsec_ST[0] = ReScaleXS*32.51; xsec_ST[1] = ReScaleXS*32.45;
-//  xsec_TTV[0] = ReScaleXS*0.29; xsec_TTV[1] = ReScaleXS*0.052; xsec_TTV[2] =  ReScaleXS*0.0070;
-//  xsec_VV[0] = ReScaleXS*11.09; xsec_VV[1] = ReScaleXS*6.57; xsec_VV[2] = ReScaleXS*3.68;
+   // as a starting point and then divided by 3 (lepton universality)
+   if (thesample.Contains("TTZToLL_5f"))                             { XS = 0.253 ;FracEffEvent = 1.;   }// !!  0.253 Not found on XSDB => used ana.py macro : 0.05188  +- 2.437e-04 pb
+   if (thesample.Contains("TTWW"))                                   { XS = 0.006992; FracEffEvent = 1.; }//found on XSDB
+   if (thesample.Contains("ST_t-channel_antitop_5f_InclusiveDecays")) {XS = 80.95; FracEffEvent = 0.995;}
+   if (thesample.Contains("ST_t-channel_top_5f_InclusiveDecays")) {XS = 136.02;FracEffEvent = 0.995;}
+   //Signal
+   if (thesample.Contains("smu200")) { XS = 0.01; MSmuon = 200;   }
+   if (thesample.Contains("smu250")) { XS = 0.0045; MSmuon = 250; }
+   if (thesample.Contains("smu300")) { XS = 0.002; MSmuon = 300; }
+   if (thesample.Contains("smu350")) { XS = 0.001; MSmuon = 350; }
+   if (thesample.Contains("smu400")) { XS = 0.0006; MSmuon = 400;}
+   if (thesample.Contains("smu450")) { XS = 0.0004; MSmuon = 450;}
+   if (thesample.Contains("smu500")) { XS = 0.00025;MSmuon = 500;}
 
 // Signla XS are given in fb
+
 PDFWeight PDFW(mixing);
 
 if (thesample.Contains("smu200"))
@@ -208,44 +684,18 @@ if (thesample.Contains("smu200"))
     }
 
 
-   float NormFactor1 = 1;
 
-   double NormFactor=1;
-   double top_pt_wt=1;
-   double Pref_PU_gen_wt=1;
-
-   double NormFactor_mu=1;
-   double NormFactor_mu2 =1;
-   double NormFactor_ele=1;
-
-   float NormFactorLumiUp = 1.;
-   float NormFactorLumi = 1.;
-   float NormFactorLumiDown = 1.;   
-
-   float NormFactorXSUp = 1.;
-   float NormFactorXS = 1.;
-   float NormFactorXSDown = 1.;
-
-   float Lumi = 59700.;
-   float LumiUp = 66000.0;
-   float LumiDown = 55000.0;
-   LumiWeights LUMI(Year);
-
-   // the year is taken into account at the creation of the instance of LumiWeights
-   // Uncertainties are taken year by year (and not for the full run 2, see LUMIPOG)
-   Lumi = LUMI.GetLumi();
-   LumiUp = LUMI.GetLumiUp();
-   LumiDown = LUMI.GetLumiDown();
 
   if (!isMC)//<=> Data
     {
-      NormFactorLumi = 1;
+      NormFactorLumi = 1;   
       NormFactorLumiUp = 1.;  
       NormFactorLumiDown = 1.;    
 
-      NormFactorXS = 1;  
+      NormFactorXS = 1;   
       NormFactorXSUp = 1.;  
-      NormFactorXSDown = 1.;                                                                                                                                                               
+      NormFactorXSDown = 1.;   
+                                                                                                                                                               
     }
   else{
       NormFactorLumi =  XS*Lumi;  
@@ -256,322 +706,15 @@ if (thesample.Contains("smu200"))
       NormFactorXSUp = XS_up*Lumi;
       NormFactorXSDown = XS_down*Lumi;
    }
-
-  // !! -- Parameters -- !! //
-   // // std::cout<<"Mixing : "<<mixing<<std::endl;
-   // // std::cout<<"Msmuon : "<<MSmuon<<std::endl;
-   bool BlindSR = false;
-   float Nevent = 0;
-   bool signal = Signal;
-   int allevents = 0;
-   double lowHpt = 20.;
-   double LT = 0.;
-   // nentries = 1;
-
-   double nFilterEvt = 0;
-   double nFilterJet = 0;
-   double nFilternHemi = 0;
-   double nFilterHpt = 0;
-
-   double nRecoVertex = 0;
-   double nReco1Vertex = 0;
-   double nReco1TightVertex = 0;
-   double nReco2Vertex = 0;
-   double nReco2TightVertex = 0;
-   double nRecoTightVertex = 0;
-   double nRecoLooseVertex = 0;
-
-   bool showoutput = false;
-  // !! -- END OF Parameters -- !! //
-  
-
-     
-      //---------------------------------------------------------------------------//
-      // !! ----------------------------- Scale Factors---------------------------------//
-      //---------------------------------------------------------------------------//
-
-     // Where L1 is always a muon and L2 is either a muon for the dimuon channel or a
-   // an electron for the Emu channel
-   TFile*            fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.root");
-   TFile*            fL1_ID_SF= new TFile("../../Scale_factors/Muon/Efficiencies_muon_generalTracks_Z_Run2018_UL_ID.root");
-   TFile*           fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Efficiencies_muon_generalTracks_Z_Run2018_UL_ISO.root");
-   TFile*           fL2_ISO_SF= new TFile("../../Scale_factors/Muon/Efficiencies_muon_generalTracks_Z_Run2018_UL_ISO.root");
-   // $$$$$ Changer les noms des fichiers
-   TFile*           fL2_Reco_SF= new TFile("../../Scale_factors/Electron/egammaEffi_ptAbove20.txt_EGM2D_UL2018.root");
-   TFile*            fL2_Reco_SF2= new TFile("../../Scale_factors/Electron/egammaEffi_ptBelow20.txt_EGM2D_UL2018.root");
-   TFile*            fL2_ID_SF= new TFile("../../Scale_factors/Electron/egammaEffi.txt_Ele_Tight_EGM2D_U18.root");
-   TFile*            fL1L2_TRG_SF= new TFile("../../Scale_factors/Electron/Top_trigger_group/TriggerSF_2018_ULv2.root");
-   TFile*            fL1_TRG_SF = new TFile("../../Scale_factors/Muon/DoubleMuon_2018/NUM_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8_DEN_MiniIsoTight_and_TightID_abseta_pt.root");
-   
-   
-   TFile*            fL1L2_TRG_SFerr = new TFile("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/Scale_factors/Trig_2018/trigSF_2Derr.root");
-
-
-
-   TFile*            fEle_SF = new TFile("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/DATAMCREADER/EMU/hRatioCor.root");
-   TH1F*             hEle_SF = (TH1F*)(fEle_SF->Get("hRatio"));
-
-   TFile*            fEle_2DSF = new TFile("/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/DATAMCREADER/EMU/2DSFele.root");
-   TH2F*             hEle_2DSF = (TH2F*)(fEle_2DSF->Get("h_ratio"));
-
-
-
-
-   TH2F *fh2DL1_ID_SF1;//
-   TH2F *fh2DL2_ID_SF1;
-   TH2F *fh2DL1_ID_SF1err;//
-   TH2F *fh2DL2_ID_SF1err;
-
-
-   TH2F *fh2DL1_ISO_SF1;
-   TH2F *fh2DL2_ISO_SF1;
-   TH2F *fh2DL1_ISO_SF1err;
-   TH2F *fh2DL2_ISO_SF1err;
-
-   TH2F *fh2DL1_Reco_SF1;
-   TH2F *fh2DL2_Reco_SF1;
-
-   
-   TH2F *fhL1L2_TRG_SF; // x- axiss pt and y axis pt  
-   TH2F *fhL1L2_TRG_SFerr; // x- axiss pt and y axis pt 
-
-
-   int MuMu = Channel; // Emu = 0 ; SingleMuon = 1; DiMuon = 2
-   
-   if (MuMu == 0 && isMC)
-      {
-         if (Year == 2018)
-            {
-               //cout<< " 2018 year="<<endl;
-               fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.root");
-               fL1_ID_SF= new TFile("../../Scale_factors/Muon/Efficiencies_muon_generalTracks_Z_Run2018_UL_ID.root");
-               fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Efficiencies_muon_generalTracks_Z_Run2018_UL_ISO.root");
-               
-               fL2_Reco_SF= new TFile("../../Scale_factors/Electron/egammaEffi_ptAbove20.txt_EGM2D_UL2018.root");
-               fL2_ISO_SF= new TFile("../../Scale_factors/Electron/egammaEffi_ptBelow20.txt_EGM2D_UL2018.root");
-               fL2_ID_SF= new TFile("../../Scale_factors/Electron/egammaEffi.txt_Ele_Tight_EGM2D_U18.root");
-
-               // fL1L2_TRG_SF= new TFile("../Scale_factors/Electron/Top_trigger_group/TriggerSF_2018_ULv2.root");
-               fL1L2_TRG_SF= new TFile("../Scale_factors/Trig_2018/trigSF_2D.root");
-               fL1L2_TRG_SFerr = new TFile("../Scale_factors/Trig_2018/trigSF_2Derr.root");
-            }
-         if(Year == 2017)
-            {
-               //cout<<" year 2017"<<endl;
-               fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2017_UL_trackerMuon.root");
-               fL1_ID_SF= new TFile("../../Scale_factors/Muon/Efficiencies_muon_generalTracks_Z_Run2017_UL_ID.root");
-               fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Efficiencies_muon_generalTracks_Z_Run2017_UL_ISO.root");
-               
-               fL2_Reco_SF= new TFile("../../Scale_factors/Electron/egammaEffi_ptAbove20.txt_EGM2D_UL2017.root");
-               fL2_ISO_SF= new TFile("../../Scale_factors/Electron/egammaEffi_ptBelow20.txt_EGM2D_UL2017.root");
-               fL2_ID_SF= new TFile("../../Scale_factors/Electron/egammaEffi.txt_EGM2D_Tight_UL17.root");
-
-               // fL1L2_TRG_SF= new TFile("../Scale_factors/Electron/Top_trigger_group/TriggerSF_2018_ULv2.root");
-               fL1L2_TRG_SF= new TFile("../Scale_factors/Trig_2018/trigSF_2D.root");
-               fL1L2_TRG_SFerr = new TFile("../Scale_factors/Trig_2017/trigSF_2Derr.root");
-            }
-         if(Year == 2016)
-            {
-               if (isPostAPV){
-                  //cout<<" post 2016="<<endl;
-                  fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2016postVFP_UL_trackerMuon.root");
-                  fL1_ID_SF= new TFile("../../Scale_factors/Muon/Efficiencies_muon_generalTracks_Z_Run2016_UL_ID.root");
-                  fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Efficiencies_muon_generalTracks_Z_Run2016_UL_ISO.root");
-
-                  fL2_Reco_SF= new TFile("../../Scale_factors/Electron/egammaEffi_ptAbove20.txt_EGM2D_UL2016postVFP.root");
-                  fL2_ISO_SF= new TFile("../../Scale_factors/Electron/egammaEffi_ptBelow20.txt_EGM2D_UL2016postVFP.root");
-                  fL2_ID_SF= new TFile("../../Scale_factors/Electron/egammaEffi.txt_Ele_Tight_postVFP_EGM2D.root");
-
-
-                  // fL1L2_TRG_SF= new TFile("../Scale_factors/Electron/Top_trigger_group/TriggerSF_2016postVFP_ULv2.root");
-                  fL1L2_TRG_SF= new TFile("../Scale_factors/Trig_2016/trigSF_2D.root");
-                  fL1L2_TRG_SFerr = new TFile("../Scale_factors/Trig_2016/trigSF_2Derr.root");
-
-               }
-               else{
-                  // cout<<" pre  2016="<<endl;
-                  fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2016preVFP_UL_trackerMuon.root");
-                  fL1_ID_SF= new TFile("../../Scale_factors/Muon/Efficiencies_muon_generalTracks_Z_Run2016_UL_HIPM_ID.root");
-                  fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Efficiencies_muon_generalTracks_Z_Run2016_UL_HIPM_ISO.root");
-                  
-                  fL2_Reco_SF= new TFile("../../Scale_factors/Electron/egammaEffi_ptAbove20.txt_EGM2D_UL2016preVFP.root");
-                  fL2_ISO_SF= new TFile("../../Scale_factors/Electron/egammaEffi_ptBelow20.txt_EGM2D_UL2016preVFP.root");
-                  fL2_ID_SF= new TFile("../../Scale_factors/Electron/egammaEffi.txt_Ele_Tight_preVFP_EGM2D.root");
-
-
-                  // fL1L2_TRG_SF= new TFile("../Scale_factors/Electron/Top_trigger_group/TriggerSF_2016preVFP_ULv2.root");
-                  fL1L2_TRG_SF= new TFile("../Scale_factors/Trig_2016_pre/trigSF_2D.root");
-                  fL1L2_TRG_SFerr = new TFile("../Scale_factors/Trig_2016_pre/trigSF_2Derr.root");
-               }
-               
-            }// else 2016
-
-         fh2DL1_Reco_SF1 = (TH2F*)(fL1_Reco_SF->Get("NUM_TrackerMuons_DEN_genTracks"));
-         fh2DL1_ID_SF1 = (TH2F*)(fL1_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt"));//
-         fh2DL1_ISO_SF1 = (TH2F*)(fL1_ISO_SF->Get("NUM_TightRelIso_DEN_TightIDandIPCut_abseta_pt"));
-         // fh2DL2_ISO_SF1 = (TH2F*)(fL2_ISO_SF->Get("NUM_probe_MiniIsoTight_DEN_probe_isTight_abseta_pt"));
-         //$$$$ 
-         fh2DL2_Reco_SF1 = (TH2F*)(fL2_Reco_SF->Get("EGamma_SF2D"));
-         fh2DL2_ISO_SF1 = (TH2F*)(fL2_ISO_SF->Get("EGamma_SF2D"));
-         fh2DL2_ID_SF1 = (TH2F*)(fL2_ID_SF->Get("EGamma_SF2D"));
-         
-
-         fh2DL1_ID_SF1err  = (TH2F*)(fL1_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt_syst"));//
-         fh2DL2_ID_SF1err  = (TH2F*)(fL2_ID_SF->Get("statMC"));
-         fh2DL1_ISO_SF1err  = (TH2F*)(fL1_ISO_SF->Get("NUM_TightRelIso_DEN_TightIDandIPCut_abseta_pt_syst"));
-         fh2DL2_ISO_SF1err  = (TH2F*)(fL2_ISO_SF->Get("statMC"));
-
-
-
-         // fhL1L2_TRG_SF = (TH2F*)(fL1L2_TRG_SF->Get("h2D_SF_emu_lepABpt_FullError")); // x- axiss pt and y axis pt 
-         fhL1L2_TRG_SF = (TH2F*)(fL1L2_TRG_SF->Get("c1")); // x- axiss pt and y axis pt 
-         fhL1L2_TRG_SFerr = (TH2F*)(fL1L2_TRG_SFerr->Get("c1")); // x- axiss pt and y axis pt 
-      }
-   else if (MuMu > 0 && isMC) // SingleMuon or DiMuon
-      {
-         if (Year == 2018)
-            {
-               //cout<< " 2018 year="<<endl;
-               fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.root");
-               fL1_ID_SF= new TFile("../../Scale_factors/Muon/Run2018_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
-               fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Run2018_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
-               
-               fL2_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.root");
-               fL2_ID_SF= new TFile("../../Scale_factors/Muon/Run2018_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
-               fL2_ISO_SF= new TFile("../../Scale_factors/Muon/Run2018_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
-
-               fL1L2_TRG_SF = new TFile("../../Scale_factors/Muon/Run2018_UL/NUM_Trigger_DEN_MiniIsoTight/NUM_Trigger_DEN_MiniIsoTight_abseta_pt.root");
-               fL1L2_TRG_SFerr = new TFile("../../Scale_factors/Muon/Run2018_UL/NUM_Trigger_DEN_MiniIsoTight/NUM_Trigger_DEN_MiniIsoTight_abseta_pt.root");
-
-               // histos associated to files
-               fh2DL1_Reco_SF1 = (TH2F*)(fL1_Reco_SF->Get("NUM_TrackerMuons_DEN_genTracks"));
-               fh2DL2_Reco_SF1 = (TH2F*)(fL2_Reco_SF->Get("NUM_TrackerMuons_DEN_genTracks"));
-
-               fh2DL1_ID_SF1 = (TH2F*)(fL1_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt"));//
-               fh2DL2_ID_SF1 = (TH2F*)(fL2_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt"));
-               fh2DL1_ID_SF1err  = (TH2F*)(fL1_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt_combined_syst"));//
-               fh2DL2_ID_SF1err  = (TH2F*)(fL2_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt_combined_syst"));
-
-
-               fh2DL1_ISO_SF1 = (TH2F*)(fL1_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt"));
-               fh2DL2_ISO_SF1 = (TH2F*)(fL2_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt"));
-               fh2DL1_ISO_SF1err  = (TH2F*)(fL1_ISO_SF->Get("NUM_TightRelIso_DEN_TightIDandIPCut_abseta_pt_combined_syst"));
-               fh2DL2_ISO_SF1err  = (TH2F*)(fL2_ISO_SF->Get("NUM_TightRelIso_DEN_TightIDandIPCut_abseta_pt_combined_syst"));
-         
-               fhL1L2_TRG_SF = (TH2F*)(fL1L2_TRG_SF->Get("NUM_Trigger_DEN_MiniIsoTight_abseta_pt")); // x- axiss pt and y axis pt 
-               fhL1L2_TRG_SFerr = (TH2F*)(fL1L2_TRG_SFerr->Get("NUM_Trigger_DEN_MiniIsoTight_abseta_pt_combined_syst"));
-
-            }
-         if(Year == 2017)
-            {
-               //cout<<" year 2017"<<endl;
-               fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.root");
-               fL1_ID_SF= new TFile("../../Scale_factors/Muon/Run2017_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
-               fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Run2017_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
-               
-               fL2_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.root");
-               fL2_ID_SF= new TFile("../../Scale_factors/Muon/Run2017_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
-               fL2_ISO_SF= new TFile("../../Scale_factors/Muon/Run2017_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
-
-               fL1L2_TRG_SF = new TFile("../../Scale_factors/Muon/Run2017_UL/NUM_Trigger_DEN_MiniIsoTight/NUM_Trigger_DEN_MiniIsoTight_abseta_pt.root");
-               fL1L2_TRG_SFerr = new TFile("../../Scale_factors/Muon/Run2017_UL/NUM_Trigger_DEN_MiniIsoTight/NUM_Trigger_DEN_MiniIsoTight_abseta_pt.root");
-               // histos associated to files
-
-               fh2DL1_Reco_SF1 = (TH2F*)(fL1_Reco_SF->Get("NUM_TrackerMuons_DEN_genTracks"));
-               fh2DL2_Reco_SF1 = (TH2F*)(fL2_Reco_SF->Get("NUM_TrackerMuons_DEN_genTracks"));
-
-               fh2DL1_ID_SF1 = (TH2F*)(fL1_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt"));//
-               fh2DL2_ID_SF1 = (TH2F*)(fL2_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt"));
-               fh2DL1_ID_SF1err  = (TH2F*)(fL1_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt_combined_syst"));//
-               fh2DL2_ID_SF1err  = (TH2F*)(fL2_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt_combined_syst"));
-
-               fh2DL1_ISO_SF1 = (TH2F*)(fL1_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt"));
-               fh2DL2_ISO_SF1 = (TH2F*)(fL2_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt"));
-               fh2DL1_ISO_SF1err  = (TH2F*)(fL1_ISO_SF->Get("NUM_TightRelIso_DEN_TightIDandIPCut_abseta_pt_combined_syst"));
-               fh2DL2_ISO_SF1err  = (TH2F*)(fL2_ISO_SF->Get("NUM_TightRelIso_DEN_TightIDandIPCut_abseta_pt_combined_syst"));
-
-               fhL1L2_TRG_SF = (TH2F*)(fL1L2_TRG_SF->Get("NUM_Trigger_DEN_MiniIsoTight_abseta_pt")); // x- axiss pt and y axis pt 
-               //$$$$ 
-
-               fhL1L2_TRG_SFerr = (TH2F*)(fL1L2_TRG_SFerr->Get("NUM_Trigger_DEN_MiniIsoTight_abseta_pt_combined_syst"));
-
-
-
-            }
-         if(Year == 2016)
-            {
-               if (isPostAPV){
-                  //cout<<" post 2016="<<endl;
-                  fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.root");
-                  fL1_ID_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
-                  fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
-                  
-                  fL2_Reco_SF =  new TFile("../../Scale_factors/Muon/Run2016_UL/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.root");
-                  fL2_ID_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
-                  fL2_ISO_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
-
-                  fL1L2_TRG_SF = new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_Trigger_DEN_MiniIsoTight/NUM_Trigger_DEN_MiniIsoTight_abseta_pt.root");
-                  fL1L2_TRG_SFerr = new TFile("../../Scale_factors/Muon/Run2017_UL/NUM_Trigger_DEN_MiniIsoTight/NUM_Trigger_DEN_MiniIsoTight_abseta_pt.root");
-
-
-
-               // histos associated to files
-
-               }
-               else{
-                  // cout<<" pre  2016="<<endl;
-                  fL1_Reco_SF =  new TFile("../../Scale_factors/Muon/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.root");
-                  fL1_ID_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
-                  fL1_ISO_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
-                  
-                  fL2_Reco_SF =  new TFile("../../Scale_factors/Muon/Run2016_UL/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.root");
-                  fL2_ID_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_TightID_DEN_TrackerMuons/NUM_TightID_DEN_TrackerMuons_abseta_pt.root");
-                  fL2_ISO_SF= new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_MiniIsoTight_DEN_TightID/NUM_MiniIsoTight_DEN_TightID_abseta_pt.root");
-
-                  fL1L2_TRG_SF = new TFile("../../Scale_factors/Muon/Run2016_UL/NUM_Trigger_DEN_MiniIsoTight/NUM_Trigger_DEN_MiniIsoTight_abseta_pt.root");
-                  fL1L2_TRG_SFerr = new TFile("../../Scale_factors/Muon/Run2017_UL/NUM_Trigger_DEN_MiniIsoTight/NUM_Trigger_DEN_MiniIsoTight_abseta_pt.root");
-                  // histos associated to files
-
-               }
-               
-               // histos associated to files
-               fh2DL1_Reco_SF1 = (TH2F*)(fL1_Reco_SF->Get("NUM_TrackerMuons_DEN_genTracks"));
-               fh2DL2_Reco_SF1 = (TH2F*)(fL2_Reco_SF->Get("NUM_TrackerMuons_DEN_genTracks"));
-
-               fh2DL1_ID_SF1 = (TH2F*)(fL1_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt"));//
-               fh2DL2_ID_SF1 = (TH2F*)(fL2_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt"));
-               fh2DL1_ID_SF1err  = (TH2F*)(fL1_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt_combined_syst"));//
-               fh2DL2_ID_SF1err  = (TH2F*)(fL2_ID_SF->Get("NUM_TightID_DEN_TrackerMuons_abseta_pt_combined_syst"));
-
-               fh2DL1_ISO_SF1 = (TH2F*)(fL1_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt"));
-               fh2DL2_ISO_SF1 = (TH2F*)(fL2_ISO_SF->Get("NUM_MiniIsoTight_DEN_TightID_abseta_pt"));
-               fh2DL1_ISO_SF1err  = (TH2F*)(fL1_ISO_SF->Get("NUM_TightRelIso_DEN_TightIDandIPCut_abseta_pt_combined_syst"));
-               fh2DL2_ISO_SF1err  = (TH2F*)(fL2_ISO_SF->Get("NUM_TightRelIso_DEN_TightIDandIPCut_abseta_pt_combined_syst"));
-
-
-               fhL1L2_TRG_SF = (TH2F*)(fL1L2_TRG_SF->Get("NUM_Trigger_DEN_MiniIsoTight_abseta_pt")); // x- axiss pt and y axis pt 
-               fhL1L2_TRG_SFerr = (TH2F*)(fL1L2_TRG_SFerr->Get("NUM_Trigger_DEN_MiniIsoTight_abseta_pt_combined_syst"));
-               //$$$$ 
-            }// else 2016
-      }
-
-      //---------------------------------------------------------------------------//
-      // !! ----------------------------- End of Scale Factors---------------------------------//
-      //---------------------------------------------------------------------------//
-
-std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"};
-
-  Long64_t nbytes = 0, nb = 0;
-  cout<< "Line : "  << __LINE__ << " " << nentries2 << endl; 
-  cout<< " XS : "<<XS<<endl;
-
+   // std::cout<<"here 2"<<std::endl;  
+// if (nentries > 10000000){nentries = 10000000; norm = 10000000.;}
    for (Long64_t jentry=0; jentry<nentries;jentry++) {//nentries2
       Long64_t ientry = LoadTree(jentry);
       
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
       allevents++;
-      if ( allevents%10000 == 0 )  std::cout << "events : " << allevents << std::endl;
+      if ( allevents%1000000 == 0 )  std::cout << "events : " << allevents << std::endl;
       // cout<< " count "<<jentry<<endl;
       // if (jentry > 100000) break;
             
@@ -579,18 +722,30 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
          {
           if (  minitree_nLLP->at(0) != 2)  continue; // protection against rare wrong signal events    //
          } 
-
-      if (minitree_Mmumu->at(0) < 10) continue;
- 
-      if ( !minitree_Filter->at(0) && !minitree_FilterSameSign->at(0) ) continue;//
-
+       fillHisto("StepEffi","",samplename, 0,1 );
+      if (minitree_Mmumu->at(0) < 20) continue;
+            float L1 = 1; 
+      float L2 = 1;
+      if ( !minitree_Filter->at(0) ) continue;//
       nFilterEvt++;
+fillHisto("StepEffi","",samplename, 1,1 );
       if (minitree_njetNOmu->at(0) < 1) continue;
       nFilterJet++;
+fillHisto("StepEffi","",samplename, 2,1 );
       if ( minitree_Hemi_pt->size() != 2 ) continue;
       nFilternHemi++;
+fillHisto("StepEffi","",samplename, 3,1 );
       if ( minitree_Hemi_pt->at(0) < lowHpt || minitree_Hemi_pt->at(1) < lowHpt ) continue;
       nFilterHpt++;
+fillHisto("StepEffi","",samplename, 4,1 );
+
+      if (minitree_lepton_leadingpt->at(0) > minitree_lepton_leadingpt2->at(0)) {L1 = minitree_lepton_leadingpt->at(0); L2 = minitree_lepton_leadingpt2->at(0);}
+      else {L1 = minitree_lepton_leadingpt2->at(0); L2 = minitree_lepton_leadingpt->at(0);}
+      if ( L1 < 25 || L2 < 14) continue;
+
+      // if ( minitree_Hemi_pt->size() != 2 ) continue;
+
+      // if ( abs(minitree_Hemi_eta->at(0)) > 2.4 || abs(minitree_Hemi_eta->at(1)) > 2.4 ) continue;
       fillHisto("hData_Filter","",samplename, minitree_Filter->at(0),1 );
             
       // --------- Lepton SF ------//
@@ -601,14 +756,37 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
       double  Mu_ID_SF1=1, Mu_ISO_SF1=1, Mu_Reco_SF1=1,Mu_ID_SF2=1, Mu_ISO_SF2=1, Mu_Reco_SF2=1, Ele_Reco_SF1=1, Ele_ID_SF1=1, Ele_Reco_SF2=1;//$$$$
       double  Mu_ID_SF1err=0, Mu_ISO_SF1err=0, Mu_ID_SF2err=0, Mu_ISO_SF2err=0,  Ele_ID_SF1err=0, Ele_Reco_SF1err = 0;//$$$$
       float mu1_pt=0;
+      float mu1_eta = 0;
       float mu2_pt = 0;
 	   float ele1_pt=0;
 	   float ele1_eta=0;
       float SFele_pt_eta = 1.;
       float SFele_eta = 1.;
+      float SFele_eta_err = 0.;
+      float ele1_trigger_pt = 0;
 
       //  MuMu = Channel; // Emu = 0 ; SingleMuon = 1; DiMuon = 2
-
+      // !!
+      // std::cout<<" here 0 "<<std::endl;
+      // std::cout << "minitree_lepton_leadingeta2.size() : " <<minitree_lepton_leadingeta2->size()<< std::endl;
+      if (abs(minitree_lepton_leadingeta2->at(0))>1.5  && MuMu==0) 
+         {
+            SFele_eta = hEle_SF->GetBinContent(hEle_SF->GetXaxis()->FindBin(minitree_lepton_leadingeta2->at(0)));
+            SFele_eta_err = hEle_SF->GetBinError(hEle_SF->GetXaxis()->FindBin(minitree_lepton_leadingeta2->at(0)));
+         }
+      // !! 
+      if (!isMC)
+         {
+            mu1_pt = minitree_lepton_leadingpt->at(0);
+            if (MuMu == 0)
+               {
+                  ele1_pt = minitree_lepton_leadingpt2->at(0);
+               }
+            else
+               {
+                  mu2_pt = minitree_lepton_leadingpt2->at(0);
+               }
+         }
             for (unsigned int iMuon = 0; iMuon < minitree_lepton_leadingpt->size(); iMuon++)
                {
                   if (minitree_lepton_leadingpt->at(0) == 0   )
@@ -616,51 +794,51 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
                         Mu_Reco_SF1 = 1;
                         Mu_ID_SF1 = 1;	    
                         Mu_ISO_SF1 = 1 ;
+                        //  std::cout<<"here2A : "<<std::endl;
                         continue;
                      }
                   if (MuMu == 0 && isMC)
                      {// leading letpn is muon by default
-
+                        // leading letpn is muon by default , 
+                           // !! ne pas mettre les valeurs par défaut à 1 quand on est en dehors des ranges de la SF => 15 1 et 119 etc
+                              //  std::cout<<"here2B : "<<std::endl;
                               mu1_pt = minitree_lepton_leadingpt->at(iMuon);
-                              Mu_Reco_SF1= fh2DL1_Reco_SF1->GetBinContent(fh2DL1_Reco_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_Reco_SF1->GetYaxis()->FindBin(minitree_lepton_leadingpt->at(iMuon)));
-                              Mu_ID_SF1 = 1;//fh2DL1_ID_SF1->GetBinContent(fh2DL2_ID_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_ID_SF1->GetYaxis()->FindBin(minitree_lepton_leadingpt->at(iMuon)));	    
-                              Mu_ID_SF1err = 0.;
-                              Mu_ISO_SF1 = fh2DL1_ISO_SF1->GetBinContent(fh2DL1_ISO_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_ISO_SF1->GetYaxis()->FindBin(minitree_lepton_leadingpt->at(iMuon)));//fh2DL1_ISO_SF1->GetBinContent(fh2DL1_ISO_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_ISO_SF1->GetYaxis()->FindBin(minitree_lepton_leadingpt->at(iMuon)));
-                              Mu_ISO_SF1err = fh2DL1_ISO_SF1err->GetBinContent(fh2DL1_ISO_SF1err->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_ISO_SF1err->GetYaxis()->FindBin(minitree_lepton_leadingpt->at(iMuon)));//fh2DL1_ISO_SF1->GetBinContent(fh2DL1_ISO_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_ISO_SF1->GetYaxis()->FindBin(minitree_lepton_leadingpt->at(iMuon)));
-                              if(minitree_lepton_leadingpt->at(iMuon) <= 15. ) {   Mu_Reco_SF1=1.; Mu_ID_SF1 = 1.;  Mu_ISO_SF1=1.; Mu_ID_SF1err = 0.;  Mu_ISO_SF1err=0.; } //muon ID, reco,ISO, Y axis  pt range 15-200,  x axis eta 0-2.4
-                              if(minitree_lepton_leadingpt->at(iMuon) > 40  ) { Mu_Reco_SF1 = 1. ;} 
-                              if(minitree_lepton_leadingpt->at(iMuon) >= 120. ) { Mu_ID_SF1 = 1.; Mu_ISO_SF1=1.;Mu_ID_SF1err = 0.; Mu_ISO_SF1err=0.;}
+                              float mu1_pt_reco = mu1_pt;
+                              if(minitree_lepton_leadingpt->at(iMuon) <= 15. ) {  mu1_pt = 15.1 ;} 
+                              if(minitree_lepton_leadingpt->at(iMuon) >= 120. ) { mu1_pt = 119. ;}
+                              if (minitree_lepton_leadingpt->at(iMuon) >= 40.) {mu1_pt_reco = 39.9;}
+                              Mu_Reco_SF1= fh2DL1_Reco_SF1->GetBinContent(fh2DL1_Reco_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_Reco_SF1->GetYaxis()->FindBin(mu1_pt_reco));
+                              Mu_ID_SF1 = fh2DL1_ID_SF1->GetBinContent(fh2DL1_ID_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_ID_SF1->GetYaxis()->FindBin(mu1_pt));	    
+                              Mu_ID_SF1err = fh2DL1_ID_SF1err->GetBinContent(fh2DL1_ID_SF1err->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_ID_SF1err->GetYaxis()->FindBin(mu1_pt));
+                              Mu_ISO_SF1 = fh2DL1_ISO_SF1->GetBinContent(fh2DL1_ISO_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_ISO_SF1->GetYaxis()->FindBin(mu1_pt));//fh2DL1_ISO_SF1->GetBinContent(fh2DL1_ISO_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_ISO_SF1->GetYaxis()->FindBin(mu1_pt));
+                              Mu_ISO_SF1err = fh2DL1_ISO_SF1err->GetBinContent(fh2DL1_ISO_SF1err->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_ISO_SF1err->GetYaxis()->FindBin(mu1_pt));//fh2DL1_ISO_SF1->GetBinContent(fh2DL1_ISO_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_ISO_SF1->GetYaxis()->FindBin(mu1_pt));
 
                      }
                   else if (MuMu > 0 && isMC) // $$$$$
                      {
-                        
+
                         mu1_pt = minitree_lepton_leadingpt->at(iMuon);
+                        mu1_eta = minitree_lepton_leadingeta->at(iMuon);
                         mu2_pt = minitree_lepton_leadingpt2->at(iMuon);
+                        float mu1_pt_reco = mu1_pt;
+                        float mu2_pt_reco = mu2_pt;
+                        if (minitree_lepton_leadingpt->at(iMuon) >= 40.) {mu1_pt_reco = 39.9;}
+                        if (minitree_lepton_leadingpt2->at(iMuon) >= 40.) {mu2_pt_reco = 39.9;}
 
-                        Mu_Reco_SF1= fh2DL1_Reco_SF1->GetBinContent(fh2DL1_Reco_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_Reco_SF1->GetYaxis()->FindBin(minitree_lepton_leadingpt->at(iMuon)));
-                        Mu_ID_SF1 = fh2DL1_ID_SF1->GetBinContent(fh2DL1_ID_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_ID_SF1->GetYaxis()->FindBin(minitree_lepton_leadingpt->at(iMuon)));	    
-                        Mu_ISO_SF1 = fh2DL1_ISO_SF1->GetBinContent(fh2DL1_ISO_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_ISO_SF1->GetYaxis()->FindBin(minitree_lepton_leadingpt->at(iMuon)));
-                        Mu_ID_SF1err = fh2DL1_ID_SF1err->GetBinContent(fh2DL1_ID_SF1err->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_ID_SF1err->GetYaxis()->FindBin(minitree_lepton_leadingpt->at(iMuon)));	    
-                        Mu_ISO_SF1err = fh2DL1_ISO_SF1err->GetBinContent(fh2DL1_ISO_SF1err->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_ISO_SF1err->GetYaxis()->FindBin(minitree_lepton_leadingpt->at(iMuon)));
-
-                        
-                        Mu_Reco_SF2= fh2DL1_Reco_SF1->GetBinContent(fh2DL1_Reco_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta2->at(iMuon))),fh2DL1_Reco_SF1->GetYaxis()->FindBin(minitree_lepton_leadingpt2->at(iMuon)));
-                        Mu_ID_SF2 = fh2DL1_ID_SF1->GetBinContent(fh2DL1_ID_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta2->at(iMuon))),fh2DL1_ID_SF1->GetYaxis()->FindBin(minitree_lepton_leadingpt2->at(iMuon)));	    
-                        Mu_ISO_SF2 = fh2DL1_ISO_SF1->GetBinContent(fh2DL1_ISO_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta2->at(iMuon))),fh2DL1_ISO_SF1->GetYaxis()->FindBin(minitree_lepton_leadingpt2->at(iMuon)));
-                        Mu_ID_SF2err = fh2DL1_ID_SF1err->GetBinContent(fh2DL1_ID_SF1err->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta2->at(iMuon))),fh2DL1_ID_SF1err->GetYaxis()->FindBin(minitree_lepton_leadingpt2->at(iMuon)));	    
-                        Mu_ISO_SF2err = fh2DL1_ISO_SF1err->GetBinContent(fh2DL1_ISO_SF1err->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta2->at(iMuon))),fh2DL1_ISO_SF1err->GetYaxis()->FindBin(minitree_lepton_leadingpt2->at(iMuon)));
-
-
-                        if(minitree_lepton_leadingpt->at(iMuon) <= 15. ) {   Mu_Reco_SF1=1.; Mu_ID_SF1 = 1.;  Mu_ISO_SF1=1.;  Mu_ID_SF1err = 0.;  Mu_ISO_SF1err=0.;  } //muon ID, reco,ISO, Y axis  pt range 15-200,  x axis eta 0-2.4
-                        if(minitree_lepton_leadingpt->at(iMuon) > 40  ) { Mu_Reco_SF1 = 1. ;} 
-                        if(minitree_lepton_leadingpt->at(iMuon) >= 120. ) { Mu_ID_SF1 = 1.; Mu_ISO_SF1=1.;Mu_ID_SF1err = 0.; Mu_ISO_SF1err=0.;}
-
-                        
-                        if(minitree_lepton_leadingpt2->at(iMuon) <= 15. ) {   Mu_Reco_SF2=1.; Mu_ID_SF2 = 1.;  Mu_ISO_SF2=1.; Mu_ID_SF2err = 0.;  Mu_ISO_SF2err=0.; } //muon ID, reco,ISO, Y axis  pt range 15-200,  x axis eta 0-2.4
-                        if(minitree_lepton_leadingpt2->at(iMuon) > 40  ) { Mu_Reco_SF2 = 1. ;} 
-                        if(minitree_lepton_leadingpt2->at(iMuon) >= 120. ) { Mu_ID_SF2 = 1.; Mu_ISO_SF2=1.;Mu_ID_SF2err = 0.; Mu_ISO_SF2err=0.;}
-                        
+                        if(minitree_lepton_leadingpt->at(iMuon) <= 15. ) {  mu1_pt = 15.1 ;} 
+                        if(minitree_lepton_leadingpt->at(iMuon) >= 120. ) { mu1_pt = 119. ;}
+                        if(minitree_lepton_leadingpt2->at(iMuon) <= 15. ) {  mu2_pt = 15.1 ;} 
+                        if(minitree_lepton_leadingpt2->at(iMuon) >= 120. ) { mu2_pt = 119. ;}
+                        Mu_Reco_SF1= fh2DL1_Reco_SF1->GetBinContent(fh2DL1_Reco_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_Reco_SF1->GetYaxis()->FindBin(mu1_pt_reco));
+                        Mu_ID_SF1 = fh2DL1_ID_SF1->GetBinContent(fh2DL1_ID_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_ID_SF1->GetYaxis()->FindBin(mu1_pt));	    
+                        Mu_ISO_SF1 = fh2DL1_ISO_SF1->GetBinContent(fh2DL1_ISO_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_ISO_SF1->GetYaxis()->FindBin(mu1_pt));
+                        Mu_ID_SF1err = fh2DL1_ID_SF1err->GetBinContent(fh2DL1_ID_SF1err->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_ID_SF1err->GetYaxis()->FindBin(mu1_pt));	    
+                        Mu_ISO_SF1err = fh2DL1_ISO_SF1err->GetBinContent(fh2DL1_ISO_SF1err->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta->at(iMuon))),fh2DL1_ISO_SF1err->GetYaxis()->FindBin(mu1_pt));
+                        Mu_Reco_SF2= fh2DL1_Reco_SF1->GetBinContent(fh2DL1_Reco_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta2->at(iMuon))),fh2DL1_Reco_SF1->GetYaxis()->FindBin(mu2_pt_reco));
+                        Mu_ID_SF2 = fh2DL1_ID_SF1->GetBinContent(fh2DL1_ID_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta2->at(iMuon))),fh2DL1_ID_SF1->GetYaxis()->FindBin(mu2_pt));	    
+                        Mu_ISO_SF2 = fh2DL1_ISO_SF1->GetBinContent(fh2DL1_ISO_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta2->at(iMuon))),fh2DL1_ISO_SF1->GetYaxis()->FindBin(mu2_pt));
+                        Mu_ID_SF2err = fh2DL1_ID_SF1err->GetBinContent(fh2DL1_ID_SF1err->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta2->at(iMuon))),fh2DL1_ID_SF1err->GetYaxis()->FindBin(mu2_pt));	    
+                        Mu_ISO_SF2err = fh2DL1_ISO_SF1err->GetBinContent(fh2DL1_ISO_SF1err->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta2->at(iMuon))),fh2DL1_ISO_SF1err->GetYaxis()->FindBin(mu2_pt));
                      }
 
                }
@@ -668,17 +846,26 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
                {
                      for(unsigned int iel = 0; iel <minitree_lepton_leadingpt2->size(); iel ++)//test    after trigger and lepton selection cut                                    
                         {
+                           //  std::cout<<"here4 : "<<std::endl;
                           if (minitree_lepton_leadingpt2->at(0) == 0  )
                            {
                               Ele_Reco_SF1 = 1;
                               Ele_ID_SF1 = 1;	
                               Ele_ID_SF1err = 0;   
                               Ele_Reco_SF1err = 0; 
+                              //  std::cout<<"here5A : "<<std::endl;
                               continue;
                            }
 
                            ele1_pt = minitree_lepton_leadingpt2->at(iel);
+                            ele1_trigger_pt = minitree_lepton_leadingpt2->at(iel);
                            ele1_eta = fabs(minitree_lepton_leadingeta2->at(iel));
+
+                           if(minitree_lepton_leadingpt2->at(iel) <= 10. ) {  ele1_pt = 11; }// ID, 10-500, eta -2.5 to 2.5, x axis = eta, y axis=pt   
+                           if(minitree_lepton_leadingpt2->at(iel) >= 500. ) { ele1_pt = 499;}
+                           if ( ele1_trigger_pt >= 200){ ele1_trigger_pt = 199;}
+                           if ( ele1_trigger_pt <= 15){ ele1_trigger_pt = 15.1;}
+
                            if ( ele1_pt < 20)
                               {  
                                  Ele_Reco_SF1 = fh2DL2_ISO_SF1->GetBinContent(fh2DL2_ISO_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta2->at(iel))),fh2DL2_ISO_SF1->GetYaxis()->FindBin(minitree_lepton_leadingpt2->at(iel)));
@@ -687,31 +874,36 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
                            else
                               {
                                  Ele_Reco_SF1 = fh2DL2_Reco_SF1->GetBinContent(fh2DL2_Reco_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta2->at(iel))),fh2DL2_Reco_SF1->GetYaxis()->FindBin(minitree_lepton_leadingpt2->at(iel)));
-                                 Ele_Reco_SF1err = fh2DL2_Reco_SF1->GetBinContent(fh2DL2_Reco_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta2->at(iel))),fh2DL2_Reco_SF1->GetYaxis()->FindBin(minitree_lepton_leadingpt2->at(iel)));
+                                 Ele_Reco_SF1err = fh2DL2_Reco_SF1err->GetBinContent(fh2DL2_Reco_SF1err->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta2->at(iel))),fh2DL2_Reco_SF1err->GetYaxis()->FindBin(minitree_lepton_leadingpt2->at(iel)));
                               }
                            Ele_ID_SF1 = fh2DL2_ID_SF1->GetBinContent(fh2DL2_ID_SF1->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta2->at(iel))),fh2DL2_ID_SF1->GetYaxis()->FindBin(minitree_lepton_leadingpt2->at(iel)));
                            Ele_ID_SF1err = fh2DL2_ID_SF1err->GetBinContent(fh2DL2_ID_SF1err->GetXaxis()->FindBin(fabs(minitree_lepton_leadingeta2->at(iel))),fh2DL2_ID_SF1err->GetYaxis()->FindBin(minitree_lepton_leadingpt2->at(iel)));
-
-                           if(minitree_lepton_leadingpt2->at(iel) <= 10. ) {  Ele_ID_SF1=1.;Ele_ID_SF1err=0.;Ele_Reco_SF1err = 0; }// ID, 10-500, eta -2.5 to 2.5, x axis = eta, y axis=pt   
-                           if(minitree_lepton_leadingpt2->at(iel) <= 10. ) {  Ele_Reco_SF1 = 1.;  }// Reco , 10-500, eta -2.5 to 2.5, x axis = eta, y axis=pt
-                           if(minitree_lepton_leadingpt2->at(iel) >= 500. ) { Ele_Reco_SF1 = 1.; Ele_ID_SF1err=0.; Ele_Reco_SF1err = 0;}
-
                         }
-               }                        
+               }                       
 
+         if (isMC && MuMu == 0) 
+            {   
 
-            //cout<<" mu pt inside ="<<mu1_pt<<" ele pt outside ="<<ele1_pt<<endl;
-         if (isMC && MuMu == 0) {   
-                                  triggerSF  = fhL1L2_TRG_SF->GetBinContent(fhL1L2_TRG_SF->GetXaxis()->FindBin(ele1_pt),fhL1L2_TRG_SF->GetYaxis()->FindBin(mu1_pt));
-                                 triggerSFerr = fhL1L2_TRG_SFerr->GetBinContent(fhL1L2_TRG_SFerr->GetXaxis()->FindBin(ele1_pt),fhL1L2_TRG_SFerr->GetYaxis()->FindBin(mu1_pt));
-                                 if ((ele1_pt < 15. && mu1_pt < 15.) ||  (ele1_pt > 200 && mu1_pt > 200)){triggerSF=1.;triggerSFerr=0.;} // x and y axis 15 to 500
-                                 }
-         else if (isMC && MuMu >0 ) 
+               bool skippy = false;
+
+               if (ele1_trigger_pt < 15. || mu1_pt < 15. ||  ele1_trigger_pt > 200 || mu1_pt > 200){triggerSF=1.;triggerSFerr=0.;skippy = true;} // x and y axis 15 to 200
+               if (!skippy)
                   {
-                     triggerSF = fhL1L2_TRG_SF->GetBinContent(fhL1L2_TRG_SF->GetXaxis()->FindBin(mu1_pt),fhL1L2_TRG_SF->GetYaxis()->FindBin(mu2_pt)); 
-                     triggerSFerr = fhL1L2_TRG_SFerr->GetBinContent(fhL1L2_TRG_SFerr->GetXaxis()->FindBin(mu1_pt),fhL1L2_TRG_SFerr->GetYaxis()->FindBin(mu2_pt));
-                     if ((mu1_pt < 15. && mu2_pt < 15.) ||  (mu1_pt > 500 && mu2_pt > 500)){triggerSF=1.;triggerSFerr=0.;}
-                  }// !! 
+                     // std::cout<<"here6A0: "<<std::endl;
+                     triggerSF  = fhL1L2_TRG_SF->GetBinContent(fhL1L2_TRG_SF->GetXaxis()->FindBin(ele1_trigger_pt),fhL1L2_TRG_SF->GetYaxis()->FindBin(mu1_pt));
+                     if (triggerSF == 0) {std::cout<<"ele1_pt : "<<ele1_pt<<std::endl;std::cout<<"mu1_pt : "<<mu1_pt<<std::endl;}
+                     // std::cout<<"here6A1: "<<std::endl;
+                     triggerSFerr = fhL1L2_TRG_SFerr->GetBinContent(fhL1L2_TRG_SFerr->GetXaxis()->FindBin(ele1_trigger_pt),fhL1L2_TRG_SFerr->GetYaxis()->FindBin(mu1_pt));
+                     // std::cout<<"here6A2: "<<std::endl;
+                  }
+               //  std::cout<<"here6B: "<<std::endl;
+            }
+         else if (isMC && MuMu >0 ) 
+            {
+               triggerSF = fhL1L2_TRG_SF->GetBinContent(fhL1L2_TRG_SF->GetXaxis()->FindBin(fabs(mu1_eta)),fhL1L2_TRG_SF->GetYaxis()->FindBin(mu1_pt)); 
+               triggerSFerr = fhL1L2_TRG_SFerr->GetBinContent(fhL1L2_TRG_SFerr->GetXaxis()->FindBin(fabs(mu1_eta)),fhL1L2_TRG_SFerr->GetYaxis()->FindBin(mu1_pt));
+               if ((mu1_pt < 15.) ||  (mu1_pt > 120 )){triggerSF=1.;triggerSFerr=0.;}
+            }// !! 
 
             // std::cout<<" here 1 "<<std::endl;
       //---------------------------------------------------------------------------//
@@ -728,7 +920,6 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
       //---------------------------------------------------------------------------//  
       //---------------------------------------------------------------------------//
 
-
       // if (showoutput) // std::cout<<"GenWeight : "<<minitree_only_gen_wt->at(0)<<std::endl;
       float GenWeight = minitree_only_gen_wt->at(0)/mean;
       if (Signal || !isMC)
@@ -736,6 +927,13 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
             GenWeight = 1.;
          }
       fillHisto("GenWeight","", samplename, GenWeight,1);
+
+      float ScaleWeight = 1;
+      float PdfWeight = 1;
+
+      std::vector<float>   PDFWeights;
+      std::vector<float>   ScaleWeights;
+
       float top_pt_wt = 1.;
       float Prefweight = miniPrefweight->at(0);
       float PrefweightUp = 1.;
@@ -743,6 +941,9 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
       float PUweight = miniPUweight->at(0);
       float PUweightUp = 1.;
       float PUweightDown = 1.;
+      float Roccor = 1;
+      float RoccorUp = 1;
+      float RoccorDown = 1;
       float TriggerSyst = triggerSF;
       Ele_SF =Ele_Reco_SF1*Ele_ID_SF1;
       Mu_SF = Mu_Reco_SF1* Mu_ID_SF1 * Mu_ISO_SF1;
@@ -752,12 +953,7 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
             PUweightUp = miniPUweight_Up->at(0);
             PUweightDown = miniPUweight_Down->at(0);
          }
-       
-      double NormFactor=1;
-      double NormFactor_wo_top_pt=1;
-      double NormFactor_full=1;
-      double NormFactor_mu=1;
-      double NormFactor_ele=1;
+
       NormFactorLumi =  XS*Lumi;  
       NormFactorLumiUp = XS*LumiUp;
       NormFactorLumiDown = XS*LumiDown;
@@ -768,6 +964,8 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
 
       // rajouter l1 prefiring
       float NormFactorSYST = NormFactorLumi/norm;
+if (isMC)
+         {
          PUweight = miniPUweight->at(0);
          PUweightUp = miniPUweight_Up->at(0);
          PUweightDown = miniPUweight_Down->at(0);
@@ -775,46 +973,125 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
          PrefweightUp = miniPrefweight_Up->at(0);
          PrefweightDown = miniPrefweight_Down->at(0);
          NormFactorSYST =  NormFactorLumi/norm;
+}
+
          // It is supposed to run for several systematics sequentially, however the code oes not work when lloping on  different systematics ...
          // so we have to put the 0 instead of the index of the syst in the vector systlist
-         if (systlist[0].Contains("LumiUp"))
+
+   if(thesample.Contains("TTTo2L2Nu") || thesample.Contains("TTToHadronic") ||  thesample.Contains("TTToSemiLeptonic")){
+         top_pt_wt=minitree_genTop_Weight->at(0);
+         // top_pt_wt=1;
+      }
+      else{
+	      top_pt_wt=1;
+      }
+
+
+   if (!isMC)//<=> Data
+      {
+         NormFactorSYST = 1;                                                                                                                                                               
+      }
+   else{
+     PUweight = miniPUweight->at(0);
+         // !! regarer pour sf > 4 et fixer à 1
+         PUweightUp = miniPUweight_Up->at(0);
+         PUweightDown = miniPUweight_Down->at(0);
+         Prefweight = miniPrefweight->at(0);
+         PrefweightUp = miniPrefweight_Up->at(0);
+         PrefweightDown = miniPrefweight_Down->at(0);
+         //  std::cout<<"here8 : "<<std::endl;
+         NormFactorSYST =  NormFactorLumi/norm;
+
+         if (systlist.Contains("LumiUp"))
             {
                NormFactorSYST =  NormFactorLumiUp/norm;
             }
-         else if (systlist[0].Contains("LumiDown"))
+         else if (systlist.Contains("LumiDown"))
             {
                NormFactorSYST =  NormFactorLumiDown/norm;
             }
-         else if (systlist[0].Contains("XSUp"))
+         else if (systlist.Contains("XSUp"))
             {
                NormFactorSYST =  NormFactorXSUp/norm;
             }
-         else if (systlist[0].Contains("XSDown"))
+         else if (systlist.Contains("XSDown"))
             {
                NormFactorSYST =  NormFactorXSDown/norm;
             }
-         else if (systlist[0].Contains("L1Up"))
+         else if (systlist.Contains("L1Up"))
             {
                Prefweight = PrefweightUp;
             }
-         else if (systlist[0].Contains("L1Down"))
+         else if (systlist.Contains("L1Down"))
             {
                Prefweight = PrefweightDown;
             }
-         else if (systlist[0].Contains("TriggerDown"))
+         else if (systlist.Contains("TriggerDown"))
             {
                TriggerSyst = triggerSF-triggerSFerr;
                
             }
-         else if (systlist[0].Contains("TriggerUp"))
+         else if (systlist.Contains("TriggerUp"))
             {
                TriggerSyst = triggerSF+triggerSFerr;
             }
-         else if (systlist[0].Contains("LepIDUp"))
+         else if (systlist.Contains("MuonIDUp"))
             {
                if (MuMu == 0)
                   {
-                     Mu_SF = Mu_Reco_SF1* (Mu_ID_SF1+abs(Mu_ID_SF1-Mu_ID_SF1err)) * Mu_ISO_SF1;
+                     Mu_SF = Mu_Reco_SF1* (Mu_ID_SF1+Mu_ID_SF1err) * Mu_ISO_SF1;
+                     // Ele_SF=Ele_Reco_SF1*(Ele_ID_SF1+Ele_ID_SF1err);
+                  }
+               else
+                  {
+                     Mu_SF = Mu_Reco_SF1* (Mu_ID_SF1+Mu_ID_SF1err) * Mu_ISO_SF1;
+                     Mu_SF2 = Mu_Reco_SF2* (Mu_ID_SF2+Mu_ID_SF2err) * Mu_ISO_SF2;
+                  }
+            }    
+         else if (systlist.Contains("MuonIDDown"))
+            {
+               if (MuMu == 0)
+                  {
+                     Mu_SF = Mu_Reco_SF1* (Mu_ID_SF1-Mu_ID_SF1err) * Mu_ISO_SF1;
+                     // Ele_SF=Ele_Reco_SF1*(Ele_ID_SF1-Ele_ID_SF1err);
+                  }
+               else
+                  {
+                     Mu_SF = Mu_Reco_SF1* (Mu_ID_SF1-Mu_ID_SF1err) * Mu_ISO_SF1;
+                     Mu_SF2 = Mu_Reco_SF2* (Mu_ID_SF2-Mu_ID_SF2err) * Mu_ISO_SF2;
+                  }
+            }  
+         else if (systlist.Contains("MuonISOUp"))
+            {
+               if (MuMu == 0)
+                  {
+                     Mu_SF = Mu_Reco_SF1* Mu_ID_SF1 * (Mu_ISO_SF1+Mu_ISO_SF1err);
+                     // Ele_SF=Ele_Reco_SF1*(Ele_ID_SF1+Ele_Reco_SF1err);
+                  }
+               else
+                  {
+                     Mu_SF = Mu_Reco_SF1* Mu_ID_SF1 * (Mu_ISO_SF1+Mu_ISO_SF1err);
+                     Mu_SF2 = Mu_Reco_SF2* Mu_ID_SF2 * (Mu_ISO_SF2+Mu_ISO_SF2err);
+                  }
+            } 
+         else if (systlist.Contains("MuonISODown"))
+            {
+               if (MuMu == 0)
+                  {
+                     Mu_SF = Mu_Reco_SF1* Mu_ID_SF1 * (Mu_ISO_SF1-Mu_ISO_SF1err);
+                     // Ele_SF=Ele_Reco_SF1*(Ele_ID_SF1-Ele_Reco_SF1err);
+                  }
+               else
+                  {
+                     Mu_SF = Mu_Reco_SF1* Mu_ID_SF1 * (Mu_ISO_SF1-Mu_ISO_SF1err);
+                     Mu_SF2 = Mu_Reco_SF2* Mu_ID_SF2 * (Mu_ISO_SF2-Mu_ISO_SF2err);
+                  }
+            } 
+                  else if (systlist.Contains("EleIDUp"))
+            {
+               if (MuMu == 0)
+                  {
+                     // Mu_SF = Mu_Reco_SF1* (Mu_ID_SF1+abs(Mu_ID_SF1-Mu_ID_SF1err)) * Mu_ISO_SF1;
                      Ele_SF=Ele_Reco_SF1*(Ele_ID_SF1+Ele_ID_SF1err);
                   }
                else
@@ -823,11 +1100,11 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
                      Mu_SF2 = Mu_Reco_SF2* (Mu_ID_SF2+Mu_ID_SF2err) * Mu_ISO_SF2;
                   }
             }    
-         else if (systlist[0].Contains("LepIDDown"))
+         else if (systlist.Contains("EleIDDown"))
             {
                if (MuMu == 0)
                   {
-                     Mu_SF = Mu_Reco_SF1* (Mu_ID_SF1- abs(Mu_ID_SF1-Mu_ID_SF1err)) * Mu_ISO_SF1;
+                     // Mu_SF = Mu_Reco_SF1* (Mu_ID_SF1- abs(Mu_ID_SF1-Mu_ID_SF1err)) * Mu_ISO_SF1;
                      Ele_SF=Ele_Reco_SF1*(Ele_ID_SF1-Ele_ID_SF1err);
                   }
                else
@@ -836,11 +1113,11 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
                      Mu_SF2 = Mu_Reco_SF2* (Mu_ID_SF2-Mu_ID_SF2err) * Mu_ISO_SF2;
                   }
             }  
-         else if (systlist[0].Contains("LepISOUp"))
+         else if (systlist.Contains("EleISOUp"))
             {
                if (MuMu == 0)
                   {
-                     Mu_SF = Mu_Reco_SF1* Mu_ID_SF1 * (Mu_ISO_SF1+abs(Mu_ISO_SF1-Mu_ISO_SF1err));
+                     // Mu_SF = Mu_Reco_SF1* Mu_ID_SF1 * (Mu_ISO_SF1+abs(Mu_ISO_SF1-Mu_ISO_SF1err));
                      Ele_SF=Ele_Reco_SF1*(Ele_ID_SF1+Ele_Reco_SF1err);
                   }
                else
@@ -849,11 +1126,11 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
                      Mu_SF2 = Mu_Reco_SF2* Mu_ID_SF2 * (Mu_ISO_SF2+Mu_ISO_SF2err);
                   }
             } 
-         else if (systlist[0].Contains("LepISODown"))
+         else if (systlist.Contains("EleISODown"))
             {
                if (MuMu == 0)
                   {
-                     Mu_SF = Mu_Reco_SF1* Mu_ID_SF1 * (Mu_ISO_SF1-abs(Mu_ISO_SF1-Mu_ISO_SF1err));
+                     // Mu_SF = Mu_Reco_SF1* Mu_ID_SF1 * (Mu_ISO_SF1-abs(Mu_ISO_SF1-Mu_ISO_SF1err));
                      Ele_SF=Ele_Reco_SF1*(Ele_ID_SF1-Ele_Reco_SF1err);
                   }
                else
@@ -861,27 +1138,101 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
                      Mu_SF = Mu_Reco_SF1* Mu_ID_SF1 * (Mu_ISO_SF1-Mu_ISO_SF1err);
                      Mu_SF2 = Mu_Reco_SF2* Mu_ID_SF2 * (Mu_ISO_SF2-Mu_ISO_SF2err);
                   }
-            } 
-         else  if (systlist[0].Contains("PUUp"))
+            }
+         else  if (systlist.Contains("PUUp"))
             {
                PUweight = PUweightUp;
             }
-         else if (systlist[0].Contains("PUDown"))
+         else if (systlist.Contains("PUDown"))
             {
                PUweight = PUweightDown;
+            }
+         else if (systlist.Contains("SFEleDown"))
+            {
+               SFele_eta = SFele_eta - SFele_eta_err;
+            }
+         else if (systlist.Contains("SFEleUp"))
+            {
+               SFele_eta = SFele_eta + SFele_eta_err;
+            }
+         else if (systlist.Contains("TopPtUp"))
+            {
+               if(thesample.Contains("TTTo2L2Nu") || thesample.Contains("TTToHadronic") ||  thesample.Contains("TTToSemiLeptonic")){
+                  top_pt_wt=minitree_genTop_Weight->at(0);
+                  // top_pt_wt=1;
+               }
+               else{
+                  top_pt_wt=1;
+               }
+            }
+         else if (systlist.Contains("TopPtDown"))
+            {
+               top_pt_wt=1;
+            }
+         else if (systlist.Contains("PDFUp"))
+            {  
+
+               for (unsigned int i = 0; i < minitree_LHE_Weights->size(); i++)
+                  {
+                     if (i >=10 || i == 0) {PDFWeights.push_back(minitree_LHE_Weights->at(i));}
+                     else  {ScaleWeights.push_back(minitree_LHE_Weights->at(i));}//if (i < 10 && i >=1)
+                  }
+               PDFVar PDFV(PDFWeights);
+               ScaleVars ScaleV(ScaleWeights);
+               PdfWeight = PDFV.GetPDFVarUp()/PDFV.GetPDFOriginal();
+               GenWeight = GenWeight*PdfWeight;
+               // std::cout<<"PdfWeight = "<<PdfWeight<<std::endl;
+               // std::cout<<"PDFV.GetPDFVarUp() = "<<PDFV.GetPDFVarUp()<<std::endl;
+               // std::cout<<"PDFV.GetPDFOriginal() = "<<PDFV.GetPDFOriginal()<<std::endl;
+
+            }
+         else if (systlist.Contains("PDFDown"))
+            {
+               for (unsigned int i = 0; i < minitree_LHE_Weights->size(); i++)
+                  {
+                     if (i >=10 || i == 0) {PDFWeights.push_back(minitree_LHE_Weights->at(i));}
+                     else if (i < 10 && i >=1) {ScaleWeights.push_back(minitree_LHE_Weights->at(i));}
+                  }
+               
+               PDFVar PDFV(PDFWeights);
+               ScaleVars ScaleV(ScaleWeights);
+               PdfWeight = PDFV.GetPDFVarDown()/PDFV.GetPDFOriginal();
+
+               GenWeight = GenWeight*PdfWeight;
+            }
+         else if (systlist.Contains("ScaleUp"))
+            {
+               for (unsigned int i = 0; i < minitree_LHE_Weights->size(); i++)
+                  {
+                     if (i >=10 || i == 0) {PDFWeights.push_back(minitree_LHE_Weights->at(i));}
+                     else if (i < 10 && i >=1) {ScaleWeights.push_back(minitree_LHE_Weights->at(i));}
+                  }
+               
+               PDFVar PDFV(PDFWeights);
+               ScaleVars ScaleV(ScaleWeights);
+               ScaleWeight = ScaleV.GetScaleVarUp();
+                if (std::isnan(ScaleWeight)) {ScaleWeight = 1;}
+               GenWeight = GenWeight*ScaleWeight;
+               // std::cout<<"ScaleWeight = "<<ScaleWeight<<std::endl;
+            }
+         else if (systlist.Contains("ScaleDown"))
+            {
+               for (unsigned int i = 0; i < minitree_LHE_Weights->size(); i++)
+                  {
+                     if (i >=10 || i == 0) {PDFWeights.push_back(minitree_LHE_Weights->at(i));}
+                     else if (i < 10 && i >=1) {ScaleWeights.push_back(minitree_LHE_Weights->at(i));}
+                  }
+               
+               PDFVar PDFV(PDFWeights);
+               ScaleVars ScaleV(ScaleWeights);
+               ScaleWeight = ScaleV.GetScaleVarDown();
+               if (std::isnan(ScaleWeight)) {ScaleWeight = 1;}
+               GenWeight = GenWeight*ScaleWeight;
             }
          else
             {
                NormFactorSYST =  NormFactorLumi/norm;
             }
-
-
-      if(thesample.Contains("TTTo2L2Nu") || thesample.Contains("TTToHadronic") ||  thesample.Contains("TTToSemiLeptonic")){
-         top_pt_wt=minitree_genTop_Weight->at(0);
-         //top_pt_wt=1;
-      }
-      else{
-	      top_pt_wt=1;
       }
       if (!isMC)
          {
@@ -903,26 +1254,37 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
             Mu_ISO_SF2err = 0;
          }
       else{
-         
-            Pref_PU_gen_wt= NormFactorSYST*GenWeight*Prefweight*PUweight*top_pt_wt;
-            NormFactor_mu =  SFele_eta*NormFactorSYST*GenWeight*Prefweight*PUweight*top_pt_wt*Mu_SF*TriggerSyst;
-            NormFactor_mu2 =  SFele_eta*NormFactorSYST*GenWeight*Prefweight*PUweight*top_pt_wt*Mu_SF2*TriggerSyst;
-            NormFactor_ele=  SFele_eta*NormFactorSYST*GenWeight*Prefweight*PUweight*top_pt_wt*Ele_SF*TriggerSyst;
-            NormFactor =  SFele_eta*NormFactorSYST*GenWeight*Prefweight*PUweight*top_pt_wt*Mu_SF*Ele_SF*TriggerSyst;
+            SFele_eta = 1;
+            Pref_PU_gen_wt= (NormFactorSYST*GenWeight*Prefweight*PUweight*top_pt_wt) / FracEffEvent;
+            NormFactor_mu =  (SFele_eta*NormFactorSYST*GenWeight*Prefweight*PUweight*top_pt_wt*Mu_SF*TriggerSyst) / FracEffEvent;
+
+            if (MuMu == 0)
+               {
+                  NormFactor =  (SFele_eta*NormFactorSYST*GenWeight*Prefweight*PUweight*top_pt_wt*Mu_SF*Ele_SF*TriggerSyst) / FracEffEvent;
+                  NormFactor_ele=  (SFele_eta*NormFactorSYST*GenWeight*Prefweight*PUweight*top_pt_wt*Ele_SF*TriggerSyst) / FracEffEvent;
+               }
+            else
+               {
+                  NormFactor =  (SFele_eta*NormFactorSYST*GenWeight*Prefweight*PUweight*top_pt_wt*Mu_SF*Mu_SF2*TriggerSyst) / FracEffEvent;
+                  NormFactor_mu2 =  (SFele_eta*NormFactorSYST*GenWeight*Prefweight*PUweight*top_pt_wt*Mu_SF2*TriggerSyst) / FracEffEvent;
+               }
+
+            
+
          }
    if (Signal)
       {
             Pref_PU_gen_wt= NormFactorSYST*Prefweight*PUweight*top_pt_wt;
+            NormFactor =  SFele_eta*NormFactorSYST*Prefweight*PUweight*top_pt_wt*Mu_SF*Mu_SF2*TriggerSyst;
             NormFactor_mu =  SFele_eta*NormFactorSYST*Prefweight*PUweight*top_pt_wt*Mu_SF*TriggerSyst;
             NormFactor_mu2 =  SFele_eta*NormFactorSYST*Prefweight*PUweight*top_pt_wt*Mu_SF2*TriggerSyst;
             NormFactor_ele=  SFele_eta*NormFactorSYST*Prefweight*PUweight*top_pt_wt*Ele_SF*TriggerSyst;
-            NormFactor =  SFele_eta*NormFactorSYST*Prefweight*PUweight*top_pt_wt*Mu_SF*Ele_SF*TriggerSyst;
       }
-      fillHisto("hData_Event_Weight","",samplename, Pref_PU_gen_wt,1 );
+      fillHisto("hData_Event_Weight","",samplename, NormFactor,1 );
 
-      // std::cout<<" here 2 "<<std::endl;
+// std::cout<<" here 2 "<<std::endl;
 
-      //--------------------------------------------------------------//
+//--------------------------------------------------------------//
       bool isHemiVtx1 = false, isHemiVtx2 = false;
       bool isCutVtx = false, isCutVtx1 = false, isCutVtx2 = false;
       bool isCutEvt = false;
@@ -934,6 +1296,8 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
       float VtxMass = 0., dR, dist, NChi2, r, eta;
       float Vtx_HMass = 0;
       float Vtx_nTrks= 0;
+      float Vtx_x = 0;
+      float Vtx_y = 0;
       float Vtx_z= 0;
       float Vtx_r= 0;
       float Vtx_dR= 0;
@@ -941,7 +1305,9 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
       float Vtx_track_MeanDCA_d= 0;
       float Vtx_dist = 0;
       float Vtx_NChi = 0;
-
+      float Vtx_ntrk10 = 0;
+      float Vtx_step = 0;
+      float highHpt = 100.;
       bool ping0 = false;
       bool ping1 = false;
       float dR0 = 0.;
@@ -951,38 +1317,41 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
       float  hemi2_pt  = -1.;
       ////////////////////////////////
       
-      fillHisto("hData_Mmumu","",samplename, minitree_Mmumu->at(0),Pref_PU_gen_wt );
+      fillHisto("hData_Mmumu","",samplename, minitree_Mmumu->at(0),NormFactor );
 
       int FilterSample = -1;
       // if (showoutput) // std::cout<<"minitree_Mmumu->at(0) : "<<minitree_Mmumu->at(0)<<std::endl;
       if (MuMu == 2 || MuMu == 1)
          {
-            // // std::cout<<"minitree_trigger_doublelepton->at(0) : "<<minitree_trigger_doublelepton->at(0)<<std::endl;
-            // // std::cout<<"minitree_trigger_singlelepton->at(0) : "<<minitree_trigger_singlelepton->at(0)<<std::endl;
             if (DoubleMuon && minitree_trigger_doublelepton->at(0)  ) //&& !minitree_trigger_singlelepton->at(0)
                {
                   FilterSample = 2;
-                        // // std::cout<<"FS 2  "<<std::endl;
                }
             else if  (!DoubleMuon && minitree_trigger_singlelepton->at(0) &&  !minitree_trigger_doublelepton->at(0) ) 
                {
                   FilterSample = 1;
-                        // // std::cout<<"FS 1 "<<std::endl;
                }
          }
       if (MuMu == 0)
          {
                FilterSample = 0;
          }
-      // // std::cout<<"FilterSample : "<<FilterSample<<std::endl;
       if (DoubleMuon && FilterSample != 2) continue;
       else if (!DoubleMuon && FilterSample != 1 && MuMu ==1) continue;
       else if (!DoubleMuon && FilterSample != 0 && MuMu ==0) continue;
 
          // std::cout<<" here 3 "<<std::endl;
 
-      //--------------------------------------------------------//
-      //--------------------------------------------------------//
+      // !! --------------------------------------------------------//
+      // !!--------------------------------------------------------//
+      // !! --------------------------------------------------------//
+      // !!                                                      // 
+      // !!            ABCD regions code start here              //
+      // !!                                                      //
+      // !!                                                      //
+      // !! -------------------------------------------------------//
+      // !! --------------------------------------------------------//
+
       bool isSS = SS;// decide if you want SS category or not
       bool isFWD = FWD;// decide if you want FWD category or not
       //**//
@@ -1010,8 +1379,6 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
       hemi1_pt = minitree_Hemi_pt->at(0);
       hemi2_pt = minitree_Hemi_pt->at(1);
 
-
-
       //--------------------------------------------------------//
       //--------------------------------------------------------//
 
@@ -1023,8 +1390,8 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
       float hemi_ptmin = hemi2_pt;
       float hemi_ptmax = hemi1_pt;
       if ( hemi2_pt > hemi1_pt ) {hemi_ptmin = hemi1_pt;hemi_ptmax = hemi2_pt;}
-      fillHisto("Hemisphere_leadingpt","", samplename, hemi_ptmax,Pref_PU_gen_wt);
-      fillHisto("Hemisphere_subleadingpt","", samplename, hemi_ptmin,Pref_PU_gen_wt);
+      fillHisto("Hemisphere_leadingpt","", samplename, hemi_ptmax,NormFactor);
+      fillHisto("Hemisphere_subleadingpt","", samplename, hemi_ptmin,NormFactor);
 
    if (signal)
       {
@@ -1047,6 +1414,10 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
    float Vtx_HMass1 = minitree_Hemi_Vtx_BDT_HMass->at(1);
    float Vtx_nTrks0 = minitree_Hemi_Vtx_nTrks->at(0);
    float Vtx_nTrks1 = minitree_Hemi_Vtx_nTrks->at(1);
+   float Vtx_x0 = minitree_Hemi_Vtx_x->at(0);
+   float Vtx_x1 = minitree_Hemi_Vtx_x->at(1);
+   float Vtx_y0 = minitree_Hemi_Vtx_y->at(0);
+   float Vtx_y1 = minitree_Hemi_Vtx_y->at(1);
    float Vtx_z0 = minitree_Hemi_Vtx_z->at(0);
    float Vtx_z1 = minitree_Hemi_Vtx_z->at(1);
    float Vtx_r0 = minitree_Hemi_Vtx_r->at(0);
@@ -1055,6 +1426,8 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
    float Vtx_dR1 = minitree_Hemi_Vtx_dR->at(1);
    float Vtx_SumtrackWeight0 = minitree_Hemi_Vtx_SumtrackWeight->at(0);
    float Vtx_SumtrackWeight1 = minitree_Hemi_Vtx_SumtrackWeight->at(1);
+   float Vtx0_ntrk10 = minitree_Hemi_Vtx_BDT_ntrk10->at(0);
+   float Vtx1_ntrk10 = minitree_Hemi_Vtx_BDT_ntrk10->at(1);
 
    float Vtx_MeantrackWeight0 = 0;
    float Vtx_MeantrackWeight1 = 0;
@@ -1119,6 +1492,8 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
             posy0 = minitree_Hemi_SecVtx_y->at(0);
             posz0 = minitree_Hemi_SecVtx_z->at(0);
             r0 = minitree_Hemi_SecVtx_r->at(0);
+            Vtx_x0 = posx0;
+            Vtx_y0 = posy0;
             Vtx_step1 = 0;
             Vtx_NChi1 = -1.;
             Vtx_Mass1 = 0.;
@@ -1153,6 +1528,8 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
             posx1 = minitree_Hemi_SecVtx_x->at(1);
             posy1 = minitree_Hemi_SecVtx_y->at(1);
             posz1 = minitree_Hemi_SecVtx_z->at(1);
+            Vtx_x1 = posx1;
+            Vtx_y1 = posy1;
             r1 = minitree_Hemi_SecVtx_r->at(1);
             float SecrecX1 = posx1 - minitree_PV_x->at(0);
             float SecrecY1 = posy1 - minitree_PV_y->at(0);
@@ -1175,9 +1552,11 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
       isHemiVtx2 = false;
       isHemiVtx1Loose = false;
       isHemiVtx2Loose = false;  
-
+      float VtxChicut = 2.;
+      float VtxChicut_low = 0.;
       Vtx_Vtx_dist = sqrt((posx1-posx0)*(posx1-posx0)+(posy1-posy0)*(posy1-posy0)+
                             (posz1-posz0)*(posz1-posz0));
+
 
           //First Vertex
       if ( Vtx_NChi0 > 0 && Vtx_NChi0 < 10 && Vtx_step0 >= 1 && Vtx_step0 <= 2 ) {
@@ -1190,12 +1569,18 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
           Vtx_dist = Vtx_dist0;
           Vtx_HMass = Vtx_HMass0;
           Vtx_nTrks = Vtx_nTrks0;
+          Vtx_x = Vtx_x0;
+          Vtx_y = Vtx_y0;
           Vtx_z = Vtx_z0;
           Vtx_r = Vtx_r0;
           Vtx_dR = Vtx_dR0;
           Vtx_SumtrackWeight = Vtx_SumtrackWeight0;
           Vtx_MeantrackWeight = Vtx_MeantrackWeight0;
           Vtx_track_MeanDCA_d = Vtx_track_MeanDCA_d0;
+          Vtx_ntrk10 = Vtx0_ntrk10;
+          Vtx_step = Vtx_step0;
+         fillHisto("hData_Vtx_dist","Tight",samplename, Vtx_dist0,1);
+
 
 
       }
@@ -1209,12 +1594,18 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
           Vtx_dist = Vtx_dist0;
           Vtx_HMass = Vtx_HMass0;
           Vtx_nTrks = Vtx_nTrks0;
+          Vtx_x = Vtx_x0;
+          Vtx_y = Vtx_y0;
           Vtx_z = Vtx_z0;
           Vtx_r = Vtx_r0;
           Vtx_dR = Vtx_dR0;
           Vtx_SumtrackWeight = Vtx_SumtrackWeight0;
           Vtx_MeantrackWeight = Vtx_MeantrackWeight0;
           Vtx_track_MeanDCA_d = Vtx_track_MeanDCA_d0;
+          Vtx_ntrk10 = Vtx0_ntrk10;
+          Vtx_step = Vtx_step0;
+         fillHisto("hData_Vtx_dist","Loose",samplename, Vtx_dist0,1);
+
       }
 
       //Second Vertex
@@ -1228,12 +1619,18 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
           if ( Vtx_dist1 > Vtx_dist ) Vtx_dist      = Vtx_dist1;
           if ( Vtx_HMass1 > Vtx_HMass ) Vtx_HMass   = Vtx_HMass1;
           if ( Vtx_nTrks1 > Vtx_nTrks ) Vtx_nTrks      = Vtx_nTrks1;
+            if ( Vtx_x1 > Vtx_x )     Vtx_x           = Vtx_x1;
+          if ( Vtx_y1 > Vtx_y )     Vtx_y           = Vtx_y1;
           if ( Vtx_r1 > Vtx_r )     Vtx_r           = Vtx_r1;
           if ( Vtx_z1 > Vtx_z )     Vtx_z           = Vtx_z1;
           if ( Vtx_dR1 > Vtx_dR )    Vtx_dR         = Vtx_dR1;
           if ( Vtx_SumtrackWeight1 > Vtx_SumtrackWeight )    Vtx_SumtrackWeight = Vtx_SumtrackWeight1;
           if ( Vtx_MeantrackWeight1 > Vtx_MeantrackWeight )    Vtx_MeantrackWeight = Vtx_MeantrackWeight1;
           if ( Vtx_track_MeanDCA_d1 < Vtx_track_MeanDCA_d ) Vtx_track_MeanDCA_d = Vtx_track_MeanDCA_d1;
+          if ( Vtx1_ntrk10 > Vtx_ntrk10 ) Vtx_ntrk10 = Vtx1_ntrk10;
+          if ( Vtx_step1 < Vtx_step && Vtx_step1 > 0) Vtx_step = Vtx_step1;
+         fillHisto("hData_Vtx_dist","Tight",samplename, Vtx_dist1,1);
+
       }
 
       if ( Vtx_NChi1 > 0 && Vtx_NChi1 < 10 && Vtx_step1 >= 3 && Vtx_step1 <= 4 ) {
@@ -1246,12 +1643,18 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
           if ( Vtx_dist1 > Vtx_dist ) Vtx_dist      = Vtx_dist1;
           if ( Vtx_HMass1 > Vtx_HMass ) Vtx_HMass   = Vtx_HMass1;
           if ( Vtx_nTrks1 > Vtx_nTrks ) Vtx_nTrks      = Vtx_nTrks1;
+          if ( Vtx_x1 > Vtx_x )     Vtx_x           = Vtx_x1;
+          if ( Vtx_y1 > Vtx_y )     Vtx_y           = Vtx_y1;
           if ( Vtx_r1 > Vtx_r )     Vtx_r           = Vtx_r1;
           if ( Vtx_z1 > Vtx_z )     Vtx_z           = Vtx_z1;
           if ( Vtx_dR1 > Vtx_dR )    Vtx_dR         = Vtx_dR1;
           if ( Vtx_SumtrackWeight1 > Vtx_SumtrackWeight )    Vtx_SumtrackWeight = Vtx_SumtrackWeight1;
           if ( Vtx_MeantrackWeight1 > Vtx_MeantrackWeight )    Vtx_MeantrackWeight = Vtx_MeantrackWeight1;
           if ( Vtx_track_MeanDCA_d1 < Vtx_track_MeanDCA_d ) Vtx_track_MeanDCA_d = Vtx_track_MeanDCA_d1;
+          if ( Vtx1_ntrk10 > Vtx_ntrk10 ) Vtx_ntrk10 = Vtx1_ntrk10;
+          if ( Vtx_step1 < Vtx_step && Vtx_step1 > 0) Vtx_step = Vtx_step1;
+         fillHisto("hData_Vtx_dist","Loose",samplename, Vtx_dist1,1);
+
       }
 
 
@@ -1263,11 +1666,207 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
 
    nRecoTightVertex= nVtx;
    nRecoLooseVertex= nVtxLoose;
+   if (nVtx+nVtxLoose == 2) {
 
+         if (Vtx_SumtrackWeight0 <= VtxChicut) {
+
+            fillHisto("VtxLowSTW_Hemipt","2Vtx",samplename,hemi1_pt,1);
+         }
+
+         if (Vtx_SumtrackWeight0 > VtxChicut) {
+
+            fillHisto("VtxHighSTW_Hemipt","2Vtx",samplename,hemi1_pt,1);
+         }
+          
+         if (Vtx_MeantrackWeight1 <= VtxChicut) {
+
+            fillHisto("VtxLowSTW_Hemipt","2Vtx",samplename,hemi2_pt,1);
+         }
+         if (Vtx_MeantrackWeight1 > VtxChicut) {
+
+            fillHisto("VtxHighSTW_Hemipt","2Vtx",samplename,hemi2_pt,1);
+         }
+   }
    float RATIOVTX = 0.;
-   // We can say that a Tight vertex counts for 2, to increase the value that we cna observe in the ratio :D
 
+
+   // !! New VTX BDT
+   // mva_V_nTrks
+   mva_V_chi =  Vtx_NChi0;
+   mva_V_step =  Vtx_step0;
+   mva_V_r = Vtx_r0;
+   // mva_V_z = abs(Vtx_z0);
+   mva_V_z = abs(Vtx_z0);
+   mva_V_MTW = Vtx_SumtrackWeight0;
+   mva_V_Mass = Vtx_Mass0;
+   // mva_H_Mass);
+   mva_V_dist = Vtx_dist0;
+   // mva_V_ntrk10 = Vtx0_ntrk10;
+   // mva_V_ntrk20);
+   mva_V_MeanDCA = Vtx_track_MeanDCA_d0;
+  double Vtx1_bdtVal = -10 ;
+  double Vtx1_bdtVal_EVT = -10;
+  if (isHemiVtx1 || isHemiVtx1Loose)
+     {
+      Vtx1_bdtVal = readerVtx->EvaluateMVA("BDTG");// values at -999 => thishappens if the Hemi_Mass and Hemi_Vtx_Mass are not definite
+
+     }
    
+
+   // mva_V_nTrks
+   mva_V_chi =  Vtx_NChi1;
+   mva_V_step = Vtx_step1;
+   mva_V_r = Vtx_r1;
+   // mva_V_z = abs(Vtx_z1);
+   mva_V_z = abs(Vtx_z1);
+   mva_V_MTW = Vtx_SumtrackWeight1;
+   mva_V_Mass = Vtx_Mass1;
+   // mva_H_Mass);
+   mva_V_dist = Vtx_dist1;
+   // mva_V_ntrk10 = Vtx1_ntrk10;
+   // mva_V_ntrk20);
+   mva_V_MeanDCA = Vtx_track_MeanDCA_d1;
+
+   double Vtx2_bdtVal = -10;
+
+  if (isHemiVtx2 || isHemiVtx2Loose)
+     {
+      Vtx2_bdtVal = readerVtx->EvaluateMVA("BDTG");// values at -999 => thishappens if the Hemi_Mass and Hemi_Vtx_Mass are not definite
+
+     }
+   
+double Best_BDTVal = Vtx1_bdtVal;
+   if (Vtx2_bdtVal > Vtx1_bdtVal)
+      {
+         Best_BDTVal = Vtx2_bdtVal;
+
+      }
+
+double SumBDTVal = -2;
+double AveBDTVal = -2;
+double SumSTW = -2;
+double AveSTW = -2;
+
+   if (nVtx+nVtxLoose == 2)
+      {
+         SumBDTVal = Vtx1_bdtVal + Vtx2_bdtVal;
+         AveBDTVal = SumBDTVal/2.;
+         SumSTW = Vtx_SumtrackWeight0 + Vtx_SumtrackWeight1;
+         AveSTW = SumSTW/2.;
+      }
+   else if (nVtx+nVtxLoose == 1)
+      {
+         SumBDTVal = Best_BDTVal;
+         AveBDTVal = Best_BDTVal;
+      }
+   else
+      {
+         SumBDTVal = -10;
+         AveBDTVal = -10;
+      }
+
+   double Vtx_bdtVal = -10;
+   double Vtx_bdtVal_NoSTW = -10;
+
+      // mva_V_nTrks
+   mva_V_chi =  Vtx_NChi;
+   mva_V_step = Vtx_step;
+   mva_V_r = Vtx_r;
+   // mva_V_z = abs(Vtx_z);
+   mva_V_z = abs(Vtx_z);
+
+   mva_V_MTW = Vtx_SumtrackWeight;
+   mva_V_Mass = VtxMass;
+   // mva_H_Mass) = Vtx_HMass;
+   mva_V_dist =  Vtx_dist;
+   mva_V_ntrk10 = Vtx_ntrk10;
+   // mva_V_ntrk20);
+   mva_V_MeanDCA =  Vtx_track_MeanDCA_d ;
+
+   if (nVtx+nVtxLoose == 1)
+      {
+         Vtx_bdtVal = readerVtx->EvaluateMVA("BDTG");
+      }
+
+
+  // !! New Vtx BDT at EVENT LEVEL taking as input the two vertices separately
+
+   float VTX_BDTVal_EVT = -10;
+
+   mva_V1_chi =  Vtx_NChi0;
+   mva_V1_step =  Vtx_step0;
+   mva_V1_r = Vtx_r0;
+   mva_V1_z = abs(Vtx_z0);
+   mva_V1_MTW = Vtx_SumtrackWeight0;
+   mva_V1_Mass = Vtx_Mass0;
+   // mva_V_dist = Vtx_dist0;
+   mva_V1_MeanDCA = Vtx_track_MeanDCA_d0;
+
+   mva_V2_chi =  Vtx_NChi1;
+   mva_V2_step = Vtx_step1;
+   mva_V2_r = Vtx_r1;
+   mva_V2_z = abs(Vtx_z1);
+   mva_V2_MTW = Vtx_SumtrackWeight1;
+   mva_V2_Mass = Vtx_Mass1;
+   // mva_V_dist = Vtx_dist1;
+   mva_V2_MeanDCA = Vtx_track_MeanDCA_d1;
+
+   if (nVtx+nVtxLoose == 2)
+      {
+         VTX_BDTVal_EVT = readerVtx_EVT->EvaluateMVA("BDTG");
+      }
+
+   // !! ---------------VtxRecoEffi ------------//
+   if (Signal)
+      {
+         float rLLP1 = sqrt((minitree_Hemi_LLP_x->at(0)*minitree_Hemi_LLP_x->at(0))+(minitree_Hemi_LLP_y->at(0)*minitree_Hemi_LLP_y->at(0)));              
+         float rLLP2 = sqrt((minitree_Hemi_LLP_x->at(1)*minitree_Hemi_LLP_x->at(1))+(minitree_Hemi_LLP_y->at(1)*minitree_Hemi_LLP_y->at(1)));              
+         
+
+         fillHisto("hSim_Hemi_Vtx_r","noSel",samplename,rLLP1,1);
+         fillHisto("hSim_Hemi_Vtx_r","noSel",samplename,rLLP2,1);
+         fillHisto("hSim_Hemi_Vtx_dist","noSel",samplename,minitree_Hemi_LLP_dist->at(0),1);
+         fillHisto("hSim_Hemi_Vtx_dist","noSel",samplename,minitree_Hemi_LLP_dist->at(1),1);
+      }
+
+    if ( Vtx_NChi0>0 && Vtx_NChi0<10)//Reco Vtx criteria
+      {//-->Goodrecovtx
+
+         fillHisto("hData_Hemi_Vtx_r","Goodrecovtx",samplename,Vtx_r0,1);
+         fillHisto("hData_Hemi_Vtx_dist","Goodrecovtx",samplename,Vtx_dist0,1);
+        if (ping0)
+          {
+
+            fillHisto("hData_Hemi_Vtx_r","Ping",samplename,Vtx_r0,1);
+            fillHisto("hData_Hemi_Vtx_dist","Ping",samplename,Vtx_dist0,1);
+            //  Tightping
+            if ( Vtx_step0 >=1 && Vtx_step0 <=2 ) fillHisto("hData_Hemi_Vtx_r","TightPing",samplename,Vtx_r0,1);
+            if ( Vtx_step0 >=1 && Vtx_step0 <=2 ) fillHisto("hData_Hemi_Vtx_dist","TightPing",samplename,Vtx_dist0,1);
+             // Looseping
+            if ( Vtx_step0 >=3 && Vtx_step0 <=4 ) fillHisto("hData_Hemi_Vtx_r","LoosePing",samplename,Vtx_r0,1);
+            if ( Vtx_step0 >=3 && Vtx_step0 <=4 ) fillHisto("hData_Hemi_Vtx_dist","LoosePing",samplename,Vtx_dist0,1);
+          }
+      }
+   if ( Vtx_NChi1>0 && Vtx_NChi1<10)//Reco Vtx criteria
+      {//-->Goodrecovtx
+         fillHisto("hData_Hemi_Vtx_r","Goodrecovtx",samplename,Vtx_r1,1);
+         fillHisto("hData_Hemi_Vtx_dist","Goodrecovtx",samplename,Vtx_dist1,1);
+        if (ping1)
+          {
+            fillHisto("hData_Hemi_Vtx_r","Ping",samplename,Vtx_r1,1);
+            fillHisto("hData_Hemi_Vtx_dist","Ping",samplename,Vtx_dist1,1);
+            //  Tightping
+            if ( Vtx_step1 >=1 && Vtx_step1 <=2 )fillHisto("hData_Hemi_Vtx_r","TightPing",samplename,Vtx_r1,1);
+            // if ( step >=1 && step <=2 ) hData_Hemi_Vtx_eta_Tightping->Fill(eta);//to be changed
+            if ( Vtx_step1>=1 && Vtx_step1 <=2 ) fillHisto("hData_Hemi_Vtx_dist","TightPing",samplename,Vtx_dist1,1);
+             // Looseping
+            if ( Vtx_step1 >=3 && Vtx_step1 <=4 )fillHisto("hData_Hemi_Vtx_r","LoosePing",samplename,Vtx_r1,1);
+            // if ( step >=3 && step <=4 ) hData_Hemi_Vtx_eta_Looseping->Fill(eta);//to be changed
+            if ( Vtx_step1 >=3 && Vtx_step1 <=4 ) fillHisto("hData_Hemi_Vtx_dist","LoosePing",samplename,Vtx_dist1,1);
+          }
+      }
+   // !! ---------------VtxRecoEffi ------------//
+
 
    int nVtx1 = 0;
    int nVtx2 = 0;
@@ -1280,426 +1879,153 @@ std::vector<TString> NJET = {"0","1","2","3","4","5","6","7","8","9","10","11","
    if (isHemiVtx1Loose){nVtxLoose1=1;}
    if (isHemiVtx2Loose){nVtxLoose2=1;}
 
-   if (nVtx == 0 && nVtxLoose == 0)
-      {
-         RATIOVTX = 0;
-         
-      }
-   if (nVtx == 2 && nVtxLoose == 0)
-      {
-         RATIOVTX = 4;
-       
-        fillHisto("hData_VtxQualityTight_Hemi1pt","2Vtx",samplename,hemi1_pt,1);
-        fillHisto("hData_VtxQualityTight_Hemi2pt","2Vtx",samplename,hemi2_pt,1);
-
-      }
-   if (nVtx == 1 && nVtxLoose == 0)
-      {
-         RATIOVTX = 2;
-
-         if (isHemiVtx1)
-            {
-               fillHisto("hData_VtxQualityTight_Hemi1pt","1Vtx",samplename,hemi1_pt,1);
-            }
-         else if (isHemiVtx2)
-            {
-               fillHisto("hData_VtxQualityTight_Hemi2pt","1Vtx",samplename,hemi2_pt,1);
-            }
-      }
-   if (nVtx == 0 && nVtxLoose == 1)
-      {
-         RATIOVTX = 0.5;
-
-         if (isHemiVtx1Loose)
-            {
-               fillHisto("hData_VtxQualityLoose_Hemi1pt","1Vtx",samplename,hemi1_pt,1);
-
-            }
-         else if (isHemiVtx2Loose)
-            {
-               fillHisto("hData_VtxQualityLoose_Hemi2pt","1Vtx",samplename,hemi2_pt,1);
-            }
-      }
-   if (nVtx == 0 && nVtxLoose == 2)
-      {
-         RATIOVTX = 1;
-         fillHisto("hData_VtxQualityLoose_Hemi1pt","2Vtx",samplename,hemi1_pt,1);
-         fillHisto("hData_VtxQualityLoose_Hemi2pt","2Vtx",samplename,hemi2_pt,1);
-      }
-   if (nVtx == 1 && nVtxLoose == 1)
-      {
-         RATIOVTX = 3;
-
-
-         if (isHemiVtx1)
-            {
-              fillHisto("hData_VtxQualityTight_Hemi1pt","2Vtx",samplename,hemi1_pt,1);
-               // else if ( hemi1_pt > lowHpt && hemi1_pt< 80 ){fillHisto("hData_VtxQualityTight_LowHemi1pt","2Vtx",samplename,hemi1_pt,1);}
-            }
-         else if (isHemiVtx2)
-            {
-               fillHisto("hData_VtxQualityTight_Hemi2pt","2Vtx",samplename,hemi2_pt,1);
-               // else if ( hemi2_pt > lowHpt && hemi2_pt< 80 ){fillHisto("hData_VtxQualityTight_LowHemi2pt","2Vtx",samplename,hemi2_pt,1);}
-            }
-         if (isHemiVtx1Loose)
-            {
-               fillHisto("hData_VtxQualityLoose_Hemi1pt","2Vtx",samplename,hemi1_pt,1);
-               // else if ( hemi1_pt > lowHpt && hemi1_pt< 80 ){fillHisto("hData_VtxQualityLoose_LowHemi1pt","2Vtx",samplename,hemi1_pt,1);}
-            }
-         else if (isHemiVtx2Loose)
-            {
-               fillHisto("hData_VtxQualityLoose_Hemi2pt","2Vtx",samplename,hemi2_pt,1);
-               // else if ( hemi2_pt > lowHpt && hemi2_pt< 80 ){fillHisto("hData_VtxQualityLoose_LowHemi2pt","2Vtx",samplename,hemi2_pt,1);}
-            }
-
-      }
-
-
-
    //-------------- //    
    float HemiAveragePt = (hemi_ptmax+hemi_ptmin)/2.;
-   fillHisto("hData_VtxQualityTight_Hemi1pt","NoSel",samplename,hemi1_pt,nVtx1);
-   fillHisto("hData_VtxQualityTight_Hemi2pt","NoSel",samplename,hemi2_pt,nVtx2);
 
-   fillHisto("hData_VtxQualityLoose_Hemi1pt","NoSel",samplename,hemi1_pt,nVtxLoose1);
-   fillHisto("hData_VtxQualityLoose_Hemi2pt","NoSel",samplename,hemi2_pt,nVtxLoose2);
+   if ( (nRecoTightVertex + nRecoLooseVertex) == 2)
+   {
 
-   //-------------- //
-   fillHisto("hData_VtxQualityTight_Hemileadingpt","NoSel",samplename,hemi_ptmax,nRecoTightVertex);
-   fillHisto("hData_VtxQualityTight_Hemisubleadingpt","NoSel",samplename,hemi_ptmin,nRecoTightVertex);
-  
-   fillHisto("hData_VtxQualityLoose_Hemileadingpt","NoSel",samplename,hemi_ptmax,nRecoLooseVertex);
-   fillHisto("hData_VtxQualityLoose_Hemisubleadingpt","NoSel",samplename,hemi_ptmin,nRecoLooseVertex);
-   
-   fillHisto("hData_VtxQualityTight_HemiAveragept","NoSel",samplename,HemiAveragePt,nRecoTightVertex);
-   fillHisto("hData_VtxQualityLoose_HemiAveragept","NoSel",samplename,HemiAveragePt,nRecoLooseVertex);
-
-   fillHisto("hData_VtxQualityRatio_Hemileadingpt","NoSel",samplename,hemi_ptmax,RATIOVTX);
-   fillHisto("hData_VtxQualityRatio_Hemisubleadingpt","NoSel",samplename,hemi_ptmin,RATIOVTX);
-   fillHisto("hData_VtxQualityRatio_HemiAveragept","NoSel",samplename,HemiAveragePt,RATIOVTX);
+      fillHisto("hData_VtxQualityTight_Hemipt","2Vtx",samplename,hemi_ptmax,nRecoTightVertex);
+      fillHisto("hData_VtxQualityTight_Hemipt","2Vtx",samplename,hemi_ptmin,nRecoTightVertex);
 
 
-   fillHisto("hData_VtxQualityTight_Mmumu","NoSel",samplename,minitree_Mmumu->at(0),nRecoTightVertex);
-   fillHisto("hData_VtxQualityLoose_Mmumu","NoSel",samplename,minitree_Mmumu->at(0),nRecoLooseVertex);
+      fillHisto("hData_VtxQualityTight_VtxBDT","2Vtx",samplename,Vtx1_bdtVal,nRecoTightVertex);
+      fillHisto("hData_VtxQualityTight_VtxBDT","2Vtx",samplename,Vtx2_bdtVal,nRecoTightVertex);
 
-   fillHisto("hData_VtxQualityTight_Njet1","NoSel",samplename,minitree_Hemi_njet_nomu->at(0),nVtx1);
-   fillHisto("hData_VtxQualityLoose_Njet1","NoSel",samplename,minitree_Hemi_njet_nomu->at(0),nVtxLoose1);
+      fillHisto("hData_VtxQualityLoose_VtxBDT","2Vtx",samplename,Vtx1_bdtVal,nRecoLooseVertex);
+      fillHisto("hData_VtxQualityLoose_VtxBDT","2Vtx",samplename,Vtx2_bdtVal,nRecoLooseVertex);
 
-   fillHisto("hData_VtxQualityTight_Njet2","NoSel",samplename,minitree_Hemi_njet_nomu->at(1),nVtx2);
-   fillHisto("hData_VtxQualityLoose_Njet2","NoSel",samplename,minitree_Hemi_njet_nomu->at(1),nVtxLoose2);
+      fillHisto2D("hData_Hemipt_VtxBDT","2Vtx",samplename,Vtx1_bdtVal,hemi1_pt,1);
+      fillHisto2D("hData_Hemipt_VtxBDT","2Vtx",samplename,Vtx2_bdtVal,hemi2_pt,1);
 
-   fillHisto2D("hData_njetvsHemi1pt","NoSel",samplename,minitree_Hemi_njet_nomu->at(0),hemi1_pt,1);
-   fillHisto2D("hData_njetvsHemi2pt","NoSel",samplename,minitree_Hemi_njet_nomu->at(1),hemi2_pt,1);
+      fillHisto("hData_VtxQualityLoose_Hemipt","2Vtx",samplename,hemi_ptmax,nRecoLooseVertex);
+      fillHisto("hData_VtxQualityLoose_Hemipt","2Vtx",samplename,hemi_ptmin,nRecoLooseVertex);
 
+   }
 
-
-      if ((nVtx == 1 && nVtxLoose == 0)|| (nVtx == 0 && nVtxLoose == 1) )
-      {
-          fillHisto2D("hData_Hemi_1Vtx_STW_Ntrks","NoSel",samplename,Vtx_SumtrackWeight,Vtx_nTrks,1);
-          fillHisto("hData_Hemi_1Vtx_NChi2","",samplename,Vtx_NChi,1);
-          fillHisto("LT_1Vtx","",samplename,minitree_LT->at(0),1);
-          fillHisto("LT_1Vtx","Prompt",samplename,LT,1);
-          nReco1Vertex++;
-          if ((nVtx == 1 && nVtxLoose == 0))
-            {
-               fillHisto("LT_1Vtx","Tight",samplename,minitree_LT->at(0),1);
-               fillHisto("LT_1Vtx","PromptTight",samplename,LT,1);
-               nReco1TightVertex++;
-            }
-          if ((nVtx == 0 && nVtxLoose == 1))
-            {
-               fillHisto("LT_1Vtx","Loose",samplename,minitree_LT->at(0),1); 
-               fillHisto("LT_1Vtx","PromptLoose",samplename,LT,1);
-            }
-      }
-
-          if ((nVtx == 2 && nVtxLoose == 0)|| (nVtx == 0 && nVtxLoose == 2) || (nVtx == 1 && nVtxLoose == 1))
+   if ((nVtx == 2 && nVtxLoose == 0)|| (nVtx == 0 && nVtxLoose == 2) || (nVtx == 1 && nVtxLoose == 1))
       {
           fillHisto2D("hData_Hemi_2VtxAll_STW_Ntrks","NoSel",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,1);
           fillHisto2D("hData_Hemi_2VtxAll_STW_Ntrks","NoSel",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,1);
           fillHisto("hData_Hemi_2VtxAll_NChi2","",samplename,Vtx_NChi0,1);
           fillHisto("hData_Hemi_2VtxAll_NChi2","",samplename,Vtx_NChi1,1);
-          fillHisto("LT_2Vtx","",samplename,minitree_LT->at(0),1);
-          fillHisto("LT_2Vtx","Prompt",samplename,LT,1);
-          nReco2Vertex++;
-          if ((nVtx == 2 && nVtxLoose == 0))
-            {
-                fillHisto("LT_2Vtx","TT",samplename,minitree_LT->at(0),1);
-                fillHisto("LT_2Vtx","PromptTT",samplename,LT,1);
-                nReco2TightVertex++;
-            }
-         if ((nVtx == 0 && nVtxLoose == 2))
-            {
-               fillHisto("LT_2Vtx","LL",samplename,minitree_LT->at(0),1);
-               fillHisto("LT_2Vtx","PromptLL",samplename,LT,1);
-            }
-         if ((nVtx == 1 && nVtxLoose == 1))
-            {
-               fillHisto("LT_2Vtx","TL",samplename,minitree_LT->at(0),1);
-               fillHisto("LT_2Vtx","PromptTL",samplename,LT,1);
-            }
+
       }
 
+// !! $$ ££ ¤¤ NEW
+      if (nVtx == 2)
+         {
+            fillHisto("hData_2Vtx_VTXMVA","Tight",samplename,Best_BDTVal,NormFactor );
+            fillHisto("hData_2Vtx_VTXMVA_EVT","Tight",samplename,VTX_BDTVal_EVT,NormFactor );
+         }
+      else if (nVtx + nVtxLoose == 2)
+         {
+            fillHisto("hData_2Vtx_VTXMVA","TightLoose",samplename,Best_BDTVal,NormFactor );
+            fillHisto("hData_2Vtx_VTXMVA_EVT","TightLoose",samplename,VTX_BDTVal_EVT,NormFactor );
+         }
+      else if (nVtxLoose == 2)
+         {
+            fillHisto("hData_2Vtx_VTXMVA","LooseLoose",samplename,Best_BDTVal,NormFactor );
+            fillHisto("hData_2Vtx_VTXMVA_EVT","LooseLoose",samplename,VTX_BDTVal_EVT,NormFactor );   
+         }
+// !! $$ ££ ¤¤ NEW 2 
+
+   if (Vtx_step0 >= 1 && Vtx_step0 <= 2 && Vtx_step1 >= 1 && Vtx_step1 <= 2 )
+      {
+            fillHisto("hData_2Vtx_VtxVTx_VTXMVA","TightTight",samplename,Best_BDTVal,NormFactor );
+            fillHisto("hData_2Vtx_VtxVTx_VTXMVA_EVT","TightTight",samplename,VTX_BDTVal_EVT,NormFactor );  
+      }
+   else if (Vtx_step0 >= 1 && Vtx_step0 <= 2 && Vtx_step1 >= 3 && Vtx_step1 <= 4 )
+      {
+            fillHisto("hData_2Vtx_VtxVTx_VTXMVA","TightLoose",samplename,Best_BDTVal,NormFactor );
+            fillHisto("hData_2Vtx_VtxVTx_VTXMVA_EVT","TightLoose",samplename,VTX_BDTVal_EVT,NormFactor );  
+      }
+   else if (Vtx_step0 >= 3 && Vtx_step0 <= 4 && Vtx_step1 >= 1 && Vtx_step1 <= 2 )
+      {
+            fillHisto("hData_2Vtx_VtxVTx_VTXMVA","LooseTight",samplename,Best_BDTVal,NormFactor );
+            fillHisto("hData_2Vtx_VtxVTx_VTXMVA_EVT","LooseTight",samplename,VTX_BDTVal_EVT,NormFactor );  
+      }
+   else if (Vtx_step0 >= 3 && Vtx_step0 <= 4 && Vtx_step1 >= 3 && Vtx_step1 <= 4 )
+      {
+            fillHisto("hData_2Vtx_VtxVTx_VTXMVA","LooseLoose",samplename,Best_BDTVal,NormFactor );
+            fillHisto("hData_2Vtx_VtxVTx_VTXMVA_EVT","LooseLoose",samplename,VTX_BDTVal_EVT,NormFactor );  
+      }
+// !! $$ ££ ¤¤ 
       //-----------------------------------------------------------//
       // ABCD using Hemipshere pt anf Tight+loose steps of vertexing 
       //-----------------------------------------------------------//
 
-      // !! --------SR-------- !! //
-
-    if (minitree_Filter->at(0))// CHANGE
-      {
-         if ((nVtx == 1 && nVtxLoose == 0) || (nVtx == 0 && nVtxLoose == 1)) 
-            {
-               int Quality = 0 ;// 0 is tight and 1 is loose
-               if (nVtxLoose == 1)  Quality = 1;
-               fillHisto2D("hData_ABCD_1Vtx_TL_Hemipt","",samplename, hemi_ptmin, Quality, Vtx_SumtrackWeight);
-            }
-         if (nVtx == 2  || nVtxLoose == 2) 
-            {
-               int Quality = 0;
-               if (nVtxLoose == 2)  Quality = 1;
-               fillHisto2D("hData_ABCD_TLVtxAll_Hemipt","",samplename, hemi_ptmin,Quality, Vtx_SumtrackWeight);
-               fillHisto2D("hData_ABCD_TLVtxAll_Hemipt","",samplename, hemi1_pt, Quality, Vtx_SumtrackWeight0);
-               fillHisto2D("hData_ABCD_TLVtxAll_Hemipt","",samplename, hemi2_pt, Quality, Vtx_SumtrackWeight1);
-            }
-
-      }    
-
-
-                        // !! -------------- Beginning OF LT ------------  !! //
-
-float LTcut = 80.; //GeV
-// can try both LT (prompt muons ) and minitree_LT->at(0) (all muons) 
-isCutEvt = false;
-if (LT > LTcut){isCutEvt = true;}
-
-                           // ---        1 Vertex        ---//
-         if (nVtx == 1 && nVtxLoose == 0 ) 
-            {
-               if (isCutEvt) // Signal Region C
-                  {
-                     if (!BlindSR) 
-                        {
-                           fillHisto("Quality_LT_STW_1Vtx_C","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt);
-                        }
-                     else
-                        {
-                           fillHisto("Quality_LT_STW_1Vtx_C","",samplename,0,Pref_PU_gen_wt);
-                        }
-                     
-                  }
-               else // Contol region A
-                  {
-                     fillHisto("Quality_LT_STW_1Vtx_A","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt);
-                  }
-            }
-         if (nVtx == 0 && nVtxLoose == 1 ) 
-            {
-               if (isCutEvt) // Control Region D
-                  {
-                     fillHisto("Quality_LT_STW_1Vtx_D","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt);
-                  }
-               else // Contol region B
-                  {
-                     fillHisto("Quality_LT_STW_1Vtx_B","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt);
-                  } 
-            }
-
-
-                        // ---        2 Vertex        ---//
-         if (nVtx == 1 && nVtxLoose == 1 ) 
-            {
-               if (isCutEvt) // Signal Region C
-                  {
-                     if (!BlindSR) 
-                        {
-                           fillHisto("Quality_LT_STW_2Vtx_C","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt);
-                           fillHisto("Quality_LT_STW_2VtxAll_C","",samplename,Vtx_SumtrackWeight0,Pref_PU_gen_wt);
-                           fillHisto("Quality_LT_STW_2VtxAll_C","",samplename,Vtx_SumtrackWeight1,Pref_PU_gen_wt);
-                        }
-                     else
-                        {
-                           fillHisto("Quality_LT_STW_2Vtx_C","",samplename,0,Pref_PU_gen_wt);
-                           fillHisto("Quality_LT_STW_2VtxAll_C","",samplename,0,Pref_PU_gen_wt);
-                           fillHisto("Quality_LT_STW_2VtxAll_C","",samplename,0,Pref_PU_gen_wt);
-                        }
-
-                  }
-               else // Contol region A
-                  {
-                     fillHisto("Quality_LT_STW_2Vtx_A","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt);
-                     fillHisto("Quality_LT_STW_2VtxAll_A","",samplename,Vtx_SumtrackWeight0,Pref_PU_gen_wt);
-                     fillHisto("Quality_LT_STW_2VtxAll_A","",samplename,Vtx_SumtrackWeight1,Pref_PU_gen_wt);
-                  } 
-            }
-         if (nVtx == 2 && nVtxLoose == 0 ) 
-            {
-               if (isCutEvt) // Signal Region C
-                  {
-                     if (!BlindSR) 
-                        {
-                           fillHisto("Quality_LT_STW_2Vtx_C","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt);
-                           fillHisto("Quality_LT_STW_2VtxAll_C","",samplename,Vtx_SumtrackWeight0,Pref_PU_gen_wt);
-                           fillHisto("Quality_LT_STW_2VtxAll_C","",samplename,Vtx_SumtrackWeight1,Pref_PU_gen_wt);
-                        }
-                     else
-                        {
-                           fillHisto("Quality_LT_STW_2Vtx_C","",samplename,0,Pref_PU_gen_wt);
-                           fillHisto("Quality_LT_STW_2VtxAll_C","",samplename,0,Pref_PU_gen_wt);
-                           fillHisto("Quality_LT_STW_2VtxAll_C","",samplename,0,Pref_PU_gen_wt);
-                        }
-
-                  }
-               else // Contol region A
-                  {
-                     fillHisto("Quality_LT_STW_2Vtx_A","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt);
-                     fillHisto("Quality_LT_STW_2VtxAll_A","",samplename,Vtx_SumtrackWeight0,Pref_PU_gen_wt);
-                     fillHisto("Quality_LT_STW_2VtxAll_A","",samplename,Vtx_SumtrackWeight1,Pref_PU_gen_wt);
-                  } 
-            }
-         if (nVtx == 0 && nVtxLoose == 2 ) 
-            {
-               if (isCutEvt) // Control Region D
-                  {
-                     fillHisto("Quality_LT_STW_2Vtx_D","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt);
-                     fillHisto("Quality_LT_STW_2VtxAll_D","",samplename,Vtx_SumtrackWeight0,Pref_PU_gen_wt);
-                     fillHisto("Quality_LT_STW_2VtxAll_D","",samplename,Vtx_SumtrackWeight1,Pref_PU_gen_wt);
-                  }
-               else // Contol region B
-                  {
-                     fillHisto("Quality_LT_STW_2Vtx_B","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt);
-                     fillHisto("Quality_LT_STW_2VtxAll_B","",samplename,Vtx_SumtrackWeight0,Pref_PU_gen_wt);
-                     fillHisto("Quality_LT_STW_2VtxAll_B","",samplename,Vtx_SumtrackWeight1,Pref_PU_gen_wt);
-                  } 
-            }
-
-                        // !! -------------- END OF LT ------------  !! //
-
-
    isCutEvt = false;
     if (!BlindSR) {
          
-         // if (showoutput) // std::cout<<"SR "<<std::endl;
-         fillHisto("hData_Hemi_BDTevt","",samplename, minitree_Evts_MVAval->at(0) ,Pref_PU_gen_wt);
-         //$$
-   
-         if (hemi_ptmin > 80.) isCutEvt = true;
-            //    //$$
-            //          hemi1_pt = minitree_Hemi_pt->at(0);
-            // hemi2_pt = minitree_Hemi_pt->at(1);
-
-         if (nVtx == 0 && nVtxLoose == 0 && isCutEvt) {
-            fillHisto("hData_Hemi_0Vtx_Mmumu","",samplename,minitree_Mmumu->at(0),Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_0Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
-         }
-
-         
-         if (nVtx == 1 && nVtxLoose==0 && isCutEvt ) {
-            fillHisto("hData_Hemi_1Vtx_Mmumu","",samplename,minitree_Mmumu->at(0),Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_1Vtx_Mass","",samplename,VtxMass,Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_1Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0) ,Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_1Vtx_BDTvtx","",samplename, BDTvtx,Pref_PU_gen_wt );
-            fillHisto("hData_Hemi_1Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight,Pref_PU_gen_wt );
-            fillHisto("hData_Hemi_1Vtx_dist","",samplename, Vtx_dist,Pref_PU_gen_wt );
-            fillHisto2D("hData_Hemi_1Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
-
-         }
-
-
       if (nVtx == 1 && nVtxLoose == 1 && isCutEvt) { // same as Loose since TL = LT
-         fillHisto("hData_Hemi_TLVtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt);
-         fillHisto("hData_Hemi_TLVtx_Mass","",samplename,VtxMass,Pref_PU_gen_wt);
+         fillHisto("hData_Hemi_TLVtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,NormFactor);
+         fillHisto("hData_Hemi_TLVtx_Mass","",samplename,VtxMass,NormFactor);
 
-         fillHisto("hData_Hemi_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight0,Pref_PU_gen_wt);
-         fillHisto("hData_Hemi_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight1,Pref_PU_gen_wt);
-         fillHisto("hData_Hemi_TLVtxAll_Mass","",samplename,Vtx_Mass0,Pref_PU_gen_wt);
-         fillHisto("hData_Hemi_TLVtxAll_Mass","",samplename,Vtx_Mass1,Pref_PU_gen_wt);
-         fillHisto2D("hData_Hemi_TLVtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
-         fillHisto2D("hData_Hemi_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,Pref_PU_gen_wt);
-         fillHisto2D("hData_Hemi_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,Pref_PU_gen_wt);
+         fillHisto("hData_Hemi_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight0,NormFactor);
+         fillHisto("hData_Hemi_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight1,NormFactor);
+         fillHisto("hData_Hemi_TLVtxAll_Mass","",samplename,Vtx_Mass0,NormFactor);
+         fillHisto("hData_Hemi_TLVtxAll_Mass","",samplename,Vtx_Mass1,NormFactor);
+         fillHisto2D("hData_Hemi_TLVtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,NormFactor);
+         fillHisto2D("hData_Hemi_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,NormFactor);
+         fillHisto2D("hData_Hemi_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,NormFactor);
 
       }
          
          if (nVtx == 2 && isCutEvt ) {
-            fillHisto("hData_Hemi_2Vtx_Mmumu","",samplename,minitree_Mmumu->at(0),Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_2Vtx_Mass","",samplename,VtxMass,Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_2Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
-            fillHisto("hData_Hemi_2Vtx_MaxBDTvtx","",samplename, BDTvtx,Pref_PU_gen_wt );
-            fillHisto("hData_Hemi_2Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight,Pref_PU_gen_wt );
-            fillHisto2D("hData_Hemi_2Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
+            fillHisto("hData_Hemi_2Vtx_Mmumu","",samplename,minitree_Mmumu->at(0),NormFactor);
+            fillHisto("hData_Hemi_2Vtx_Mass","",samplename,VtxMass,NormFactor);
+            fillHisto("hData_Hemi_2Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0),NormFactor );
+            fillHisto("hData_Hemi_2Vtx_MaxBDTvtx","",samplename, BDTvtx,NormFactor );
+            fillHisto("hData_Hemi_2Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight,NormFactor );
+            fillHisto2D("hData_Hemi_2Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,NormFactor);
 
-            fillHisto("hData_Hemi_2VtxAll_Mass","",samplename,Vtx_Mass0,Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_2VtxAll_Mass","",samplename,Vtx_Mass1,Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_2VtxAll_BDTvtx","",samplename, BDTvtx1 ,Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_2VtxAll_BDTvtx","",samplename, BDTvtx2 ,Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight0,Pref_PU_gen_wt );
-            fillHisto("hData_Hemi_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight1,Pref_PU_gen_wt );
-            fillHisto2D("hData_Hemi_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,Pref_PU_gen_wt);
-            fillHisto2D("hData_Hemi_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,Pref_PU_gen_wt);
-
+            fillHisto("hData_Hemi_2VtxAll_Mass","",samplename,Vtx_Mass0,NormFactor);
+            fillHisto("hData_Hemi_2VtxAll_Mass","",samplename,Vtx_Mass1,NormFactor);
+            fillHisto("hData_Hemi_2VtxAll_BDTvtx","",samplename, BDTvtx1 ,NormFactor);
+            fillHisto("hData_Hemi_2VtxAll_BDTvtx","",samplename, BDTvtx2 ,NormFactor);
+            fillHisto("hData_Hemi_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight0,NormFactor );
+            fillHisto("hData_Hemi_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight1,NormFactor );
+            fillHisto2D("hData_Hemi_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,NormFactor);
+            fillHisto2D("hData_Hemi_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,NormFactor);
 
          }
 
       }
    else {
-         
-         // if (showoutput) // std::cout<<"SR "<<std::endl;
-         fillHisto("hData_Hemi_BDTevt","",samplename, 0 ,Pref_PU_gen_wt);
-         //$$
-   
-         if (hemi_ptmin > 80.) isCutEvt = true;
-            //    //$$
-            //          hemi1_pt = minitree_Hemi_pt->at(0);
-            // hemi2_pt = minitree_Hemi_pt->at(1);
 
-         if (nVtx == 0 && nVtxLoose == 0 && isCutEvt) {
-            fillHisto("hData_Hemi_0Vtx_Mmumu","",samplename,0,Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_0Vtx_BDTevt","",samplename, 0,Pref_PU_gen_wt );
-         }
-
-         
-         if (nVtx == 1 && nVtxLoose==0 && isCutEvt ) {
-            fillHisto("hData_Hemi_1Vtx_Mmumu","",samplename,0,Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_1Vtx_Mass","",samplename,0,Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_1Vtx_BDTevt","",samplename, 0 ,Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_1Vtx_BDTvtx","",samplename, 0,Pref_PU_gen_wt );
-            fillHisto("hData_Hemi_1Vtx_SumtrackWeight","",samplename, 0,Pref_PU_gen_wt );
-            fillHisto("hData_Hemi_1Vtx_dist","",samplename, 0,Pref_PU_gen_wt );
-            fillHisto2D("hData_Hemi_1Vtx_STW_Ntrks","",samplename,0,0,Pref_PU_gen_wt);
-
-         }
-
+         if (hemi_ptmin > highHpt) isCutEvt = true;
 
       if (nVtx == 1 && nVtxLoose == 1 && isCutEvt ) { // same as Loose since TL = LT
-         fillHisto("hData_Hemi_TLVtx_SumtrackWeight","",samplename,0,Pref_PU_gen_wt);
-         fillHisto("hData_Hemi_TLVtx_Mass","",samplename,0,Pref_PU_gen_wt);
+         fillHisto("hData_Hemi_TLVtx_SumtrackWeight","",samplename,0,NormFactor);
+         fillHisto("hData_Hemi_TLVtx_Mass","",samplename,0,NormFactor);
 
-         fillHisto("hData_Hemi_TLVtxAll_SumtrackWeight","",samplename,0,Pref_PU_gen_wt);
-         fillHisto("hData_Hemi_TLVtxAll_SumtrackWeight","",samplename,0,Pref_PU_gen_wt);
-         fillHisto("hData_Hemi_TLVtxAll_Mass","",samplename,0,Pref_PU_gen_wt);
-         fillHisto("hData_Hemi_TLVtxAll_Mass","",samplename,0,Pref_PU_gen_wt);
-         fillHisto2D("hData_Hemi_TLVtx_STW_Ntrks","",samplename,0,0,Pref_PU_gen_wt);
-         fillHisto2D("hData_Hemi_TLVtxAll_STW_Ntrks","",samplename,0,0,Pref_PU_gen_wt);
-         fillHisto2D("hData_Hemi_TLVtxAll_STW_Ntrks","",samplename,0,0,Pref_PU_gen_wt);
+         fillHisto("hData_Hemi_TLVtxAll_SumtrackWeight","",samplename,0,NormFactor);
+         fillHisto("hData_Hemi_TLVtxAll_SumtrackWeight","",samplename,0,NormFactor);
+         fillHisto("hData_Hemi_TLVtxAll_Mass","",samplename,0,NormFactor);
+         fillHisto("hData_Hemi_TLVtxAll_Mass","",samplename,0,NormFactor);
+         fillHisto2D("hData_Hemi_TLVtx_STW_Ntrks","",samplename,0,0,NormFactor);
+         fillHisto2D("hData_Hemi_TLVtxAll_STW_Ntrks","",samplename,0,0,NormFactor);
+         fillHisto2D("hData_Hemi_TLVtxAll_STW_Ntrks","",samplename,0,0,NormFactor);
 
       }
          
          if (nVtx == 2 && isCutEvt ) {
-            fillHisto("hData_Hemi_2Vtx_Mmumu","",samplename,minitree_Mmumu->at(0),Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_2Vtx_Mass","",samplename,0,Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_2Vtx_BDTevt","",samplename, 0,Pref_PU_gen_wt );
-            fillHisto("hData_Hemi_2Vtx_MaxBDTvtx","",samplename, 0,Pref_PU_gen_wt );
-            fillHisto("hData_Hemi_2Vtx_SumtrackWeight","",samplename, 0,Pref_PU_gen_wt );
-            fillHisto2D("hData_Hemi_2Vtx_STW_Ntrks","",samplename,0,Vtx_nTrks,Pref_PU_gen_wt);
+            fillHisto("hData_Hemi_2Vtx_Mmumu","",samplename,minitree_Mmumu->at(0),NormFactor);
+            fillHisto("hData_Hemi_2Vtx_Mass","",samplename,0,NormFactor);
+            fillHisto("hData_Hemi_2Vtx_BDTevt","",samplename, 0,NormFactor );
+            fillHisto("hData_Hemi_2Vtx_MaxBDTvtx","",samplename, 0,NormFactor );
+            fillHisto("hData_Hemi_2Vtx_SumtrackWeight","",samplename, 0,NormFactor );
+            fillHisto2D("hData_Hemi_2Vtx_STW_Ntrks","",samplename,0,Vtx_nTrks,NormFactor);
 
-            fillHisto("hData_Hemi_2VtxAll_Mass","",samplename,0,Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_2VtxAll_Mass","",samplename,0,Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_2VtxAll_BDTvtx","",samplename, 0 ,Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_2VtxAll_BDTvtx","",samplename, BDTvtx2 ,Pref_PU_gen_wt);
-            fillHisto("hData_Hemi_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight0,Pref_PU_gen_wt );
-            fillHisto("hData_Hemi_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight1,Pref_PU_gen_wt );
-            fillHisto2D("hData_Hemi_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,Pref_PU_gen_wt);
-            fillHisto2D("hData_Hemi_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,Pref_PU_gen_wt);
+            fillHisto("hData_Hemi_2VtxAll_Mass","",samplename,0,NormFactor);
+            fillHisto("hData_Hemi_2VtxAll_Mass","",samplename,0,NormFactor);
+            fillHisto("hData_Hemi_2VtxAll_BDTvtx","",samplename, 0 ,NormFactor);
+            fillHisto("hData_Hemi_2VtxAll_BDTvtx","",samplename, BDTvtx2 ,NormFactor);
+            fillHisto("hData_Hemi_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight0,NormFactor );
+            fillHisto("hData_Hemi_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight1,NormFactor );
+            fillHisto2D("hData_Hemi_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,NormFactor);
+            fillHisto2D("hData_Hemi_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,NormFactor);
 
 
          }
@@ -1709,65 +2035,43 @@ if (LT > LTcut){isCutEvt = true;}
       //--------CR : Low Pt --------//
 
       isCutEvt = false;
-      // BDTvtx = -2.; BDTvtx1 = -2.; BDTvtx2 = -2.;
-      // hemi1_pt = minitree_Hemi_pt->at(0);
-      // hemi2_pt = minitree_Hemi_pt->at(1);
-      if (Filter &&  ( (hemi1_pt >= lowHpt && hemi1_pt < 80. && hemi2_pt >= 80.) ||
-             (hemi2_pt >= lowHpt && hemi2_pt < 80. && hemi1_pt >= 80.) ))//hemi_ptmin > lowHpt && hemi_ptmin < 80.
+
+
+      if (Filter &&  ( (hemi1_pt >= lowHpt && hemi1_pt <highHpt && hemi2_pt >=highHpt) ||
+             (hemi2_pt >= lowHpt && hemi2_pt <highHpt && hemi1_pt >=highHpt) ))//hemi_ptmin > lowHpt && hemi_ptmin <highHpt
          {
-             //$$
-            fillHisto("hData_CRlowpt_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
-
-            // if ( hemi_ptmin > 80. ) isCutEvt = true;   
-            //$$
-            if (nVtx == 0   && nVtxLoose == 0 )
-               {
-                  fillHisto("hData_CRlowpt_0Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRlowpt_0Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
-                  
-               }
-            if (nVtx == 1  && nVtxLoose==0 )
-               {
-                  fillHisto("hData_CRlowpt_1Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0) ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlowpt_1Vtx_Mass","",samplename,   VtxMass,Pref_PU_gen_wt );
-                  fillHisto("hData_CRlowpt_1Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRlowpt_1Vtx_BDTvtx","",samplename, BDTvtx,Pref_PU_gen_wt );
-                  fillHisto("hData_CRlowpt_1Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight,Pref_PU_gen_wt );
-                  fillHisto2D("hData_CRlowpt_1Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
-               }
-
 
             if (nVtx == 1 && nVtxLoose == 1  ) { // same as Loose low pt since TL = LT
-                 fillHisto("hData_CRlowpt_TLVtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt);
-                 fillHisto("hData_CRlowpt_TLVtx_Mass","",samplename,VtxMass,Pref_PU_gen_wt);
+                 fillHisto("hData_CRlowpt_TLVtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,NormFactor);
+                 fillHisto("hData_CRlowpt_TLVtx_Mass","",samplename,VtxMass,NormFactor);
 
-                 fillHisto("hData_CRlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight0,Pref_PU_gen_wt);
-                 fillHisto("hData_CRlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight1,Pref_PU_gen_wt);
-                 fillHisto("hData_CRlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass0,Pref_PU_gen_wt);
-                 fillHisto("hData_CRlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass1,Pref_PU_gen_wt);
-                 fillHisto2D("hData_CRlowpt_TLVtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
-                 fillHisto2D("hData_CRlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,Pref_PU_gen_wt);
-                 fillHisto2D("hData_CRlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,Pref_PU_gen_wt);
+                 fillHisto("hData_CRlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight0,NormFactor);
+                 fillHisto("hData_CRlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight1,NormFactor);
+                 fillHisto("hData_CRlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass0,NormFactor);
+                 fillHisto("hData_CRlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass1,NormFactor);
+                 fillHisto2D("hData_CRlowpt_TLVtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,NormFactor);
+                 fillHisto2D("hData_CRlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,NormFactor);
+                 fillHisto2D("hData_CRlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,NormFactor);
 
             }
 
             if (nVtx == 2 )
                {
-                  fillHisto("hData_CRlowpt_2Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0) ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlowpt_2Vtx_Mass","",samplename,   VtxMass ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlowpt_2Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRlowpt_2Vtx_MaxBDTvtx","",samplename, BDTvtx ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlowpt_2Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight ,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRlowpt_2Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
+                  fillHisto("hData_CRlowpt_2Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0) ,NormFactor);
+                  fillHisto("hData_CRlowpt_2Vtx_Mass","",samplename,   VtxMass ,NormFactor);
+                  fillHisto("hData_CRlowpt_2Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0),NormFactor );
+                  fillHisto("hData_CRlowpt_2Vtx_MaxBDTvtx","",samplename, BDTvtx ,NormFactor);
+                  fillHisto("hData_CRlowpt_2Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight ,NormFactor);
+                  fillHisto2D("hData_CRlowpt_2Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,NormFactor);
                   
-                  fillHisto("hData_CRlowpt_2VtxAll_Mass","",samplename, Vtx_Mass0,Pref_PU_gen_wt );
-                  fillHisto("hData_CRlowpt_2VtxAll_Mass","",samplename, Vtx_Mass1 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlowpt_2VtxAll_BDTvtx","",samplename, BDTvtx1,Pref_PU_gen_wt );
-                  fillHisto("hData_CRlowpt_2VtxAll_BDTvtx","",samplename, BDTvtx2 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight0 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight1 ,Pref_PU_gen_wt);         
-                  fillHisto2D("hData_CRlowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRlowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,Pref_PU_gen_wt);
+                  fillHisto("hData_CRlowpt_2VtxAll_Mass","",samplename, Vtx_Mass0,NormFactor );
+                  fillHisto("hData_CRlowpt_2VtxAll_Mass","",samplename, Vtx_Mass1 ,NormFactor);
+                  fillHisto("hData_CRlowpt_2VtxAll_BDTvtx","",samplename, BDTvtx1,NormFactor );
+                  fillHisto("hData_CRlowpt_2VtxAll_BDTvtx","",samplename, BDTvtx2 ,NormFactor);
+                  fillHisto("hData_CRlowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight0 ,NormFactor);
+                  fillHisto("hData_CRlowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight1 ,NormFactor);         
+                  fillHisto2D("hData_CRlowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,NormFactor);
+                  fillHisto2D("hData_CRlowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,NormFactor);
 
 
                }
@@ -1780,62 +2084,40 @@ if (LT > LTcut){isCutEvt = true;}
       // BDTvtx = -2.; BDTvtx1 = -2.; BDTvtx2 = -2.;
       // hemi1_pt = minitree_Hemi_pt->at(0);
       // hemi2_pt = minitree_Hemi_pt->at(1);
-      if (Filter &&   hemi1_pt >= lowHpt && hemi1_pt < 80. && lowHpt < hemi2_pt < 80. )//hemi_ptmin > lowHpt && hemi_ptmin < 80.
+      if (Filter &&   hemi1_pt >= lowHpt && hemi1_pt <highHpt && lowHpt < hemi2_pt <highHpt )//hemi_ptmin > lowHpt && hemi_ptmin <highHpt
          {
-             //$$
-
-            fillHisto("hData_CRlowlowpt_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
-
-            // if ( hemi_ptmin > 80. ) isCutEvt = true;   
-            //$$
-            if (nVtx == 0   && nVtxLoose == 0 )
-               {
-                  fillHisto("hData_CRlowlowpt_0Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRlowlowpt_0Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
-                  
-               }
-            if (nVtx == 1  && nVtxLoose==0 )
-               {
-                  fillHisto("hData_CRlowlowpt_1Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0) ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlowlowpt_1Vtx_Mass","",samplename,   VtxMass,Pref_PU_gen_wt );
-                  fillHisto("hData_CRlowlowpt_1Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRlowlowpt_1Vtx_BDTvtx","",samplename, BDTvtx,Pref_PU_gen_wt );
-
-                  fillHisto("hData_CRlowlowpt_1Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight,Pref_PU_gen_wt );
-                  fillHisto2D("hData_CRlowlowpt_1Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
-               }
 
 
             if (nVtx == 1 && nVtxLoose == 1  ) { // same as LooseLowLowpt since TL = LT
-                  fillHisto("hData_CRlowlowpt_TLVtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlowlowpt_TLVtx_Mass","",samplename,VtxMass,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRlowlowpt_TLVtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
+                  fillHisto("hData_CRlowlowpt_TLVtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,NormFactor);
+                  fillHisto("hData_CRlowlowpt_TLVtx_Mass","",samplename,VtxMass,NormFactor);
+                  fillHisto2D("hData_CRlowlowpt_TLVtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,NormFactor);
 
-                  fillHisto("hData_CRlowlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight0,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlowlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight1,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlowlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass0,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlowlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass1,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRlowlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRlowlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,Pref_PU_gen_wt);
+                  fillHisto("hData_CRlowlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight0,NormFactor);
+                  fillHisto("hData_CRlowlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight1,NormFactor);
+                  fillHisto("hData_CRlowlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass0,NormFactor);
+                  fillHisto("hData_CRlowlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass1,NormFactor);
+                  fillHisto2D("hData_CRlowlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,NormFactor);
+                  fillHisto2D("hData_CRlowlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,NormFactor);
 
             }
 
             if (nVtx == 2 )
                {
-                  fillHisto("hData_CRlowlowpt_2Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRlowlowpt_2Vtx_Mass","",samplename,   VtxMass ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlowlowpt_2Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRlowlowpt_2Vtx_MaxBDTvtx","",samplename, BDTvtx ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlowlowpt_2Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlowlowpt_2VtxAll_Mass","",samplename, Vtx_Mass0,Pref_PU_gen_wt );
-                  fillHisto("hData_CRlowlowpt_2VtxAll_Mass","",samplename, Vtx_Mass1 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlowlowpt_2VtxAll_BDTvtx","",samplename, BDTvtx1,Pref_PU_gen_wt );
-                  fillHisto("hData_CRlowlowpt_2VtxAll_BDTvtx","",samplename, BDTvtx2 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlowlowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight0 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlowlowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight1 ,Pref_PU_gen_wt);
+                  fillHisto("hData_CRlowlowpt_2Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0),NormFactor );
+                  fillHisto("hData_CRlowlowpt_2Vtx_Mass","",samplename,   VtxMass ,NormFactor);
+                  fillHisto("hData_CRlowlowpt_2Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0),NormFactor );
+                  fillHisto("hData_CRlowlowpt_2Vtx_MaxBDTvtx","",samplename, BDTvtx ,NormFactor);
+                  fillHisto("hData_CRlowlowpt_2Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight ,NormFactor);
+                  fillHisto("hData_CRlowlowpt_2VtxAll_Mass","",samplename, Vtx_Mass0,NormFactor );
+                  fillHisto("hData_CRlowlowpt_2VtxAll_Mass","",samplename, Vtx_Mass1 ,NormFactor);
+                  fillHisto("hData_CRlowlowpt_2VtxAll_BDTvtx","",samplename, BDTvtx1,NormFactor );
+                  fillHisto("hData_CRlowlowpt_2VtxAll_BDTvtx","",samplename, BDTvtx2 ,NormFactor);
+                  fillHisto("hData_CRlowlowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight0 ,NormFactor);
+                  fillHisto("hData_CRlowlowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight1 ,NormFactor);
 
-                  fillHisto2D("hData_CRlowlowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRlowlowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,Pref_PU_gen_wt);
+                  fillHisto2D("hData_CRlowlowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,NormFactor);
+                  fillHisto2D("hData_CRlowlowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,NormFactor);
 
 
                }
@@ -1847,55 +2129,39 @@ if (LT > LTcut){isCutEvt = true;}
       // BDTvtx = -2.; BDTvtx1 = -2.; BDTvtx2 = -2.;
       if ( Filter ) 
          {
-            fillHisto("hData_CRloose_BDTevt","",samplename, minitree_Evts_MVAval->at(0) ,Pref_PU_gen_wt);
-            //$$
-            if ( hemi_ptmin > 80. ) isCutEvt = true;
-            //$$ 
-            if (nVtxLoose == 0  && nVtx == 0 && isCutEvt)
-               {
-                  fillHisto("hData_CRloose_0Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRloose_0Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0) ,Pref_PU_gen_wt);
-                  
-               }
-            if (nVtxLoose == 1 && nVtx==0 && isCutEvt)
-               {
-                  fillHisto("hData_CRloose_1Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0) ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRloose_1Vtx_Mass","",samplename,   VtxMass,Pref_PU_gen_wt );
-                  fillHisto("hData_CRloose_1Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRloose_1Vtx_BDTvtx","",samplename, BDTvtx,Pref_PU_gen_wt );
-                  fillHisto("hData_CRloose_1Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight,Pref_PU_gen_wt );
-                  fillHisto2D("hData_CRloose_1Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
 
-               }
+            if ( hemi_ptmin >highHpt ) isCutEvt = true;
+            //$$ 
+
 
             if (nVtx == 1 && nVtxLoose == 1 && isCutEvt ) { 
-                  fillHisto("hData_CRloose_TLVtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt);
-                  fillHisto("hData_CRloose_TLVtx_Mass","",samplename,VtxMass,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRloose_TLVtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
-                  fillHisto("hData_CRloose_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight0,Pref_PU_gen_wt);
-                  fillHisto("hData_CRloose_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight1,Pref_PU_gen_wt);
-                  fillHisto("hData_CRloose_TLVtxAll_Mass","",samplename,Vtx_Mass0,Pref_PU_gen_wt);
-                  fillHisto("hData_CRloose_TLVtxAll_Mass","",samplename,Vtx_Mass1,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRloose_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRloose_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,Pref_PU_gen_wt);
+                  fillHisto("hData_CRloose_TLVtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,NormFactor);
+                  fillHisto("hData_CRloose_TLVtx_Mass","",samplename,VtxMass,NormFactor);
+                  fillHisto2D("hData_CRloose_TLVtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,NormFactor);
+                  fillHisto("hData_CRloose_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight0,NormFactor);
+                  fillHisto("hData_CRloose_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight1,NormFactor);
+                  fillHisto("hData_CRloose_TLVtxAll_Mass","",samplename,Vtx_Mass0,NormFactor);
+                  fillHisto("hData_CRloose_TLVtxAll_Mass","",samplename,Vtx_Mass1,NormFactor);
+                  fillHisto2D("hData_CRloose_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,NormFactor);
+                  fillHisto2D("hData_CRloose_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,NormFactor);
             }
 
             if (nVtxLoose == 2 && isCutEvt)
                {
-                  fillHisto("hData_CRloose_2Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0) ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRloose_2Vtx_Mass","",samplename,   VtxMass,Pref_PU_gen_wt );
-                  fillHisto("hData_CRloose_2Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRloose_2Vtx_MaxBDTvtx","",samplename, BDTvtx,Pref_PU_gen_wt );
-                  fillHisto("hData_CRloose_2Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight,Pref_PU_gen_wt );
-                  fillHisto2D("hData_CRloose_2Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRloose_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRloose_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,Pref_PU_gen_wt);
-                  fillHisto("hData_CRloose_2VtxAll_Mass","",samplename, Vtx_Mass0 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRloose_2VtxAll_Mass","",samplename, Vtx_Mass1 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRloose_2VtxAll_BDTvtx","",samplename, BDTvtx1,Pref_PU_gen_wt );
-                  fillHisto("hData_CRloose_2VtxAll_BDTvtx","",samplename, BDTvtx2,Pref_PU_gen_wt );           
-                  fillHisto("hData_CRloose_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight0,Pref_PU_gen_wt );
-                  fillHisto("hData_CRloose_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight1,Pref_PU_gen_wt );
+                  fillHisto("hData_CRloose_2Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0) ,NormFactor);
+                  fillHisto("hData_CRloose_2Vtx_Mass","",samplename,   VtxMass,NormFactor );
+                  fillHisto("hData_CRloose_2Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0),NormFactor );
+                  fillHisto("hData_CRloose_2Vtx_MaxBDTvtx","",samplename, BDTvtx,NormFactor );
+                  fillHisto("hData_CRloose_2Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight,NormFactor );
+                  fillHisto2D("hData_CRloose_2Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,NormFactor);
+                  fillHisto2D("hData_CRloose_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,NormFactor);
+                  fillHisto2D("hData_CRloose_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,NormFactor);
+                  fillHisto("hData_CRloose_2VtxAll_Mass","",samplename, Vtx_Mass0 ,NormFactor);
+                  fillHisto("hData_CRloose_2VtxAll_Mass","",samplename, Vtx_Mass1 ,NormFactor);
+                  fillHisto("hData_CRloose_2VtxAll_BDTvtx","",samplename, BDTvtx1,NormFactor );
+                  fillHisto("hData_CRloose_2VtxAll_BDTvtx","",samplename, BDTvtx2,NormFactor );           
+                  fillHisto("hData_CRloose_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight0,NormFactor );
+                  fillHisto("hData_CRloose_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight1,NormFactor );
 
                }  
          }
@@ -1904,58 +2170,41 @@ if (LT > LTcut){isCutEvt = true;}
 
       isCutEvt = false;
       // BDTvtx = -2.; BDTvtx1 = -2.; BDTvtx2 = -2.;
-      if (Filter && ( (hemi1_pt >= lowHpt && hemi1_pt < 80. && hemi2_pt >= 80.) ||
-             (hemi2_pt >= lowHpt && hemi2_pt < 80. && hemi1_pt >= 80.) )  )//hemi_ptmin > lowHpt && hemi_ptmin < 80.
+      if (Filter && ( (hemi1_pt >= lowHpt && hemi1_pt <highHpt && hemi2_pt >=highHpt) ||
+             (hemi2_pt >= lowHpt && hemi2_pt <highHpt && hemi1_pt >=highHpt) )  )//hemi_ptmin > lowHpt && hemi_ptmin <highHpt
          {
-            fillHisto("hData_CRlooselowpt_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
-
-            if (nVtxLoose == 0  && nVtx == 0)
-               {
-                  fillHisto("hData_CRlooselowpt_0Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRlooselowpt_1Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRlooselowpt_1Vtx_BDTvtx","",samplename, BDTvtx ,Pref_PU_gen_wt);
-               }
-            if (nVtxLoose == 1 && nVtx==0 )
-               {
-                  fillHisto("hData_CRlooselowpt_1Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRlooselowpt_1Vtx_Mass","",samplename,   VtxMass,Pref_PU_gen_wt );
-                  fillHisto("hData_CRlooselowpt_2Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRlooselowpt_2Vtx_MaxBDTvtx","",samplename, BDTvtx,Pref_PU_gen_wt );
-                  fillHisto("hData_CRlooselowpt_1Vtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt );
-                  fillHisto2D("hData_CRlooselowpt_1Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
-               }
 
             if (nVtx == 1 && nVtxLoose == 1  ) {
-                  fillHisto("hData_CRlooselowpt_TLVtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselowpt_TLVtx_Mass","",samplename,VtxMass,Pref_PU_gen_wt);
+                  fillHisto("hData_CRlooselowpt_TLVtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,NormFactor);
+                  fillHisto("hData_CRlooselowpt_TLVtx_Mass","",samplename,VtxMass,NormFactor);
 
-                  fillHisto("hData_CRlooselowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight0,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight1,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselowpt_TLVtxAll_Mass","",samplename,Vtx_Mass0,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselowpt_TLVtxAll_Mass","",samplename,Vtx_Mass1,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRlooselowpt_TLVtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRlooselowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRlooselowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,Pref_PU_gen_wt);
+                  fillHisto("hData_CRlooselowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight0,NormFactor);
+                  fillHisto("hData_CRlooselowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight1,NormFactor);
+                  fillHisto("hData_CRlooselowpt_TLVtxAll_Mass","",samplename,Vtx_Mass0,NormFactor);
+                  fillHisto("hData_CRlooselowpt_TLVtxAll_Mass","",samplename,Vtx_Mass1,NormFactor);
+                  fillHisto2D("hData_CRlooselowpt_TLVtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,NormFactor);
+                  fillHisto2D("hData_CRlooselowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,NormFactor);
+                  fillHisto2D("hData_CRlooselowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,NormFactor);
 
             }
             if (nVtxLoose == 2)
                {
-                  fillHisto("hData_CRlooselowpt_2Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRlooselowpt_2Vtx_Mass","",samplename,   VtxMass,Pref_PU_gen_wt );
+                  fillHisto("hData_CRlooselowpt_2Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0),NormFactor );
+                  fillHisto("hData_CRlooselowpt_2Vtx_Mass","",samplename,   VtxMass,NormFactor );
 
-                  fillHisto("hData_CRlooselowpt_2Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight ,Pref_PU_gen_wt);
+                  fillHisto("hData_CRlooselowpt_2Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight ,NormFactor);
 
-                  fillHisto2D("hData_CRlooselowpt_2Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRlooselowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRlooselowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,Pref_PU_gen_wt);
+                  fillHisto2D("hData_CRlooselowpt_2Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,NormFactor);
+                  fillHisto2D("hData_CRlooselowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,NormFactor);
+                  fillHisto2D("hData_CRlooselowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,NormFactor);
 
-                  fillHisto("hData_CRlooselowpt_2VtxAll_Mass","",samplename, Vtx_Mass0 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselowpt_2VtxAll_Mass","",samplename, Vtx_Mass1 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselowpt_2VtxAll_BDTvtx","",samplename, BDTvtx1,Pref_PU_gen_wt );
-                  fillHisto("hData_CRlooselowpt_2VtxAll_BDTvtx","",samplename, BDTvtx2 ,Pref_PU_gen_wt);
+                  fillHisto("hData_CRlooselowpt_2VtxAll_Mass","",samplename, Vtx_Mass0 ,NormFactor);
+                  fillHisto("hData_CRlooselowpt_2VtxAll_Mass","",samplename, Vtx_Mass1 ,NormFactor);
+                  fillHisto("hData_CRlooselowpt_2VtxAll_BDTvtx","",samplename, BDTvtx1,NormFactor );
+                  fillHisto("hData_CRlooselowpt_2VtxAll_BDTvtx","",samplename, BDTvtx2 ,NormFactor);
 
-                  fillHisto("hData_CRlooselowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight0 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight1 ,Pref_PU_gen_wt);
+                  fillHisto("hData_CRlooselowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight0 ,NormFactor);
+                  fillHisto("hData_CRlooselowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight1 ,NormFactor);
 
                }
 
@@ -1965,65 +2214,53 @@ if (LT > LTcut){isCutEvt = true;}
 
       isCutEvt = false;
       // BDTvtx = -2.; BDTvtx1 = -2.; BDTvtx2 = -2.;
-      if (Filter &&  hemi1_pt >= lowHpt && hemi1_pt < 80. &&  lowHpt <= hemi2_pt  &&  hemi2_pt <= 80.   )//hemi_ptmin > lowHpt && hemi_ptmin < 80.
+      if (Filter &&  hemi1_pt >= lowHpt && hemi1_pt <highHpt &&  lowHpt <= hemi2_pt  &&  hemi2_pt <=highHpt   )//hemi_ptmin > lowHpt && hemi_ptmin <highHpt
          {
-            fillHisto("hData_CRlooselowlowpt_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
-            if (nVtxLoose == 0  && nVtx == 0)
-               {
-                  fillHisto("hData_CRlooselowlowpt_0Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRlooselowlowpt_1Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRlooselowlowpt_1Vtx_BDTvtx","",samplename, BDTvtx ,Pref_PU_gen_wt);
-                  
-               }
-            if (nVtxLoose == 1 && nVtx==0 )
-               {
-                  fillHisto("hData_CRlooselowlowpt_1Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRlooselowlowpt_1Vtx_Mass","",samplename,   VtxMass,Pref_PU_gen_wt );
-                  fillHisto("hData_CRlooselowlowpt_2Vtx_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRlooselowlowpt_2Vtx_MaxBDTvtx","",samplename, BDTvtx,Pref_PU_gen_wt );
 
-                  fillHisto("hData_CRlooselowlowpt_1Vtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt );
-                  fillHisto2D("hData_CRlooselowlowpt_1Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
-
-               }
 
             if (nVtx == 1 && nVtxLoose == 1  ) {
-                  fillHisto("hData_CRlooselowlowpt_TLVtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselowlowpt_TLVtx_Mass","",samplename,VtxMass,Pref_PU_gen_wt);
+                  fillHisto("hData_CRlooselowlowpt_TLVtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,NormFactor);
+                  fillHisto("hData_CRlooselowlowpt_TLVtx_Mass","",samplename,VtxMass,NormFactor);
 
 
-                  fillHisto2D("hData_CRlooselowlowpt_TLVtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRlooselowlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRlooselowlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,Pref_PU_gen_wt);
+                  fillHisto2D("hData_CRlooselowlowpt_TLVtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,NormFactor);
+                  fillHisto2D("hData_CRlooselowlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,NormFactor);
+                  fillHisto2D("hData_CRlooselowlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,NormFactor);
 
-                  fillHisto("hData_CRlooselowlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight0,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselowlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight1,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselowlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass0,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselowlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass1,Pref_PU_gen_wt);
+                  fillHisto("hData_CRlooselowlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight0,NormFactor);
+                  fillHisto("hData_CRlooselowlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight1,NormFactor);
+                  fillHisto("hData_CRlooselowlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass0,NormFactor);
+                  fillHisto("hData_CRlooselowlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass1,NormFactor);
             }
             if (nVtxLoose == 2)
                {
-                  fillHisto("hData_CRlooselowlowpt_2Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRlooselowlowpt_2Vtx_Mass","",samplename,   VtxMass,Pref_PU_gen_wt );
+                  fillHisto("hData_CRlooselowlowpt_2Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0),NormFactor );
+                  fillHisto("hData_CRlooselowlowpt_2Vtx_Mass","",samplename,   VtxMass,NormFactor );
 
-                  fillHisto("hData_CRlooselowlowpt_2Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight ,Pref_PU_gen_wt);
+                  fillHisto("hData_CRlooselowlowpt_2Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight ,NormFactor);
 
-                  fillHisto2D("hData_CRlooselowlowpt_2Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRlooselowlowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRlooselowlowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,Pref_PU_gen_wt);
+                  fillHisto2D("hData_CRlooselowlowpt_2Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,NormFactor);
+                  fillHisto2D("hData_CRlooselowlowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,NormFactor);
+                  fillHisto2D("hData_CRlooselowlowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,NormFactor);
 
-                  fillHisto("hData_CRlooselowlowpt_2VtxAll_Mass","",samplename, Vtx_Mass0 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselowlowpt_2VtxAll_Mass","",samplename, Vtx_Mass1 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselowlowpt_2VtxAll_BDTvtx","",samplename, BDTvtx1,Pref_PU_gen_wt );
-                  fillHisto("hData_CRlooselowlowpt_2VtxAll_BDTvtx","",samplename, BDTvtx2 ,Pref_PU_gen_wt);
+                  fillHisto("hData_CRlooselowlowpt_2VtxAll_Mass","",samplename, Vtx_Mass0 ,NormFactor);
+                  fillHisto("hData_CRlooselowlowpt_2VtxAll_Mass","",samplename, Vtx_Mass1 ,NormFactor);
+                  fillHisto("hData_CRlooselowlowpt_2VtxAll_BDTvtx","",samplename, BDTvtx1,NormFactor );
+                  fillHisto("hData_CRlooselowlowpt_2VtxAll_BDTvtx","",samplename, BDTvtx2 ,NormFactor);
 
-                  fillHisto("hData_CRlooselowlowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight0 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselowlowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight1 ,Pref_PU_gen_wt);
+                  fillHisto("hData_CRlooselowlowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight0 ,NormFactor);
+                  fillHisto("hData_CRlooselowlowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight1 ,NormFactor);
 
 
                }
 
          }
+
+
+         // !! Tests 1 !! //
+         // !! 
+         // !! 
+         // !! ---------------------------- !!//
 
 
          // !! rename la première catégorie !! //
@@ -2033,22 +2270,113 @@ if (LT > LTcut){isCutEvt = true;}
 
 
       // this is new B, same as old C with LooseLooseLowLowpt
-      if (Filter &&  hemi1_pt >= lowHpt && hemi1_pt < 80. &&  lowHpt <= hemi2_pt  &&  hemi2_pt <= 80.   )//hemi_ptmin > lowHpt && hemi_ptmin < 80.
+      if (Filter &&  hemi1_pt >= lowHpt && hemi1_pt <highHpt &&  lowHpt <= hemi2_pt  &&  hemi2_pt <=highHpt   )//hemi_ptmin > lowHpt && hemi_ptmin <highHpt
          {
-            fillHisto("hData_CRlooselooselowlowpt_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
+            fillHisto("hData_CRlooselooselowlowpt_BDTevt","",samplename, minitree_Evts_MVAval->at(0),NormFactor );
             if ( nVtx == 0 && nVtxLoose == 2 ) {
-                  fillHisto("hData_CRlooselooselowlowpt_TLVtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselooselowlowpt_TLVtx_Mass","",samplename,VtxMass,Pref_PU_gen_wt);
+                  // fillHisto("hData_CRlooselooselowlowpt_TLVtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,NormFactor);
+                  fillHisto("hData_CRlooselooselowlowpt_TLVtx_Mass","",samplename,VtxMass,NormFactor);
 
 
-                  fillHisto2D("hData_CRlooselooselowlowpt_TLVtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRlooselooselowlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRlooselooselowlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,Pref_PU_gen_wt);
+                  fillHisto2D("hData_CRlooselooselowlowpt_TLVtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,NormFactor);
+                  fillHisto2D("hData_CRlooselooselowlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,NormFactor);
+                  fillHisto2D("hData_CRlooselooselowlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,NormFactor);
 
-                  fillHisto("hData_CRlooselooselowlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight0,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselooselowlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight1,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselooselowlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass0,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselooselowlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass1,Pref_PU_gen_wt);
+                  fillHisto("hData_CRlooselooselowlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight0,NormFactor);
+                  fillHisto("hData_CRlooselooselowlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight1,NormFactor);
+                  fillHisto("hData_CRlooselooselowlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass0,NormFactor);
+                  fillHisto("hData_CRlooselooselowlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass1,NormFactor);
+
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_MVA","",samplename,  minitree_Hemi_Vtx_MVAval_Tight->at(0),NormFactor );
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_MVA","",samplename,  minitree_Hemi_Vtx_MVAval_Tight->at(1),NormFactor );
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_NEWMVA","",samplename,Vtx1_bdtVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_NEWMVA","",samplename,Vtx2_bdtVal,NormFactor );
+
+                  // !! $$ ----------------------
+                  fillHisto("hData_CRlooselooselowlowpt_2Vtx_NEWMVA","",samplename,Best_BDTVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowlowpt_2Vtx_NEWMVA","diffBin",samplename,Best_BDTVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowlowpt_2Vtx_NEWMVA","6Bins",samplename,Best_BDTVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowlowpt_2Vtx_NEWMVA","7Bins",samplename,Best_BDTVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowlowpt_2Vtx_NEWMVA","8Bins",samplename,Best_BDTVal,NormFactor );
+
+                  fillHisto("hData_CRlooselooselowlowpt_2Vtx_NEWMVA","Sum",samplename,SumBDTVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowlowpt_2Vtx_NEWMVA","Ave",samplename,AveBDTVal,NormFactor );
+
+                  fillHisto("hData_CRlooselooselowlowpt_2Vtx_STW","Sum",samplename,SumSTW,NormFactor );
+                  fillHisto("hData_CRlooselooselowlowpt_2Vtx_STW","Ave",samplename,AveSTW,NormFactor );
+
+                  fillHisto("hData_CRlooselooselowlowpt_2Vtx_STW","SumdiffBin",samplename,SumSTW,NormFactor );
+                  fillHisto("hData_CRlooselooselowlowpt_2Vtx_STW","AvediffBin",samplename,AveSTW,NormFactor );
+
+                  // !! $$ ----------------------
+
+
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_NEWMVA","6Bins",samplename,Vtx1_bdtVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_NEWMVA","6Bins",samplename,Vtx2_bdtVal,NormFactor );
+
+                  // !! ----------------------- VtxBDTVariables
+
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_NChi2","",samplename,Vtx_NChi0,NormFactor );
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_NChi2","",samplename,Vtx_NChi1,NormFactor );
+
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_z","",samplename,Vtx_z0,NormFactor );
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_z","",samplename,Vtx_z1,NormFactor );
+
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_dist","",samplename,Vtx_dist0,NormFactor );
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_dist","",samplename,Vtx_dist1,NormFactor );
+
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_ntrk10","",samplename,Vtx0_ntrk10,NormFactor );
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_ntrk10","",samplename,Vtx1_ntrk10,NormFactor );
+
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_MeanDCA","",samplename,Vtx_track_MeanDCA_d0,NormFactor );
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_MeanDCA","",samplename,Vtx_track_MeanDCA_d1,NormFactor );
+
+                  // !! --------------------
+
+               // !! Control Plots
+
+               fillHisto2D("TrackerMap","BestVtx_A",samplename,Vtx_x,Vtx_y,1);//500,-25.,25.,500,-25.,25.
+               fillHisto2D("TrackerMap","rz_BestVtx_A",samplename,Vtx_z,Vtx_r,1);//500,-25.,25.,500,-25.,25.
+               fillHisto2D("TrackerMap","BothVtx_A",samplename,Vtx_x0,Vtx_y0,1);//500,-25.,25.,500,-25.,25.
+               fillHisto2D("TrackerMap","BothVtx_A",samplename,Vtx_x1,Vtx_y1,1 );//500,-25.,25.,500,-25.,25.
+               fillHisto2D("TrackerMap","rz_BothVtx_A",samplename,Vtx_z0,Vtx_r0,1);//500,-25.,25.,500,-25.,25.
+               fillHisto2D("TrackerMap","rz_BothVtx_A",samplename,Vtx_z1,Vtx_r1,1);//500,-25.,25.,500,-25.,25.
+
+               fillHisto("Step","BestVtx_A",samplename,Vtx_step,NormFactor );
+               fillHisto("r","BestVtx_A",samplename,Vtx_r,NormFactor );
+               fillHisto("z","BestVtx_A",samplename,abs(Vtx_z),NormFactor );
+               fillHisto("STW","BestVtx_A",samplename,Vtx_SumtrackWeight,NormFactor );
+               fillHisto("Mass","BestVtx_A",samplename,VtxMass,NormFactor );
+               fillHisto("ntrk10","BestVtx_A",samplename,Vtx_ntrk10,NormFactor );
+               fillHisto("MeanDCA","BestVtx_A",samplename,Vtx_track_MeanDCA_d,NormFactor );
+               // !! -------------
+
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_NEWMVA","7Bins",samplename,Vtx1_bdtVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_NEWMVA","7Bins",samplename,Vtx2_bdtVal,NormFactor );
+
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_NEWMVA","8Bins",samplename,Vtx1_bdtVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowlowpt_2VtxAll_NEWMVA","8Bins",samplename,Vtx2_bdtVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowlowpt_dist_VtxVtx","",samplename,  Vtx_Vtx_dist,NormFactor );
+
+
+                  fillHisto("hData_CRlooselooselowlowpt_TLVtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,NormFactor);
+                  fillHisto("hData_CRlooselooselowlowpt_TLVtx_SumtrackWeight","diffBin",samplename,Vtx_SumtrackWeight,NormFactor);
+
+                                    if (Vtx_SumtrackWeight0 > 8 ) { Vtx_SumtrackWeight0 = 8.5;}
+                  if (Vtx_SumtrackWeight1 > 8 ) { Vtx_SumtrackWeight1 = 8.5;}
+                  fillHisto("hData_CRlooselooselowlowpt_TLVtxAll_SumtrackWeight","8Bins",samplename,Vtx_SumtrackWeight0,NormFactor);
+                  fillHisto("hData_CRlooselooselowlowpt_TLVtxAll_SumtrackWeight","8Bins",samplename,Vtx_SumtrackWeight1,NormFactor);
+                  fillHisto("hData_CRlooselooselowlowpt_TLVtx_SumtrackWeight","8Bins",samplename,Vtx_SumtrackWeight,NormFactor);
+                                    if (Vtx_SumtrackWeight0 > 7 ) { Vtx_SumtrackWeight0 = 7.5;}
+                  if (Vtx_SumtrackWeight1 > 7 ) { Vtx_SumtrackWeight1 = 7.5;}
+                  fillHisto("hData_CRlooselooselowlowpt_TLVtxAll_SumtrackWeight","7Bins",samplename,Vtx_SumtrackWeight0,NormFactor);
+                  fillHisto("hData_CRlooselooselowlowpt_TLVtxAll_SumtrackWeight","7Bins",samplename,Vtx_SumtrackWeight1,NormFactor);
+                  fillHisto("hData_CRlooselooselowlowpt_TLVtx_SumtrackWeight","7Bins",samplename,Vtx_SumtrackWeight,NormFactor);
+                  if (Vtx_SumtrackWeight0 > 6 ) { Vtx_SumtrackWeight0 = 6.5;}
+                  if (Vtx_SumtrackWeight1 > 6 ) { Vtx_SumtrackWeight1 = 6.5;}
+                  fillHisto("hData_CRlooselooselowlowpt_TLVtxAll_SumtrackWeight","6Bins",samplename,Vtx_SumtrackWeight0,NormFactor);
+                  fillHisto("hData_CRlooselooselowlowpt_TLVtxAll_SumtrackWeight","6Bins",samplename,Vtx_SumtrackWeight1,NormFactor);
+                  fillHisto("hData_CRlooselooselowlowpt_TLVtx_SumtrackWeight","6Bins",samplename,Vtx_SumtrackWeight,NormFactor);
             }
          }
 
@@ -2057,19 +2385,116 @@ if (LT > LTcut){isCutEvt = true;}
 // Old A and B combined to form new A
       isCutEvt = false;
       // BDTvtx = -2.; BDTvtx1 = -2.; BDTvtx2 = -2.;
-      if (Filter &&  hemi1_pt >= lowHpt && hemi1_pt < 80. &&  lowHpt <= hemi2_pt  &&  hemi2_pt <= 80. )//hemi_ptmin > lowHpt && hemi_ptmin < 80.
+      if (Filter &&  hemi1_pt >= lowHpt && hemi1_pt <highHpt &&  lowHpt <= hemi2_pt  &&  hemi2_pt <=highHpt )//hemi_ptmin > lowHpt && hemi_ptmin <highHpt
          {
-            fillHisto("hData_CRtightlowlowpt_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
+
             if ( (nVtx == 1 && nVtxLoose == 1 ) || (nVtx == 2 && nVtxLoose == 0) ){
-                  fillHisto("hData_CRtightlowlowpt_TLVtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt);
-                  fillHisto("hData_CRtightlowlowpt_TLVtx_Mass","",samplename,VtxMass,Pref_PU_gen_wt);
-                  fillHisto("hData_CRtightlowlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight0,Pref_PU_gen_wt);
-                  fillHisto("hData_CRtightlowlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight1,Pref_PU_gen_wt);
-                  fillHisto("hData_CRtightlowlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass0,Pref_PU_gen_wt);
-                  fillHisto("hData_CRtightlowlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass1,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRtightlowlowpt_TLVtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRtightlowlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRtightlowlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,Pref_PU_gen_wt);
+                  
+                  fillHisto("hData_CRtightlowlowpt_TLVtx_Mass","",samplename,VtxMass,NormFactor);
+                  fillHisto("hData_CRtightlowlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight0,NormFactor);
+                  fillHisto("hData_CRtightlowlowpt_TLVtxAll_SumtrackWeight","",samplename,Vtx_SumtrackWeight1,NormFactor);
+
+                  fillHisto("hData_CRtightlowlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass0,NormFactor);
+                  fillHisto("hData_CRtightlowlowpt_TLVtxAll_Mass","",samplename,Vtx_Mass1,NormFactor);
+                  fillHisto2D("hData_CRtightlowlowpt_TLVtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,NormFactor);
+                  fillHisto2D("hData_CRtightlowlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,NormFactor);
+                  fillHisto2D("hData_CRtightlowlowpt_TLVtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,NormFactor);
+
+
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_MVA","",samplename,  minitree_Hemi_Vtx_MVAval_Tight->at(0),NormFactor );
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_MVA","",samplename,  minitree_Hemi_Vtx_MVAval_Tight->at(1),NormFactor );
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_NEWMVA","",samplename,Vtx1_bdtVal,NormFactor );
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_NEWMVA","",samplename,Vtx2_bdtVal,NormFactor );
+
+                  // !! $$ ----------------------
+                  fillHisto("hData_CRtightlowlowpt_2Vtx_NEWMVA","",samplename,Best_BDTVal,NormFactor );
+                  fillHisto("hData_CRtightlowlowpt_2Vtx_NEWMVA","diffBin",samplename,Best_BDTVal,NormFactor );
+                  fillHisto("hData_CRtightlowlowpt_2Vtx_NEWMVA","6Bins",samplename,Best_BDTVal,NormFactor );
+                  fillHisto("hData_CRtightlowlowpt_2Vtx_NEWMVA","7Bins",samplename,Best_BDTVal,NormFactor );
+                  fillHisto("hData_CRtightlowlowpt_2Vtx_NEWMVA","8Bins",samplename,Best_BDTVal,NormFactor );
+
+                  fillHisto("hData_CRtightlowlowpt_2Vtx_NEWMVA","Sum",samplename,SumBDTVal,NormFactor );
+                  fillHisto("hData_CRtightlowlowpt_2Vtx_NEWMVA","Ave",samplename,AveBDTVal,NormFactor );
+
+                  fillHisto("hData_CRtightlowlowpt_2Vtx_STW","Sum",samplename,SumSTW,NormFactor );
+                  fillHisto("hData_CRtightlowlowpt_2Vtx_STW","Ave",samplename,AveSTW,NormFactor );
+
+                  fillHisto("hData_CRtightlowlowpt_2Vtx_STW","SumdiffBin",samplename,SumSTW,NormFactor );
+                  fillHisto("hData_CRtightlowlowpt_2Vtx_STW","AvediffBin",samplename,AveSTW,NormFactor );
+                  // !! $$ ----------------------
+                  // !! Control Plots
+
+
+                  fillHisto2D("TrackerMap","BestVtx_B",samplename,Vtx_x,Vtx_y,1);//500,-25.,25.,500,-25.,25.
+                  fillHisto2D("TrackerMap","rz_BestVtx_B",samplename,Vtx_z,Vtx_r,1);//500,-25.,25.,500,-25.,25.
+                  fillHisto2D("TrackerMap","BothVtx_B",samplename,Vtx_x0,Vtx_y0,1);//500,-25.,25.,500,-25.,25.
+                  fillHisto2D("TrackerMap","BothVtx_B",samplename,Vtx_x1,Vtx_y1,1 );//500,-25.,25.,500,-25.,25.
+
+                  fillHisto2D("TrackerMap","rz_BothVtx_B",samplename,Vtx_z0,Vtx_r0,1);//500,-25.,25.,500,-25.,25.
+                  fillHisto2D("TrackerMap","rz_BothVtx_B",samplename,Vtx_z1,Vtx_r1,1);//500,-25.,25.,500,-25.,25.
+
+                  fillHisto("Step","BestVtx_B",samplename,Vtx_step,NormFactor );
+                  fillHisto("r","BestVtx_B",samplename,Vtx_r,NormFactor );
+                  fillHisto("z","BestVtx_B",samplename,abs(Vtx_z),NormFactor );
+                  fillHisto("STW","BestVtx_B",samplename,Vtx_SumtrackWeight,NormFactor );
+                  fillHisto("Mass","BestVtx_B",samplename,VtxMass,NormFactor );
+                  fillHisto("ntrk10","BestVtx_B",samplename,Vtx_ntrk10,NormFactor );
+                  fillHisto("MeanDCA","BestVtx_B",samplename,Vtx_track_MeanDCA_d,NormFactor );
+         // !! ------------
+
+                  // !! ----------------------- VtxBDT variables
+
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_2VtxAll_NChi2","",samplename,Vtx_NChi0,NormFactor );
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_2VtxAll_NChi2","",samplename,Vtx_NChi1,NormFactor );
+
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_2VtxAll_z","",samplename,Vtx_z0,NormFactor );
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_2VtxAll_z","",samplename,Vtx_z1,NormFactor );
+
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_2VtxAll_dist","",samplename,Vtx_dist0,NormFactor );
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_2VtxAll_dist","",samplename,Vtx_dist1,NormFactor );
+
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_2VtxAll_ntrk10","",samplename,Vtx0_ntrk10,NormFactor );
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_2VtxAll_ntrk10","",samplename,Vtx1_ntrk10,NormFactor );
+
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_2VtxAll_MeanDCA","",samplename,Vtx_track_MeanDCA_d0,NormFactor );
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_2VtxAll_MeanDCA","",samplename,Vtx_track_MeanDCA_d1,NormFactor );
+
+                  // !! --------------------
+
+
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_NEWMVA","6Bins",samplename,Vtx1_bdtVal,NormFactor );
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_NEWMVA","6Bins",samplename,Vtx2_bdtVal,NormFactor );
+
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_NEWMVA","7Bins",samplename,Vtx1_bdtVal,NormFactor );
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_NEWMVA","7Bins",samplename,Vtx2_bdtVal,NormFactor );
+
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_NEWMVA","8Bins",samplename,Vtx1_bdtVal,NormFactor );
+                  fillHisto("hData_CRtightlowlowpt_2VtxAll_NEWMVA","8Bins",samplename,Vtx2_bdtVal,NormFactor );
+                  fillHisto("hData_CRtightlowlowpt_dist_VtxVtx","",samplename,  Vtx_Vtx_dist,NormFactor );
+
+
+                  fillHisto("hData_CRtightlowlowpt_TLVtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,NormFactor);
+                  fillHisto("hData_CRtightlowlowpt_TLVtx_SumtrackWeight","diffBin",samplename,Vtx_SumtrackWeight,NormFactor);
+
+                  if (Vtx_SumtrackWeight0 > 8 ) { Vtx_SumtrackWeight0 = 8.5;}
+                  if (Vtx_SumtrackWeight1 > 8 ) { Vtx_SumtrackWeight1 = 8.5;}
+                  fillHisto("hData_CRtightlowlowpt_TLVtxAll_SumtrackWeight","8Bins",samplename,Vtx_SumtrackWeight0,NormFactor);
+                  fillHisto("hData_CRtightlowlowpt_TLVtxAll_SumtrackWeight","8Bins",samplename,Vtx_SumtrackWeight1,NormFactor);
+                  fillHisto("hData_CRtightlowlowpt_TLVtx_SumtrackWeight","8Bins",samplename,Vtx_SumtrackWeight,NormFactor);
+
+
+                  if (Vtx_SumtrackWeight0 > 7 ) { Vtx_SumtrackWeight0 = 7.5;}
+                  if (Vtx_SumtrackWeight1 > 7 ) { Vtx_SumtrackWeight1 = 7.5;}
+                  fillHisto("hData_CRtightlowlowpt_TLVtxAll_SumtrackWeight","7Bins",samplename,Vtx_SumtrackWeight0,NormFactor);
+                  fillHisto("hData_CRtightlowlowpt_TLVtxAll_SumtrackWeight","7Bins",samplename,Vtx_SumtrackWeight1,NormFactor);
+                  fillHisto("hData_CRtightlowlowpt_TLVtx_SumtrackWeight","7Bins",samplename,Vtx_SumtrackWeight,NormFactor);
+
+
+                  if (Vtx_SumtrackWeight0 > 6 ) { Vtx_SumtrackWeight0 = 6.5;}
+                  if (Vtx_SumtrackWeight1 > 6 ) { Vtx_SumtrackWeight1 = 6.5;}
+                  fillHisto("hData_CRtightlowlowpt_TLVtxAll_SumtrackWeight","6Bins",samplename,Vtx_SumtrackWeight0,NormFactor);
+                  fillHisto("hData_CRtightlowlowpt_TLVtxAll_SumtrackWeight","6Bins",samplename,Vtx_SumtrackWeight1,NormFactor);
+                  fillHisto("hData_CRtightlowlowpt_TLVtx_SumtrackWeight","6Bins",samplename,Vtx_SumtrackWeight,NormFactor);
             }
          }
 
@@ -2078,82 +2503,282 @@ if (LT > LTcut){isCutEvt = true;}
 // Old F and I combined to form new D
 
 
-      if (Filter &&  ((hemi1_pt >= 80 && hemi2_pt >= 80) || ( (hemi1_pt >= lowHpt && hemi1_pt < 80. && hemi2_pt >= 80.) ||
-             (hemi2_pt >= lowHpt && hemi2_pt < 80. && hemi1_pt >= 80.) )  ))//hemi_ptmin > lowHpt && hemi_ptmin < 80.
+      if (Filter &&  ((hemi1_pt >= highHpt && hemi2_pt >= highHpt) || ( (hemi1_pt >= lowHpt && hemi1_pt <highHpt && hemi2_pt >=highHpt) ||
+             (hemi2_pt >= lowHpt && hemi2_pt <highHpt && hemi1_pt >=highHpt) )  ))//hemi_ptmin > lowHpt && hemi_ptmin < 80.
          {
-            fillHisto("hData_CRlooselooselowpt_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
-            if (nVtxLoose == 1 && nVtx == 0)
-               {
-                  fillHisto("hData_CRLoose_1Vtx_Mass","",samplename,   VtxMass,Pref_PU_gen_wt );
-                  fillHisto("hData_CRLoose_1Vtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt );
-               }
-            if (nVtxLoose == 0 && nVtx == 1)
-               {
-                  fillHisto("hData_CRTight_1Vtx_Mass","",samplename,   VtxMass,Pref_PU_gen_wt );
-                  fillHisto("hData_CRTight_1Vtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,Pref_PU_gen_wt );
-               }
 
             if (nVtxLoose == 2 && nVtx == 0)
                {
-                  fillHisto("hData_CRlooselooselowpt_2Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRlooselooselowpt_2Vtx_Mass","",samplename,   VtxMass,Pref_PU_gen_wt );
+                  fillHisto("hData_CRlooselooselowpt_2Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0),NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2Vtx_Mass","",samplename,   VtxMass,NormFactor );
 
-                  fillHisto("hData_CRlooselooselowpt_2Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight ,Pref_PU_gen_wt);
+                  fillHisto("hData_CRlooselooselowpt_2Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight ,NormFactor);
 
-                  fillHisto2D("hData_CRlooselooselowpt_2Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRlooselooselowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRlooselooselowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,Pref_PU_gen_wt);
+                  fillHisto2D("hData_CRlooselooselowpt_2Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,NormFactor);
+                  fillHisto2D("hData_CRlooselooselowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,NormFactor);
+                  fillHisto2D("hData_CRlooselooselowpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,NormFactor);
 
-                  fillHisto("hData_CRlooselooselowpt_2VtxAll_Mass","",samplename, Vtx_Mass0 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselooselowpt_2VtxAll_Mass","",samplename, Vtx_Mass1 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselooselowpt_2VtxAll_BDTvtx","",samplename, BDTvtx1,Pref_PU_gen_wt );
-                  fillHisto("hData_CRlooselooselowpt_2VtxAll_BDTvtx","",samplename, BDTvtx2 ,Pref_PU_gen_wt);
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_Mass","",samplename, Vtx_Mass0 ,NormFactor);
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_Mass","",samplename, Vtx_Mass1 ,NormFactor);
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_BDTvtx","",samplename, BDTvtx1,NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_BDTvtx","",samplename, BDTvtx2 ,NormFactor);
 
-                  fillHisto("hData_CRlooselooselowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight0 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRlooselooselowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight1 ,Pref_PU_gen_wt);
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight0 ,NormFactor);
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight1 ,NormFactor);
+
+
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_MVA","",samplename,  minitree_Hemi_Vtx_MVAval_Tight->at(0),NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_MVA","",samplename,  minitree_Hemi_Vtx_MVAval_Tight->at(1),NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_NEWMVA","",samplename,Vtx1_bdtVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_NEWMVA","",samplename,Vtx2_bdtVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_NEWMVA","6Bins",samplename,Vtx1_bdtVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_NEWMVA","6Bins",samplename,Vtx2_bdtVal,NormFactor );
+
+                  // !! $$ ----------------------
+                  fillHisto("hData_CRlooselooselowpt_2Vtx_NEWMVA","",samplename,Best_BDTVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2Vtx_NEWMVA","diffBin",samplename,Best_BDTVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2Vtx_NEWMVA","6Bins",samplename,Best_BDTVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2Vtx_NEWMVA","7Bins",samplename,Best_BDTVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2Vtx_NEWMVA","8Bins",samplename,Best_BDTVal,NormFactor );
+
+                  fillHisto("hData_CRlooselooselowpt_2Vtx_NEWMVA","Sum",samplename,SumBDTVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2Vtx_NEWMVA","Ave",samplename,AveBDTVal,NormFactor );
+
+                  fillHisto("hData_CRlooselooselowpt_2Vtx_STW","Sum",samplename,SumSTW,NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2Vtx_STW","Ave",samplename,AveSTW,NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2Vtx_STW","SumdiffBin",samplename,SumSTW,NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2Vtx_STW","AvediffBin",samplename,AveSTW,NormFactor );
+                  // !! $$ ----------------------
+
+
+                  // !! ----------------------- VtxBDT variables
+
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_2VtxAll_NChi2","",samplename,Vtx_NChi0,NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_2VtxAll_NChi2","",samplename,Vtx_NChi1,NormFactor );
+
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_2VtxAll_z","",samplename,Vtx_z0,NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_2VtxAll_z","",samplename,Vtx_z1,NormFactor );
+
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_2VtxAll_dist","",samplename,Vtx_dist0,NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_2VtxAll_dist","",samplename,Vtx_dist1,NormFactor );
+
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_2VtxAll_ntrk10","",samplename,Vtx0_ntrk10,NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_2VtxAll_ntrk10","",samplename,Vtx1_ntrk10,NormFactor );
+
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_2VtxAll_MeanDCA","",samplename,Vtx_track_MeanDCA_d0,NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_2VtxAll_MeanDCA","",samplename,Vtx_track_MeanDCA_d1,NormFactor );
+
+                  // !! --------------------
+               // !! Control Plots
+
+               fillHisto2D("TrackerMap","BestVtx_D",samplename,Vtx_x,Vtx_y,1);//500,-25.,25.,500,-25.,25.
+               fillHisto2D("TrackerMap","rz_BestVtx_D",samplename,Vtx_z,Vtx_r,1);//500,-25.,25.,500,-25.,25.
+               fillHisto2D("TrackerMap","BothVtx_D",samplename,Vtx_x0,Vtx_y0,1);//500,-25.,25.,500,-25.,25.
+               fillHisto2D("TrackerMap","BothVtx_D",samplename,Vtx_x1,Vtx_y1,1 );//500,-25.,25.,500,-25.,25.
+               fillHisto2D("TrackerMap","rz_BothVtx_D",samplename,Vtx_z0,Vtx_r0,1);//500,-25.,25.,500,-25.,25.
+               fillHisto2D("TrackerMap","rz_BothVtx_D",samplename,Vtx_z1,Vtx_r1,1);//500,-25.,25.,500,-25.,25.
+
+
+               fillHisto("Step","BestVtx_D",samplename,Vtx_step,NormFactor );
+               fillHisto("r","BestVtx_D",samplename,Vtx_r,NormFactor );
+               fillHisto("z","BestVtx_D",samplename,abs(Vtx_z),NormFactor );
+               fillHisto("STW","BestVtx_D",samplename,Vtx_SumtrackWeight,NormFactor );
+               fillHisto("Mass","BestVtx_D",samplename,VtxMass,NormFactor );
+               fillHisto("ntrk10","BestVtx_D",samplename,Vtx_ntrk10,NormFactor );
+               fillHisto("MeanDCA","BestVtx_D",samplename,Vtx_track_MeanDCA_d,NormFactor );
+               // !! -------------
+
+
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_NEWMVA","7Bins",samplename,Vtx1_bdtVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_NEWMVA","7Bins",samplename,Vtx2_bdtVal,NormFactor );
+
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_NEWMVA","8Bins",samplename,Vtx1_bdtVal,NormFactor );
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_NEWMVA","8Bins",samplename,Vtx2_bdtVal,NormFactor );
+
+                  fillHisto("hData_CRlooselooselowpt_dist_VtxVtx","",samplename,  Vtx_Vtx_dist,NormFactor );
+
+
+                  fillHisto("hData_CRlooselooselowpt_TLVtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,NormFactor);
+                  fillHisto("hData_CRlooselooselowpt_TLVtx_SumtrackWeight","diffBin",samplename,Vtx_SumtrackWeight,NormFactor);
+
+
+                  if (Vtx_SumtrackWeight0 > 8 ) { Vtx_SumtrackWeight0 = 8.5;}
+                  if (Vtx_SumtrackWeight1 > 8 ) { Vtx_SumtrackWeight1 = 8.5;}
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_SumtrackWeight","8Bins",samplename,Vtx_SumtrackWeight0,NormFactor);
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_SumtrackWeight","8Bins",samplename,Vtx_SumtrackWeight1,NormFactor);
+                  fillHisto("hData_CRlooselooselowpt_TLVtx_SumtrackWeight","8Bins",samplename,Vtx_SumtrackWeight,NormFactor);
+
+
+                  if (Vtx_SumtrackWeight0 > 7 ) { Vtx_SumtrackWeight0 = 7.5;}
+                  if (Vtx_SumtrackWeight1 > 7 ) { Vtx_SumtrackWeight1 = 7.5;}
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_SumtrackWeight","7Bins",samplename,Vtx_SumtrackWeight0,NormFactor);
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_SumtrackWeight","7Bins",samplename,Vtx_SumtrackWeight1,NormFactor);
+                  fillHisto("hData_CRlooselooselowpt_TLVtx_SumtrackWeight","7Bins",samplename,Vtx_SumtrackWeight,NormFactor);
+
+
+                  if (Vtx_SumtrackWeight0 > 6 ) { Vtx_SumtrackWeight0 = 6.5;}
+                  if (Vtx_SumtrackWeight1 > 6 ) { Vtx_SumtrackWeight1 = 6.5;}
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_SumtrackWeight","6Bins",samplename,Vtx_SumtrackWeight0,NormFactor);
+                  fillHisto("hData_CRlooselooselowpt_2VtxAll_SumtrackWeight","6Bins",samplename,Vtx_SumtrackWeight1,NormFactor);
+                  fillHisto("hData_CRlooselooselowpt_TLVtx_SumtrackWeight","6Bins",samplename,Vtx_SumtrackWeight,NormFactor);
                }
 
          }
 
       //--------SR : TIghtLoose+ TIghtTight for highhighpt or highlowpt --------//
 // Old F and I combined to form new C
+if ( (nVtx +  nVtxLoose == 2))
+   {
+      fillHisto("StepEffi","",samplename, 5,1 );// at least 1 tight vtx
+   }
 
 
-      if (Filter &&  ((hemi1_pt >= 80 && hemi2_pt >= 80) || ( (hemi1_pt >= lowHpt && hemi1_pt < 80. && hemi2_pt >= 80.) ||
-             (hemi2_pt >= lowHpt && hemi2_pt < 80. && hemi1_pt >= 80.) )  ))//hemi_ptmin > lowHpt && hemi_ptmin < 80.
+if ((nVtx == 1 && nVtxLoose == 1) || (nVtx == 2 && nVtxLoose == 0))
+   {
+      fillHisto("StepEffi","",samplename, 6,1 );// at least 1 tight vtx
+   }
+
+
+
+      if (Filter &&  ((hemi1_pt >= highHpt && hemi2_pt >= highHpt) || ( (hemi1_pt >= lowHpt && hemi1_pt <highHpt && hemi2_pt >=highHpt) ||
+             (hemi2_pt >= lowHpt && hemi2_pt <highHpt && hemi1_pt >=highHpt) )  ))//hemi_ptmin > lowHpt && hemi_ptmin < 80.
          {
-            fillHisto("hData_CRtighthighpt_BDTevt","",samplename, minitree_Evts_MVAval->at(0),Pref_PU_gen_wt );
+            fillHisto("hData_CRtighthighpt_BDTevt","",samplename, minitree_Evts_MVAval->at(0),NormFactor );
 
             if (nVtx == 2 || (nVtx == 1 && nVtxLoose == 1 ) ){
    
-                  fillHisto("hData_CRtighthighpt_2Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0),Pref_PU_gen_wt );
-                  fillHisto("hData_CRtighthighpt_2Vtx_Mass","",samplename,   VtxMass,Pref_PU_gen_wt );
+                  fillHisto("hData_CRtighthighpt_2Vtx_Mmumu","",samplename,  minitree_Mmumu->at(0),NormFactor );
+                  fillHisto("hData_CRtighthighpt_2Vtx_Mass","",samplename,   VtxMass,NormFactor );
 
-                  fillHisto("hData_CRtighthighpt_2Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight ,Pref_PU_gen_wt);
+                  fillHisto("hData_CRtighthighpt_2Vtx_SumtrackWeight","",samplename, Vtx_SumtrackWeight ,NormFactor);
 
-                  fillHisto2D("hData_CRtighthighpt_2Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRtighthighpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,Pref_PU_gen_wt);
-                  fillHisto2D("hData_CRtighthighpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,Pref_PU_gen_wt);
+                  fillHisto2D("hData_CRtighthighpt_2Vtx_STW_Ntrks","",samplename,Vtx_SumtrackWeight,Vtx_nTrks,NormFactor);
+                  fillHisto2D("hData_CRtighthighpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight0,Vtx_nTrks0,NormFactor);
+                  fillHisto2D("hData_CRtighthighpt_2VtxAll_STW_Ntrks","",samplename,Vtx_SumtrackWeight1,Vtx_nTrks1,NormFactor);
 
-                  fillHisto("hData_CRtighthighpt_2VtxAll_Mass","",samplename, Vtx_Mass0 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRtighthighpt_2VtxAll_Mass","",samplename, Vtx_Mass1 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRtighthighpt_2VtxAll_BDTvtx","",samplename, BDTvtx1,Pref_PU_gen_wt );
-                  fillHisto("hData_CRtighthighpt_2VtxAll_BDTvtx","",samplename, BDTvtx2 ,Pref_PU_gen_wt);
+                  fillHisto("hData_CRtighthighpt_2VtxAll_Mass","",samplename, Vtx_Mass0 ,NormFactor);
+                  fillHisto("hData_CRtighthighpt_2VtxAll_Mass","",samplename, Vtx_Mass1 ,NormFactor);
+                  fillHisto("hData_CRtighthighpt_2VtxAll_BDTvtx","",samplename, BDTvtx1,NormFactor );
+                  fillHisto("hData_CRtighthighpt_2VtxAll_BDTvtx","",samplename, BDTvtx2 ,NormFactor);
 
-                  fillHisto("hData_CRtighthighpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight0 ,Pref_PU_gen_wt);
-                  fillHisto("hData_CRtighthighpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight1 ,Pref_PU_gen_wt);
+                  fillHisto("hData_CRtighthighpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight0 ,NormFactor);
+                  fillHisto("hData_CRtighthighpt_2VtxAll_SumtrackWeight","",samplename, Vtx_SumtrackWeight1 ,NormFactor);
+
+                  fillHisto("hData_CRtighthighpt_2VtxAll_MVA","",samplename,  minitree_Hemi_Vtx_MVAval_Tight->at(0),NormFactor );
+                  fillHisto("hData_CRtighthighpt_2VtxAll_MVA","",samplename,  minitree_Hemi_Vtx_MVAval_Tight->at(1),NormFactor );
+
+                  // !! $$ ----------------------
+                  fillHisto("hData_CRtighthighpt_2Vtx_NEWMVA","",samplename,Best_BDTVal,NormFactor );
+                  fillHisto("hData_CRtighthighpt_2Vtx_NEWMVA","diffBin",samplename,Best_BDTVal,NormFactor );
+                  fillHisto("hData_CRtighthighpt_2Vtx_NEWMVA","6Bins",samplename,Best_BDTVal,NormFactor );
+                  fillHisto("hData_CRtighthighpt_2Vtx_NEWMVA","7Bins",samplename,Best_BDTVal,NormFactor );
+                  fillHisto("hData_CRtighthighpt_2Vtx_NEWMVA","8Bins",samplename,Best_BDTVal,NormFactor );
+
+                  fillHisto("hData_CRtighthighpt_2Vtx_NEWMVA","Sum",samplename,SumBDTVal,NormFactor );
+                  fillHisto("hData_CRtighthighpt_2Vtx_NEWMVA","Ave",samplename,AveBDTVal,NormFactor );
+
+                  fillHisto("hData_CRtighthighpt_2Vtx_STW","Sum",samplename,SumSTW,NormFactor );
+                  fillHisto("hData_CRtighthighpt_2Vtx_STW","Ave",samplename,AveSTW,NormFactor );
+
+                  fillHisto("hData_CRtighthighpt_2Vtx_STW","SumdiffBin",samplename,SumSTW,NormFactor );
+                  fillHisto("hData_CRtighthighpt_2Vtx_STW","AvediffBin",samplename,AveSTW,NormFactor );
+                  // !! $$ ----------------------
+
+
+                  // !! ----------------------- VtxBDT variables
+
+                  fillHisto("hData_CRtighthighpt_2VtxAll_2VtxAll_NChi2","",samplename,Vtx_NChi0,NormFactor );
+                  fillHisto("hData_CRtighthighpt_2VtxAll_2VtxAll_NChi2","",samplename,Vtx_NChi1,NormFactor );
+
+                  fillHisto("hData_CRtighthighpt_2VtxAll_2VtxAll_z","",samplename,Vtx_z0,NormFactor );
+                  fillHisto("hData_CRtighthighpt_2VtxAll_2VtxAll_z","",samplename,Vtx_z1,NormFactor );
+
+                  fillHisto("hData_CRtighthighpt_2VtxAll_2VtxAll_dist","",samplename,Vtx_dist0,NormFactor );
+                  fillHisto("hData_CRtighthighpt_2VtxAll_2VtxAll_dist","",samplename,Vtx_dist1,NormFactor );
+
+                  fillHisto("hData_CRtighthighpt_2VtxAll_2VtxAll_ntrk10","",samplename,Vtx0_ntrk10,NormFactor );
+                  fillHisto("hData_CRtighthighpt_2VtxAll_2VtxAll_ntrk10","",samplename,Vtx1_ntrk10,NormFactor );
+
+                  fillHisto("hData_CRtighthighpt_2VtxAll_2VtxAll_MeanDCA","",samplename,Vtx_track_MeanDCA_d0,NormFactor );
+                  fillHisto("hData_CRtighthighpt_2VtxAll_2VtxAll_MeanDCA","",samplename,Vtx_track_MeanDCA_d1,NormFactor );
+
+                  // !! --------------------
+
+                              // !! Control Plots
+                  fillHisto2D("TrackerMap","BestVtx_C",samplename,Vtx_x,Vtx_y,1);//500,-25.,25.,500,-25.,25.
+                  fillHisto2D("TrackerMap","rz_BestVtx_C",samplename,Vtx_z,Vtx_r,1);//500,-25.,25.,500,-25.,25.
+                  fillHisto2D("TrackerMap","BothVtx_C",samplename,Vtx_x0,Vtx_y0,1);//500,-25.,25.,500,-25.,25.
+                  fillHisto2D("TrackerMap","BothVtx_C",samplename,Vtx_x1,Vtx_y1,1 );//500,-25.,25.,500,-25.,25.
+                  fillHisto2D("TrackerMap","rz_BothVtx_C",samplename,Vtx_z0,Vtx_r0,1);//500,-25.,25.,500,-25.,25.
+                  fillHisto2D("TrackerMap","rz_BothVtx_C",samplename,Vtx_z1,Vtx_r1,1);//500,-25.,25.,500,-25.,25.
+
+                  fillHisto("Step","BestVtx_C",samplename,Vtx_step,NormFactor );
+                  fillHisto("r","BestVtx_C",samplename,Vtx_r,NormFactor );
+                  fillHisto("z","BestVtx_C",samplename,abs(Vtx_z),NormFactor );
+                  fillHisto("STW","BestVtx_C",samplename,Vtx_SumtrackWeight,NormFactor );
+                  fillHisto("Mass","BestVtx_C",samplename,VtxMass,NormFactor );
+                  fillHisto("ntrk10","BestVtx_C",samplename,Vtx_ntrk10,NormFactor );
+                  fillHisto("MeanDCA","BestVtx_C",samplename,Vtx_track_MeanDCA_d,NormFactor );
+                     // !! Control Plots
+
+                  fillHisto("hData_CRtighthighpt_2VtxAll_NEWMVA","",samplename,Vtx1_bdtVal,NormFactor );
+                  fillHisto("hData_CRtighthighpt_2VtxAll_NEWMVA","",samplename,Vtx2_bdtVal,NormFactor );
+                  fillHisto("hData_CRtighthighpt_2VtxAll_NEWMVA","6Bins",samplename,Vtx1_bdtVal,NormFactor );
+                  fillHisto("hData_CRtighthighpt_2VtxAll_NEWMVA","6Bins",samplename,Vtx2_bdtVal,NormFactor );
+
+                  fillHisto("hData_CRtighthighpt_2VtxAll_NEWMVA","7Bins",samplename,Vtx1_bdtVal,NormFactor );
+                  fillHisto("hData_CRtighthighpt_2VtxAll_NEWMVA","7Bins",samplename,Vtx2_bdtVal,NormFactor );
+
+                  fillHisto("hData_CRtighthighpt_2VtxAll_NEWMVA","8Bins",samplename,Vtx1_bdtVal,NormFactor );
+                  fillHisto("hData_CRtighthighpt_2VtxAll_NEWMVA","8Bins",samplename,Vtx2_bdtVal,NormFactor );
+
+
+                  fillHisto("hData_CRtighthighpt_2VtxAll_dist_VtxVtx","",samplename,  Vtx_Vtx_dist,NormFactor );
+
+
+                  fillHisto("hData_CRtighthighpt_TLVtx_SumtrackWeight","",samplename,Vtx_SumtrackWeight,NormFactor);
+                  fillHisto("hData_CRtighthighpt_TLVtx_SumtrackWeight","diffBin",samplename,Vtx_SumtrackWeight,NormFactor);
+
+
+                  fillHisto("StepEffi","",samplename, 7,1 );// at least 1 tight vtx with at least 1 hemi witth pt > 100 GeV
+                  if (Vtx_SumtrackWeight0 > 8 ) { Vtx_SumtrackWeight0 = 8.5;}
+                  if (Vtx_SumtrackWeight1 > 8 ) { Vtx_SumtrackWeight1 = 8.5;}
+                  fillHisto("hData_CRtighthighpt_2VtxAll_SumtrackWeight","8Bins",samplename,Vtx_SumtrackWeight0,NormFactor);
+                  fillHisto("hData_CRtighthighpt_2VtxAll_SumtrackWeight","8Bins",samplename,Vtx_SumtrackWeight1,NormFactor);
+                  fillHisto("hData_CRtighthighpt_TLVtx_SumtrackWeight","8Bins",samplename,Vtx_SumtrackWeight,NormFactor);
+
+
+                                    if (Vtx_SumtrackWeight0 > 7 ) { Vtx_SumtrackWeight0 = 7.5;}
+                  if (Vtx_SumtrackWeight1 > 7 ) { Vtx_SumtrackWeight1 = 7.5;}
+                  fillHisto("hData_CRtighthighpt_2VtxAll_SumtrackWeight","7Bins",samplename,Vtx_SumtrackWeight0,NormFactor);
+                  fillHisto("hData_CRtighthighpt_2VtxAll_SumtrackWeight","7Bins",samplename,Vtx_SumtrackWeight1,NormFactor);
+                  fillHisto("hData_CRtighthighpt_TLVtx_SumtrackWeight","7Bins",samplename,Vtx_SumtrackWeight,NormFactor);
+
+                  
+                                    if (Vtx_SumtrackWeight0 > 6 ) { Vtx_SumtrackWeight0 = 6.5;}
+                  if (Vtx_SumtrackWeight1 > 6 ) { Vtx_SumtrackWeight1 = 6.5;}
+                  fillHisto("hData_CRtighthighpt_2VtxAll_SumtrackWeight","6Bins",samplename,Vtx_SumtrackWeight0,NormFactor);
+                  fillHisto("hData_CRtighthighpt_2VtxAll_SumtrackWeight","6Bins",samplename,Vtx_SumtrackWeight1,NormFactor);
+                  fillHisto("hData_CRtighthighpt_TLVtx_SumtrackWeight","6Bins",samplename,Vtx_SumtrackWeight,NormFactor);
+
+
                }
 
          }
 
-         // std::cout<<" here 4 "<<std::endl;
-//----------------END of njet caeroisation ---------------------------//
+         fillHisto("NewBDT_GlobalOutput","BestScore",samplename,Best_BDTVal,NormFactor );
+         fillHisto("NewBDT_GlobalOutput","BothScore",samplename,Vtx1_bdtVal,NormFactor );
+         fillHisto("NewBDT_GlobalOutput","BothScore",samplename,Vtx2_bdtVal,NormFactor );
+
+         fillHisto("NewEVTBDT_GlobalOutput","Score",samplename,VTX_BDTVal_EVT,NormFactor );
 
 
+
+        
    }// end of event loop
 
    //add end accolade
-      NormFactor = NormFactor/allevents;
+      NormFactor = NormFactor;
    fillHisto("hData_StepEff","",samplename,0.,allevents*NormFactor);
    fillHisto("hData_StepEff","",samplename,1.,nFilterEvt*NormFactor);//
    fillHisto("hData_StepEff","",samplename,2.,nFilterJet*NormFactor);
@@ -2174,42 +2799,30 @@ if (LT > LTcut){isCutEvt = true;}
    fillHisto("hData_StepEff","NonNormalized",samplename,7.,nReco1TightVertex);
    fillHisto("hData_StepEff","NonNormalized",samplename,8.,nReco2TightVertex);
 
-       theoutputfile->Write();
-       // std::cout<<"File has been written: "<<theoutputfile->GetName()<<std::endl;
+   theoutputfile->Write();
+   // std::cout<<"File has been written: "<<theoutputfile->GetName()<<std::endl;
 
-   // std::cout<<"1"<<std::endl;
+
    fL1_Reco_SF->Close();
-      // // std::cout<<"2"<<std::endl;
-// std::cout<<"2"<<std::endl;
    fL1_ID_SF->Close();
-      // // std::cout<<"3"<<std::endl;
-// std::cout<<"3"<<std::endl;
    fL1_ISO_SF->Close();
-      // // std::cout<<"4"<<std::endl;
-// std::cout<<"4"<<std::endl;
    fL2_ISO_SF->Close();
-      // // std::cout<<"5"<<std::endl;
-// std::cout<<"5"<<std::endl;
    fL2_Reco_SF->Close();
-      // // std::cout<<"6"<<std::endl;
-// std::cout<<"6"<<std::endl;
-   // fL2_Reco_SF2->Close();
-      // // std::cout<<"7"<<std::endl;
-
    fL2_ID_SF->Close();
-      // // std::cout<<"8"<<std::endl;
-// std::cout<<"7"<<std::endl;
    fL1L2_TRG_SF->Close();
-      // // std::cout<<"9"<<std::endl;
-//  std::cout<<"8"<<std::endl;
-   //deleteHisto();
+   fL2_Reco_SF2->Close(); 
+   fL1_TRG_SF->Close();
+   fL1L2_TRG_SFerr->Close();
+   fEle_SF->Close();
+   fEle_2DSF->Close();
+
    theoutputfile->Close();
+   // gROOT->GetListOfFiles()->Print();
       // // std::cout<<"10"<<std::endl;
 
    // delete theoutputfile;
 
 
-}// end of systematics
 }// end of loop method
 void TreeABCDReader::initializeHisto(TString sample, bool isfirstset){
 
@@ -2232,6 +2845,301 @@ void TreeABCDReader::initializeHisto(TString sample, bool isfirstset){
       numb_histo_2D_++;
    }
 
+// !! $$ --
+
+// addHistoDiffBin(TString var, TString selstep, TString sample, int nbins, float* binedges)
+const int nbin4 = 4;
+const int nbin5 = 5;
+const int nbin6 = 6;
+const int nbin7 = 7;
+float binEdgesBestBDT[nbin6+1] = {-1,-0.7,-0.4,-0.1,0.2,0.5,1};
+float binEdgesSTW[nbin5+1] = {1,2,3,4,5,20};
+float binEdgesSumSTW[nbin5+1] = {2,3,4,5,6,20};
+float binEdgesAveSTW[nbin4+1] = {1,2,3,4,20};
+float binEdgesNewBDT[nbin5+1] = {-1,-0.8,-0.6,0.,0.8,1};
+float binEdgesNewBDT_v2[nbin6+1] = {-1,-0.8,-0.6,0.,0.8,0.99,1};
+
+// !! -- $$ ££ $$ ¤¤
+
+addHisto("NewEVTBDT_GlobalOutput","Score",sample.Data(),20,-1,1);
+
+// !! -- $$ ££ $$ ¤¤
+addHisto("2Vtx_HighSTW_Highpt_BDT","C",sample.Data(),20,-1,1);
+addHisto("2Vtx_LowSTW_Highpt_BDT","D",sample.Data(),20,-1,1 );
+addHisto("2Vtx_LowSTW_Lowpt_BDT","B",sample.Data(),20,-1,1 );
+addHisto("2Vtx_HighSTW_Lowpt_BDT","A",sample.Data(),20,-1,1);
+
+
+
+addHistoDiffBin("hData_CRlooselooselowlowpt_2Vtx_NEWMVA","diffBin",sample.Data(),nbin6,binEdgesBestBDT );
+addHistoDiffBin("hData_CRlooselooselowlowpt_2Vtx_STW","SumdiffBin",sample.Data(),nbin5,binEdgesSumSTW );
+addHistoDiffBin("hData_CRlooselooselowlowpt_2Vtx_STW","AvediffBin",sample.Data(),nbin4,binEdgesAveSTW );
+addHistoDiffBin("hData_CRlooselooselowlowpt_TLVtx_SumtrackWeight","diffBin",sample.Data(),nbin5,binEdgesSTW);
+
+addHistoDiffBin("hData_CRtightlowlowpt_2Vtx_NEWMVA","diffBin",sample.Data(),nbin6,binEdgesBestBDT );
+addHistoDiffBin("hData_CRtightlowlowpt_2Vtx_STW","SumdiffBin",sample.Data(),nbin5,binEdgesSumSTW );
+addHistoDiffBin("hData_CRtightlowlowpt_2Vtx_STW","AvediffBin",sample.Data(),nbin4,binEdgesAveSTW );
+addHistoDiffBin("hData_CRtightlowlowpt_TLVtx_SumtrackWeight","diffBin",sample.Data(),nbin5,binEdgesSTW);
+
+addHistoDiffBin("hData_CRlooselooselowpt_2Vtx_NEWMVA","diffBin",sample.Data(),nbin6,binEdgesBestBDT);
+addHistoDiffBin("hData_CRlooselooselowpt_2Vtx_STW","SumdiffBin",sample.Data(),nbin5,binEdgesSumSTW );
+addHistoDiffBin("hData_CRlooselooselowpt_2Vtx_STW","AvediffBin",sample.Data(),nbin4,binEdgesAveSTW );
+addHistoDiffBin("hData_CRlooselooselowpt_TLVtx_SumtrackWeight","diffBin",sample.Data(),nbin5,binEdgesSTW);
+
+addHistoDiffBin("hData_CRtighthighpt_2Vtx_NEWMVA","diffBin",sample.Data(),nbin6,binEdgesBestBDT );
+addHistoDiffBin("hData_CRtighthighpt_2Vtx_STW","SumdiffBin",sample.Data(),nbin5,binEdgesSumSTW );
+addHistoDiffBin("hData_CRtighthighpt_2Vtx_STW","AvediffBin",sample.Data(),nbin4,binEdgesAveSTW );
+addHistoDiffBin("hData_CRtighthighpt_TLVtx_SumtrackWeight","diffBin",sample.Data(),nbin5,binEdgesSTW);
+
+
+
+// !! ££ Control Plots
+addHisto("NewBDT_GlobalOutput","BestScore",sample.Data(),20,-1,1);
+   addHisto("NewBDT_GlobalOutput","BothScore",sample.Data(),20,-1,1 );
+
+
+addHisto2D("TrackerMap","BestVtx_C",sample.Data(),500,-25.,25.,500,-25.,25.);//500,-25.,25.,500,-25.,25.
+addHisto2D("TrackerMap","BothVtx_C",sample.Data(),500,-25.,25.,500,-25.,25.);
+
+addHisto2D("TrackerMap","BestVtx_B",sample.Data(),500,-25.,25.,500,-25.,25.);//500,-25.,25.,500,-25.,25.
+addHisto2D("TrackerMap","BothVtx_B",sample.Data(),500,-25.,25.,500,-25.,25.);
+
+addHisto2D("TrackerMap","BestVtx_D",sample.Data(),500,-25.,25.,500,-25.,25.);//500,-25.,25.,500,-25.,25.
+addHisto2D("TrackerMap","BothVtx_D",sample.Data(),500,-25.,25.,500,-25.,25.);
+
+addHisto2D("TrackerMap","BestVtx_A",sample.Data(),500,-25.,25.,500,-25.,25.);//500,-25.,25.,500,-25.,25.
+addHisto2D("TrackerMap","BothVtx_A",sample.Data(),500,-25.,25.,500,-25.,25.);
+
+
+addHisto2D("TrackerMap","rz_BestVtx_C",sample.Data(),1200,0.,120.,700,0.,70.);//1200,0.,120.,700,0.,70.
+addHisto2D("TrackerMap","rz_BothVtx_C",sample.Data(),1200,0.,120.,700,0.,70.);
+
+addHisto2D("TrackerMap","rz_BestVtx_B",sample.Data(),1200,0.,120.,700,0.,70.);//1200,0.,120.,700,0.,70.
+addHisto2D("TrackerMap","rz_BothVtx_B",sample.Data(),1200,0.,120.,700,0.,70.);
+
+addHisto2D("TrackerMap","rz_BestVtx_D",sample.Data(),1200,0.,120.,700,0.,70.);//1200,0.,120.,700,0.,70.
+addHisto2D("TrackerMap","rz_BothVtx_D",sample.Data(),1200,0.,120.,700,0.,70.);
+
+addHisto2D("TrackerMap","rz_BestVtx_A",sample.Data(),1200,0.,120.,700,0.,70.);//1200,0.,120.,700,0.,70.
+addHisto2D("TrackerMap","rz_BothVtx_A",sample.Data(),1200,0.,120.,700,0.,70.);
+
+
+
+   addHisto("VtxLowSTW_Hemipt","2Vtx",sample.Data(),25,0,500);
+   addHisto("VtxHighSTW_Hemipt","2Vtx",sample.Data(),25,0,500);
+
+
+   addHisto("Step","BestVtx_A",sample.Data(),4,0,4 );
+   addHisto("r","BestVtx_A",sample.Data(),50,0,100);
+   addHisto("z","BestVtx_A",sample.Data(),50,0,100);
+   addHisto("STW","BestVtx_A",sample.Data(),50,0,5 );
+   addHisto("Mass","BestVtx_A",sample.Data(),20,0,100 );
+   addHisto("ntrk10","BestVtx_A",sample.Data(),20,0,20 );
+   addHisto("MeanDCA","BestVtx_A",sample.Data(),100,0,10 );
+
+   addHisto("Step","BestVtx_B",sample.Data(),4,0,4 );
+   addHisto("r","BestVtx_B",sample.Data(),50,0,100);
+   addHisto("z","BestVtx_B",sample.Data(),50,0,100);
+   addHisto("STW","BestVtx_B",sample.Data(),50,0,5 );
+   addHisto("Mass","BestVtx_B",sample.Data(),20,0,100);
+   addHisto("ntrk10","BestVtx_B",sample.Data(),20,0,20 );
+   addHisto("MeanDCA","BestVtx_B",sample.Data(),100,0,10);
+
+   addHisto("Step","BestVtx_C",sample.Data(),4,0,4 );
+   addHisto("r","BestVtx_C",sample.Data(),50,0,100);
+   addHisto("z","BestVtx_C",sample.Data(),50,0,100 );
+   addHisto("STW","BestVtx_C",sample.Data(),50,0,5 );
+   addHisto("Mass","BestVtx_C",sample.Data(),20,0,100 );
+   addHisto("ntrk10","BestVtx_C",sample.Data(),20,0,20 );
+   addHisto("MeanDCA","BestVtx_C",sample.Data(),100,0,10 );
+
+   addHisto("Step","BestVtx_D",sample.Data(),4,0,4 );
+   addHisto("r","BestVtx_D",sample.Data(),50,0,100 );
+   addHisto("z","BestVtx_D",sample.Data(),50,0,100 );
+   addHisto("STW","BestVtx_D",sample.Data(),50,0,5 );
+   addHisto("Mass","BestVtx_D",sample.Data(),20,0,100 );
+   addHisto("ntrk10","BestVtx_D",sample.Data(),20,0,20 );
+   addHisto("MeanDCA","BestVtx_D",sample.Data(),100,0,10 );
+// !! ££
+
+
+      addHisto("hData_Vtx_dist","Tight",sample.Data(), 30,0,150);
+      addHisto("hData_Vtx_dist","Loose",sample.Data(), 30,0,150);
+
+
+      addHisto("hData_VtxQualityTight_VtxBDT","2Vtx",sample.Data(),20,-1,1);
+      addHisto("hData_VtxQualityLoose_VtxBDT","2Vtx",sample.Data(),20,-1,1);
+      addHisto2D("hData_Hemipt_VtxBDT","2Vtx",sample.Data(),20,-1,1,20,30,230);
+
+
+// !!
+   addHisto("hData_CRlooselooselowlowpt_2VtxAll_NEWMVA","",sample.Data(), 20,-1,1 );
+   addHisto("hData_CRtightlowlowpt_2VtxAll_NEWMVA","",sample.Data(), 20,-1,1 );
+   addHisto("hData_CRlooselooselowpt_2VtxAll_NEWMVA","",sample.Data(), 20,-1,1 );
+   addHisto("hData_CRtighthighpt_2VtxAll_NEWMVA","",sample.Data(), 20,-1,1 );
+
+   addHisto("hData_CRlooselooselowlowpt_2VtxAll_NEWMVA","6Bins",sample.Data(), 6,-1,1 );
+   addHisto("hData_CRtightlowlowpt_2VtxAll_NEWMVA","6Bins",sample.Data(), 6,-1,1 );
+   addHisto("hData_CRlooselooselowpt_2VtxAll_NEWMVA","6Bins",sample.Data(), 6,-1,1 );
+   addHisto("hData_CRtighthighpt_2VtxAll_NEWMVA","6Bins",sample.Data(), 6,-1,1 );
+
+
+   addHisto("hData_CRlooselooselowlowpt_2VtxAll_NEWMVA","7Bins",sample.Data(), 7,-1,1 );
+   addHisto("hData_CRtightlowlowpt_2VtxAll_NEWMVA","7Bins",sample.Data(), 7,-1,1 );
+   addHisto("hData_CRlooselooselowpt_2VtxAll_NEWMVA","7Bins",sample.Data(), 7,-1,1 );
+   addHisto("hData_CRtighthighpt_2VtxAll_NEWMVA","7Bins",sample.Data(), 7,-1,1 );
+
+      addHisto("hData_CRlooselooselowlowpt_2VtxAll_NEWMVA","8Bins",sample.Data(), 8,-1,1 );
+   addHisto("hData_CRtightlowlowpt_2VtxAll_NEWMVA","8Bins",sample.Data(), 8,-1,1 );
+   addHisto("hData_CRlooselooselowpt_2VtxAll_NEWMVA","8Bins",sample.Data(), 8,-1,1 );
+   addHisto("hData_CRtighthighpt_2VtxAll_NEWMVA","8Bins",sample.Data(), 8,-1,1 );
+
+
+   // !! $$    -----------------
+addHisto("hData_CRlooselooselowlowpt_2Vtx_NEWMVA","",sample.Data(),20,-1,1);
+addHisto("hData_CRlooselooselowlowpt_2Vtx_NEWMVA","6Bins",sample.Data(),6,-1,1);
+addHisto("hData_CRlooselooselowlowpt_2Vtx_NEWMVA","7Bins",sample.Data(),7,-1,1);
+addHisto("hData_CRlooselooselowlowpt_2Vtx_NEWMVA","8Bins",sample.Data(),8,-1,1 );
+addHisto("hData_CRlooselooselowlowpt_TLVtx_SumtrackWeight","",sample.Data(),19,1,20);
+addHisto("hData_CRlooselooselowlowpt_TLVtx_SumtrackWeight","8Bins",sample.Data(),8,1,9);
+addHisto("hData_CRlooselooselowlowpt_TLVtx_SumtrackWeight","7Bins",sample.Data(),7,1,8);
+addHisto("hData_CRlooselooselowlowpt_TLVtx_SumtrackWeight","6Bins",sample.Data(),6,1,7);
+
+addHisto("hData_CRtightlowlowpt_2Vtx_NEWMVA","",sample.Data(),20,-1,1 );
+addHisto("hData_CRtightlowlowpt_2Vtx_NEWMVA","6Bins",sample.Data(),6,-1,1);
+addHisto("hData_CRtightlowlowpt_2Vtx_NEWMVA","7Bins",sample.Data(),7,-1,1 );
+addHisto("hData_CRtightlowlowpt_2Vtx_NEWMVA","8Bins",sample.Data(),8,-1,1);
+// addHisto("hData_CRtightlowlowpt_TLVtx_SumtrackWeight","",sample.Data(),19,1,20);
+addHisto("hData_CRtightlowlowpt_TLVtx_SumtrackWeight","8Bins",sample.Data(),8,1,9);
+addHisto("hData_CRtightlowlowpt_TLVtx_SumtrackWeight","7Bins",sample.Data(),7,1,8);
+addHisto("hData_CRtightlowlowpt_TLVtx_SumtrackWeight","6Bins",sample.Data(),6,1,7);
+            
+addHisto("hData_CRlooselooselowpt_2Vtx_NEWMVA","",sample.Data(),20,-1,1 );
+addHisto("hData_CRlooselooselowpt_2Vtx_NEWMVA","6Bins",sample.Data(),6,-1,1 );
+addHisto("hData_CRlooselooselowpt_2Vtx_NEWMVA","7Bins",sample.Data(),7,-1,1);
+addHisto("hData_CRlooselooselowpt_2Vtx_NEWMVA","8Bins",sample.Data(),8,-1,1 );
+addHisto("hData_CRlooselooselowpt_TLVtx_SumtrackWeight","",sample.Data(),19,1,20);
+addHisto("hData_CRlooselooselowpt_TLVtx_SumtrackWeight","8Bins",sample.Data(),8,1,9);
+addHisto("hData_CRlooselooselowpt_TLVtx_SumtrackWeight","7Bins",sample.Data(),7,1,8);
+addHisto("hData_CRlooselooselowpt_TLVtx_SumtrackWeight","6Bins",sample.Data(),6,1,7);
+
+
+addHisto("hData_CRtighthighpt_2Vtx_NEWMVA","",sample.Data(),20,-1,1);
+addHisto("hData_CRtighthighpt_2Vtx_NEWMVA","6Bins",sample.Data(),6,-1,1 );
+addHisto("hData_CRtighthighpt_2Vtx_NEWMVA","7Bins",sample.Data(),7,-1,1 );
+addHisto("hData_CRtighthighpt_2Vtx_NEWMVA","8Bins",sample.Data(),8,-1,1 );
+addHisto("hData_CRtighthighpt_TLVtx_SumtrackWeight","",sample.Data(),19,1,20);
+addHisto("hData_CRtighthighpt_TLVtx_SumtrackWeight","8Bins",sample.Data(),8,1,9);
+addHisto("hData_CRtighthighpt_TLVtx_SumtrackWeight","7Bins",sample.Data(),7,1,8);
+addHisto("hData_CRtighthighpt_TLVtx_SumtrackWeight","6Bins",sample.Data(),6,1,7);
+   // !! $$    -----------------
+
+
+// !! $$$ --------------------
+
+addHisto("hData_CRlooselooselowlowpt_2Vtx_NEWMVA","Sum",sample.Data(),20,-2,2);
+addHisto("hData_CRlooselooselowlowpt_2Vtx_NEWMVA","Ave",sample.Data(),20,-1,1);
+
+addHisto("hData_CRtightlowlowpt_2Vtx_NEWMVA","Sum",sample.Data(),20,-2,2);
+addHisto("hData_CRtightlowlowpt_2Vtx_NEWMVA","Ave",sample.Data(),20,-1,1 );
+
+addHisto("hData_CRlooselooselowpt_2Vtx_NEWMVA","Sum",sample.Data(),20,-2,2 );
+addHisto("hData_CRlooselooselowpt_2Vtx_NEWMVA","Ave",sample.Data(),20,-1,1 );
+
+addHisto("hData_CRtighthighpt_2Vtx_NEWMVA","Sum",sample.Data(),20,-2,2 );
+addHisto("hData_CRtighthighpt_2Vtx_NEWMVA","Ave",sample.Data(),20,-1,1);
+
+
+addHisto("hData_CRlooselooselowlowpt_2Vtx_STW","Sum",sample.Data(),19,1,20);
+addHisto("hData_CRlooselooselowlowpt_2Vtx_STW","Ave",sample.Data(),19,1,20);
+
+addHisto("hData_CRtightlowlowpt_2Vtx_STW","Sum",sample.Data(),19,1,20);
+addHisto("hData_CRtightlowlowpt_2Vtx_STW","Ave",sample.Data(),19,1,20 );
+
+addHisto("hData_CRlooselooselowpt_2Vtx_STW","Sum",sample.Data(),19,1,20 );
+addHisto("hData_CRlooselooselowpt_2Vtx_STW","Ave",sample.Data(),19,1,20 );
+
+addHisto("hData_CRtighthighpt_2Vtx_STW","Sum",sample.Data(),19,1,20 );
+addHisto("hData_CRtighthighpt_2Vtx_STW","Ave",sample.Data(),19,1,20);
+// !! $$$ --------------------
+// !! 
+
+   addHisto("hData_CRlooselooselowlowpt_2VtxAll_MVA","",sample.Data(), 25,-1,1 );
+   addHisto("hData_CRlooselooselowlowpt_dist_VtxVtx","",sample.Data(),50,0,100);
+   addHisto("hData_CRtightlowlowpt_2VtxAll_MVA","",sample.Data(), 25,-1,1 );
+   addHisto("hData_CRtightlowlowpt_dist_VtxVtx","",sample.Data(),50,0,100 );
+   addHisto("hData_CRlooselooselowpt_2VtxAll_MVA","",sample.Data(), 25,-1,1 );
+   addHisto("hData_CRlooselooselowpt_dist_VtxVtx","",sample.Data(),50,0,100 );
+   addHisto("hData_CRtighthighpt_2VtxAll_MVA","",sample.Data(), 25,-1,1 );
+   addHisto("hData_CRtighthighpt_2VtxAll_dist_VtxVtx","",sample.Data(),50,0,100 );
+
+
+
+                  // !! ----------------------- VtxBDTVariables
+
+                  addHisto("hData_CRlooselooselowlowpt_2VtxAll_NChi2","",sample.Data(),100,0,10 );
+
+                  addHisto("hData_CRlooselooselowlowpt_2VtxAll_z","",sample.Data(),20,-100,100 );
+
+                  addHisto("hData_CRlooselooselowlowpt_2VtxAll_dist","",sample.Data(),30,0,150 );
+
+                  addHisto("hData_CRlooselooselowlowpt_2VtxAll_ntrk10","",sample.Data(),30,0,30 );
+
+                  addHisto("hData_CRlooselooselowlowpt_2VtxAll_MeanDCA","",sample.Data(),60,0,15 );
+
+
+                  addHisto("hData_CRtightlowlowpt_2VtxAll_2VtxAll_NChi2","",sample.Data(),100,0,10 );
+
+                  addHisto("hData_CRtightlowlowpt_2VtxAll_2VtxAll_z","",sample.Data(),20,-100,100 );
+
+                  addHisto("hData_CRtightlowlowpt_2VtxAll_2VtxAll_dist","",sample.Data(),30,0,150);
+
+                  addHisto("hData_CRtightlowlowpt_2VtxAll_2VtxAll_ntrk10","",sample.Data(),30,0,30);
+
+                  addHisto("hData_CRtightlowlowpt_2VtxAll_2VtxAll_MeanDCA","",sample.Data(),60,0,15);
+
+
+                  addHisto("hData_CRlooselooselowpt_2VtxAll_2VtxAll_NChi2","",sample.Data(),100,0,10 );
+
+                  addHisto("hData_CRlooselooselowpt_2VtxAll_2VtxAll_z","",sample.Data(),20,-100,100  );
+
+                  addHisto("hData_CRlooselooselowpt_2VtxAll_2VtxAll_dist","",sample.Data(),30,0,150 );
+
+                  addHisto("hData_CRlooselooselowpt_2VtxAll_2VtxAll_ntrk10","",sample.Data(),30,0,30 );
+
+                  addHisto("hData_CRlooselooselowpt_2VtxAll_2VtxAll_MeanDCA","",sample.Data(),60,0,15 );
+
+
+                  addHisto("hData_CRtighthighpt_2VtxAll_2VtxAll_NChi2","",sample.Data(),100,0,10 );
+
+                  addHisto("hData_CRtighthighpt_2VtxAll_2VtxAll_z","",sample.Data(),20,-100,100  );
+
+                  addHisto("hData_CRtighthighpt_2VtxAll_2VtxAll_dist","",sample.Data(),30,0,150);
+
+                  addHisto("hData_CRtighthighpt_2VtxAll_2VtxAll_ntrk10","",sample.Data(),30,0,30 );
+
+                  addHisto("hData_CRtighthighpt_2VtxAll_2VtxAll_MeanDCA","",sample.Data(),60,0,15 );
+
+
+
+addHisto("hSim_Hemi_Vtx_r","noSel",sample.Data(),50,0,100);
+
+addHisto("hSim_Hemi_Vtx_dist","noSel",sample.Data(),50,0,100);
+
+addHisto("hData_Hemi_Vtx_r","Goodrecovtx",sample.Data(),50,0,100);
+addHisto("hData_Hemi_Vtx_dist","Goodrecovtx",sample.Data(),50,0,100);
+
+addHisto("hData_Hemi_Vtx_r","Ping",sample.Data(),50,0,100);
+addHisto("hData_Hemi_Vtx_dist","Ping",sample.Data(),50,0,100);
+
+addHisto("hData_Hemi_Vtx_r","TightPing",sample.Data(),50,0,100);
+addHisto("hData_Hemi_Vtx_dist","TightPing",sample.Data(),50,0,100);
+
+addHisto("hData_Hemi_Vtx_r","LoosePing",sample.Data(),50,0,100);
+addHisto("hData_Hemi_Vtx_dist","LoosePing",sample.Data(),50,0,100);
+
+
+
 //-----------AddHisto ------//
    addHisto("GenWeight","", sample.Data(), 300,0,3);
    addHisto("hData_Event_Weight","",sample.Data(), 1000,0,1000 );
@@ -2249,127 +3157,22 @@ void TreeABCDReader::initializeHisto(TString sample, bool isfirstset){
    addHisto("hData_2TriggerEff","fail",sample.Data(), 50, 0 ,100);
    //------- LT --------//
 
-   addHisto("Quality_LT_STW_1Vtx_C","",sample.Data(),40, 0, 40);
-   addHisto("Quality_LT_STW_1Vtx_A","",sample.Data(),40, 0, 40);
-   addHisto("Quality_LT_STW_1Vtx_D","",sample.Data(),40, 0, 40);
-   addHisto("Quality_LT_STW_1Vtx_B","",sample.Data(),40, 0, 40);
-
-   addHisto("Quality_LT_STW_2Vtx_C","",sample.Data(),40, 0, 40);
-   addHisto("Quality_LT_STW_2VtxAll_C","",sample.Data(),40, 0, 40);
+   addHisto("hData_VtxQualityTight_Hemipt","2Vtx",sample.Data(), 50,0,1000);
+   addHisto("hData_VtxQualityLoose_Hemipt","2Vtx",sample.Data(), 50,0,1000);
 
 
-   addHisto("Quality_LT_STW_2Vtx_A","",sample.Data(),40, 0, 40);
-   addHisto("Quality_LT_STW_2VtxAll_A","",sample.Data(),40, 0, 40);
-
-
-   addHisto("Quality_LT_STW_2Vtx_D","",sample.Data(),40, 0, 40);
-   addHisto("Quality_LT_STW_2VtxAll_D","",sample.Data(),40, 0, 40);
-
-
-   addHisto("Quality_LT_STW_2Vtx_B","",sample.Data(),40, 0, 40);
-   addHisto("Quality_LT_STW_2VtxAll_B","",sample.Data(),40, 0, 40);
-
-
-   //---------Tight/Loose------//
-
-addHisto("hData_VtxQualityTight_Hemi1pt","2Vtx",sample.Data(),50,0,1000);
-addHisto("hData_VtxQualityTight_Hemi2pt","2Vtx",sample.Data(),50,0,1000);
-addHisto("hData_VtxQualityTight_Hemi1pt","1Vtx",sample.Data(),50,0,1000);
-addHisto("hData_VtxQualityTight_Hemi2pt","1Vtx",sample.Data(),50,0,1000);
-
-
-addHisto("hData_VtxQualityLoose_Hemi1pt","1Vtx",sample.Data(),50,0,1000);
-addHisto("hData_VtxQualityLoose_Hemi2pt","1Vtx",sample.Data(),50,0,1000);
-addHisto("hData_VtxQualityLoose_Hemi1pt","2Vtx",sample.Data(),50,0,1000);
-addHisto("hData_VtxQualityLoose_Hemi2pt","2Vtx",sample.Data(),50,0,1000);
-
-   addHisto2D("hData_njetvsHemi1pt","NoSel",sample.Data(),20, 0 ,20,50,0,1000);
-   addHisto2D("hData_njetvsHemi2pt","NoSel",sample.Data(),20, 0 ,20,50,0,1000);
-   addHisto2D("hData_njetvsHemi1pt","1jet",sample.Data(),20, 0 ,20,50,0,1000);
-   addHisto2D("hData_njetvsHemi2pt","1jet",sample.Data(),20, 0 ,20,50,0,1000);
-   addHisto2D("hData_njetvsHemi1pt","2jet",sample.Data(),20, 0 ,20,50,0,1000);
-   addHisto2D("hData_njetvsHemi2pt","2jet",sample.Data(),20, 0 ,20,50,0,1000);
-      addHisto2D("hData_njetvsHemi1pt","3jet",sample.Data(),20, 0 ,20,50,0,1000);
-   addHisto2D("hData_njetvsHemi2pt","3jet",sample.Data(),20, 0 ,20,50,0,1000);
-      addHisto2D("hData_njetvsHemi1pt","4jet",sample.Data(),20, 0 ,20,50,0,1000);
-   addHisto2D("hData_njetvsHemi2pt","4jet",sample.Data(),20, 0 ,20,50,0,1000);
-      addHisto2D("hData_njetvsHemi1pt","5jet",sample.Data(),20, 0 ,20,50,0,1000);
-   addHisto2D("hData_njetvsHemi2pt","5jet",sample.Data(),20, 0 ,20,50,0,1000);
-      addHisto2D("hData_njetvsHemi1pt","6jet",sample.Data(),20, 0 ,20,50,0,1000);
-   addHisto2D("hData_njetvsHemi2pt","6jet",sample.Data(),20, 0 ,20,50,0,1000);
-         addHisto2D("hData_njetvsHemi1pt","7jet",sample.Data(),20, 0 ,20,50,0,1000);
-   addHisto2D("hData_njetvsHemi2pt","7jet",sample.Data(),20, 0 ,20,50,0,1000);
-   //------------------//
-   addHisto("hData_VtxQualityRatio_Hemileadingpt","NoSel",sample.Data(), 50,0,1000);
-   addHisto("hData_VtxQualityRatio_Hemisubleadingpt","NoSel",sample.Data(), 50,0,1000);
-   addHisto("hData_VtxQualityRatio_HemiAveragept","NoSel",sample.Data(), 50,0,1000);
-
-   addHisto("hData_VtxQualityTight_Hemi1pt","NoSel",sample.Data(),50,0,1000);
-   addHisto("hData_VtxQualityTight_Hemi2pt","NoSel",sample.Data(),50,0,1000);
-   addHisto("hData_VtxQualityLoose_Hemi1pt","NoSel",sample.Data(),50,0,1000);
-   addHisto("hData_VtxQualityLoose_Hemi2pt","NoSel",sample.Data(),50,0,1000);
-
-   addHisto("hData_VtxQualityTight_Hemileadingpt","NoSel",sample.Data(), 50,0,1000);
-   addHisto("hData_VtxQualityTight_Hemisubleadingpt","NoSel",sample.Data(), 50,0,1000);
-
-   addHisto("hData_VtxQualityLoose_Hemileadingpt","NoSel",sample.Data(), 50,0,1000);
-   addHisto("hData_VtxQualityLoose_Hemisubleadingpt","NoSel",sample.Data(), 50,0,1000);
-
-   addHisto("hData_VtxQualityTight_HemiAveragept","NoSel",sample.Data(), 50,0,1000);
-   addHisto("hData_VtxQualityLoose_HemiAveragept","NoSel",sample.Data(), 50,0,1000);
-
-
-   addHisto("hData_VtxQualityTight_Mmumu","NoSel",sample.Data(),100, 0 ,200);
-   addHisto("hData_VtxQualityLoose_Mmumu","NoSel",sample.Data(),100, 0 ,200);
-
-   addHisto("hData_VtxQualityTight_Njet1","NoSel",sample.Data(),20, 0 ,20);
-   addHisto("hData_VtxQualityLoose_Njet1","NoSel",sample.Data(),20, 0 ,20);
-
-   addHisto("hData_VtxQualityTight_Njet2","NoSel",sample.Data(),20, 0 ,20);
-   addHisto("hData_VtxQualityLoose_Njet2","NoSel",sample.Data(),20, 0 ,20);
-
-   
- //-----------------//
-   addHisto("LT_1Vtx","",sample.Data(),50,0,1000);
-   addHisto("LT_1Vtx","Tight",sample.Data(),50,0,1000);
-   addHisto("LT_1Vtx","Loose",sample.Data(),50,0,1000); 
-   addHisto("LT_2Vtx","",sample.Data(),50,0,1000);
-   addHisto("LT_2Vtx","TT",sample.Data(),50,0,1000);
-   addHisto("LT_2Vtx","LL",sample.Data(),50,0,1000);
-   addHisto("LT_2Vtx","TL",sample.Data(),50,0,1000);
-   addHisto("LT_1Vtx","Prompt",sample.Data(),50,0,1000);
-   addHisto("LT_1Vtx","PromptTight",sample.Data(),50,0,1000);
-   addHisto("LT_1Vtx","PromptLoose",sample.Data(),50,0,1000); 
-   addHisto("LT_2Vtx","Prompt",sample.Data(),50,0,1000);
-   addHisto("LT_2Vtx","PromptTT",sample.Data(),50,0,1000);
-   addHisto("LT_2Vtx","PromptLL",sample.Data(),50,0,1000);
-   addHisto("LT_2Vtx","PromptTL",sample.Data(),50,0,1000);
-   //-----------------//
-   addHisto2D("hData_Hemi_1Vtx_STW_Ntrks","NoSel",sample.Data(),25,0,25,25,0,25);
-   addHisto("hData_Hemi_1Vtx_NChi2","",sample.Data(),64,-1,15);
    addHisto2D("hData_Hemi_2VtxAll_STW_Ntrks","NoSel",sample.Data(),25,0,25,25,0,25);
    addHisto("hData_Hemi_2VtxAll_NChi2","",sample.Data(),64,-1,15);
 
-   addHisto2D("hData_ABCD_1Vtx_TL_Hemipt","",sample.Data(), 300, 0, 500, 2, 0, 2);
-   addHisto2D("hData_ABCD_TLVtxAll_Hemipt","",sample.Data(), 300, 0, 500, 2, 0, 2);
 
    addHisto("Hemisphere_leadingpt","", sample.Data(), 50,0,1000);
    addHisto("Hemisphere_subleadingpt","", sample.Data(), 50,0,1000);
 
-   addHisto("hData_Hemi_BDTevt","",sample.Data(), 25,-1,1);
-   addHisto("hData_Hemi_0Vtx_Mmumu","",sample.Data(),25,0.,500.);
-   addHisto("hData_Hemi_0Vtx_BDTevt","",sample.Data(), 25,-1,1 );
-   addHisto("hData_Hemi_1Vtx_Mmumu","",sample.Data(),25,0.,500.);
-   addHisto("hData_Hemi_1Vtx_Mass","",sample.Data(),25,0.,100.);
-   addHisto("hData_Hemi_1Vtx_BDTevt","",sample.Data(), 25,-1,1);
-   addHisto("hData_Hemi_1Vtx_BDTvtx","",sample.Data(), 25,-1,1 );
-   addHisto("hData_Hemi_1Vtx_SumtrackWeight","",sample.Data(), 40, 0, 40 );
-   addHisto("hData_Hemi_1Vtx_dist","",sample.Data(), 25,-1,1 );
-   addHisto2D("hData_Hemi_1Vtx_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
-   addHisto("hData_Hemi_TLVtx_SumtrackWeight","",sample.Data(),40, 0, 40);
+
+   addHisto("hData_Hemi_TLVtx_SumtrackWeight","",sample.Data(),19,1,20);
    addHisto("hData_Hemi_TLVtx_Mass","",sample.Data(),25,0.,100.);
 
-   addHisto("hData_Hemi_TLVtxAll_SumtrackWeight","",sample.Data(),40, 0, 40);
+   addHisto("hData_Hemi_TLVtxAll_SumtrackWeight","",sample.Data(),19,1,20);
 
    addHisto("hData_Hemi_TLVtxAll_Mass","",sample.Data(),25,0.,100.);
 
@@ -2379,200 +3182,125 @@ addHisto("hData_VtxQualityLoose_Hemi2pt","2Vtx",sample.Data(),50,0,1000);
    addHisto("hData_Hemi_2Vtx_Mass","",sample.Data(),25,0.,100.);
    addHisto("hData_Hemi_2Vtx_BDTevt","",sample.Data(), 25,-1,1 );
    addHisto("hData_Hemi_2Vtx_MaxBDTvtx","",sample.Data(), 25,-1,1 );
-   addHisto("hData_Hemi_2Vtx_SumtrackWeight","",sample.Data(), 40, 0, 40 );
+   addHisto("hData_Hemi_2Vtx_SumtrackWeight","",sample.Data(), 19,1,20 );
    addHisto2D("hData_Hemi_2Vtx_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
-
    addHisto("hData_Hemi_2VtxAll_Mass","",sample.Data(),25,0.,100.);
-
    addHisto("hData_Hemi_2VtxAll_BDTvtx","",sample.Data(), 25,-1,1);
-
-   addHisto("hData_Hemi_2VtxAll_SumtrackWeight","",sample.Data(),40, 0, 40 );
-
+   addHisto("hData_Hemi_2VtxAll_SumtrackWeight","",sample.Data(),19,1,20 );
    addHisto2D("hData_Hemi_2VtxAll_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
 
-
-   addHisto("hData_CRlowpt_BDTevt","",sample.Data(), 25,-1,1 );
-   addHisto("hData_CRlowpt_0Vtx_Mmumu","",sample.Data(),  25,0.,500. );
-   addHisto("hData_CRlowpt_0Vtx_BDTevt","",sample.Data(), 25,-1,1 );
-   addHisto("hData_CRlowpt_1Vtx_Mmumu","",sample.Data(),  25,0.,500.);
-   addHisto("hData_CRlowpt_1Vtx_Mass","",sample.Data(),   25,0.,100. );
-   addHisto("hData_CRlowpt_1Vtx_BDTevt","",sample.Data(), 25,-1,1 );
-   addHisto("hData_CRlowpt_1Vtx_BDTvtx","",sample.Data(), 25,-1,1 );
-   addHisto("hData_CRlowpt_1Vtx_SumtrackWeight","",sample.Data(),40, 0, 40 );
-   addHisto2D("hData_CRlowpt_1Vtx_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
-   addHisto("hData_CRlowpt_TLVtx_SumtrackWeight","",sample.Data(),40, 0, 40);
+   addHisto("hData_CRlowpt_TLVtx_SumtrackWeight","",sample.Data(),19,1,20);
    addHisto("hData_CRlowpt_TLVtx_Mass","",sample.Data(),25,0.,100.);
-
-   addHisto("hData_CRlowpt_TLVtxAll_SumtrackWeight","",sample.Data(),40, 0, 40);
-
+   addHisto("hData_CRlowpt_TLVtxAll_SumtrackWeight","",sample.Data(),19,1,20);
    addHisto("hData_CRlowpt_TLVtxAll_Mass","",sample.Data(),25,0.,100.);
-
    addHisto2D("hData_CRlowpt_TLVtx_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
    addHisto2D("hData_CRlowpt_TLVtxAll_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
    addHisto("hData_CRlowpt_2Vtx_Mmumu","",sample.Data(),  25,0.,500. );
    addHisto("hData_CRlowpt_2Vtx_Mass","",sample.Data(),   25,0.,100.);
    addHisto("hData_CRlowpt_2Vtx_BDTevt","",sample.Data(), 25,-1,1 );
    addHisto("hData_CRlowpt_2Vtx_MaxBDTvtx","",sample.Data(), 25,-1,1);
-   addHisto("hData_CRlowpt_2Vtx_SumtrackWeight","",sample.Data(), 40, 0, 40);
+   addHisto("hData_CRlowpt_2Vtx_SumtrackWeight","",sample.Data(), 19,1,20);
    addHisto2D("hData_CRlowpt_2Vtx_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
-
    addHisto("hData_CRlowpt_2VtxAll_Mass","",sample.Data(), 25,0.,100.);
-
    addHisto("hData_CRlowpt_2VtxAll_BDTvtx","",sample.Data(), 25,-1,1 );
-
-   addHisto("hData_CRlowpt_2VtxAll_SumtrackWeight","",sample.Data(), 40, 0, 40);
-   
+   addHisto("hData_CRlowpt_2VtxAll_SumtrackWeight","",sample.Data(), 19,1,20);
    addHisto2D("hData_CRlowpt_2VtxAll_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
 
-   addHisto("hData_CRlowlowpt_BDTevt","",sample.Data(), 25,-1,1);
-   addHisto("hData_CRlowlowpt_0Vtx_Mmumu","",sample.Data(), 25,0.,500. );
-   addHisto("hData_CRlowlowpt_0Vtx_BDTevt","",sample.Data(), 25,-1,1 );
-   addHisto("hData_CRlowlowpt_1Vtx_Mmumu","",sample.Data(),  25,0.,500.);
-   addHisto("hData_CRlowlowpt_1Vtx_Mass","",sample.Data(),   25,0.,100.);
-   addHisto("hData_CRlowlowpt_1Vtx_BDTevt","",sample.Data(), 25,-1,1);
-   addHisto("hData_CRlowlowpt_1Vtx_BDTvtx","",sample.Data(),25,-1,1);
-
-   addHisto("hData_CRlowlowpt_1Vtx_SumtrackWeight","",sample.Data(), 40, 0, 40 );
-   addHisto2D("hData_CRlowlowpt_1Vtx_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
-   addHisto("hData_CRlowlowpt_TLVtx_SumtrackWeight","",sample.Data(),40, 0, 40);
+   addHisto("hData_CRlowlowpt_TLVtx_SumtrackWeight","",sample.Data(),19,1,20);
    addHisto("hData_CRlowlowpt_TLVtx_Mass","",sample.Data(),25,0.,100.);
    addHisto2D("hData_CRlowlowpt_TLVtx_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
-
-   addHisto("hData_CRlowlowpt_TLVtxAll_SumtrackWeight","",sample.Data(),40, 0, 40);
-
+   addHisto("hData_CRlowlowpt_TLVtxAll_SumtrackWeight","",sample.Data(),19,1,20);
    addHisto("hData_CRlowlowpt_TLVtxAll_Mass","",sample.Data(),25,0.,100.);
-
    addHisto2D("hData_CRlowlowpt_TLVtxAll_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
    addHisto("hData_CRlowlowpt_2Vtx_Mmumu","",sample.Data(),  25,0.,500. );
    addHisto("hData_CRlowlowpt_2Vtx_Mass","",sample.Data(),   25,0.,100.);
    addHisto("hData_CRlowlowpt_2Vtx_BDTevt","",sample.Data(), 25,-1,1 );
    addHisto("hData_CRlowlowpt_2Vtx_MaxBDTvtx","",sample.Data(), 25,-1,1);
-   addHisto("hData_CRlowlowpt_2Vtx_SumtrackWeight","",sample.Data(), 40, 0, 40);
-
+   addHisto("hData_CRlowlowpt_2Vtx_SumtrackWeight","",sample.Data(), 19,1,20);
    addHisto("hData_CRlowlowpt_2VtxAll_Mass","",sample.Data(), 25,0.,100.);
-
    addHisto("hData_CRlowlowpt_2VtxAll_BDTvtx","",sample.Data(),25,-1,1);
-
-   addHisto("hData_CRlowlowpt_2VtxAll_SumtrackWeight","",sample.Data(),40, 0, 40);
-
+   addHisto("hData_CRlowlowpt_2VtxAll_SumtrackWeight","",sample.Data(),19,1,20);
    addHisto2D("hData_CRlowlowpt_2VtxAll_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
-   addHisto("hData_CRloose_BDTevt","",sample.Data(), 25,-1,1);
-   addHisto("hData_CRloose_0Vtx_Mmumu","",sample.Data(),  25,0.,500. );
-   addHisto("hData_CRloose_0Vtx_BDTevt","",sample.Data(), 25,-1,1);
-   addHisto("hData_CRloose_1Vtx_Mmumu","",sample.Data(),  25,0.,500.);
-   addHisto("hData_CRloose_1Vtx_Mass","",sample.Data(),   25,0.,100. );
-   addHisto("hData_CRloose_1Vtx_BDTevt","",sample.Data(), 25,-1,1 );
-   addHisto("hData_CRloose_1Vtx_BDTvtx","",sample.Data(), 25,-1,1 );
-   addHisto("hData_CRloose_1Vtx_SumtrackWeight","",sample.Data(),40, 0, 40 );
-   addHisto2D("hData_CRloose_1Vtx_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
-   addHisto("hData_CRloose_TLVtx_SumtrackWeight","",sample.Data(),40, 0, 40);
+
+   addHisto("hData_CRloose_TLVtx_SumtrackWeight","",sample.Data(),19,1,20);
    addHisto("hData_CRloose_TLVtx_Mass","",sample.Data(),25,0.,100.);
    addHisto2D("hData_CRloose_TLVtx_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
-
-   addHisto("hData_CRloose_TLVtxAll_SumtrackWeight","",sample.Data(),40, 0, 40);
+   addHisto("hData_CRloose_TLVtxAll_SumtrackWeight","",sample.Data(),19,1,20);
    addHisto("hData_CRloose_TLVtxAll_Mass","",sample.Data(),25,0.,100.);
    addHisto2D("hData_CRloose_TLVtxAll_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
    addHisto("hData_CRloose_2Vtx_Mmumu","",sample.Data(),  25,0.,500.);
    addHisto("hData_CRloose_2Vtx_Mass","",sample.Data(),   25,0.,100. );
    addHisto("hData_CRloose_2Vtx_BDTevt","",sample.Data(), 25,-1,1);
    addHisto("hData_CRloose_2Vtx_MaxBDTvtx","",sample.Data(), 25,-1,1 );
-   addHisto("hData_CRloose_2Vtx_SumtrackWeight","",sample.Data(), 40, 0, 40 );
+   addHisto("hData_CRloose_2Vtx_SumtrackWeight","",sample.Data(), 19,1,20 );
    addHisto2D("hData_CRloose_2Vtx_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
    addHisto2D("hData_CRloose_2VtxAll_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
    addHisto("hData_CRloose_2VtxAll_Mass","",sample.Data(), 25,0.,100.);
    addHisto("hData_CRloose_2VtxAll_BDTvtx","",sample.Data(), 25,-1,1 );           
-   addHisto("hData_CRloose_2VtxAll_SumtrackWeight","",sample.Data(), 40, 0, 40 );
+   addHisto("hData_CRloose_2VtxAll_SumtrackWeight","",sample.Data(), 19,1,20 );
 
-   addHisto("hData_CRlooselowpt_BDTevt","",sample.Data(), 25,-1,1 );
-   addHisto("hData_CRlooselowpt_0Vtx_Mmumu","",sample.Data(),  25,0.,500. );
-   addHisto("hData_CRlooselowpt_1Vtx_BDTevt","",sample.Data(), 25,-1,1 );
-   addHisto("hData_CRlooselowpt_1Vtx_BDTvtx","",sample.Data(), 25,-1,1);
-   addHisto("hData_CRlooselowpt_1Vtx_Mmumu","",sample.Data(),  25,0.,500. );
-   addHisto("hData_CRlooselowpt_1Vtx_Mass","",sample.Data(),   25,0.,100. );
-   addHisto("hData_CRlooselowpt_2Vtx_BDTevt","",sample.Data(), 25,-1,1);
-   addHisto("hData_CRlooselowpt_2Vtx_MaxBDTvtx","",sample.Data(), 25,-1,1 );
-   addHisto("hData_CRlooselowpt_1Vtx_SumtrackWeight","",sample.Data(),40, 0, 40 );
-   addHisto2D("hData_CRlooselowpt_1Vtx_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
-   addHisto("hData_CRlooselowpt_TLVtx_SumtrackWeight","",sample.Data(),40, 0, 40);
+
+   addHisto("hData_CRlooselowpt_TLVtx_SumtrackWeight","",sample.Data(),19,1,20);
    addHisto("hData_CRlooselowpt_TLVtx_Mass","",sample.Data(),25,0.,100.);
-
-
-   addHisto("hData_CRlooselowpt_TLVtxAll_SumtrackWeight","",sample.Data(),40, 0, 40);
+   addHisto("hData_CRlooselowpt_TLVtxAll_SumtrackWeight","",sample.Data(),19,1,20);
    addHisto("hData_CRlooselowpt_TLVtxAll_Mass","",sample.Data(),25,0.,100.);
    addHisto2D("hData_CRlooselowpt_TLVtx_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
    addHisto2D("hData_CRlooselowpt_TLVtxAll_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
    addHisto("hData_CRlooselowpt_2Vtx_Mmumu","",sample.Data(),  25,0.,500. );
    addHisto("hData_CRlooselowpt_2Vtx_Mass","",sample.Data(),   25,0.,100. );
-
-   addHisto("hData_CRlooselowpt_2Vtx_SumtrackWeight","",sample.Data(), 40, 0, 40);
-
+   addHisto("hData_CRlooselowpt_2Vtx_SumtrackWeight","",sample.Data(), 19,1,20);
    addHisto2D("hData_CRlooselowpt_2Vtx_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
    addHisto2D("hData_CRlooselowpt_2VtxAll_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
-
    addHisto("hData_CRlooselowpt_2VtxAll_Mass","",sample.Data(), 25,0.,100.);
    addHisto("hData_CRlooselowpt_2VtxAll_BDTvtx","",sample.Data(), 25,-1,1 );
+   addHisto("hData_CRlooselowpt_2VtxAll_SumtrackWeight","",sample.Data(), 19,1,20);
 
 
-   addHisto("hData_CRlooselowpt_2VtxAll_SumtrackWeight","",sample.Data(), 40, 0, 40);
-
-   addHisto("hData_CRlooselowlowpt_BDTevt","",sample.Data(), 25,-1,1 );
-   addHisto("hData_CRlooselowlowpt_0Vtx_Mmumu","",sample.Data(),  25,0.,500. );
-   addHisto("hData_CRlooselowlowpt_1Vtx_BDTevt","",sample.Data(), 25,-1,1 );
-   addHisto("hData_CRlooselowlowpt_1Vtx_BDTvtx","",sample.Data(), 25,-1,1);
-   addHisto("hData_CRlooselowlowpt_1Vtx_Mmumu","",sample.Data(),  25,0.,500. );
-   addHisto("hData_CRlooselowlowpt_1Vtx_Mass","",sample.Data(),   25,0.,100.);
-   addHisto("hData_CRlooselowlowpt_2Vtx_BDTevt","",sample.Data(),25,-1,1 );
-   addHisto("hData_CRlooselowlowpt_2Vtx_MaxBDTvtx","",sample.Data(), 25,-1,1 );
-
-   addHisto("hData_CRlooselowlowpt_1Vtx_SumtrackWeight","",sample.Data(),40, 0, 40 );
-   addHisto2D("hData_CRlooselowlowpt_1Vtx_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
-   addHisto("hData_CRlooselowlowpt_TLVtx_SumtrackWeight","",sample.Data(),40, 0, 40);
+   addHisto("hData_CRlooselowlowpt_TLVtx_SumtrackWeight","",sample.Data(),19,1,20);
    addHisto("hData_CRlooselowlowpt_TLVtx_Mass","",sample.Data(),25,0.,100.);
-
-
    addHisto2D("hData_CRlooselowlowpt_TLVtx_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
    addHisto2D("hData_CRlooselowlowpt_TLVtxAll_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
-
-
-   addHisto("hData_CRlooselowlowpt_TLVtxAll_SumtrackWeight","",sample.Data(),40, 0, 40);
+   addHisto("hData_CRlooselowlowpt_TLVtxAll_SumtrackWeight","",sample.Data(),19,1,20);
    addHisto("hData_CRlooselowlowpt_TLVtxAll_Mass","",sample.Data(),25,0.,100.);
    addHisto("hData_CRlooselowlowpt_2Vtx_Mmumu","",sample.Data(), 25,0.,500. );
    addHisto("hData_CRlooselowlowpt_2Vtx_Mass","",sample.Data(),   25,0.,100. );
-
-   addHisto("hData_CRlooselowlowpt_2Vtx_SumtrackWeight","",sample.Data(),40, 0, 40);
-
+   addHisto("hData_CRlooselowlowpt_2Vtx_SumtrackWeight","",sample.Data(),19,1,20);
    addHisto2D("hData_CRlooselowlowpt_2Vtx_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
    addHisto2D("hData_CRlooselowlowpt_2VtxAll_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
-
-
    addHisto("hData_CRlooselowlowpt_2VtxAll_Mass","",sample.Data(), 25,0.,100.);
    addHisto("hData_CRlooselowlowpt_2VtxAll_BDTvtx","",sample.Data(), 25,-1,1 );
-
-
-   addHisto("hData_CRlooselowlowpt_2VtxAll_SumtrackWeight","",sample.Data(), 40, 0, 40);
+   addHisto("hData_CRlooselowlowpt_2VtxAll_SumtrackWeight","",sample.Data(), 19,1,20);
 
 
    addHisto("hData_StepEff","",sample.Data(),9, 0, 9);
    addHisto("hData_StepEff","NonNormalized",sample.Data(),9, 0, 9);
-   
+
+   addHisto("StepEffi","",sample.Data(),8, 0, 8);
+
     // --------------- zzzzzzzzzzzzzzzzzzzzzzzzzzzz ------------------------------------//
 
 //A
    addHisto("hData_CRtightlowlowpt_BDTevt","",sample.Data(),  25,-1,1  );
-   addHisto("hData_CRtightlowlowpt_TLVtx_SumtrackWeight","",sample.Data(), 40, 0, 40);
+   addHisto("hData_CRtightlowlowpt_TLVtx_SumtrackWeight","",sample.Data(), 19,1,20);
    addHisto("hData_CRtightlowlowpt_TLVtx_Mass","",sample.Data(),25,0.,100.);
-   addHisto("hData_CRtightlowlowpt_TLVtxAll_SumtrackWeight","",sample.Data(), 40, 0, 40);
+   addHisto("hData_CRtightlowlowpt_TLVtxAll_SumtrackWeight","",sample.Data(), 19,1,20);
+   addHisto("hData_CRtightlowlowpt_TLVtxAll_SumtrackWeight","6Bins",sample.Data(), 6,1,7);
+   addHisto("hData_CRtightlowlowpt_TLVtxAll_SumtrackWeight","7Bins",sample.Data(), 7,1,8);
+   addHisto("hData_CRtightlowlowpt_TLVtxAll_SumtrackWeight","8Bins",sample.Data(), 8,1,9);
    addHisto("hData_CRtightlowlowpt_TLVtxAll_Mass","",sample.Data(),25,0.,100.);
    addHisto2D("hData_CRtightlowlowpt_TLVtx_STW_Ntrks","",sample.Data(), 25,0,25,25,0,25);
    addHisto2D("hData_CRtightlowlowpt_TLVtxAll_STW_Ntrks","",sample.Data() ,25,0,25,25,0,25);
 
    //B
    addHisto("hData_CRlooselooselowlowpt_BDTevt","",sample.Data(),  25,-1,1  );
-   addHisto("hData_CRlooselooselowlowpt_TLVtx_SumtrackWeight","",sample.Data(), 40, 0, 40);
+   // addHisto("hData_CRlooselooselowlowpt_TLVtx_SumtrackWeight","",sample.Data(), 19,1,20);
    addHisto("hData_CRlooselooselowlowpt_TLVtx_Mass","",sample.Data(),25,0.,100.);
    addHisto2D("hData_CRlooselooselowlowpt_TLVtx_STW_Ntrks","",sample.Data() ,25,0,25,25,0,25);
    addHisto2D("hData_CRlooselooselowlowpt_TLVtxAll_STW_Ntrks","",sample.Data() ,25,0,25,25,0,25);
-   addHisto("hData_CRlooselooselowlowpt_TLVtxAll_SumtrackWeight","",sample.Data(), 40, 0, 40);
+   addHisto("hData_CRlooselooselowlowpt_TLVtxAll_SumtrackWeight","",sample.Data(), 19,1,20);
+   addHisto("hData_CRlooselooselowlowpt_TLVtxAll_SumtrackWeight","6Bins",sample.Data(),6,1,7);
+   addHisto("hData_CRlooselooselowlowpt_TLVtxAll_SumtrackWeight","7Bins",sample.Data(),7,1,8);
+   addHisto("hData_CRlooselooselowlowpt_TLVtxAll_SumtrackWeight","8Bins",sample.Data(),8,1,9);
    addHisto("hData_CRlooselooselowlowpt_TLVtxAll_Mass","",sample.Data(),25,0.,100.);
 
 
@@ -2580,30 +3308,30 @@ addHisto("hData_VtxQualityLoose_Hemi2pt","2Vtx",sample.Data(),50,0,1000);
    addHisto("hData_CRtighthighpt_BDTevt","",sample.Data(),25,-1,1  );
    addHisto("hData_CRtighthighpt_2Vtx_Mmumu","",sample.Data(),  25,0.,500. );
    addHisto("hData_CRtighthighpt_2Vtx_Mass","",sample.Data(),   25,0.,100.);
-   addHisto("hData_CRtighthighpt_2Vtx_SumtrackWeight","",sample.Data(), 40, 0, 40);
+   addHisto("hData_CRtighthighpt_2Vtx_SumtrackWeight","",sample.Data(), 19,1,20);
    addHisto2D("hData_CRtighthighpt_2Vtx_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
    addHisto2D("hData_CRtighthighpt_2VtxAll_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
    addHisto("hData_CRtighthighpt_2VtxAll_Mass","",sample.Data(), 25,0.,100.);
    addHisto("hData_CRtighthighpt_2VtxAll_BDTvtx","",sample.Data(),  25,-1,1 );
-   addHisto("hData_CRtighthighpt_2VtxAll_SumtrackWeight","",sample.Data(), 40, 0, 40);
+   addHisto("hData_CRtighthighpt_2VtxAll_SumtrackWeight","",sample.Data(), 19,1,20);
+   addHisto("hData_CRtighthighpt_2VtxAll_SumtrackWeight","6Bins",sample.Data(), 6,1,7);
+   addHisto("hData_CRtighthighpt_2VtxAll_SumtrackWeight","7Bins",sample.Data(), 7,1,8);
+   addHisto("hData_CRtighthighpt_2VtxAll_SumtrackWeight","8Bins",sample.Data(), 8,1,9);
    
 //D
    addHisto("hData_CRlooselooselowpt_BDTevt","",sample.Data(), 25,-1,1  );
    addHisto("hData_CRlooselooselowpt_2Vtx_Mmumu","",sample.Data(),   25,0.,500.);
    addHisto("hData_CRlooselooselowpt_2Vtx_Mass","",sample.Data(),  25,0.,100. );
-   addHisto("hData_CRlooselooselowpt_2Vtx_SumtrackWeight","",sample.Data(), 40, 0, 40);
+   addHisto("hData_CRlooselooselowpt_2Vtx_SumtrackWeight","",sample.Data(), 19,1,20);
    addHisto2D("hData_CRlooselooselowpt_2Vtx_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
    addHisto2D("hData_CRlooselooselowpt_2VtxAll_STW_Ntrks","",sample.Data(),25,0,25,25,0,25);
    addHisto("hData_CRlooselooselowpt_2VtxAll_Mass","",sample.Data(),25,0.,100.);
    addHisto("hData_CRlooselooselowpt_2VtxAll_BDTvtx","",sample.Data(), 25,-1,1  );
-   addHisto("hData_CRlooselooselowpt_2VtxAll_SumtrackWeight","",sample.Data(), 40, 0, 40);
+   addHisto("hData_CRlooselooselowpt_2VtxAll_SumtrackWeight","",sample.Data(), 19,1,20);
+   addHisto("hData_CRlooselooselowpt_2VtxAll_SumtrackWeight","6Bins",sample.Data(), 6,1,7);
+   addHisto("hData_CRlooselooselowpt_2VtxAll_SumtrackWeight","7Bins",sample.Data(), 7,1,8);
+   addHisto("hData_CRlooselooselowpt_2VtxAll_SumtrackWeight","8Bins",sample.Data(), 8,1,9);
 
-//----- if using ABCD for 1 Vtx with combined regions ------//
-
-   addHisto("hData_CRLoose_1Vtx_Mass","",sample.Data(),   25,0.,100. );
-   addHisto("hData_CRLoose_1Vtx_SumtrackWeight","",sample.Data(),40, 0, 40);
-   addHisto("hData_CRTight_1Vtx_Mass","",sample.Data(),   25,0.,100. );
-   addHisto("hData_CRTight_1Vtx_SumtrackWeight","",sample.Data(),40, 0, 40);
 
 }
 
@@ -2626,6 +3354,19 @@ void TreeABCDReader::addHisto(TString var, TString selstep, TString sample, int 
   histo_map_[name.Data()] = numb_histo;
   numb_histo++;
 }
+
+void TreeABCDReader::addHistoDiffBin(TString var, TString selstep, TString sample, int nbins, float* binedges){
+ 
+   TString name =  sample+"_"+var+"_"+selstep;
+  TH1F * thehisto = new TH1F(name,name,nbins,binedges);
+  thehisto->Sumw2();
+  thehisto->SetOption("HIST");
+   // // std::cout<<"adding histo with name : "<<name<<std::endl;
+  histo_list_.push_back(thehisto);
+  histo_map_[name.Data()] = numb_histo;
+  numb_histo++;
+}
+
 
 void TreeABCDReader::addHisto2D(TString var, TString selstep, TString sample, int nxbins, float xmin, float xmax, int nybins, float ymin, float ymax){
  
