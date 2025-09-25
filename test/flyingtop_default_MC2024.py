@@ -23,8 +23,8 @@ from CondCore.CondDB.CondDB_cfi import *
 ###--------------------------
 #$$
 IsMC = True
-year = 2023
-isPost = False
+year = 2024
+isPost = True
 #$$
 
 from Configuration.AlCa.GlobalTag import GlobalTag
@@ -32,25 +32,25 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 
 ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2018UL.txt"
 EGERA = '2022-Prompt'
-#$$$$
-GT = '140X_mcRun3_2024_realistic_v26' # for period C
-#$$$$
-if isPost:
-    GT = '140X_mcRun3_2024_realistic_v26' # for period D
+
+
+GT = '140X_mcRun3_2024_realistic_v26' # for period D
+
 TIGHTJETIDERA = 'RUN3CHSruns2022FGruns2023CD'
 L1PREFERA = '20172018'
-DATAPUFILE = 'pileupHistogram-Cert_Collisions2023_366442_370790_GoldenJson-13p6TeV-69200ub-100bins.root'
-DATAPUFILEUP = 'pileupHistogram-Cert_Collisions2023_366442_370790_GoldenJson-13p6TeV-72400ub-100bins.root'
-DATAPUFILEDOWN = 'pileupHistogram-Cert_Collisions2023_366442_370790_GoldenJson-13p6TeV-66000ub-100bins.root'
-MCPUFILE   = 'PU_Run2023_MC.root'
 
-# $$$$$
-# JETVETOMAP = './JECDatabase/jet_veto_maps/Summer23Prompt23/Summer23Prompt23_RunC_v1.root'
+MCPUFILE   = 'Run2024_MC.root'
+DATAPUFILE = 'Run2024_DATA.root'
 
-JECUNCDATA = 'Summer23Prompt23_V1_MC_Uncertainty_AK4PFchs.txt' #./JECDatabase/textFiles/Summer23Prompt23_RunCv4_V1_DATA/Summer23Prompt23_RunCv4_V1_DATA_Uncertainty_AK4PFchs.txt
+# !! to be changed when avialable 
+DATAPUFILEUP = 'pileupHistogram-Cert_Collisions2024_378891_386951_GoldenJson-13p6TeV-72400ub-100bins.root'
+DATAPUFILEDOWN = 'pileupHistogram-Cert_Collisions2024_378891_386951_GoldenJson-13p6TeV-66000ub-100bins.root'
+
+# JETVETOMAP = './JECDatabase/jet_veto_maps/Winter24Prompt24/Winter24Prompt24_2024BCDEFGHI.root'
+JECUNCDATA = 'Summer23Prompt23_V1_MC_Uncertainty_AK4PFPuppi.txt' #./JECDatabase/textFiles/Summer23Prompt23_RunCv4_V1_DATA/Summer23Prompt23_RunCv4_V1_DATA_Uncertainty_AK4PFchs.txt
 JECUNCMC = 'Summer23Prompt23_V1_MC_Uncertainty_AK4PFPuppi.txt' #./JECDatabase/textFiles/Summer23Prompt23_V1_MC/Summer23Prompt23_V1_MC_Uncertainty_AK4PFchs.txt
 
-JERMC = 'Summer23Prompt23_RunCv1234_JRV1_MC_PtResolution_AK4PFPuppi.txt' #./JRDatabase/textFiles/Summer23Prompt23_RunCv1234_JRV1_MC/
+JERMC = 'Summer23Prompt23_RunCv1234_JRV1_MC_PtResolution_AK4PFchs.txt' #./JRDatabase/textFiles/Summer23Prompt23_RunCv1234_JRV1_MC/
 JERSFMC = 'Summer23Prompt23_RunCv1234_JRV1_MC_SF_AK4PFPuppi.txt' #./JRDatabase/textFiles/Summer23Prompt23_RunCv1234_JRV1_MC/Summer23Prompt23_RunCv1234_JRV1_MC_SF_AK4PFchs.txt
 JERDATA = 'Summer23Prompt23_RunCv1234_JRV1_DATA_PtResolution_AK4PFchs.txt' #./JRDatabase/textFiles/Summer23Prompt23_RunCv1234_JRV1_DATA/
 JERSFDATA = 'Summer23Prompt23_RunCv1234_JRV1_DATA_SF_AK4PFPuppi.txt' #./JRDatabase/textFiles/Summer23Prompt23_RunCv1234_JRV1_DATA/Summer23Prompt23_RunCv1234_JRV1_DATA_SF_AK4PFchs.txt
@@ -62,11 +62,11 @@ if isPost:
     # $$$$$
     # JETVETOMAP = './JECDatabase/jet_veto_maps/Summer23BPixPrompt23/Summer23BPixPrompt23_RunD_v1.root'
     
-    JECUNCDATA = 'Summer23BPixPrompt23_V1_MC_Uncertainty_AK4PFPuppi.txt' #./JECDatabase/textFiles/Summer23BPixPrompt23_RunD_V1_DATA/Summer23BPixPrompt23_RunD_V1_DATA_Uncertainty_AK4PFchs.txtSummer23BPixPrompt23_V1_MC_Uncertainty_AK4PFchs.txt
-    JECUNCMC = 'Summer23BPixPrompt23_V1_MC_Uncertainty_AK4PFPuppi.txt' #/JECDatabase/textFiles/Summer23BPixPrompt23_V1_MC/Summer23BPixPrompt23_V1_MC_Uncertainty_AK4PFchs.txt
+    JECUNCDATA = 'Summer23BPixPrompt23_V1_MC_Uncertainty_AK4PFPuppi.txt' #./JECDatabase/textFiles/Summer23BPixPrompt23_RunD_V1_DATA/Summer23BPixPrompt23_RunD_V1_DATA_Uncertainty_AK4PFchs.txt
+    JECUNCMC = 'Summer23BPixPrompt23_V1_MC_Uncertainty_AK4PFPuppi.txt'#/JECDatabase/textFiles/Summer23BPixPrompt23_V1_MC/Summer23BPixPrompt23_V1_MC_Uncertainty_AK4PFchs.txt
     
     JERMC = 'Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt' #./JRDatabase/textFiles/Summer23BPixPrompt23_RunD_JRV1_MC/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFchs.txt
-    JERSFMC = 'Summer23BPixPrompt23_RunD_JRV1_MC_SF_AK4PFPuppi.txt' #./JRDatabase/textFiles/Summer23BPixPrompt23_RunD_JRV1_MC/Summer23BPixPrompt23_RunD_JRV1_MC_SF_AK4PFchs.txt
+    JERSFMC = 'Summer23BPixPrompt23_RunD_JRV1_MC_SF_AK4PFPuppi.txt'#./JRDatabase/textFiles/Summer23BPixPrompt23_RunD_JRV1_MC/Summer23BPixPrompt23_RunD_JRV1_MC_SF_AK4PFchs.txt
     JERDATA = 'Summer23BPixPrompt23_RunD_JRV1_DATA_PtResolution_AK4PFchs.txt' #./JRDatabase/textFiles/Summer23BPixPrompt23_RunD_JRV1_DATA/
     JERSFDATA = 'Summer23BPixPrompt23_RunD_JRV1_DATA_SF_AK4PFPuppi.txt' #./JRDatabase/textFiles/Summer23BPixPrompt23_RunD_JRV1_DATA/Summer23BPixPrompt23_RunD_JRV1_DATA_SF_AK4PFchs.txt
 
@@ -93,19 +93,31 @@ process.GoodVertexFilter = cms.EDFilter("VertexSelector",
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
 #$$
-#   'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu400_neu300_ctau100/MINIAODSIM_1.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_1.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_2.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_3.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_4.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_5.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_6.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_7.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_9.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_8.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_9.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_10.root'
 
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_1.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_2.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_3.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_4.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_5.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_6.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_7.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_9.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_8.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_9.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_10.root'
+
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/RPV_2024A_smu200_neu180_ctau001/MINIAODSIM_1.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_2.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_3.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_4.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_5.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_6.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_7.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_8.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_9.root',
+# 'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2024/inputFile/MINIAODSIM_10.root'
+
 #$$
 )
 )
@@ -228,7 +240,9 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
            YEAR = cms.int32(year),
            ERA2016 = cms.bool(isPost),
            RochString = cms.string(ROCCORPATH),
-           weightFileMVA = cms.untracked.string("BDT_TRK_241122_2023A_ctau100vsEMUdata.xml"),
+#$$
+           weightFileMVA = cms.untracked.string("BDT_TRK_250527_2024_ctau100vsEMUdata.xml"),
+#$$
            weightFileMVA_EVTS = cms.untracked.string("BDT_EVT_ALLSIGvsALLBKG.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
            weightFileMVA_EVTSDY = cms.untracked.string("BDT_EVT_ALLSIGvsDYM50.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
            weightFileMVA_EVTSTT = cms.untracked.string("BDT_EVT_ALLSIGvsTTTo2L2Nu.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
@@ -246,7 +260,7 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
            genpacked   = cms.InputTag('packedGenParticles'),
            vertices    = cms.InputTag('offlineSlimmedPrimaryVertices'),
            mets        = cms.InputTag("slimmedMETs"),
-           jets        = cms.InputTag("updatedJetsWithUserData"),
+           jets        = cms.InputTag("slimmedJets"), # updatedJetsWithUserData"
            genjets     = cms.InputTag("slimmedGenJets"),
            electrons   = cms.InputTag("slimmedElectrons"),
            muons       = cms.InputTag("slimmedMuons"),
@@ -266,21 +280,16 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
             jetjersfmc = cms.string(JERSFMC)
        )
 
-#process.tsk = cms.Task()
-#for mod in process.producers_().itervalues():
-#    process.tsk.add(mod)
-#    for mod in process.filters_().itervalues():
-#        process.tsk.add(mod)
 #-------------------------------------
 #process.p = cms.Path(process.prefiringweight* process.egammaPostRecoSeq* process.updatedPatJetsTransientCorrectedNewDFTraining* process.FlyingTop,process.tsk)
 process.p = cms.Path(
     process.GoodVertexFilter*
-    process.jetCorrFactors*
-    process.updatedJets*
-    process.tightJetId*
-    process.tightLepVetoJetId *
+    # process.jetCorrFactors*
+    # process.updatedJets*
+    # process.tightJetId*
+    # process.tightLepVetoJetId *
     # !!  process.pileupJetIdUpdated* # Using Puppi jets so not needed
-    process.updatedJetsWithUserData*
+    # process.updatedJetsWithUserData*
     # !! process.prefiringweight* # I have to figure out why it is not working for run 3
     # !! process.egammaPostRecoSeq* #I have to figure out why it is not working for run 3
     process.FlyingTop
@@ -292,7 +301,7 @@ process.pathRunPatAlgos = cms.Path(process.patAlgosToolsTask)
 
 ########## output of ntuple
 #$$
-process.TFileService = cms.Service("TFileService", fileName = cms.string("RPV_2023A_smu500_neu180_ctau003.root") )
+process.TFileService = cms.Service("TFileService", fileName = cms.string("inputFile.root") )
 #$$
 
 #$$

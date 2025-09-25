@@ -24,7 +24,7 @@ from CondCore.CondDB.CondDB_cfi import *
 #$$
 IsMC = True
 year = 2023
-isPost = False
+isPost = True
 #$$
 
 from Configuration.AlCa.GlobalTag import GlobalTag
@@ -32,11 +32,11 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 
 ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2018UL.txt"
 EGERA = '2022-Prompt'
-#$$$$
+#$$
 GT = '140X_mcRun3_2024_realistic_v26' # for period C
-#$$$$
 if isPost:
     GT = '140X_mcRun3_2024_realistic_v26' # for period D
+#$$
 TIGHTJETIDERA = 'RUN3CHSruns2022FGruns2023CD'
 L1PREFERA = '20172018'
 DATAPUFILE = 'pileupHistogram-Cert_Collisions2023_366442_370790_GoldenJson-13p6TeV-69200ub-100bins.root'
@@ -47,10 +47,10 @@ MCPUFILE   = 'PU_Run2023_MC.root'
 # $$$$$
 # JETVETOMAP = './JECDatabase/jet_veto_maps/Summer23Prompt23/Summer23Prompt23_RunC_v1.root'
 
-JECUNCDATA = 'Summer23Prompt23_V1_MC_Uncertainty_AK4PFchs.txt' #./JECDatabase/textFiles/Summer23Prompt23_RunCv4_V1_DATA/Summer23Prompt23_RunCv4_V1_DATA_Uncertainty_AK4PFchs.txt
+JECUNCDATA = 'Summer23Prompt23_V1_MC_Uncertainty_AK4PFPuppi.txt' #./JECDatabase/textFiles/Summer23Prompt23_RunCv4_V1_DATA/Summer23Prompt23_RunCv4_V1_DATA_Uncertainty_AK4PFchs.txt
 JECUNCMC = 'Summer23Prompt23_V1_MC_Uncertainty_AK4PFPuppi.txt' #./JECDatabase/textFiles/Summer23Prompt23_V1_MC/Summer23Prompt23_V1_MC_Uncertainty_AK4PFchs.txt
 
-JERMC = 'Summer23Prompt23_RunCv1234_JRV1_MC_PtResolution_AK4PFPuppi.txt' #./JRDatabase/textFiles/Summer23Prompt23_RunCv1234_JRV1_MC/
+JERMC = 'Summer23Prompt23_RunCv1234_JRV1_MC_PtResolution_AK4PFchs.txt' #./JRDatabase/textFiles/Summer23Prompt23_RunCv1234_JRV1_MC/
 JERSFMC = 'Summer23Prompt23_RunCv1234_JRV1_MC_SF_AK4PFPuppi.txt' #./JRDatabase/textFiles/Summer23Prompt23_RunCv1234_JRV1_MC/Summer23Prompt23_RunCv1234_JRV1_MC_SF_AK4PFchs.txt
 JERDATA = 'Summer23Prompt23_RunCv1234_JRV1_DATA_PtResolution_AK4PFchs.txt' #./JRDatabase/textFiles/Summer23Prompt23_RunCv1234_JRV1_DATA/
 JERSFDATA = 'Summer23Prompt23_RunCv1234_JRV1_DATA_SF_AK4PFPuppi.txt' #./JRDatabase/textFiles/Summer23Prompt23_RunCv1234_JRV1_DATA/Summer23Prompt23_RunCv1234_JRV1_DATA_SF_AK4PFchs.txt
@@ -62,11 +62,11 @@ if isPost:
     # $$$$$
     # JETVETOMAP = './JECDatabase/jet_veto_maps/Summer23BPixPrompt23/Summer23BPixPrompt23_RunD_v1.root'
     
-    JECUNCDATA = 'Summer23BPixPrompt23_V1_MC_Uncertainty_AK4PFPuppi.txt' #./JECDatabase/textFiles/Summer23BPixPrompt23_RunD_V1_DATA/Summer23BPixPrompt23_RunD_V1_DATA_Uncertainty_AK4PFchs.txtSummer23BPixPrompt23_V1_MC_Uncertainty_AK4PFchs.txt
-    JECUNCMC = 'Summer23BPixPrompt23_V1_MC_Uncertainty_AK4PFPuppi.txt' #/JECDatabase/textFiles/Summer23BPixPrompt23_V1_MC/Summer23BPixPrompt23_V1_MC_Uncertainty_AK4PFchs.txt
+    JECUNCDATA = 'Summer23BPixPrompt23_V1_MC_Uncertainty_AK4PFPuppi.txt' #./JECDatabase/textFiles/Summer23BPixPrompt23_RunD_V1_DATA/Summer23BPixPrompt23_RunD_V1_DATA_Uncertainty_AK4PFchs.txt
+    JECUNCMC = 'Summer23BPixPrompt23_V1_MC_Uncertainty_AK4PFPuppi.txt'#/JECDatabase/textFiles/Summer23BPixPrompt23_V1_MC/Summer23BPixPrompt23_V1_MC_Uncertainty_AK4PFchs.txt
     
     JERMC = 'Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt' #./JRDatabase/textFiles/Summer23BPixPrompt23_RunD_JRV1_MC/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFchs.txt
-    JERSFMC = 'Summer23BPixPrompt23_RunD_JRV1_MC_SF_AK4PFPuppi.txt' #./JRDatabase/textFiles/Summer23BPixPrompt23_RunD_JRV1_MC/Summer23BPixPrompt23_RunD_JRV1_MC_SF_AK4PFchs.txt
+    JERSFMC = 'Summer23BPixPrompt23_RunD_JRV1_MC_SF_AK4PFPuppi.txt'#./JRDatabase/textFiles/Summer23BPixPrompt23_RunD_JRV1_MC/Summer23BPixPrompt23_RunD_JRV1_MC_SF_AK4PFchs.txt
     JERDATA = 'Summer23BPixPrompt23_RunD_JRV1_DATA_PtResolution_AK4PFchs.txt' #./JRDatabase/textFiles/Summer23BPixPrompt23_RunD_JRV1_DATA/
     JERSFDATA = 'Summer23BPixPrompt23_RunD_JRV1_DATA_SF_AK4PFPuppi.txt' #./JRDatabase/textFiles/Summer23BPixPrompt23_RunD_JRV1_DATA/Summer23BPixPrompt23_RunD_JRV1_DATA_SF_AK4PFchs.txt
 
@@ -93,19 +93,17 @@ process.GoodVertexFilter = cms.EDFilter("VertexSelector",
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
 #$$
-#   'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu400_neu300_ctau100/MINIAODSIM_1.root',
-
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_1.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_2.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_3.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_4.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_5.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_6.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_7.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_9.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_8.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_9.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_10.root'
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023B/inputFile/MINIAODSIM_1.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023B/inputFile/MINIAODSIM_2.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023B/inputFile/MINIAODSIM_3.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023B/inputFile/MINIAODSIM_4.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023B/inputFile/MINIAODSIM_5.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023B/inputFile/MINIAODSIM_6.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023B/inputFile/MINIAODSIM_7.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023B/inputFile/MINIAODSIM_9.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023B/inputFile/MINIAODSIM_8.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023B/inputFile/MINIAODSIM_9.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023B/inputFile/MINIAODSIM_10.root'
 #$$
 )
 )
@@ -228,7 +226,7 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
            YEAR = cms.int32(year),
            ERA2016 = cms.bool(isPost),
            RochString = cms.string(ROCCORPATH),
-           weightFileMVA = cms.untracked.string("BDT_TRK_241122_2023A_ctau100vsEMUdata.xml"),
+           weightFileMVA = cms.untracked.string("BDT_TRK_241119_2023B_ctau100vsEMUdata.xml"),
            weightFileMVA_EVTS = cms.untracked.string("BDT_EVT_ALLSIGvsALLBKG.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
            weightFileMVA_EVTSDY = cms.untracked.string("BDT_EVT_ALLSIGvsDYM50.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
            weightFileMVA_EVTSTT = cms.untracked.string("BDT_EVT_ALLSIGvsTTTo2L2Nu.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
@@ -292,7 +290,7 @@ process.pathRunPatAlgos = cms.Path(process.patAlgosToolsTask)
 
 ########## output of ntuple
 #$$
-process.TFileService = cms.Service("TFileService", fileName = cms.string("RPV_2023A_smu500_neu180_ctau003.root") )
+process.TFileService = cms.Service("TFileService", fileName = cms.string("inputFile.root") )
 #$$
 
 #$$

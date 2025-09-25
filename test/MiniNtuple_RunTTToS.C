@@ -18,26 +18,21 @@ int main(int argc, char **argv)
  
  TChain c("FlyingTop/ttree");
 
-TString Prod[2] = {"MC_EMU_2024_23_06_2025","MC_MUMU_2024_23_06_2025"};
+TString Prod[4] = {"MC_EMU_2024_23_06_2025","MC_MUMU_2024_23_06_2025"};
 
-// MC_EMU_2022_23_04_2025
- // MC_EMU_2022_EFG_23_04_2025
- // MC_EMU_2023_C_23_04_2025
- //- MC_EMU_2023_D_23_04_2025
+
+
 bool Signal = false;
 ////////////////////////////////////////////////////////////////////////////////
 
-
-  TString BKGSet[1]={"TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8"
+// //--------------------Background Emu MiniNtuples ------------//
+  TString BKGSet[1]={"TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8"
   };
-     
+
 for (int j = 0 ; j < 2 ; j++)
   { 
     for (int i = 0 ; i< 1 ; i++) 
         {
-                // /opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/PROD_CSI_10_06_2024
-          // /opt/sbg/cms/ui2_data1/mmeena/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/Macro_new/Ntuple_03_06_24/2018/
-
           TString Path = "/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_14_0_20/src/FlyingTop/FlyingTop/test/"+Prod[j]+"/"+BKGSet[i]+".root";
           c.Reset();
           c.Add(Path);

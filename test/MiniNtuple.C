@@ -82,6 +82,7 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
    std::vector<bool>   minitree_FilterSameSign;
    std::vector<bool>   minitree_trigger_doublelepton;
    std::vector<bool>   minitree_trigger_singlelepton;
+   std::vector<bool>   minitree_trigger_met;
     
    std::vector<float>  minitree_GenPVx;
    std::vector<float>  minitree_GenPVy;
@@ -140,6 +141,9 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
    std::vector<bool>   minitree_muon_MiniIsoLoose;
    std::vector<bool>   minitree_muon_MiniIsoMedium;
    std::vector<bool>   minitree_muon_MiniIsoTight;
+std::vector<bool>   minitree_muon_trigger_dimu;
+   std::vector<bool>   minitree_muon_trigger_isomu;
+
 
    std::vector<float>  minitree_lepton_leadingpt;
    std::vector<float>  minitree_lepton_leadingpt2;
@@ -156,7 +160,7 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
    std::vector<float>  minitree_lepton_leadingdz;
    std::vector<float>  minitree_lepton_leadingdz2;
 
-   std::vector<float>  minitree_lepton_b4trigger_leadingpt;
+std::vector<float>  minitree_lepton_b4trigger_leadingpt;
    std::vector<float>  minitree_lepton_b4trigger_leadingpt2;
 
    std::vector<int>    minitree_all_nel; 
@@ -195,7 +199,7 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
    std::vector<float>  minitree_jet_jet_dEta; // in BDT_EVT
    std::vector<float>  minitree_muon_jet_dRmin;
    std::vector<float>  minitree_muon_jet_dRmax;
-   std::vector<float>  minitree_elemu_jet_dRmin;
+std::vector<float>  minitree_elemu_jet_dRmin;
    std::vector<float>  minitree_elemu_jet_dRmax;
    std::vector<float>  minitree_ele_jet_dRmin; // empty, usefull ???
    std::vector<float>  minitree_ele_jet_dRmax; // empty, usefull ???
@@ -275,7 +279,7 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
     std::vector<float> minitree_Hemi_Vtx_dR;
     std::vector<float> minitree_Hemi_Vtx_SumtrackWeight;//Vertx selection variable for the BDT
     std::vector<float> minitree_Hemi_Vtx_Mass;
-    std::vector<float> minitree_Hemi_Vtx_pt;
+std::vector<float> minitree_Hemi_Vtx_pt;
     std::vector<float> minitree_Hemi_Vtx_eta;
     std::vector<float> minitree_Hemi_Vtx_phi;
     std::vector<float> minitree_Hemi_Vtx_track_MeanDCA_d;//Veertex selection BDT
@@ -307,6 +311,9 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
     std::vector<float> minitree_Hemi_SecVtx_track_MeanDCA_d;
     std::vector<float> minitree_Hemi_SecVtx_SumtrackWeight;
     std::vector<float> minitree_Hemi_SecVtx_Mass;
+std::vector<float> minitree_Hemi_SecVtx_pt;
+    std::vector<float> minitree_Hemi_SecVtx_eta;
+    std::vector<float> minitree_Hemi_SecVtx_phi;
     std::vector<float> minitree_event_MergedVtx_Vtx_dr;
     std::vector<float> minitree_event_MergedVtx_Vtx_dz;
     std::vector<float> minitree_event_MergedVtx_Vtx_dd;
@@ -343,17 +350,16 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
    std::vector<bool>  miniHLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v;
    std::vector<bool>  miniHLT_PFMET250_HBHECleaned_v;
    std::vector<bool>  miniHLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v;
+   std::vector<bool>  miniHLT_PFMET200_BeamHaloCleaned_v;
    std::vector<bool>  miniHLT_IsoMu24_v;
    std::vector<bool>  miniHLT_IsoMu27_v;
    std::vector<bool>  miniHLT_IsoTkMu24_v; 
    std::vector<bool>  miniHLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v;  
-   std::vector<bool> miniHLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v;    
-   std::vector<bool> miniHLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v;    
-   std::vector<bool> miniHLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ_v;  
-   std::vector<bool> miniHLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v;
- 
-
-     
+   std::vector<bool>  miniHLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v;    
+   std::vector<bool>  miniHLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v;    
+   std::vector<bool>  miniHLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ_v;  
+   std::vector<bool>  miniHLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v;
+      
    smalltree->Branch("minirunNumber",&minirunNumber);
    smalltree->Branch("minieventNumber",&minieventNumber);
    smalltree->Branch("minilumiBlock",&minilumiBlock);
@@ -369,7 +375,7 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
    smalltree->Branch("miniPUweight_Up",&miniPUweight_Up);
    smalltree->Branch("miniPUweight_Down",&miniPUweight_Down);
    smalltree->Branch("miniPrefweight",&miniPrefweight);
-   smalltree->Branch("miniPrefweight_Up",&miniPrefweight_Up);
+smalltree->Branch("miniPrefweight_Up",&miniPrefweight_Up);
    smalltree->Branch("miniPrefweight_Down",&miniPrefweight_Down);
    smalltree->Branch("miniPU_events",&miniPU_events);
    smalltree->Branch("miniAllPU_events_weight",&miniAllPU_events_weight);
@@ -377,6 +383,7 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
    smalltree->Branch("minitree_FilterSameSign",&minitree_FilterSameSign);
    smalltree->Branch("minitree_trigger_doublelepton",&minitree_trigger_doublelepton);
    smalltree->Branch("minitree_trigger_singlelepton",&minitree_trigger_singlelepton);
+   smalltree->Branch("minitree_trigger_met",&minitree_trigger_met);
 
    smalltree->Branch("minitree_GenPVx",&minitree_GenPVx);
    smalltree->Branch("minitree_GenPVy",&minitree_GenPVy);
@@ -435,6 +442,9 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
    smalltree->Branch("minitree_muon_MiniIsoLoose",&minitree_muon_MiniIsoLoose);
    smalltree->Branch("minitree_muon_MiniIsoMedium",&minitree_muon_MiniIsoMedium);
    smalltree->Branch("minitree_muon_MiniIsoTight",&minitree_muon_MiniIsoTight);
+smalltree->Branch("minitree_muon_trigger_dimu",&minitree_muon_trigger_dimu);
+   smalltree->Branch("minitree_muon_trigger_isomu",&minitree_muon_trigger_isomu);
+
 
    smalltree->Branch("minitree_lepton_leadingpt",&minitree_lepton_leadingpt);
    smalltree->Branch("minitree_lepton_leadingpt2",&minitree_lepton_leadingpt2);
@@ -492,7 +502,7 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
    smalltree->Branch("minitree_jet_jet_dEta",&minitree_jet_jet_dEta); // in BDT_EVT
    smalltree->Branch("minitree_muon_jet_dRmin",&minitree_muon_jet_dRmin);
    smalltree->Branch("minitree_muon_jet_dRmax",&minitree_muon_jet_dRmax);
-   smalltree->Branch("minitree_elemu_jet_dRmin",&minitree_elemu_jet_dRmin);
+smalltree->Branch("minitree_elemu_jet_dRmin",&minitree_elemu_jet_dRmin);
    smalltree->Branch("minitree_elemu_jet_dRmax",&minitree_elemu_jet_dRmax);
    smalltree->Branch("minitree_ele_jet_dRmin",&minitree_ele_jet_dRmin); // empty, usefull ???
    smalltree->Branch("minitree_ele_jet_dRmax",&minitree_ele_jet_dRmax); // empty, usefull ???
@@ -574,7 +584,7 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
    smalltree->Branch("minitree_Hemi_Vtx_SumtrackWeight",&minitree_Hemi_Vtx_SumtrackWeight);
    smalltree->Branch("minitree_Hemi_Vtx_track_MeanDCA_d",&minitree_Hemi_Vtx_track_MeanDCA_d);
    smalltree->Branch("minitree_Hemi_Vtx_Mass", &minitree_Hemi_Vtx_Mass);
-   smalltree->Branch("minitree_Hemi_Vtx_pt",&minitree_Hemi_Vtx_pt);
+smalltree->Branch("minitree_Hemi_Vtx_pt",&minitree_Hemi_Vtx_pt);
    smalltree->Branch("minitree_Hemi_Vtx_eta",&minitree_Hemi_Vtx_eta);
    smalltree->Branch("minitree_Hemi_Vtx_phi",&minitree_Hemi_Vtx_phi);
    smalltree->Branch("minitree_Hemi_Vtx_dist",  &minitree_Hemi_Vtx_dist);
@@ -605,6 +615,9 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
    smalltree->Branch("minitree_Hemi_SecVtx_track_MeanDCA_d",&minitree_Hemi_SecVtx_track_MeanDCA_d);
    smalltree->Branch("minitree_Hemi_SecVtx_SumtrackWeight",&minitree_Hemi_SecVtx_SumtrackWeight);
    smalltree->Branch("minitree_Hemi_SecVtx_Mass",&minitree_Hemi_SecVtx_Mass);
+smalltree->Branch("minitree_Hemi_SecVtx_pt", &minitree_Hemi_SecVtx_pt);
+   smalltree->Branch("minitree_Hemi_SecVtx_eta", &minitree_Hemi_SecVtx_eta);
+   smalltree->Branch("minitree_Hemi_SecVtx_phi", &minitree_Hemi_SecVtx_phi);
    smalltree->Branch("minitree_event_MergedVtx_Vtx_dr",&minitree_event_MergedVtx_Vtx_dr);
    smalltree->Branch("minitree_event_MergedVtx_Vtx_dz",&minitree_event_MergedVtx_Vtx_dz);
    smalltree->Branch("minitree_event_MergedVtx_Vtx_dd",&minitree_event_MergedVtx_Vtx_dd);
@@ -641,6 +654,7 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
    smalltree->Branch("miniHLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v",&miniHLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v);
    smalltree->Branch("miniHLT_PFMET250_HBHECleaned_v",&miniHLT_PFMET250_HBHECleaned_v);
    smalltree->Branch("miniHLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v",&miniHLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v);
+   smalltree->Branch("miniHLT_PFMET200_BeamHaloCleaned_v",&miniHLT_PFMET200_BeamHaloCleaned_v);
    smalltree->Branch("miniHLT_IsoMu24_v",&miniHLT_IsoMu24_v);
    smalltree->Branch("miniHLT_IsoMu27_v",&miniHLT_IsoMu27_v);
    smalltree->Branch("miniHLT_IsoTkMu24_v",&miniHLT_IsoTkMu24_v); 
@@ -658,10 +672,9 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
    bool debug = false;
    if (fChain == 0) return;
 
-   Long64_t nentries = fChain->GetEntries();
-   Long64_t nentries2 = fChain->GetEntriesFast();
+   Long64_t nentries = fChain->GetEntriesFast();
    std::cout << "Total Entries : " << nentries << std::endl;
-   std::cout << "Total Entries2 : " << nentries2 << std::endl;
+
    Long64_t nbytes = 0, nb = 0;
 
    int allevents = 0;
@@ -676,7 +689,16 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
       // if ( allevents%10000 == 0 ) std::cout << "events : " << allevents << std::endl;
 
       // if (Cut(ientry) < 0) continue;
-      if ( jentry%10000 == 0 ) std::cout << "events : " << jentry << std::endl;
+      if ( jentry%1000000 == 0 ) std::cout << "events : " << jentry << std::endl;
+      // if (jentry==0.1*nentries) {std::cout<<"10/100 :"<<std::endl;}
+      // if (jentry==0.2*nentries) {std::cout<<"20/100 :"<<std::endl;}
+      // if (jentry==0.3*nentries) {std::cout<<"30/100 :"<<std::endl;}
+      // if (jentry==0.4*nentries) {std::cout<<"40/100 :"<<std::endl;}
+      // if (jentry==0.5*nentries) {std::cout<<"50/100 :"<<std::endl;}
+      // if (jentry==0.6*nentries) {std::cout<<"60/100 :"<<std::endl;}
+      // if (jentry==0.7*nentries) {std::cout<<"70/100 :"<<std::endl;}
+      // if (jentry==0.8*nentries) {std::cout<<"80/100 :"<<std::endl;}
+      // if (jentry==0.9*nentries) {std::cout<<"90/100 :"<<std::endl;}
 
 //$$ 
       itest++;
@@ -693,13 +715,9 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
       if ( tree_Filter ) hData_njetNOmu_Filter->Fill( tree_njetNOmu );
       if ( tree_FilterSameSign ) hData_njetNOmu_FilterSameSign->Fill( tree_njetNOmu );
 
-//    if (tree_lepton_b4trigger_leadingpt->size()>0)
-//       {
-//          minitree_lepton_b4trigger_leadingpt.push_back(tree_lepton_b4trigger_leadingpt->at(0));
-//          minitree_lepton_b4trigger_leadingpt2.push_back(tree_lepton_b4trigger_leadingpt2->at(0));
-//       }
-// //$$
-    // ----------------------------------------------------------------------------------//
+//$$
+   if (debug) std::cout<<" here a "<<std::endl;
+    // -------------- --------------------------------------------------------------------//
     // -----------------------------------------------------------------------------------//
     if ( !((tree_Filter || tree_FilterSameSign) && tree_njetNOmu>0) && !Signal ) continue;
     //------------------------------------------------------------------------------------//
@@ -708,8 +726,9 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
 
       minitree_trigger_doublelepton.push_back(tree_trigger_doublelepton);
       minitree_trigger_singlelepton.push_back(tree_trigger_singlelepton);
-
+      minitree_trigger_met.push_back(tree_trigger_met);
       minitree_Good_PV.push_back(tree_Good_PV);
+
 
       minitree_Filter.push_back(tree_Filter);
       minitree_FilterSameSign.push_back(tree_FilterSameSign);
@@ -732,6 +751,7 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
       miniHLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v.push_back(HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v);
       miniHLT_PFMET250_HBHECleaned_v.push_back(HLT_PFMET250_HBHECleaned_v);
       miniHLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v.push_back(HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v);
+      miniHLT_PFMET200_BeamHaloCleaned_v.push_back(HLT_PFMET200_BeamHaloCleaned_v);
       miniHLT_IsoMu24_v.push_back(HLT_IsoMu24_v);
       miniHLT_IsoMu27_v.push_back(HLT_IsoMu27_v);
       miniHLT_IsoTkMu24_v.push_back(HLT_IsoTkMu24_v); 
@@ -742,13 +762,12 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
       miniHLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v.push_back(HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v);
 
 
-
       if (debug)  {std::cout<<"muon  "<<std::endl;}
       for (unsigned int i = 0; i < tree_muon_pt->size(); i++)
          {
             minitree_muon_isPrompt.push_back(tree_muon_isPrompt->at(i));
             minitree_muon_pt.push_back(tree_muon_pt->at(i));
-            minitree_muon_SF.push_back(tree_muon_SF->at(i));
+            // minitree_muon_SF.push_back(tree_muon_SF->at(i));
             minitree_muon_eta.push_back(tree_muon_eta->at(i));
             minitree_muon_phi.push_back(tree_muon_phi->at(i));
             minitree_muon_dxy.push_back(tree_muon_dxy->at(i));
@@ -771,6 +790,8 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
             minitree_muon_MiniIsoLoose.push_back( tree_muon_MiniIsoLoose->at(i));  //Wrongly stored
             minitree_muon_MiniIsoMedium.push_back(tree_muon_MiniIsoMedium->at(i)); //Wrongly stored
             minitree_muon_MiniIsoTight.push_back( tree_muon_MiniIsoTight->at(i));  //Wrongly stored
+            minitree_muon_trigger_dimu.push_back( tree_muon_trigger_dimu->at(i) );  
+            minitree_muon_trigger_isomu.push_back( tree_muon_trigger_isomu->at(i));
          }
 
       if (debug)  {std::cout<<"electron "<<std::endl;}
@@ -786,7 +807,7 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
             minitree_electron_gen.push_back(tree_electron_gen->at(i));
             minitree_electron_energy.push_back(tree_electron_energy->at(i));
             minitree_electron_et.push_back(tree_electron_et->at(i));
-            minitree_electron_ecal_trk_postcorr.push_back(tree_electron_ecal_trk_postcorr->at(i));
+            // minitree_electron_ecal_trk_postcorr.push_back(tree_electron_ecal_trk_postcorr->at(i));
             minitree_electron_isoR4.push_back(tree_electron_isoR4->at(i));
             minitree_electron_IsLoose.push_back(tree_electron_IsLoose->at(i));
             minitree_electron_IsMedium.push_back(tree_electron_IsMedium->at(i));
@@ -805,6 +826,7 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
       //    }
       
       // minitree_MCEvt_weight.push_back(tree_MCEvt_weight);
+
       minitree_only_gen_wt.push_back(tree_only_gen_wt);
       minitree_genTop_Weight.push_back(tree_genTop_Weight);
       if (tree_gen_top_pt->size() > 0)
@@ -819,6 +841,7 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
 
       PileUp_Up = PUweight_Up;
       PileUp_Down = PUweight_Down;
+      if (debug) std::cout<<" here b "<<std::endl;
 
       miniPUweight_Up.push_back(PileUp_Up);
       miniPUweight_Down.push_back(PileUp_Down);
@@ -952,7 +975,7 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
                }
 
          }
-
+      if (debug) std::cout<<" here c "<<std::endl;
       for (unsigned int i = 0; i < tree_event_MergedVtx_Vtx_step->size(); i++)
          {
             minitree_event_MergedVtx_Vtx_step.push_back( tree_event_MergedVtx_Vtx_step->at(i));
@@ -1051,6 +1074,7 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
                //----------------------//
                //         Vtx          //
                //----------------------//
+               if (debug) std::cout<<" here d "<<std::endl;
             minitree_Hemi_Vtx_step.push_back(tree_Hemi_Vtx_step->at(i));
             minitree_Hemi_Vtx_isTight.push_back(tree_Hemi_Vtx_isTight->at(i));
             minitree_Hemi_Vtx_NChi2.push_back(tree_Hemi_Vtx_NChi2->at(i));
@@ -1114,6 +1138,9 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
          minitree_Hemi_SecVtx_track_MeanDCA_d.push_back(tree_Hemi_SecVtx_track_MeanDCA_d->at(i));
          minitree_Hemi_SecVtx_SumtrackWeight.push_back(tree_Hemi_SecVtx_SumtrackWeight->at(i));
          minitree_Hemi_SecVtx_Mass.push_back(tree_Hemi_SecVtx_Mass->at(i));
+minitree_Hemi_SecVtx_pt.push_back(tree_Hemi_SecVtx_pt->at(i));
+         minitree_Hemi_SecVtx_eta.push_back(tree_Hemi_SecVtx_eta->at(i));
+         minitree_Hemi_SecVtx_phi.push_back(tree_Hemi_SecVtx_phi->at(i));
       }
 
       //////////// FILLING //////////
@@ -1136,7 +1163,7 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
       miniPUweight_Up.clear();
       miniPUweight_Down.clear();
       miniPrefweight.clear();
-      miniPrefweight_Up.clear();
+miniPrefweight_Up.clear();
       miniPrefweight_Down.clear();
       miniPU_events.clear();
       miniAllPU_events_weight.clear();
@@ -1144,7 +1171,8 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
       minitree_FilterSameSign.clear();
       minitree_trigger_doublelepton.clear();
       minitree_trigger_singlelepton.clear();
-
+      minitree_trigger_met.clear();
+      
       minitree_GenPVx.clear();
       minitree_GenPVy.clear();
       minitree_GenPVz.clear();
@@ -1202,6 +1230,8 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
       minitree_muon_MiniIsoLoose.clear();
       minitree_muon_MiniIsoMedium.clear();
       minitree_muon_MiniIsoTight.clear();
+      minitree_muon_trigger_dimu.clear();
+      minitree_muon_trigger_isomu.clear();
 
       minitree_lepton_leadingpt.clear();
       minitree_lepton_leadingpt2.clear();
@@ -1259,7 +1289,7 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
       minitree_jet_jet_dEta.clear();
       minitree_muon_jet_dRmin.clear();
       minitree_muon_jet_dRmax.clear();
-      minitree_elemu_jet_dRmin.clear();
+minitree_elemu_jet_dRmin.clear();
       minitree_elemu_jet_dRmax.clear();
       minitree_ele_jet_dRmin.clear();
       minitree_ele_jet_dRmax.clear();
@@ -1372,6 +1402,9 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
       minitree_Hemi_SecVtx_track_MeanDCA_d.clear();
       minitree_Hemi_SecVtx_SumtrackWeight.clear();
       minitree_Hemi_SecVtx_Mass.clear();
+      minitree_Hemi_SecVtx_pt.clear();
+      minitree_Hemi_SecVtx_eta.clear();
+      minitree_Hemi_SecVtx_phi.clear();
 
       minitree_event_MergedVtx_Vtx_dr.clear();
       minitree_event_MergedVtx_Vtx_dz.clear();
@@ -1409,6 +1442,7 @@ void MiniNtuple::Loop(TString sample , TString Production,bool Signal )
       miniHLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v.clear();
       miniHLT_PFMET250_HBHECleaned_v.clear();
       miniHLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v.clear();
+      miniHLT_PFMET200_BeamHaloCleaned_v.clear();
       miniHLT_IsoMu24_v.clear();
       miniHLT_IsoMu27_v.clear();
 

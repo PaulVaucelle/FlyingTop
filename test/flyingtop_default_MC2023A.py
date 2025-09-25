@@ -95,17 +95,17 @@ process.source = cms.Source("PoolSource",
 #$$
 #   'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu400_neu300_ctau100/MINIAODSIM_1.root',
 
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_1.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_2.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_3.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_4.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_5.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_6.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_7.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_9.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_8.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_9.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_10.root'
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/inputFile/MINIAODSIM_1.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/inputFile/MINIAODSIM_2.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/inputFile/MINIAODSIM_3.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/inputFile/MINIAODSIM_4.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/inputFile/MINIAODSIM_5.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/inputFile/MINIAODSIM_6.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/inputFile/MINIAODSIM_7.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/inputFile/MINIAODSIM_9.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/inputFile/MINIAODSIM_8.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/inputFile/MINIAODSIM_9.root',
+'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/inputFile/MINIAODSIM_10.root'
 #$$
 )
 )
@@ -292,7 +292,7 @@ process.pathRunPatAlgos = cms.Path(process.patAlgosToolsTask)
 
 ########## output of ntuple
 #$$
-process.TFileService = cms.Service("TFileService", fileName = cms.string("RPV_2023A_smu500_neu180_ctau003.root") )
+process.TFileService = cms.Service("TFileService", fileName = cms.string("inputFile.root") )
 #$$
 
 #$$

@@ -40,6 +40,7 @@ void MiniDATAMCNtuple::Loop(TString sample ,TString Production, bool Signal )
    std::vector<int>    minitree_nPV;
    std::vector<bool>   minitree_trigger_doublelepton;
    std::vector<bool>   minitree_trigger_singlelepton;
+   std::vector<bool>   minitree_trigger_met;
    std::vector<bool>   minitree_Good_PV;
    std::vector<int>    minitree_smu_mass; // used for signal only
    std::vector<int>    minitree_neu_mass; // used for signal only
@@ -673,7 +674,7 @@ void MiniDATAMCNtuple::Loop(TString sample ,TString Production, bool Signal )
          {
             minitree_muon_isPrompt.push_back(tree_muon_isPrompt->at(i));
             minitree_muon_pt.push_back(tree_muon_pt->at(i));
-            minitree_muon_SF.push_back(tree_muon_SF->at(i));
+            // minitree_muon_SF.push_back(tree_muon_SF->at(i));
             minitree_muon_eta.push_back(tree_muon_eta->at(i));
             minitree_muon_phi.push_back(tree_muon_phi->at(i));
             minitree_muon_dxy.push_back(tree_muon_dxy->at(i));
@@ -711,7 +712,7 @@ void MiniDATAMCNtuple::Loop(TString sample ,TString Production, bool Signal )
             minitree_electron_gen.push_back(tree_electron_gen->at(i));
             minitree_electron_energy.push_back(tree_electron_energy->at(i));
             minitree_electron_et.push_back(tree_electron_et->at(i));
-            minitree_electron_ecal_trk_postcorr.push_back(tree_electron_ecal_trk_postcorr->at(i));
+            // minitree_electron_ecal_trk_postcorr.push_back(tree_electron_ecal_trk_postcorr->at(i));
             minitree_electron_isoR4.push_back(tree_electron_isoR4->at(i));
             minitree_electron_IsLoose.push_back(tree_electron_IsLoose->at(i));
             minitree_electron_IsMedium.push_back(tree_electron_IsMedium->at(i));

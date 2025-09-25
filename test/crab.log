@@ -1,0 +1,7 @@
+DEBUG 2025-07-09 13:54:28.554 UTC: 	 CRAB Client version: v3.250522
+DEBUG 2025-07-09 13:54:28.554 UTC: 	 Running on: Linux sbgui2.in2p3.fr 3.10.0-1160.62.1.el7.x86_64 #1 SMP Tue Apr 5 16:57:59 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-07-09 13:54:28.554 UTC: 	 Using SINGULARITY image: el8:x86_64
+DEBUG 2025-07-09 13:54:28.554 UTC: 	 Operating System: AlmaLinux 8.10 (Cerulean Leopard)
+DEBUG 2025-07-09 13:54:28.554 UTC: 	 Executing command: 'submit'
+DEBUG 2025-07-09 13:54:28.555 UTC: 	 Found CRAB cache file /home/pvaucell/.crab3
+DEBUG 2025-07-09 13:54:28.557 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).

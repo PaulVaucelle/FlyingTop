@@ -16,6 +16,7 @@
 #include "vector"
 #include <TMath.h>
 
+using namespace std;
 
 
 
@@ -559,7 +560,10 @@ public :
    std::vector<float>   *tree_Hemi_Vtx_trackWeight;
    std::vector<float>   *tree_Hemi_Vtx_SumtrackWeight;
    std::vector<float>   *tree_Hemi_Vtx_track_MeanDCA_d;
-   std::vector<float>   *tree_Hemi_Vtx_Mass;
+   vector<float>   *tree_Hemi_Vtx_Mass;
+   std::vector< float > *tree_Hemi_Vtx_pt;
+   std::vector< float > *tree_Hemi_Vtx_eta;
+   std::vector< float > *tree_Hemi_Vtx_phi;
    std::vector<float>   *tree_Hemi_Vtx_dist;
    std::vector<int>     *tree_Hemi_Vtx_ntrk10;
    std::vector<int>     *tree_Hemi_Vtx_ntrk20;
@@ -592,6 +596,9 @@ public :
    std::vector<float>   *tree_Hemi_SecVtx_trackWeight;
    std::vector<float>   *tree_Hemi_SecVtx_Mass;
    std::vector<float>   *tree_event_MergedVtx_Vtx_dr;
+      vector<float>   *tree_Hemi_SecVtx_pt;
+   vector<float>   *tree_Hemi_SecVtx_eta;
+   vector<float>   *tree_Hemi_SecVtx_phi;
    std::vector<float>   *tree_event_MergedVtx_Vtx_dz;
    std::vector<float>   *tree_event_MergedVtx_Vtx_dd;
    std::vector<float>   *tree_event_MergedVtx_Vtx_reldd;
@@ -638,6 +645,7 @@ public :
    Bool_t          HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v;
    Bool_t          HLT_PFMET250_HBHECleaned_v;
    Bool_t          HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v;
+Bool_t          HLT_PFMET200_BeamHaloCleaned_v;
    Bool_t          HLT_PFMET200_HBHE_BeamHaloCleaned_v;
    Bool_t          HLT_PFHT500_PFMET100_PFMHT100_IDTight_v;
    Bool_t          HLT_PFHT700_PFMET85_PFMHT85_IDTight_v;
@@ -1182,6 +1190,9 @@ public :
    TBranch        *b_tree_Hemi_Vtx_SumtrackWeight;   //!
    TBranch        *b_tree_Hemi_Vtx_track_MeanDCA_d;   //!
    TBranch        *b_tree_Hemi_Vtx_Mass;   //!
+TBranch        *b_tree_Hemi_Vtx_pt;
+   TBranch        *b_tree_Hemi_Vtx_eta;
+   TBranch        *b_tree_Hemi_Vtx_phi;
    TBranch        *b_tree_Hemi_Vtx_dist;   //!
    TBranch        *b_tree_Hemi_Vtx_ntrk10;   //!
    TBranch        *b_tree_Hemi_Vtx_ntrk20;   //!
@@ -1213,6 +1224,9 @@ public :
    TBranch        *b_tree_Hemi_SecVtx_SumtrackWeight;   //!
    TBranch        *b_tree_Hemi_SecVtx_trackWeight;   //!
    TBranch        *b_tree_Hemi_SecVtx_Mass;   //!
+TBranch        *b_tree_Hemi_SecVtx_pt;
+   TBranch        *b_tree_Hemi_SecVtx_eta;
+   TBranch        *b_tree_Hemi_SecVtx_phi;
    TBranch        *b_tree_event_MergedVtx_Vtx_dr;   //!
    TBranch        *b_tree_event_MergedVtx_Vtx_dz;   //!
    TBranch        *b_tree_event_MergedVtx_Vtx_dd;   //!
@@ -1259,6 +1273,7 @@ public :
    TBranch        *b_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v;   //!
    TBranch        *b_HLT_PFMET250_HBHECleaned_v;   //!
    TBranch        *b_HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v;   //!
+TBranch        *b_HLT_PFMET200_BeamHaloCleaned_v;
    TBranch        *b_HLT_PFMET200_HBHE_BeamHaloCleaned_v;   //!
    TBranch        *b_HLT_PFHT500_PFMET100_PFMHT100_IDTight_v;   //!
    TBranch        *b_HLT_PFHT700_PFMET85_PFMHT85_IDTight_v;   //!
@@ -1798,6 +1813,9 @@ void MiniDATAMCNtuple::Init(TTree *tree)
    tree_Hemi_Vtx_SumtrackWeight = 0;
    tree_Hemi_Vtx_track_MeanDCA_d = 0;
    tree_Hemi_Vtx_Mass = 0;
+tree_Hemi_Vtx_pt = 0;
+   tree_Hemi_Vtx_eta = 0;
+   tree_Hemi_Vtx_phi = 0;
    tree_Hemi_Vtx_dist = 0;
    tree_Hemi_Vtx_ntrk10 = 0;
    tree_Hemi_Vtx_ntrk20 = 0;
@@ -1829,6 +1847,9 @@ void MiniDATAMCNtuple::Init(TTree *tree)
    tree_Hemi_SecVtx_SumtrackWeight = 0;
    tree_Hemi_SecVtx_trackWeight = 0;
    tree_Hemi_SecVtx_Mass = 0;
+tree_Hemi_SecVtx_pt = 0;
+   tree_Hemi_SecVtx_eta = 0;
+   tree_Hemi_SecVtx_phi = 0;
    tree_event_MergedVtx_Vtx_dr = 0;
    tree_event_MergedVtx_Vtx_dz = 0;
    tree_event_MergedVtx_Vtx_dd = 0;
@@ -2386,6 +2407,9 @@ void MiniDATAMCNtuple::Init(TTree *tree)
    fChain->SetBranchAddress("tree_Hemi_Vtx_SumtrackWeight", &tree_Hemi_Vtx_SumtrackWeight, &b_tree_Hemi_Vtx_SumtrackWeight);
    fChain->SetBranchAddress("tree_Hemi_Vtx_track_MeanDCA_d", &tree_Hemi_Vtx_track_MeanDCA_d, &b_tree_Hemi_Vtx_track_MeanDCA_d);
    fChain->SetBranchAddress("tree_Hemi_Vtx_Mass", &tree_Hemi_Vtx_Mass, &b_tree_Hemi_Vtx_Mass);
+fChain->SetBranchAddress("tree_Hemi_Vtx_pt",&tree_Hemi_Vtx_pt, &b_tree_Hemi_Vtx_pt);
+   fChain->SetBranchAddress("tree_Hemi_Vtx_eta", &tree_Hemi_Vtx_eta, &b_tree_Hemi_Vtx_eta);
+   fChain->SetBranchAddress("tree_Hemi_Vtx_phi", &tree_Hemi_Vtx_phi, &b_tree_Hemi_Vtx_phi);
    fChain->SetBranchAddress("tree_Hemi_Vtx_dist", &tree_Hemi_Vtx_dist, &b_tree_Hemi_Vtx_dist);
    fChain->SetBranchAddress("tree_Hemi_Vtx_ntrk10", &tree_Hemi_Vtx_ntrk10, &b_tree_Hemi_Vtx_ntrk10);
    fChain->SetBranchAddress("tree_Hemi_Vtx_ntrk20", &tree_Hemi_Vtx_ntrk20, &b_tree_Hemi_Vtx_ntrk20);
@@ -2417,6 +2441,9 @@ void MiniDATAMCNtuple::Init(TTree *tree)
    fChain->SetBranchAddress("tree_Hemi_SecVtx_SumtrackWeight", &tree_Hemi_SecVtx_SumtrackWeight, &b_tree_Hemi_SecVtx_SumtrackWeight);
    fChain->SetBranchAddress("tree_Hemi_SecVtx_trackWeight", &tree_Hemi_SecVtx_trackWeight, &b_tree_Hemi_SecVtx_trackWeight);
    fChain->SetBranchAddress("tree_Hemi_SecVtx_Mass", &tree_Hemi_SecVtx_Mass, &b_tree_Hemi_SecVtx_Mass);
+fChain->SetBranchAddress("tree_Hemi_SecVtx_pt",&tree_Hemi_SecVtx_pt, &b_tree_Hemi_SecVtx_pt);
+   fChain->SetBranchAddress("tree_Hemi_SecVtx_eta", &tree_Hemi_SecVtx_eta, &b_tree_Hemi_SecVtx_eta);
+   fChain->SetBranchAddress("tree_Hemi_SecVtx_phi",&tree_Hemi_SecVtx_phi, &b_tree_Hemi_SecVtx_phi);
    fChain->SetBranchAddress("tree_event_MergedVtx_Vtx_dr", &tree_event_MergedVtx_Vtx_dr, &b_tree_event_MergedVtx_Vtx_dr);
    fChain->SetBranchAddress("tree_event_MergedVtx_Vtx_dz", &tree_event_MergedVtx_Vtx_dz, &b_tree_event_MergedVtx_Vtx_dz);
    fChain->SetBranchAddress("tree_event_MergedVtx_Vtx_dd", &tree_event_MergedVtx_Vtx_dd, &b_tree_event_MergedVtx_Vtx_dd);
@@ -2463,6 +2490,7 @@ void MiniDATAMCNtuple::Init(TTree *tree)
    fChain->SetBranchAddress("HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v", &HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v, &b_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v);
    fChain->SetBranchAddress("HLT_PFMET250_HBHECleaned_v", &HLT_PFMET250_HBHECleaned_v, &b_HLT_PFMET250_HBHECleaned_v);
    fChain->SetBranchAddress("HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v", &HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v, &b_HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned_v);
+fChain->SetBranchAddress("HLT_PFMET200_BeamHaloCleaned_v", &HLT_PFMET200_BeamHaloCleaned_v, &b_HLT_PFMET200_BeamHaloCleaned_v);
    fChain->SetBranchAddress("HLT_PFMET200_HBHE_BeamHaloCleaned_v", &HLT_PFMET200_HBHE_BeamHaloCleaned_v, &b_HLT_PFMET200_HBHE_BeamHaloCleaned_v);
    fChain->SetBranchAddress("HLT_PFHT500_PFMET100_PFMHT100_IDTight_v", &HLT_PFHT500_PFMET100_PFMHT100_IDTight_v, &b_HLT_PFHT500_PFMET100_PFMHT100_IDTight_v);
    fChain->SetBranchAddress("HLT_PFHT700_PFMET85_PFMHT85_IDTight_v", &HLT_PFHT700_PFMET85_PFMHT85_IDTight_v, &b_HLT_PFHT700_PFMET85_PFMHT85_IDTight_v);
@@ -2501,5 +2529,17 @@ Int_t MiniDATAMCNtuple::Cut(Long64_t entry)
 }
 
 //$$
-
-#endif // #ifdef MiniDATAMCNtuple_cxx
+double DeltaR(double eta1, double phi1, double eta2, double phi2) {
+  double DeltaPhi = TMath::Abs(phi2 - phi1);
+  if (DeltaPhi > 3.141593 ) DeltaPhi = 2.*3.141593 - DeltaPhi;
+  return TMath::Sqrt( (eta2-eta1)*(eta2-eta1) + DeltaPhi*DeltaPhi );
+}
+double DeltaPhi(double phi1, double phi2) {
+  double DeltaPhi = phi1 - phi2;
+  if (abs(DeltaPhi) > 3.141593 ) {
+    DeltaPhi = 2.*3.141593 - abs(DeltaPhi);
+    DeltaPhi = -DeltaPhi * (phi1 - phi2) / abs(phi1 - phi2);
+  }
+  return DeltaPhi;
+}
+#endif // #ifdef MiniNtuple_cxx

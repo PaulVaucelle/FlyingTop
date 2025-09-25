@@ -14,73 +14,71 @@ process.load("Configuration.Geometry.GeometryRecoDB_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Geometry.CaloEventSetup.CaloTowerConstituents_cfi")
 
+
 ## JeC JER for systematics ###########################
-process.load("JetMETCorrections.Configuration.JetCorrectors_cff")
-process.load("JetMETCorrections.Modules.JetResolutionESProducer_cfi")
+# process.load("JetMETCorrections.Configuration.JetCorrectors_cff")
+# process.load("JetMETCorrections.Modules.JetResolutionESProducer_cfi")
 from CondCore.CondDB.CondDB_cfi import *
+
 
 # https://twiki.cern.ch/twiki/bin/view/CMS/TopPtReweighting#TOP_PAG_corrections_based_on_dat 
 ###--------------------------
+IsMC = False
 #$$
-IsMC = True
-year = 2023
-isPost = False
+year = 2024
 #$$
 
 from Configuration.AlCa.GlobalTag import GlobalTag
 # Global Tags:
 
+isPost = True
 ROCCORPATH = "FlyingTop/FlyingTop/data/RoccoR2018UL.txt"
 EGERA = '2022-Prompt'
-#$$$$
-GT = '140X_mcRun3_2024_realistic_v26' # for period C
-#$$$$
-if isPost:
-    GT = '140X_mcRun3_2024_realistic_v26' # for period D
-TIGHTJETIDERA = 'RUN3CHSruns2022FGruns2023CD'
+GT = '150X_dataRun3_v2' 
+#140X_dataRun3_v20 : https://docs.google.com/presentation/d/1EHxQcWzw8IxPgCn8hm1prwSP-EktFtiuaEzH8WkQNVY/edit?slide=id.g34e821b3a62_2_0#slide=id.g34e821b3a62_2_0
+
+
+# 140X_dataRun3_Prompt_v4
+# 140X_dataRun3_Prompt_v2
+TIGHTJETIDERA = 'RUN3CHSruns2022FGruns2023CD'  #NOTE: RUN3CHSrunsBCDEprompt, RUN3CHSruns2022FGruns2023CD, RUN2ULCHS
 L1PREFERA = '20172018'
-DATAPUFILE = 'pileupHistogram-Cert_Collisions2023_366442_370790_GoldenJson-13p6TeV-69200ub-100bins.root'
-DATAPUFILEUP = 'pileupHistogram-Cert_Collisions2023_366442_370790_GoldenJson-13p6TeV-72400ub-100bins.root'
-DATAPUFILEDOWN = 'pileupHistogram-Cert_Collisions2023_366442_370790_GoldenJson-13p6TeV-66000ub-100bins.root'
-MCPUFILE   = 'PU_Run2023_MC.root'
-
-# $$$$$
-# JETVETOMAP = './JECDatabase/jet_veto_maps/Summer23Prompt23/Summer23Prompt23_RunC_v1.root'
-
-JECUNCDATA = 'Summer23Prompt23_V1_MC_Uncertainty_AK4PFchs.txt' #./JECDatabase/textFiles/Summer23Prompt23_RunCv4_V1_DATA/Summer23Prompt23_RunCv4_V1_DATA_Uncertainty_AK4PFchs.txt
+DATAPUFILE = 'Run2024_DATA.root'
+MCPUFILE   = 'Run2024_MC.root'
+DATAPUFILEUP = 'pileupHistogram-Cert_Collisions2024_378891_386951_GoldenJson-13p6TeV-72400ub-100bins.root'
+DATAPUFILEDOWN = 'pileupHistogram-Cert_Collisions2024_378891_386951_GoldenJson-13p6TeV-66000ub-100bins.root'
+JECUNCDATA = 'Summer23Prompt23_V1_MC_Uncertainty_AK4PFPuppi.txt' #./JECDatabase/textFiles/Summer23Prompt23_RunCv4_V1_DATA/Summer23Prompt23_RunCv4_V1_DATA_Uncertainty_AK4PFchs.txt
 JECUNCMC = 'Summer23Prompt23_V1_MC_Uncertainty_AK4PFPuppi.txt' #./JECDatabase/textFiles/Summer23Prompt23_V1_MC/Summer23Prompt23_V1_MC_Uncertainty_AK4PFchs.txt
 
-JERMC = 'Summer23Prompt23_RunCv1234_JRV1_MC_PtResolution_AK4PFPuppi.txt' #./JRDatabase/textFiles/Summer23Prompt23_RunCv1234_JRV1_MC/
+JERMC = 'Summer23Prompt23_RunCv1234_JRV1_MC_PtResolution_AK4PFchs.txt' #./JRDatabase/textFiles/Summer23Prompt23_RunCv1234_JRV1_MC/
 JERSFMC = 'Summer23Prompt23_RunCv1234_JRV1_MC_SF_AK4PFPuppi.txt' #./JRDatabase/textFiles/Summer23Prompt23_RunCv1234_JRV1_MC/Summer23Prompt23_RunCv1234_JRV1_MC_SF_AK4PFchs.txt
 JERDATA = 'Summer23Prompt23_RunCv1234_JRV1_DATA_PtResolution_AK4PFchs.txt' #./JRDatabase/textFiles/Summer23Prompt23_RunCv1234_JRV1_DATA/
 JERSFDATA = 'Summer23Prompt23_RunCv1234_JRV1_DATA_SF_AK4PFPuppi.txt' #./JRDatabase/textFiles/Summer23Prompt23_RunCv1234_JRV1_DATA/Summer23Prompt23_RunCv1234_JRV1_DATA_SF_AK4PFchs.txt
 
 # $$$$$
 if isPost:
-    MCPUFILE   = 'PU_Run2023_BPix_MC.root'
+    MCPUFILE   = 'Run2024_MC.root'
 
     # $$$$$
     # JETVETOMAP = './JECDatabase/jet_veto_maps/Summer23BPixPrompt23/Summer23BPixPrompt23_RunD_v1.root'
     
-    JECUNCDATA = 'Summer23BPixPrompt23_V1_MC_Uncertainty_AK4PFPuppi.txt' #./JECDatabase/textFiles/Summer23BPixPrompt23_RunD_V1_DATA/Summer23BPixPrompt23_RunD_V1_DATA_Uncertainty_AK4PFchs.txtSummer23BPixPrompt23_V1_MC_Uncertainty_AK4PFchs.txt
-    JECUNCMC = 'Summer23BPixPrompt23_V1_MC_Uncertainty_AK4PFPuppi.txt' #/JECDatabase/textFiles/Summer23BPixPrompt23_V1_MC/Summer23BPixPrompt23_V1_MC_Uncertainty_AK4PFchs.txt
+    JECUNCDATA = 'Summer23BPixPrompt23_V1_MC_Uncertainty_AK4PFPuppi.txt' #./JECDatabase/textFiles/Summer23BPixPrompt23_RunD_V1_DATA/Summer23BPixPrompt23_RunD_V1_DATA_Uncertainty_AK4PFchs.txt
+    JECUNCMC = 'Summer23BPixPrompt23_V1_MC_Uncertainty_AK4PFPuppi.txt'#/JECDatabase/textFiles/Summer23BPixPrompt23_V1_MC/Summer23BPixPrompt23_V1_MC_Uncertainty_AK4PFchs.txt
     
     JERMC = 'Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi.txt' #./JRDatabase/textFiles/Summer23BPixPrompt23_RunD_JRV1_MC/Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFchs.txt
-    JERSFMC = 'Summer23BPixPrompt23_RunD_JRV1_MC_SF_AK4PFPuppi.txt' #./JRDatabase/textFiles/Summer23BPixPrompt23_RunD_JRV1_MC/Summer23BPixPrompt23_RunD_JRV1_MC_SF_AK4PFchs.txt
+    JERSFMC = 'Summer23BPixPrompt23_RunD_JRV1_MC_SF_AK4PFPuppi.txt'#./JRDatabase/textFiles/Summer23BPixPrompt23_RunD_JRV1_MC/Summer23BPixPrompt23_RunD_JRV1_MC_SF_AK4PFchs.txt
     JERDATA = 'Summer23BPixPrompt23_RunD_JRV1_DATA_PtResolution_AK4PFchs.txt' #./JRDatabase/textFiles/Summer23BPixPrompt23_RunD_JRV1_DATA/
     JERSFDATA = 'Summer23BPixPrompt23_RunD_JRV1_DATA_SF_AK4PFPuppi.txt' #./JRDatabase/textFiles/Summer23BPixPrompt23_RunD_JRV1_DATA/Summer23BPixPrompt23_RunD_JRV1_DATA_SF_AK4PFchs.txt
 
-    # $$$$$
-
-
+# $$$$$
 if IsMC:                                                                                                                                                                                     
     process.GlobalTag = GlobalTag(process.GlobalTag, GT, '')
 else:
     process.GlobalTag = GlobalTag(process.GlobalTag, GT, '') 
 
+
 #$$
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+# process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 #$$
 
 process.GoodVertexFilter = cms.EDFilter("VertexSelector",
@@ -92,23 +90,13 @@ process.GoodVertexFilter = cms.EDFilter("VertexSelector",
 # Input source
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
+  # 'file:/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_14_0_8_FLY/src/FlyingTop/FlyingTop/test/TTTo2L2Nu_2024.root'
 #$$
-#   'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu400_neu300_ctau100/MINIAODSIM_1.root',
+  '/store/data/Run2024B/MuonEG/MINIAOD/PromptReco-v1/000/379/058/00000/a1c00b16-3424-4d45-9a51-34f23ec94bf1.root'
+#$$
+)
+)
 
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_1.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_2.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_3.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_4.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_5.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_6.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_7.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_9.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_8.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_9.root',
-'file:/opt/sbg/cms/ui2_data1/blochd/MINIAODSIM/MC_2023A/RPV_2023A_smu500_neu180_ctau003/MINIAODSIM_10.root'
-#$$
-)
-)
 
 ##########################################################
 #
@@ -116,7 +104,7 @@ process.source = cms.Source("PoolSource",
 #
 ##########################################################
 #
-# Setup JEC factors, see https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/NanoAOD/python/jetsAK4_Puppi_cff.py
+# Setup JEC factors
 #
 from PhysicsTools.PatAlgos.recoLayer0.jetCorrFactors_cfi import *
 process.jetCorrFactors = patJetCorrFactors.clone(src='slimmedJets',
@@ -126,7 +114,6 @@ process.jetCorrFactors = patJetCorrFactors.clone(src='slimmedJets',
         'L2L3Residual'),
     primaryVertices = cms.InputTag("offlineSlimmedPrimaryVertices"),
 )
-
 #
 # This module will take the JEC factors and update them on slimmedJets
 #
@@ -145,7 +132,7 @@ process.tightJetId = cms.EDProducer("PatJetIDValueMapProducer",
         version = cms.string(TIGHTJETIDERA),
         quality = cms.string('TIGHT'),
     ),
-    src = cms.InputTag("updatedJets")
+    src = cms.InputTag("slimmedJets")
 )
 
 process.tightLepVetoJetId = cms.EDProducer("PatJetIDValueMapProducer",
@@ -153,21 +140,19 @@ process.tightLepVetoJetId = cms.EDProducer("PatJetIDValueMapProducer",
     version = cms.string(TIGHTJETIDERA),
     quality = cms.string('TIGHTLEPVETO'),
   ),
-  src = cms.InputTag("updatedJets")
+  src = cms.InputTag("slimmedJets")
 )
 #
 # Module to calculate Pileup Jet ID
-# _chsalgos_106X_UL16
-# _chsalgos_106X_UL17
-# _chsalgos_106X_UL18
-# from RecoJets.JetProducers.PileupJetID_cfi import _chsalgos_106X_UL18
+# Might not be useful for RUn 3 since we have PUPPI jets
+# !!  from RecoJets.JetProducers.PileupJetID_cfi import _chsalgos_140X_23
 # process.load("RecoJets.JetProducers.PileupJetID_cfi")
 # process.pileupJetIdUpdated = process.pileupJetId.clone(
 #     jets=cms.InputTag("updatedJets"),# JEC corrected jets
 #     inputIsCorrected=True,
 #     applyJec=False,
 #     vertexes=cms.InputTag("offlineSlimmedPrimaryVertices"),
-#     algos = cms.VPSet(_chsalgos_106X_UL18),
+#     algos = cms.VPSet(_chsalgos_140X_23),
 # )
 #
 # Embed the Jet ID and Pileup Jet ID variables in the jets.
@@ -222,13 +207,14 @@ process.updatedJetsWithUserData = cms.EDProducer("PATJetUserDataEmbedder",
 
 process.options = cms.untracked.PSet( )
 process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
-
            DATASET = cms.untracked.vstring(process.source.fileNames),
            isMC =cms.bool(IsMC), 
            YEAR = cms.int32(year),
            ERA2016 = cms.bool(isPost),
            RochString = cms.string(ROCCORPATH),
-           weightFileMVA = cms.untracked.string("BDT_TRK_241122_2023A_ctau100vsEMUdata.xml"),
+#$$
+           weightFileMVA = cms.untracked.string("BDT_TRK_250527_2024_ctau100vsEMUdata.xml"),
+#$$
            weightFileMVA_EVTS = cms.untracked.string("BDT_EVT_ALLSIGvsALLBKG.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
            weightFileMVA_EVTSDY = cms.untracked.string("BDT_EVT_ALLSIGvsDYM50.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
            weightFileMVA_EVTSTT = cms.untracked.string("BDT_EVT_ALLSIGvsTTTo2L2Nu.xml"),#evts selection => previous :  BDT_TRK_ALLSignal.xml
@@ -246,7 +232,7 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
            genpacked   = cms.InputTag('packedGenParticles'),
            vertices    = cms.InputTag('offlineSlimmedPrimaryVertices'),
            mets        = cms.InputTag("slimmedMETs"),
-           jets        = cms.InputTag("updatedJetsWithUserData"),
+           jets        = cms.InputTag("slimmedJets"), # updatedJetsWithUserData"
            genjets     = cms.InputTag("slimmedGenJets"),
            electrons   = cms.InputTag("slimmedElectrons"),
            muons       = cms.InputTag("slimmedMuons"),
@@ -266,21 +252,16 @@ process.FlyingTop = cms.EDAnalyzer("FlyingTopAnalyzer",
             jetjersfmc = cms.string(JERSFMC)
        )
 
-#process.tsk = cms.Task()
-#for mod in process.producers_().itervalues():
-#    process.tsk.add(mod)
-#    for mod in process.filters_().itervalues():
-#        process.tsk.add(mod)
 #-------------------------------------
 #process.p = cms.Path(process.prefiringweight* process.egammaPostRecoSeq* process.updatedPatJetsTransientCorrectedNewDFTraining* process.FlyingTop,process.tsk)
 process.p = cms.Path(
     process.GoodVertexFilter*
-    process.jetCorrFactors*
-    process.updatedJets*
-    process.tightJetId*
-    process.tightLepVetoJetId *
+    # process.jetCorrFactors*
+    # process.updatedJets*
+    # process.tightJetId*
+    # process.tightLepVetoJetId *
     # !!  process.pileupJetIdUpdated* # Using Puppi jets so not needed
-    process.updatedJetsWithUserData*
+    # process.updatedJetsWithUserData*
     # !! process.prefiringweight* # I have to figure out why it is not working for run 3
     # !! process.egammaPostRecoSeq* #I have to figure out why it is not working for run 3
     process.FlyingTop
@@ -289,11 +270,9 @@ process.p = cms.Path(
 from PhysicsTools.PatAlgos.tools.helpers  import getPatAlgosToolsTask
 process.patAlgosToolsTask = getPatAlgosToolsTask(process)
 process.pathRunPatAlgos = cms.Path(process.patAlgosToolsTask)
-
 ########## output of ntuple
-#$$
-process.TFileService = cms.Service("TFileService", fileName = cms.string("RPV_2023A_smu500_neu180_ctau003.root") )
-#$$
+
+process.TFileService = cms.Service("TFileService", fileName = cms.string("Ntuple.root") )
 
 #$$
 process.options.numberOfThreads=cms.untracked.uint32(4)
