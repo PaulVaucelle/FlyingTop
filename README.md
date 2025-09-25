@@ -19,7 +19,7 @@ FlyingTop
 The analysis code is available and can run on MiniAOD data tier. For people @IPHC that want access to the code:
 
 For Run 3 Analyses, we are currently ousing the release 14_0_20 at the time of writing this readme. The analysis code is available for Run 2 : 10_6_30 (10_6_30 is the default branch) and Run 3 : 14_0_20
-From the latest update, 2024 MC and data needs t obe processed trough >= CMSSW_15_0_2. The framework was tested under the release CMSSW_15_0_2 and complied perfectly.
+From the latest update, 2024 MC and data needs t obe processed trough >= CMSSW_15_0_2. The framework was tested under the release CMSSW_15_0_2 and compiled perfectly.
 
 create repository :
 
@@ -38,14 +38,23 @@ cmssw-el8
 
 
 export SCRAM_ARCH=el8_amd64_gcc12
+
  // scram list -a # pour voir les releases si cela t'intéresse
+ 
 cmssw-el8 # ouvre la singularité
+
 // revenir à l'endroit où tu veux mettre la nouvelle release
+
 scramv1 p CMSSW CMSSW_14_0_8
+
 mv CMSSW_14_0_8 CMSSW_14_0_8_FLY
+
 cd CMSSW_14_0_8_FLY
+
 scramv1 b ProjectRename
+
 cd src
+
 eval  `scramv1 r -sh`
 
 git cms-init
@@ -70,20 +79,29 @@ scramv1 b -j4
 // Par la suite :
 
 
-cd CMSSW_14_0_8/src
+cd CMSSW_14_0_20/src
+
 export V0_CMS_SW_DIR=/cvmfs/cms.cern.ch
+
 source /cvmfs/cms.cern.ch/cmsset_default.sh
+
 export SCRAM_ARCH=el8_amd64_gcc12
+
 cmssw-el8
+
 eval `scramv1 runtime -sh`
+
 export PYTHONPATH=$PYTHONPATH:/opt/glite/lib64/python:/opt/fpconst/lib/python2.4/site-packages
+
 export PYTHONPATH=${PYTHONPATH}:${GLITE_LOCATION}/lib64
+
 // après ce point, on peut rentrer les commandes habituellles:
+
 scramv1 b clean
+
 scramv1 b -j4
 
-Electron p4 and Muon rochester corrections are directly applied in the code through different methods as well as for PileUp
-compilation :
+Electron p4 and Muon rochester corrections are directly applied in the code through different methods as well as for PileUp compilation :
 
 scramv1 b clean
 
