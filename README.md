@@ -18,24 +18,24 @@ FlyingTop
 
 The analysis code is available and can run on MiniAOD data tier. For people @IPHC that want access to the code:
 
-git clone https://github.com/Threshic/FlyingTop.git will only give these files and not the CMSSW env
+For Run 3 Analyses, we are currently ousing the release 14_0_20 at the time of writing this readme. The analysis code is available for Run 2 : 10_6_30 (10_6_30 is the default branch) and Run 3 : 14_0_20
+From the latest update, 2024 MC and data needs t obe processed trough >= CMSSW_15_0_2. The framework was tested under the release CMSSW_15_0_2 and complied perfectly.
 
-For Run 3 Analyses, we are currently ousing the release 14_0_8. The analysis code is available for Run 2 : 10_6_30 (10_6_30 is the default branch) and Run 3 : 14_0_8
-Release 14_0_8_FLY :
 create repository :
 
 FIrst time :
 
-// Dans un envrionnement CMS (10_6_30):
+// Dans un environnement CMS:
+
+
 export V0_CMS_SW_DIR=/cvmfs/cms.cern.ch
+
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-export SCRAM_ARCH=slc7_amd64_gcc700
 
-eval `scramv1 runtime -sh`
+export SCRAM_ARCH=el8_amd64_gcc12
 
-export PYTHONPATH=$PYTHONPATH:/opt/glite/lib64/python:/opt/fpconst/lib/python2.4/site-packages
-export PYTHONPATH=${PYTHONPATH}:${GLITE_LOCATION}/lib64
-cmsenv
+cmssw-el8
+
 
 export SCRAM_ARCH=el8_amd64_gcc12
  // scram list -a # pour voir les releases si cela t'intéresse
@@ -63,6 +63,7 @@ git cms-addpkg EgammaAnalysis/ElectronTools
 git cms-addpkg RecoJets/JetProducers
 
 scramv1 b clean
+
 scramv1 b -j4
 
 
@@ -110,6 +111,3 @@ The change between 10_6_20 and 14_0_8(20) is due to th echange in version of pyt
 To merge the outputfiles, use the haddWithWeights.py macro:
 
 Please check the paths so that they correspond to your envrionment
-
-python haddWithWeights.py <work_directory>/
-
