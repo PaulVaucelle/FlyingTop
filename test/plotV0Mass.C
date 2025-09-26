@@ -12,57 +12,35 @@
 #include "TMath.h" 
 #include "TLatex.h"
 
-void plot(TString Sample , TString YEAR,TString PLAN, TString SELECTION,TString PU  )
+void plot(TString YEAR,TString V0  )
 {
  TFile *f1;
 TString Prod = "SecInt";
 TString Year = YEAR;
-// TString Sample = "Data_"+Year;
-TString sample =  Sample ; //"DoubleMuon_UL"+Year+"_MiniAODv2_GT36-v1";
-TString Path = "/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"+Prod+"/SECINT_"+sample+".root";
+TString Sample = "DoubleMuon_UL2018_MiniAODv2_GT36-v1";//DoubleMuon_UL2018_MiniAODv2_GT36-v1 //"Data_"+Year
+TString Path = "/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"+Prod+"/SECINT_"+Sample+".root";
+// /opt/sbg/cms/ui2_data1/blochd/NTUPLES_FLY/Data_2018_emu/240819/
 f1 = new TFile(Path);
-TString plan = PLAN; // can also be rz
-TString Selection = SELECTION; // can also be TrackerMatched + PU25 + PU30 + PU35 + PU40 + PU45 + PU50
-TString Pu = PU; // can also be PU30 + PU35 + PU40 + PU45 + PU50
-TString Suffix = Selection+Pu;
+TString v0 = V0; // can also be rz
 
 
- TString xtitle = "x [cm]"; 
- TString ytitle = "y [cm]";  
+ TString xtitle = "M [GeV]"; 
+ TString ytitle = "Entries";  
 
+float xmin = 0.43;
+float xmax = 0.57;
 
-float xmin = -25.;
-float xmax = 25.;
-float ymin = -25.;
-float ymax = 25.;
+if (v0 == "K0") {
+  xmin = 0.43;
+  xmax = 0.57;
 
-if (plan == "rz") {
-  xmin = 0.;
-  xmax = 120.;
-  ymin = 0.;
-  ymax = 70.;
-  xtitle = "z [cm]";
-  ytitle = "r [cm]";
+  xtitle = "#pi^{+}#pi^{-} mass [GeV]";
+
 }
-else if (plan == "xy") {
-  xmin = -25;
-  xmax = 25 ;
-  ymin = -25;
-  ymax = 25;
-}
-else if (plan == "xy_Inner") {
-  xmin = -5;
-  xmax = 5 ;
-  ymin = -5;
-  ymax = 5;
-}
-else if (plan == "rz_Inner") {
-  xmin = 0;
-  xmax = 30 ;
-  ymin = 0;
-  ymax = 12;
-  xtitle = "z [cm]";
-  ytitle = "r [cm]";
+else if (v0 == "L0") {
+  xmin = -1.066;
+  xmax = 1.165 ;
+  xtitle = "p#pi^{-} / #bar{p}#pi^{+} mass [GeV]";
 }
 
 int stati=0;
@@ -81,17 +59,17 @@ c1->SetFillColor(10);
 c1->SetFillStyle(4000);
 c1->SetBorderSize(2);
 c1->SetBatch(kTRUE);
+c1->SetTicks(1, 1);
 TPad* pad1 = new TPad("pad1","This is pad1",0.01,0.01,0.99,1,21);
 pad1->SetFillColor(0);
 pad1->SetBorderMode(0);
 pad1->SetFrameFillColor(10);
 pad1->Draw();
 pad1->SetLogy(logy);
-pad1->SetLogz(true);
    pad1->SetTopMargin(0.1);
    pad1->SetBottomMargin(0.1);
    pad1->SetRightMargin(0.1);
-   pad1->SetLeftMargin(0.1);
+   pad1->SetLeftMargin(0.15);
    
 
 
@@ -123,43 +101,44 @@ gStyle->SetOptFit(0);
 /////////
  f1->cd();
 
-  htitle0 = sample+"_hData_reco_SecInt_"+plan+"_"+Suffix;
+  htitle0 = Sample+"_hData_reco_"+v0+"_mass_";
 
 
- TH2F* h0 = (TH2F*)gROOT->FindObject(htitle0);
- h0->Sumw2(); 
+ TH1F* h0 = (TH1F*)gROOT->FindObject(htitle0);
+//  h0->Sumw2(); 
 
-       h0->Draw("COL"); 
-       h0->SetLineColor(kBlack);
-       h0->SetLineStyle(1);
-       h0->SetLineWidth(1);//3
-       h0->SetTickLength(0.03, "XYZ");
-       h0->SetLabelOffset(0.002,"X");//0.007
-      //  h0->GetXaxis()->SetLabelSize(0.03);
-      //  h0->GetXaxis()->SetLabelOffset(0.001);
-       h0->SetLabelOffset(0.007,"Y");
-       h0->SetLabelSize(0.022, "XYZ");
-       h0->SetLabelFont(42, "XYZ"); 
-       h0->SetTitleFont(42, "XYZ");
-       h0->SetTitleSize(0.03, "XYZ"); 
-       h0->SetTitleOffset(1.1,"Y");
-       h0->SetTitleOffset(0.85,"X");
-       h0->GetYaxis()->SetTitle(ytitle);
-       h0->GetYaxis()->SetTitleColor(1);
-       h0->SetNdivisions(505,"XYZ");
-       h0->GetXaxis()->SetRangeUser(xmin, xmax); 
-       h0->GetYaxis()->SetRangeUser(ymin,ymax);
-       h0->GetXaxis()->SetTitle(xtitle);
-       h0->SetTitle("");
-  // leg = new TLegend(0.70,0.75,0.9,0.85);
-  // leg->SetBorderSize(0);
-  // leg->SetFillColor(kWhite);
-  // leg->SetTextFont(42);
-  // leg->SetTextSize(0.025);
-  // leg->SetHeader("MC Samples");
-  // leg->AddEntry(h0,"Secondary Vertices","LE");
 
-  // leg->Draw();
+
+  h0->Draw("PE1same");
+  h0->SetMarkerStyle(20);
+  h0->SetMarkerSize(1);
+  h0->SetMarkerColor(kBlack);
+
+  h0->SetLineColor(kBlack);
+  h0->SetLineStyle(1);
+  h0->SetLineWidth(1);//3
+  h0->SetTickLength(0.03, "XYZ");
+  h0->SetLabelOffset(0.002,"X");//0.007
+//  h0->GetXaxis()->SetLabelSize(0.03);
+//  h0->GetXaxis()->SetLabelOffset(0.001);
+  h0->SetLabelOffset(0.007,"Y");
+  h0->SetLabelSize(0.032, "XYZ");
+  h0->SetLabelFont(42, "XYZ"); 
+  h0->SetTitleFont(42, "XYZ");
+  h0->SetTitleSize(0.04, "XYZ"); 
+  h0->SetTitleOffset(1.4,"Y");
+  h0->SetTitleOffset(0.85,"X");
+  h0->GetYaxis()->SetTitle(ytitle);
+  h0->GetYaxis()->SetTitleColor(1);
+  h0->SetNdivisions(505,"XYZ");
+  h0->GetXaxis()->SetRangeUser(xmin, xmax); 
+//    h0->GetYaxis()->SetRangeUser(ymin,ymax);
+  h0->SetMaximum(h0->GetMaximum()* 1.3);
+  h0->GetXaxis()->SetTitle(xtitle);
+//  TGaxis::SetExponentOffset(-0.05, -0.05, "y");
+  h0->SetTitle("");
+//  h0->Scale(1/h0->Integral());
+
   
 // *****************************************************************************
  TString cmsText     = "CMS";//CMS
@@ -171,7 +150,7 @@ float extraTextFont = 52;  // default is helvetica-italics
 
 // text sizes and text offsets with respect to the top frame
 // in unit of the top margin size
-float lumiTextSize     = 0.53;//0.6
+float lumiTextSize     = 0.5;//0.6
 float lumiTextOffset   = 0.2;
 float cmsTextSize      = 0.65;//0.75
 float cmsTextOffset    = 0.1;  // only used in outOfFrame version
@@ -183,22 +162,9 @@ float relExtraDY = 1.2;
 // ratio of "CMS" and extra text size
 float extraOverCmsTextSize  = 0.76;
 
-    TString lumi_13TeV = "59.7 fb^{-1}";//137 fb^{-1}
-    TString lumi_sqrtS = "(13 TeV)";
-    if (Year == "2016PRE") {
-        lumi_13TeV = "19.5 fb^{-1}";
-        lumi_sqrtS = "(13 TeV)";
-    } else if (Year == "2017") {
-        lumi_13TeV = "41.5 fb^{-1}";
-        lumi_sqrtS = "(13 TeV)";
-    } else if (Year == "2018") {
-        lumi_13TeV = "59.7 fb^{-1}";
-        lumi_sqrtS = "(13 TeV)";
-    } else if (Year == "2016POST") {
-        lumi_13TeV = "16.8 fb^{-1}";
-        lumi_sqrtS = "(13 TeV)";
-    }
-    TString lumiText = lumi_13TeV+" "+lumi_sqrtS;
+TString lumi_13TeV = "59.8 fb^{-1}";//137 fb^{-1}
+TString lumi_sqrtS = "";//CMS "+Year+" Data
+TString lumiText = lumi_13TeV+lumi_sqrtS;
   float H = c1->GetWh();
   float W = c1->GetWw();
   float l = c1->GetLeftMargin();
@@ -221,7 +187,7 @@ float extraOverCmsTextSize  = 0.76;
       latex.SetTextFont(cmsTextFont);
       latex.SetTextAlign(11); 
       latex.SetTextSize(cmsTextSize*t);    
-      latex.DrawLatex(l,1-t+lumiTextOffset*t-0.01,cmsText);
+      latex.DrawLatex(l+0.1,1-t+lumiTextOffset*t-0.01-0.08,cmsText);
 
   float posX_=0;
   float posY_=0;
@@ -238,7 +204,7 @@ float extraOverCmsTextSize  = 0.76;
     {
       posX_ =  1-r - relPosX*(1-l-r);
     }
-  posY_ = 1-t - relPosY*(1-t-b);
+   posY_ = 1-t - relPosY*(1-t-b);
   	  if( writeExtraText ) 
 	    {
          posX_ =   l +  relPosX*(1-l-r);
@@ -256,23 +222,11 @@ float extraOverCmsTextSize  = 0.76;
       latex.SetTextFont(extraTextFont);
       latex.SetTextSize(extraTextSize*t);
       latex.SetTextAlign(11);
-      latex.DrawLatex(posX_+0.12, posY_-0.01, extraText);
+      latex.DrawLatex(posX_+0.11+0.1, posY_-0.01-0.08, extraText);
 	    }
 
-// if (plan == "xy") {
-//   TLatex latex;
-//   latex.SetNDC();
-//   latex.SetTextAngle(0);
-//   latex.SetTextColor(kBlack);    
-
-//   float labelSize = 0.022;
-
-//   latex.SetTextFont(42);
-//   latex.SetTextAlign(31); 
-//   latex.SetTextSize(labelSize);    
-//   latex.DrawLatex(0.93,0.09,"25");
-// }
 
  c1->Update();
  c1->SaveAs(htitle0+".pdf");
+ delete c1;
 }

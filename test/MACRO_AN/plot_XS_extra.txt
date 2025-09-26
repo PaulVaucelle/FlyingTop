@@ -1,0 +1,30 @@
+550 GeV /  : XS [fb] : 0.0995097
+550 GeV /  : XS Up [fb] : 0.110527
+550 GeV /  : XS Down [fb] : 0.0831787
+600 GeV /  : XS [fb] : 0.0597973
+600 GeV /  : XS Up [fb] : 0.066053
+600 GeV /  : XS Down [fb] : 0.0500952
+650 GeV /  : XS [fb] : 0.0366335
+650 GeV /  : XS Up [fb] : 0.0402338
+650 GeV /  : XS Down [fb] : 0.0307692
+700 GeV /  : XS [fb] : 0.0228311
+700 GeV /  : XS Up [fb] : 0.0249261
+700 GeV /  : XS Down [fb] : 0.0192319
+750 GeV /  : XS [fb] : 0.0144497
+750 GeV /  : XS Up [fb] : 0.0156793
+750 GeV /  : XS Down [fb] : 0.0122103
+800 GeV /  : XS [fb] : 0.00927331
+800 GeV /  : XS Up [fb] : 0.00999958
+800 GeV /  : XS Down [fb] : 0.00786269
+850 GeV /  : XS [fb] : 0.00602707
+850 GeV /  : XS Up [fb] : 0.00645773
+850 GeV /  : XS Down [fb] : 0.00512858
+900 GeV /  : XS [fb] : 0.00396285
+900 GeV /  : XS Up [fb] : 0.00421854
+900 GeV /  : XS Down [fb] : 0.00338476
+950 GeV /  : XS [fb] : 0.00263351
+950 GeV /  : XS Up [fb] : 0.00278505
+950 GeV /  : XS Down [fb] : 0.00225813
+1000 GeV /  : XS [fb] : 0.0017674
+1000 GeV /  : XS Up [fb] : 0.00185671
+1000 GeV /  : XS Down [fb] : 0.00152161

@@ -36,6 +36,47 @@ public :
 
    vector<float>   *minitree_K0_reco_mass;
    vector<float>   *minitree_L0_reco_mass;
+
+
+   // CMSSW collection
+  vector<float>   *minitree_K0_x;
+  vector<float>   *minitree_K0_y;
+  vector<float>   *minitree_K0_z;
+  vector<float>   *minitree_K0_r;
+  vector<float>   *minitree_K0_NChi2;
+  vector<float>   *minitree_K0_mass;
+  vector<float>   *minitree_K0_eta;
+
+  // CMSSW collection
+  vector<float>   *minitree_L0_x;
+  vector<float>   *minitree_L0_y;
+  vector<float>   *minitree_L0_z;
+  vector<float>   *minitree_L0_r;
+  vector<float>   *minitree_L0_NChi2;
+  vector<float>   *minitree_L0_mass;
+  vector<float>   *minitree_L0_eta;
+
+  // reco from us 
+  vector<float>   *minitree_V0_reco_x;
+  vector<float>   *minitree_V0_reco_y;
+  vector<float>   *minitree_V0_reco_z;
+  vector<float>   *minitree_V0_reco_r;
+  vector<float>   *minitree_V0_reco_NChi2;
+  vector<float>   *minitree_V0_reco_mass;
+  vector<float>   *minitree_V0_reco_eta;
+  vector<int>     *minitree_V0_reco_source;
+
+   //CMSSW collection
+  vector<float>   *minitree_Yc_x;
+  vector<float>   *minitree_Yc_y;
+  vector<float>   *minitree_Yc_z;
+  vector<float>   *minitree_Yc_r;
+  vector<int>     *minitree_Yc_layer;
+  vector<float>   *minitree_Yc_NChi2;
+  vector<float>   *minitree_Yc_eta;
+  vector<float>   *minitree_Yc_mass;
+
+
    vector<int>     *minitree_tree_nPV;
    vector<int>     *minitree_nSecInt;
    vector<float>   *minitree_SecInt_x;
@@ -59,12 +100,82 @@ public :
    vector<bool>    *minitree_SecInt_selec;
    vector<int>     *minitree_SecInt_layer;
 
+   vector<bool>    *minitree_V0_track_isFromV0;
+   vector<bool>    *minitree_V0_track_isFromSI;
+   vector<bool>    *minitree_V0_track_lost;
+   vector<float>   *minitree_V0_track_pt;
+   vector<float>   *minitree_V0_track_eta;
+   vector<float>   *minitree_V0_track_phi;
+   vector<int>     *minitree_V0_track_charge;
+   vector<float>   *minitree_V0_track_NChi2;
+   vector<float>   *minitree_V0_track_dxy;
+   vector<float>   *minitree_V0_track_drSig;
+   vector<float>   *minitree_V0_track_dz;
+   vector<float>   *minitree_V0_track_dzSig;
+   vector<int>     *minitree_V0_track_nHit;
+   vector<int>     *minitree_V0_track_nHitPixel;
+   vector<int>     *minitree_V0_track_firstHit;
+   vector<float>   *minitree_V0_track_firstHit_x;
+   vector<float>   *minitree_V0_track_firstHit_y;
+   vector<float>   *minitree_V0_track_firstHit_z;
+   vector<int>     *minitree_V0_track_iJet;
+   vector<float>   *minitree_V0_track_ntrk10;
+   vector<float>   *minitree_V0_track_ntrk20;
+   vector<float>   *minitree_V0_track_ntrk30;
+   vector<float>   *minitree_V0_track_ntrk40;
+   vector<int>     *minitree_V0_track_Hemi;
+   vector<float>   *minitree_V0_track_Hemi_dR;
+   vector<float>   *minitree_V0_track_Hemi_dRmax;
+
+   vector<int>       *minitree_smu_mass;
+   vector<int>       *minitree_neu_mass;
+   vector<float>     *minitree_neu_ctau; 
+
    // List of branches
    TBranch        *b_minirunNumber;   //!
    TBranch        *b_minieventNumber;   //!
    TBranch        *b_minilumiBlock;   //!
    TBranch        *b_minitree_K0_reco_mass;
    TBranch        *b_minitree_L0_reco_mass;
+
+      // CMSSW collection
+   TBranch   *b_minitree_K0_x;
+   TBranch   *b_minitree_K0_y;
+   TBranch   *b_minitree_K0_z;
+   TBranch   *b_minitree_K0_r;
+   TBranch   *b_minitree_K0_NChi2;
+   TBranch   *b_minitree_K0_mass;
+   TBranch   *b_minitree_K0_eta;
+
+   // CMSSW collection
+   TBranch   *b_minitree_L0_x;
+   TBranch   *b_minitree_L0_y;
+   TBranch   *b_minitree_L0_z;
+   TBranch   *b_minitree_L0_r;
+   TBranch   *b_minitree_L0_NChi2;
+   TBranch   *b_minitree_L0_mass;
+   TBranch   *b_minitree_L0_eta;
+
+   // reco from us 
+   TBranch   *b_minitree_V0_reco_x;
+   TBranch   *b_minitree_V0_reco_y;
+   TBranch   *b_minitree_V0_reco_z;
+   TBranch   *b_minitree_V0_reco_r;
+   TBranch   *b_minitree_V0_reco_NChi2;
+   TBranch   *b_minitree_V0_reco_mass;
+   TBranch   *b_minitree_V0_reco_eta;
+   TBranch   *b_minitree_V0_reco_source;
+
+      //CMSSW collection
+   TBranch   *b_minitree_Yc_x;
+   TBranch   *b_minitree_Yc_y;
+   TBranch   *b_minitree_Yc_z;
+   TBranch   *b_minitree_Yc_r;
+   TBranch   *b_minitree_Yc_layer;
+   TBranch   *b_minitree_Yc_NChi2;
+   TBranch   *b_minitree_Yc_eta;
+   TBranch   *b_minitree_Yc_mass;
+
    TBranch        *b_minitree_tree_nPV;
    TBranch        *b_minitree_nSecInt;   //!
    TBranch        *b_minitree_SecInt_x;   //!
@@ -87,6 +198,38 @@ public :
    TBranch        *b_minitree_SecInt_dca;   //!
    TBranch        *b_minitree_SecInt_selec;   //!
    TBranch        *b_minitree_SecInt_layer;   //!
+
+
+   TBranch     *b_minitree_V0_track_isFromV0;
+   TBranch     *b_minitree_V0_track_isFromSI;
+   TBranch     *b_minitree_V0_track_lost;
+   TBranch     *b_minitree_V0_track_pt;
+   TBranch     *b_minitree_V0_track_eta;
+   TBranch     *b_minitree_V0_track_phi;
+   TBranch     *b_minitree_V0_track_charge;
+   TBranch     *b_minitree_V0_track_NChi2;
+   TBranch     *b_minitree_V0_track_dxy;
+   TBranch     *b_minitree_V0_track_drSig;
+   TBranch     *b_minitree_V0_track_dz;
+   TBranch     *b_minitree_V0_track_dzSig;
+   TBranch     *b_minitree_V0_track_nHit;
+   TBranch     *b_minitree_V0_track_nHitPixel;
+   TBranch     *b_minitree_V0_track_firstHit;
+   TBranch     *b_minitree_V0_track_firstHit_x;
+   TBranch     *b_minitree_V0_track_firstHit_y;
+   TBranch     *b_minitree_V0_track_firstHit_z;
+   TBranch     *b_minitree_V0_track_iJet;
+   TBranch     *b_minitree_V0_track_ntrk10;
+   TBranch     *b_minitree_V0_track_ntrk20;
+   TBranch     *b_minitree_V0_track_ntrk30;
+   TBranch     *b_minitree_V0_track_ntrk40;
+   TBranch     *b_minitree_V0_track_Hemi;
+   TBranch     *b_minitree_V0_track_Hemi_dR;
+   TBranch     *b_minitree_V0_track_Hemi_dRmax;
+
+   TBranch     *b_minitree_smu_mass;
+   TBranch     *b_minitree_neu_mass;
+   TBranch     *b_minitree_neu_ctau; 
 
    TreeSecIntReader(TTree *tree=0,TString Prod ="", TString sample="");
    virtual ~TreeSecIntReader();
@@ -123,7 +266,7 @@ TreeSecIntReader::TreeSecIntReader(TTree *tree, TString Prod , TString sample) :
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
-TString Path = "/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_14_0_8_FLY/src/FlyingTop/FlyingTop/test/"+Prod+"/MiniSecInt_"+sample+".root";
+TString Path = "/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"+Prod+"/MiniSecInt_"+sample+".root";
 
    if (tree == 0) {
       TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject(Path);
@@ -179,6 +322,47 @@ void TreeSecIntReader::Init(TTree *tree)
    
    minitree_K0_reco_mass=0;
    minitree_L0_reco_mass=0;
+
+   
+   // CMSSW collection
+     minitree_K0_x=0;
+     minitree_K0_y=0;
+     minitree_K0_z=0;
+     minitree_K0_r=0;
+     minitree_K0_NChi2=0;
+     minitree_K0_mass=0;
+     minitree_K0_eta=0;
+
+  // CMSSW collection
+     minitree_L0_x=0;
+     minitree_L0_y=0;
+     minitree_L0_z=0;
+     minitree_L0_r=0;
+     minitree_L0_NChi2=0;
+     minitree_L0_mass=0;
+     minitree_L0_eta=0;
+
+  // reco from us 
+     minitree_V0_reco_x=0;
+     minitree_V0_reco_y=0;
+     minitree_V0_reco_z=0;
+     minitree_V0_reco_r=0;
+     minitree_V0_reco_NChi2=0;
+     minitree_V0_reco_mass=0;
+     minitree_V0_reco_eta=0;
+     minitree_V0_reco_source=0;
+
+   //CMSSW collection
+     minitree_Yc_x=0;
+     minitree_Yc_y=0;
+     minitree_Yc_z=0;
+     minitree_Yc_r=0;
+     minitree_Yc_layer=0;
+     minitree_Yc_NChi2=0;
+     minitree_Yc_eta=0;
+     minitree_Yc_mass=0;
+
+
    minitree_nSecInt = 0;
    minitree_SecInt_x = 0;
    minitree_SecInt_y = 0;
@@ -200,6 +384,37 @@ void TreeSecIntReader::Init(TTree *tree)
    minitree_SecInt_dca = 0;
    minitree_SecInt_selec = 0;
    minitree_SecInt_layer = 0;
+
+   minitree_V0_track_isFromV0 = 0;
+   minitree_V0_track_isFromSI= 0;
+   minitree_V0_track_lost= 0;
+   minitree_V0_track_pt= 0;
+   minitree_V0_track_eta= 0;
+   minitree_V0_track_phi= 0;
+   minitree_V0_track_charge= 0;
+   minitree_V0_track_NChi2= 0;
+   minitree_V0_track_dxy= 0;
+   minitree_V0_track_drSig= 0;
+   minitree_V0_track_dz= 0;
+   minitree_V0_track_dzSig= 0;
+   minitree_V0_track_nHit= 0;
+   minitree_V0_track_nHitPixel= 0;
+   minitree_V0_track_firstHit= 0;
+   minitree_V0_track_firstHit_x= 0;
+   minitree_V0_track_firstHit_y= 0;
+   minitree_V0_track_firstHit_z= 0;
+   minitree_V0_track_iJet= 0;
+   minitree_V0_track_ntrk10= 0;
+   minitree_V0_track_ntrk20= 0;
+   minitree_V0_track_ntrk30= 0;
+   minitree_V0_track_ntrk40= 0;
+   minitree_V0_track_Hemi= 0;
+   minitree_V0_track_Hemi_dR= 0;
+   minitree_V0_track_Hemi_dRmax= 0;
+
+   minitree_smu_mass=0;
+   minitree_neu_mass=0;
+   minitree_neu_ctau=0; 
    // Set branch addresses and branch pointers
    if (!tree) return;
    fChain = tree;
@@ -211,6 +426,47 @@ void TreeSecIntReader::Init(TTree *tree)
    fChain->SetBranchAddress("minilumiBlock", &minilumiBlock, &b_minilumiBlock);
    fChain->SetBranchAddress("minitree_K0_reco_mass", &minitree_K0_reco_mass, &b_minitree_K0_reco_mass);
    fChain->SetBranchAddress("minitree_L0_reco_mass",&minitree_L0_reco_mass, &b_minitree_L0_reco_mass);
+
+      
+   // CMSSW collection
+     fChain->SetBranchAddress("minitree_K0_x",&minitree_K0_x,&b_minitree_K0_x);
+     fChain->SetBranchAddress("minitree_K0_y",&minitree_K0_y,&b_minitree_K0_y);
+     fChain->SetBranchAddress("minitree_K0_z",&minitree_K0_z,&b_minitree_K0_z);
+     fChain->SetBranchAddress("minitree_K0_r",&minitree_K0_r,&b_minitree_K0_r);
+     fChain->SetBranchAddress("minitree_K0_NChi2",&minitree_K0_NChi2,&b_minitree_K0_NChi2);
+     fChain->SetBranchAddress("minitree_K0_mass",&minitree_K0_mass,&b_minitree_K0_mass);
+     fChain->SetBranchAddress("minitree_K0_eta",&minitree_K0_eta,&b_minitree_K0_eta);
+
+  // CMSSW collection
+     fChain->SetBranchAddress("minitree_L0_x",&minitree_L0_x,&b_minitree_L0_x);
+     fChain->SetBranchAddress("minitree_L0_y",&minitree_L0_y,&b_minitree_L0_y);
+     fChain->SetBranchAddress("minitree_L0_z",&minitree_L0_z,&b_minitree_L0_z);
+     fChain->SetBranchAddress("minitree_L0_r",&minitree_L0_r,&b_minitree_L0_r);
+     fChain->SetBranchAddress("minitree_L0_NChi2",&minitree_L0_NChi2,&b_minitree_L0_NChi2);
+     fChain->SetBranchAddress("minitree_L0_mass",&minitree_L0_mass,&b_minitree_L0_mass);
+     fChain->SetBranchAddress("minitree_L0_eta",&minitree_L0_eta,&b_minitree_L0_eta);
+
+  // reco from us 
+     fChain->SetBranchAddress("minitree_V0_reco_x",&minitree_V0_reco_x,&b_minitree_V0_reco_x);
+     fChain->SetBranchAddress("minitree_V0_reco_y",&minitree_V0_reco_y,&b_minitree_V0_reco_y);
+     fChain->SetBranchAddress("minitree_V0_reco_z",&minitree_V0_reco_z,&b_minitree_V0_reco_z);
+     fChain->SetBranchAddress("minitree_V0_reco_r",&minitree_V0_reco_r,&b_minitree_V0_reco_r);
+     fChain->SetBranchAddress("minitree_V0_reco_NChi2",&minitree_V0_reco_NChi2,&b_minitree_V0_reco_NChi2);
+     fChain->SetBranchAddress("minitree_V0_reco_mass",&minitree_V0_reco_mass,&b_minitree_V0_reco_mass);
+     fChain->SetBranchAddress("minitree_V0_reco_eta",&minitree_V0_reco_eta,&b_minitree_V0_reco_eta);
+     fChain->SetBranchAddress("minitree_V0_reco_source",&minitree_V0_reco_source,&b_minitree_V0_reco_source);
+
+   //CMSSW collection
+     fChain->SetBranchAddress("minitree_Yc_x",&minitree_Yc_x,&b_minitree_Yc_x);
+     fChain->SetBranchAddress("minitree_Yc_y",&minitree_Yc_y,&b_minitree_Yc_y);
+     fChain->SetBranchAddress("minitree_Yc_z",&minitree_Yc_z,&b_minitree_Yc_z);
+     fChain->SetBranchAddress("minitree_Yc_r",&minitree_Yc_r,&b_minitree_Yc_r);
+     fChain->SetBranchAddress("minitree_Yc_layer",&minitree_Yc_layer,&b_minitree_Yc_layer);
+     fChain->SetBranchAddress("minitree_Yc_NChi2",&minitree_Yc_NChi2,&b_minitree_Yc_NChi2);
+     fChain->SetBranchAddress("minitree_Yc_eta",&minitree_Yc_eta,&b_minitree_Yc_eta);
+     fChain->SetBranchAddress("minitree_Yc_mass",&minitree_Yc_mass,&b_minitree_Yc_mass);
+
+
    fChain->SetBranchAddress("minitree_tree_nPV",&minitree_tree_nPV, &b_minitree_tree_nPV);
    fChain->SetBranchAddress("minitree_nSecInt", &minitree_nSecInt, &b_minitree_nSecInt);
    fChain->SetBranchAddress("minitree_SecInt_x", &minitree_SecInt_x, &b_minitree_SecInt_x);
@@ -233,6 +489,38 @@ void TreeSecIntReader::Init(TTree *tree)
    fChain->SetBranchAddress("minitree_SecInt_dca", &minitree_SecInt_dca, &b_minitree_SecInt_dca);
    fChain->SetBranchAddress("minitree_SecInt_selec", &minitree_SecInt_selec, &b_minitree_SecInt_selec);
    fChain->SetBranchAddress("minitree_SecInt_layer", &minitree_SecInt_layer, &b_minitree_SecInt_layer);
+
+   fChain->SetBranchAddress("minitree_V0_track_isFromV0",&minitree_V0_track_isFromV0,&b_minitree_V0_track_isFromV0);
+   fChain->SetBranchAddress("minitree_V0_track_isFromSI",&minitree_V0_track_isFromSI,&b_minitree_V0_track_isFromSI);
+   fChain->SetBranchAddress("minitree_V0_track_lost",&minitree_V0_track_lost,&b_minitree_V0_track_lost);
+   fChain->SetBranchAddress("minitree_V0_track_pt",&minitree_V0_track_pt,&b_minitree_V0_track_pt);
+   fChain->SetBranchAddress("minitree_V0_track_eta",&minitree_V0_track_eta,&b_minitree_V0_track_eta);
+   fChain->SetBranchAddress("minitree_V0_track_phi",&minitree_V0_track_phi,&b_minitree_V0_track_phi);
+   fChain->SetBranchAddress("minitree_V0_track_charge",&minitree_V0_track_charge,&b_minitree_V0_track_charge);
+   fChain->SetBranchAddress("minitree_V0_track_NChi2",&minitree_V0_track_NChi2,&b_minitree_V0_track_NChi2);
+   fChain->SetBranchAddress("minitree_V0_track_dxy",&minitree_V0_track_dxy,&b_minitree_V0_track_dxy);
+   fChain->SetBranchAddress("minitree_V0_track_drSig",&minitree_V0_track_drSig,&b_minitree_V0_track_drSig);
+   fChain->SetBranchAddress("minitree_V0_track_dz",&minitree_V0_track_dz,&b_minitree_V0_track_dz);
+   fChain->SetBranchAddress("minitree_V0_track_dzSig",&minitree_V0_track_dzSig,&b_minitree_V0_track_dzSig);
+   fChain->SetBranchAddress("minitree_V0_track_nHit",&minitree_V0_track_nHit,&b_minitree_V0_track_nHit);
+   fChain->SetBranchAddress("minitree_V0_track_nHitPixel",&minitree_V0_track_nHitPixel,&b_minitree_V0_track_nHitPixel);
+   fChain->SetBranchAddress("minitree_V0_track_firstHit",&minitree_V0_track_firstHit,&b_minitree_V0_track_firstHit);
+   fChain->SetBranchAddress("minitree_V0_track_firstHit_x",&minitree_V0_track_firstHit_x,&b_minitree_V0_track_firstHit_x);
+   fChain->SetBranchAddress("minitree_V0_track_firstHit_y",&minitree_V0_track_firstHit_y,&b_minitree_V0_track_firstHit_y);
+   fChain->SetBranchAddress("minitree_V0_track_firstHit_z",&minitree_V0_track_firstHit_z,&b_minitree_V0_track_firstHit_z);
+   fChain->SetBranchAddress("minitree_V0_track_iJet",&minitree_V0_track_iJet,&b_minitree_V0_track_iJet);
+   fChain->SetBranchAddress("minitree_V0_track_ntrk10",&minitree_V0_track_ntrk10,&b_minitree_V0_track_ntrk10);
+   fChain->SetBranchAddress("minitree_V0_track_ntrk20",&minitree_V0_track_ntrk20,&b_minitree_V0_track_ntrk20);
+   fChain->SetBranchAddress("minitree_V0_track_ntrk30",&minitree_V0_track_ntrk30,&b_minitree_V0_track_ntrk30);
+   fChain->SetBranchAddress("minitree_V0_track_ntrk40",&minitree_V0_track_ntrk40,&b_minitree_V0_track_ntrk40);
+   fChain->SetBranchAddress("minitree_V0_track_Hemi",&minitree_V0_track_Hemi,&b_minitree_V0_track_Hemi);
+   fChain->SetBranchAddress("minitree_V0_track_Hemi_dR",&minitree_V0_track_Hemi_dR,&b_minitree_V0_track_Hemi_dR);
+   fChain->SetBranchAddress("minitree_V0_track_Hemi_dRmax",&minitree_V0_track_Hemi_dRmax,&b_minitree_V0_track_Hemi_dRmax);
+
+   fChain->SetBranchAddress("minitree_smu_mass",&minitree_smu_mass,&b_minitree_smu_mass);
+   fChain->SetBranchAddress("minitree_neu_mass",&minitree_neu_mass,&b_minitree_neu_mass);
+   fChain->SetBranchAddress("minitree_neu_ctau",&minitree_neu_ctau,&b_minitree_neu_ctau);
+
    Notify();
 }
 

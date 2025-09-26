@@ -12,29 +12,27 @@
 #include "TMath.h" 
 #include "TLatex.h"
 
-void plot(TString Sample , TString YEAR,TString PLAN, TString SELECTION,TString PU  )
+void plot(TString sample, TString YEAR,TString PLAN, TString SELECTION,TString Channel )
 {
  TFile *f1;
 TString Prod = "SecInt";
 TString Year = YEAR;
 // TString Sample = "Data_"+Year;
-TString sample =  Sample ; //"DoubleMuon_UL"+Year+"_MiniAODv2_GT36-v1";
-TString Path = "/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"+Prod+"/SECINT_"+sample+".root";
+TString Sample = sample; //"DoubleMuon_UL"+Year+"_MiniAODv2_GT36-v1";
+TString Path = "/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/"+Prod+"/SECINT_"+Sample+".root";
 f1 = new TFile(Path);
 TString plan = PLAN; // can also be rz
 TString Selection = SELECTION; // can also be TrackerMatched + PU25 + PU30 + PU35 + PU40 + PU45 + PU50
-TString Pu = PU; // can also be PU30 + PU35 + PU40 + PU45 + PU50
-TString Suffix = Selection+Pu;
 
 
  TString xtitle = "x [cm]"; 
  TString ytitle = "y [cm]";  
 
 
-float xmin = -25.;
-float xmax = 25.;
-float ymin = -25.;
-float ymax = 25.;
+float xmin = -5.;
+float xmax = 5.;
+float ymin = -5.;
+float ymax = 5.;
 
 if (plan == "rz") {
   xmin = 0.;
@@ -45,25 +43,12 @@ if (plan == "rz") {
   ytitle = "r [cm]";
 }
 else if (plan == "xy") {
-  xmin = -25;
-  xmax = 25 ;
-  ymin = -25;
-  ymax = 25;
-}
-else if (plan == "xy_Inner") {
   xmin = -5;
   xmax = 5 ;
   ymin = -5;
   ymax = 5;
 }
-else if (plan == "rz_Inner") {
-  xmin = 0;
-  xmax = 30 ;
-  ymin = 0;
-  ymax = 12;
-  xtitle = "z [cm]";
-  ytitle = "r [cm]";
-}
+
 
 int stati=0;
 bool fit= 0;
@@ -123,7 +108,7 @@ gStyle->SetOptFit(0);
 /////////
  f1->cd();
 
-  htitle0 = sample+"_hData_reco_SecInt_"+plan+"_"+Suffix;
+  htitle0 = Sample+"_hData_"+Selection+"_"+Channel+"_"+plan+"_";
 
 
  TH2F* h0 = (TH2F*)gROOT->FindObject(htitle0);
@@ -162,11 +147,11 @@ gStyle->SetOptFit(0);
   // leg->Draw();
   
 // *****************************************************************************
- TString cmsText     = "CMS";//CMS
+ TString cmsText     = "Private Work";//CMS
 float cmsTextFont   = 61;  // default is helvetic-bold
 
 bool writeExtraText = true;
-TString extraText   = "Preliminary";//Privater Work
+TString extraText   = "";//Privater Work
 float extraTextFont = 52;  // default is helvetica-italics
 
 // text sizes and text offsets with respect to the top frame
@@ -183,22 +168,9 @@ float relExtraDY = 1.2;
 // ratio of "CMS" and extra text size
 float extraOverCmsTextSize  = 0.76;
 
-    TString lumi_13TeV = "59.7 fb^{-1}";//137 fb^{-1}
-    TString lumi_sqrtS = "(13 TeV)";
-    if (Year == "2016PRE") {
-        lumi_13TeV = "19.5 fb^{-1}";
-        lumi_sqrtS = "(13 TeV)";
-    } else if (Year == "2017") {
-        lumi_13TeV = "41.5 fb^{-1}";
-        lumi_sqrtS = "(13 TeV)";
-    } else if (Year == "2018") {
-        lumi_13TeV = "59.7 fb^{-1}";
-        lumi_sqrtS = "(13 TeV)";
-    } else if (Year == "2016POST") {
-        lumi_13TeV = "16.8 fb^{-1}";
-        lumi_sqrtS = "(13 TeV)";
-    }
-    TString lumiText = lumi_13TeV+" "+lumi_sqrtS;
+TString lumi_13TeV = "";//137 fb^{-1}
+TString lumi_sqrtS = "CMS "+Year+" Data";
+TString lumiText = lumi_13TeV+lumi_sqrtS;
   float H = c1->GetWh();
   float W = c1->GetWw();
   float l = c1->GetLeftMargin();
@@ -238,7 +210,7 @@ float extraOverCmsTextSize  = 0.76;
     {
       posX_ =  1-r - relPosX*(1-l-r);
     }
-  posY_ = 1-t - relPosY*(1-t-b);
+  float posY_ = 1-t - relPosY*(1-t-b);
   	  if( writeExtraText ) 
 	    {
          posX_ =   l +  relPosX*(1-l-r);
@@ -256,7 +228,7 @@ float extraOverCmsTextSize  = 0.76;
       latex.SetTextFont(extraTextFont);
       latex.SetTextSize(extraTextSize*t);
       latex.SetTextAlign(11);
-      latex.DrawLatex(posX_+0.12, posY_-0.01, extraText);
+      latex.DrawLatex(posX_+0.14, posY_-0.01, extraText);
 	    }
 
 // if (plan == "xy") {
