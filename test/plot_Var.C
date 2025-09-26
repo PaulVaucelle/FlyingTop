@@ -1,333 +1,179 @@
 #include <iostream>
 #include <TROOT.h>
-#include "TVectorD.h"
-#include "TCanvas.h"
-#include "TPad.h"
 #include "TH1.h"
-#include "TGraphErrors.h"
-#include "TLegend.h"
-#include "TLegendEntry.h"
-#include "TEfficiency.h" 
-#include "TMath.h" 
+#include "TColor.h"
+// #include "../MCWeights.h"
+#include "/opt/sbg/cms/ui2_data1/pvaucell/CMSSW_10_6_30_FLY/src/FlyingTop/FlyingTop/test/PlotCMS.h"
+
+TCanvas * plot(int method,  TString Name, TString Year, TString Plots, bool SIGNAL)
+{
+int stati=0;
+bool fit= 1;
+bool logy=0;
+
+bool Signal = SIGNAL;
+float SumDataEvent = 0;
+float SumMCEvent = 0;
+
+TString EXTRA = "HT100_";
+TString HTcut = "100";
 
 
-void plot(int choice , int VAR , TString CT) {
-    // Liste des fichiers ROOT
-    std::vector<TString> fileNames;
-    std::vector<TString> Names;
-    int stati=0;
-    bool fit= 0;
-    bool logy=0;
+TString ProdMC_MUMU = "MC_MUMU_2018_03_02_2025";
+TString suffixMC_MUMU = "";
 
-    TString extraTXT = "";
-    TString Legheader = "";
-    int CHOICE = choice;
-    int var = VAR;
-    TString CTAU =  CT;
 
-    if (CHOICE == 0)
-        {
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_ctau001.root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_ctau003.root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_ctau010.root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_ctau030.root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_ctau100.root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_ctau300.root");
-            Names.push_back("c#tau = 0.1 cm");
-            Names.push_back("c#tau = 0.3 cm");
-            Names.push_back("c#tau = 1.0 cm");
-            Names.push_back("c#tau = 10.0 cm");
-            Names.push_back("c#tau = 30.0 cm");
-            Names.push_back("c#tau = 100.0 cm");
-            extraTXT = "_ctau_";
-        }
-    else if (CHOICE == 1)
-        {
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu200_neu180.root");
-            // fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu250_neu180.root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu300_neu180.root");
-            // fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu350_neu180.root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu400_neu180.root");
-            // fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu450_neu180.root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu500_neu180.root");
-            Names.push_back("M_{#tilde{#mu}} = 200 GeV, M_{#tilde{#chi}} = 180 GeV");
-            // Names.push_back("M_{#tilde{#mu}} = 250 GeV, M_{#tilde{#chi}} = 180 GeV");
-            Names.push_back("M_{#tilde{#mu}} = 300 GeV, M_{#tilde{#chi}} = 180 GeV");
-            // Names.push_back( "M_{#tilde{#mu}} = 350 GeV, M_{#tilde{#chi}} = 180 GeV");
-            Names.push_back("M_{#tilde{#mu}} = 400 GeV, M_{#tilde{#chi}} = 180 GeV");
-            // Names.push_back("M_{#tilde{#mu}} = 450 GeV, M_{#tilde{#chi}} = 180 GeV");
-            Names.push_back( "M_{#tilde{#mu}} = 500 GeV, M_{#tilde{#chi}} = 180 GeV");  
-            Legheader= "M_{#tilde{#chi}} = 180 GeV";
-            extraTXT = "_MNEU180_ctau_";
-        }
-    else if (CHOICE == 2)
-        {
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu200_neu180_ctau"+CTAU+".root");
-            // fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu250_neu180_ctau"+CTAU+".root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu300_neu180_ctau"+CTAU+".root");
-            // fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu350_neu180_ctau"+CTAU+".root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu400_neu180_ctau"+CTAU+".root");
-            // fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu450_neu180_ctau"+CTAU+".root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu500_neu180_ctau"+CTAU+".root");
-            Names.push_back("M_{#tilde{#mu}} = 200 GeV, M_{#tilde{#chi}} = 180 GeV");
-            // Names.push_back("M_{#tilde{#mu}} = 250 GeV, M_{#tilde{#chi}} = 180 GeV");
-            Names.push_back("M_{#tilde{#mu}} = 300 GeV, M_{#tilde{#chi}} = 180 GeV");
-            // Names.push_back("M_{#tilde{#mu}} = 350 GeV, M_{#tilde{#chi}} = 180 GeV");
-            Names.push_back("M_{#tilde{#mu}} = 400 GeV, M_{#tilde{#chi}} = 180 GeV");
-            // Names.push_back("M_{#tilde{#mu}} = 450 GeV, M_{#tilde{#chi}} = 180 GeV");
-            Names.push_back("M_{#tilde{#mu}} = 500 GeV, M_{#tilde{#chi}} = 180 GeV");
-            Legheader="c#tau = 0.1 cm";
-            extraTXT = "_MNEU180_ctau"+CTAU+"_";
-        }
-    else if  (CHOICE == 3) 
-        {
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu200_neu180.root");
-            // fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu250_neu230.root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu300_neu280.root");
-            // fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu350_neu330.root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu400_neu380.root");
-            // fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu450_neu430.root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu500_neu480.root");
-            Names.push_back("M_{#tilde{#mu}} = 200 GeV, M_{#tilde{#chi}} = 180 GeV");
-            // Names.push_back("M_{#tilde{#mu}} = 250 GeV, M_{#tilde{#chi}} = 230 GeV");
-            Names.push_back("M_{#tilde{#mu}} = 300 GeV, M_{#tilde{#chi}} = 280 GeV");
-            // Names.push_back( "M_{#tilde{#mu}} = 350 GeV, M_{#tilde{#chi}} = 330 GeV");
-            Names.push_back("M_{#tilde{#mu}} = 400 GeV, M_{#tilde{#chi}} = 380 GeV");
-            // Names.push_back("M_{#tilde{#mu}} = 450 GeV, M_{#tilde{#chi}} = 430 GeV");
-            Names.push_back( "M_{#tilde{#mu}} = 500 GeV, M_{#tilde{#chi}} = 480 GeV"); 
-            Legheader="#Delta M_{#tilde{#mu}-#tilde{#chi}} = 20 GeV";
-            extraTXT = "_DM20_ctau_";
-        }
-    else if  (CHOICE == 4) 
-        {
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu200_neu180_ctau"+CTAU+".root");
-            // fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu250_neu230_ctau"+CTAU+".root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu300_neu280_ctau"+CTAU+".root");
-            // fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu350_neu330_ctau"+CTAU+".root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu400_neu380_ctau"+CTAU+".root");
-            // fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu450_neu430_ctau"+CTAU+".root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu500_neu480_ctau"+CTAU+".root");
-            Names.push_back("M_{#tilde{#mu}} = 200 GeV, M_{#tilde{#chi}} = 180 GeV");
-            // Names.push_back("M_{#tilde{#mu}} = 250 GeV, M_{#tilde{#chi}} = 230 GeV");
-            Names.push_back("M_{#tilde{#mu}} = 300 GeV, M_{#tilde{#chi}} = 280 GeV");
-            // Names.push_back( "M_{#tilde{#mu}} = 350 GeV, M_{#tilde{#chi}} = 330 GeV");
-            Names.push_back("M_{#tilde{#mu}} = 400 GeV, M_{#tilde{#chi}} = 380 GeV");
-            // Names.push_back("M_{#tilde{#mu}} = 450 GeV, M_{#tilde{#chi}} = 430 GeV");
-            Names.push_back( "M_{#tilde{#mu}} = 500 GeV, M_{#tilde{#chi}} = 480 GeV"); 
-            Legheader= "#Delta M_{#tilde{#mu}-#tilde{#chi}} = 20 GeV, c#tau = 0.1 cm";
-            extraTXT = "_DM20_ctau"+CTAU+"_";
-        }
-    else if  (CHOICE == 4) 
-        {
-            fileNames.push_back("../Signal_2018/TrackAna_DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8.root");
-            fileNames.push_back("../Signal_2018/TrackAna_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu300_neu280.root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu400_neu300.root");
-            fileNames.push_back("../Signal_2018/TrackAna_RPV_2018_smu500_neu300.root");
-            Names.push_back("DYM50");
-            Names.push_back("t#bar{t}");
-            Names.push_back("M_{#tilde{#mu}} = 300 GeV, M_{#tilde{#chi}} = 280 GeV");
-            Names.push_back("M_{#tilde{#mu}} = 400 GeV, M_{#tilde{#chi}} = 300 GeV");
-            Names.push_back("M_{#tilde{#mu}} = 500 GeV, M_{#tilde{#chi}} = 300 GeV");
-            extraTXT = "_SvsBKG_";
-        }
+TString suffixDATA_MUMU = "_Corr";
+TString Prod_MUMU = "DATA_MUMU_2018_03_02_2025";
+TString SampleDATA_MUMU = "DoubleMuon_UL2018_MiniAODv2_GT36-v1";
+TString SampleDATA_MUMUExtra  = "DoubleMuon_UL2018_MiniAODv2_GT36-v1"+suffixDATA_MUMU;
 
-    TString ytitle = "entries";
-    TString xtitle="p^{j1}_{T} [GeV]";
-    // Nom de l'histogramme à récupérer dans chaque fichier
-    // Variable à modifier si nécessaire
-    // const char* histName = "myHistogram";
-    TString histName = "hData_jet_leadingpt";
+ if (Year == "2016PRE") 
+  {
 
-    if (var == 0)
-        {
-            ytitle = "a.u";
-            xtitle="p^{j1}_{T} [GeV]";
-            histName = "hData_jet_leadingpt";
-        }
-    else if (var == 1)
-        {
-            ytitle = "a.u";
-            xtitle="p^{j2}_{T} [GeV]";
-            histName = "hData_jet_leadingpt2";
-        }
-    else if (var == 2)
-        {
-            ytitle = "a.u";
-            xtitle="p^{#mu 1}_{T} [GeV]";
-            histName = "hData_reco_lepton_leadingpt";
-        }
-    else if (var == 3)
-        {
-            ytitle = "a.u";
-            xtitle="p^{#mu 2}_{T} [GeV]";
-            histName = "hData_reco_lepton_leadingpt2";
-        }
-    else if (var == 4)
-        {
-            ytitle = "a.u";
-            xtitle="#Delta #phi_{#mu#mu}";
-            histName = "hData_lepton_lepton_dPhi";
-        }
-    else if (var == 5)
-        {
-            ytitle = "a.u";
-            xtitle="#Delta #eta_{#mu#mu}";
-            histName = "hData_lepton_lepton_dEta";
-        }
-    else if (var == 6)
-        {
-            ytitle = "a.u";
-            xtitle="#Delta R_{#mu#mu}";
-            histName = "hData_lepton_lepton_dR";
-        }
-    else if (var == 7)
-        {
-            return;
-        }
-    else if (var == 8)
-        {
-            ytitle = "a.u";
-            xtitle="#Delta R_{jet_{1-2}}";
-            histName = "hData_jet_jet_dR";
-        }
-    else if (var == 9)  
-        {
-            ytitle = "a.u";
-            xtitle="trk p_{T} [GeV]";
-            histName = "tree_track_pt";
-        }
-    else if (var == 10)  
-        {
-            ytitle = "a.u";
-            xtitle="trk #eta ";
-            histName = "tree_track_eta";
-        }
-    else if (var == 11)  
-        {
-            ytitle = "a.u";
-            xtitle="trk nHits ";
-            histName = "tree_track_nhits";
-        }
-    else if (var == 12)  
-        {
-            ytitle = "a.u";
-            xtitle="nTrk10 ";
-            histName = "tree_track_ntrk10";
-        }
-    else if (var == 13)  
-        {
-            ytitle = "a.u";
-            xtitle="nTrk20 ";
-            histName = "tree_track_ntrk20";
-        }
-    else if (var == 14)  
-        {
-            ytitle = "a.u";
-            xtitle="nTrk30 ";
-            histName = "tree_track_ntrk30";
-        }
-    else if (var == 15)  
-        {
-            ytitle = "a.u";
-            xtitle="nTrk40 ";
-            histName = "tree_track_ntrk40";
-        }
-    else if (var == 16)  
-        {
-            ytitle = "a.u";
-            xtitle="Trk Sig_{dz} ";
-            histName = "tree_track_dzSig";
-        }
-    else if (var == 17)  
-        {
-            ytitle = "a.u";
-            xtitle="Trk Sig_{dr} ";
-            histName = "tree_track_drSig";
-        }
-    else if (var == 18)  
-        {
-            ytitle = "a.u";
-            xtitle="Trk InJet ";
-            histName = "tree_track_IsInJet";
-        }
-    else if (var == 19)  
-        {
-            ytitle = "a.u";
-            xtitle="Hemi-track #Delta R_{min}";
-            histName = "tree_track_dR";
-        }
-    else if (var == 20)  
-        {
-            ytitle = "a.u";
-            xtitle="Hemi-track #Delta R_{max}";
-            histName = "tree_track_dRmax";
-        }
-    else if (var == 21)  
-        {
-            ytitle = "a.u";
-            xtitle="Trk isLost";
-            histName = "tree_track_isLost";
-        }
-    else if (var == 21)  
-        {
-            ytitle = "a.u";
-            xtitle="Trk isLost";
-            histName = "tree_track_isLost";
-        }
-    else if (var == 22)  
-        {
-            ytitle = "a.u";
-            xtitle="TRK BDT Score";
-            histName = "tree_track_MVAval";
-        }
-    else if (var == 23)  
-        {
-            ytitle = "a.u";
-            xtitle="TRK BDT Signal Efficiency";
-            histName = "hSignalEff";
-        }
-    else if (var == 24)  
-        {
-            ytitle = "a.u";
-            xtitle="TRK BDT BKG Efficiency";
-            histName = "hBkgEff";
-        }
-    else if (var == 25)  
-        {
-            ytitle = "a.u";
-            xtitle="TRK BDT BKG Efficiency";
-            histName = "h_sig";
-        }
-            
-    gStyle->SetOptDate(0);
-    gStyle->SetStatColor(0);
-    gStyle->SetTitleFont(62);
-    gStyle->SetTitleColor(1);
-    gStyle->SetTitleTextColor(1);
-    gStyle->SetTitleFillColor(10);
-    gStyle->SetTitleFontSize(0.06);
-    gStyle->SetTitleW(0.4);
-    gStyle->SetTitleH(0.09);
-    gStyle->SetOptStat(stati);
-    gStyle->SetPadTickX(1); gStyle->SetPadTickY(1);
-    if (fit) {
-    gStyle->SetStatW(0.3);
-    gStyle->SetStatH(0.1);
-    gStyle->SetOptFit(111);
-    } else {
-    gStyle->SetStatW(0.3);
-    gStyle->SetStatH(0.2);
-    gStyle->SetOptFit(0);
-    }
+
+    ProdMC_MUMU = "MC_MUMU_2016PRE_30_03_2025";
+
+    Prod_MUMU = "DATA_MUMU_2016PRE_30_03_2025";
+
+
+    SampleDATA_MUMU = "MuonEG_Run2016-HIPM_UL2016_MiniAODv2";
+    SampleDATA_MUMUExtra = "MuonEG_Run2016-HIPM_UL2016_MiniAODv2"+suffixDATA_MUMU;
+  }
+  
+ if (Year == "2016POST") 
+  {
+
+    ProdMC_MUMU = "MC_MUMU_2016POST_30_03_2025";
+    Prod_MUMU = "DATA_MUMU_2016POST_30_03_2025";
+    SampleDATA_MUMU = "DoubleMuon_Run2016-UL2016_MiniAODv2";
+    SampleDATA_MUMUExtra = "DoubleMuon_Run2016-UL2016_MiniAODv2"+suffixDATA_MUMU;
+  }
+ if (Year == "2017") 
+  {
+
+    ProdMC_MUMU = "MC_MUMU_2017_30_03_2025";
+    Prod_MUMU = "DATA_MUMU_2017_30_03_2025";
+
+    SampleDATA_MUMU = "DoubleMuon_Run2017-UL2017_MiniAODv2";
+    SampleDATA_MUMUExtra = "DoubleMuon_Run2017-UL2017_MiniAODv2"+suffixDATA_MUMU;
+  }
+ if (Year == "2018") 
+  {
+
+    ProdMC_MUMU = "MC_MUMU_2018_03_02_2025";
+    Prod_MUMU = "DATA_MUMU_2018_03_02_2025";
+    SampleDATA_MUMU = "DoubleMuon_UL2018_MiniAODv2_GT36-v1";
+    SampleDATA_MUMUExtra = "DoubleMuon_UL2018_MiniAODv2_GT36-v1"+suffixDATA_MUMU;
+  }
+
+TFile* f1_Data_mumu  = new TFile("../../"+Prod_MUMU+"/histofile_"+EXTRA+"DM_OS_2p4_"+SampleDATA_MUMUExtra+".root");// remplacer par la prédi dans SR de MUMU
+ 
+ TFile* f1_DY_MUMU  = new TFile("../../"+ProdMC_MUMU+"/histofile_"+EXTRA+"DM_OS_2p4_DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8"+suffixMC_MUMU+".root");
+ TFile* f2_DY_MUMU  = new TFile("../../"+ProdMC_MUMU+"/histofile_"+EXTRA+"DM_OS_2p4_DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8"+suffixMC_MUMU+".root");
+ TFile* f1_TT_MUMU  = new TFile("../../"+ProdMC_MUMU+"/histofile_"+EXTRA+"DM_OS_2p4_TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8"+suffixMC_MUMU+".root");
+ TFile* f2_TT_MUMU  = new TFile("../../"+ProdMC_MUMU+"/histofile_"+EXTRA+"DM_OS_2p4_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8"+suffixMC_MUMU+".root");
+ TFile* f1_ST_MUMU  = new TFile("../../"+ProdMC_MUMU+"/histofile_"+EXTRA+"DM_OS_2p4_ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8"+suffixMC_MUMU+".root");
+ TFile* f2_ST_MUMU  = new TFile("../../"+ProdMC_MUMU+"/histofile_"+EXTRA+"DM_OS_2p4_ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8"+suffixMC_MUMU+".root");
+//  TFile* f3_ST  = new TFile("../../"+ProdMC+"/histofile_"+"_OS_2p4_ST_t-channel_top_5f_InclusiveDecays_TuneCP5_13TeV-powheg-pythia8.root");
+ //  TFile* f4_ST  = new TFile("../../"+ProdMC+"/histofile_"+"_OS_2p4_ST_t-channel_antitop_5f_InclusiveDecays_TuneCP5_13TeV-powheg-pythia8.root");
+ TFile* f1_TTV_MUMU = new TFile("../../"+ProdMC_MUMU+"/histofile_"+EXTRA+"DM_OS_2p4_ttWJetsToLNu_5f_EWK_TuneCP5_13TeV_amcatnlo-pythia8"+suffixMC_MUMU+".root");
+ TFile* f2_TTV_MUMU = new TFile("../../"+ProdMC_MUMU+"/histofile_"+EXTRA+"DM_OS_2p4_TTZToLL_5f_TuneCP5_13TeV-madgraphMLM-pythia8"+suffixMC_MUMU+".root");
+ TFile* f3_TTV_MUMU = new TFile("../../"+ProdMC_MUMU+"/histofile_"+EXTRA+"DM_OS_2p4_TTWW_TuneCP5_13TeV-madgraph-pythia8"+suffixMC_MUMU+".root");
+ TFile* f1_VV_MUMU  = new TFile("../../"+ProdMC_MUMU+"/histofile_"+EXTRA+"DM_OS_2p4_WWTo2L2Nu_TuneCP5_13TeV-powheg-pythia8"+suffixMC_MUMU+".root");
+ TFile* f2_VV_MUMU  = new TFile("../../"+ProdMC_MUMU+"/histofile_"+EXTRA+"DM_OS_2p4_WZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8"+suffixMC_MUMU+".root");
+ TFile* f3_VV_MUMU  = new TFile("../../"+ProdMC_MUMU+"/histofile_"+EXTRA+"DM_OS_2p4_ZZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8"+suffixMC_MUMU+".root");
 
 
 
+TString MSUON[3] = {"200","300","500"};
+  TString MNEU[3] = {"180","200","300"};
+  TString CTAU[3] = {"100","100","100"};
 
-    // Vecteur pour stocker les histogrammes
-    std::vector<TH1*> histograms;
+//signal
+ TFile* f1_LLP = new TFile("../../Signal_2018_L1/histofile_"+EXTRA+"DM_OS_2p4_RPV_2018_smu"+MSUON[0]+"_neu"+MNEU[0]+"_ctau"+CTAU[0]+".root");
+ TFile* f2_LLP = new TFile("../../Signal_2018_L1/histofile_"+EXTRA+"DM_OS_2p4_RPV_2018_smu"+MSUON[1]+"_neu"+MNEU[1]+"_ctau"+CTAU[1]+".root");
+ TFile* f3_LLP = new TFile("../../Signal_2018_L1/histofile_"+EXTRA+"DM_OS_2p4_RPV_2018_smu"+MSUON[2]+"_neu"+MNEU[2]+"_ctau"+CTAU[2]+".root");
 
-    // Couleurs pour les histogrammes
+ TString DATAFILE[1] = {SampleDATA_MUMU+"_"
+};
+
+
+
+TString MCFILE[12] = {
+  
+                  "DYJetsToLL_M-10to50_TuneCP5_13TeV-madgraphMLM-pythia8_",
+                  "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_",
+                  "TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_",
+                  "TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_",
+                  "ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8_",
+                  "ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8_",
+                  "ttWJetsToLNu_5f_EWK_TuneCP5_13TeV_amcatnlo-pythia8_",
+                  "TTZToLL_5f_TuneCP5_13TeV-madgraphMLM-pythia8_",
+                  "TTWW_TuneCP5_13TeV-madgraph-pythia8_",
+                  "WWTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_",
+                  "WZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8_",
+                  "ZZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8_",
+
+};
+
+
+TString LLPFILE[3] = {"RPV_2018_smu"+MSUON[0]+"_neu"+MNEU[0]+"_ctau"+CTAU[0]+"_",
+                  "RPV_2018_smu"+MSUON[1]+"_neu"+MNEU[1]+"_ctau"+CTAU[1]+"_",
+                  "RPV_2018_smu"+MSUON[2]+"_neu"+MNEU[2]+"_ctau"+CTAU[2]+"_"
+};
+
+    TString ytitle = "a.u"; 
+    TString htitleC = "hData_EVT34_1Vtx_BDTvtx";
+
+    int nbin = 40; 
+    float xmin = 0;
+    float xmax =  40;
+    TString HeaderC = "A";
+    TString HeaderCbis = "Abis";
+    TString HeaderNVtx = "k Vtx";
+    TString xtitle = "var";
+
+  //-----------------------------------------------------------//
+  // ABCD using Hemipt and Tight+looseWP 
+  //-----------------------------------------------------------//
+  int Method = method;
+
+
+if (Method == 0)
+  {
+     htitleC = "Hemisphere_leadingpt_";//
+
+    nbin = 30; 
+    xmin = 0;
+    xmax = 300;
+HeaderC = ">= 1 tight";
+HeaderCbis = ">= 1 hemi., p_{T} > "+HTcut+" GeV";
+    HeaderNVtx = "2 Vertices";
+    xtitle = "Hemi Leading pt [GeV]";
+  }
+
+    if (Method == 1)
+  {
+
+
+    htitleC = "Hemisphere_subleadingpt_";//
+
+    nbin = 30; 
+    xmin = 0;
+    xmax = 300;
+    HeaderC = ">= 1 tight";
+    HeaderCbis = ">= 1 hemi., p_{T} > "+HTcut+" GeV";
+    HeaderNVtx = "2 Vertices";
+    xtitle = "Hemi SubLeading pt [GeV]";
+      }
+
+// xsec in pb
+
+
+  TLegend* leg;
+    
+        // Couleurs pour les histogrammes
     Float_t r1 = 0.246;
 Float_t g1 = 0.563;
 Float_t b1 = 0.852;
@@ -390,209 +236,272 @@ Float_t b10 = 0.867;
 TColor color10 = TColor(310,r10, g10, b10);
 // color10.SetRGB(r10, g10, b10);
 Int_t ColorLightBlue = color10.GetNumber();
+// *****************************************************************************
 
-    std::vector<int> colors = {
-        ColorBlue,
-        ColorOrange,
-        ColorRed,
-        ColorGrey,
-        ColorDarkPurple,
-        ColorBrown,
-        ColorDarkOrange,
-        ColorNeutral,
-        ColorDarkGrey,
-        ColorLightBlue
-    };
+TCanvas *c1 = new TCanvas("c1", "plots",0,0,1300,1200);
+c1->SetFillColor(10);
+c1->SetFillStyle(4000);
+c1->SetBorderSize(2);
 
-    // Boucle sur les fichiers pour récupérer les histogrammes
-    for (size_t i = 0; i < fileNames.size(); ++i) {
-        TFile* file = TFile::Open(fileNames[i]);
-        if (!file || file->IsZombie()) {
-            std::cerr << "Erreur : Impossible d'ouvrir le fichier " << fileNames[i] << std::endl;
-            continue;
-        }
+  TPad* pad1 = new TPad("pad1","This is pad1",0.01,0.05,0.95,0.99,21);
 
-        TH1* hist = dynamic_cast<TH1*>(file->Get(histName));
-        if (!hist) {
-            std::cerr << "Erreur : Histogramme '" << histName << "' non trouvé dans " << fileNames[i] << std::endl;
-            file->Close();
-            continue;
-        }
+float bottomMargin = 0.05;
+bottomMargin = 0.15;
+pad1->SetFillColor(0);
+pad1->SetBorderMode(0);
+pad1->SetFrameFillColor(10);
+pad1->Draw();
+pad1->SetLogy(logy);
+   pad1->SetTopMargin(0.07);
+   pad1->SetBottomMargin(bottomMargin);
+   pad1->SetRightMargin(0.04);
+   pad1->SetLeftMargin(0.16);
 
-        hist->SetDirectory(0); // Détacher l'histogramme du fichier
-        histograms.push_back(hist);
 
-        // Appliquer une couleur à l'histogramme
-        int color = colors[i % colors.size()];
-        hist->SetLineColor(color);
 
-        file->Close();
-    }
+gStyle->SetOptDate(0);
+gStyle->SetStatColor(0);
+gStyle->SetTitleFont(62);
+gStyle->SetTitleColor(1);
+gStyle->SetTitleTextColor(1);
+gStyle->SetTitleFillColor(10);
+gStyle->SetTitleFontSize(0.05);
+gStyle->SetTitleW(0.4);
+gStyle->SetTitleH(0.09);
+gStyle->SetOptStat(stati);
+gStyle->SetPadTickX(1); gStyle->SetPadTickY(1);
+gStyle->SetPadGridX(false); gStyle->SetPadGridY(false);
+gROOT->SetBatch(kTRUE);
 
-    // Vérifier si au moins un histogramme a été récupéré
-    if (histograms.empty()) {
-        std::cerr << "Erreur : Aucun histogramme valide n'a été récupéré." << std::endl;
-        return;
-    }
 
-    // Créer un canvas pour dessiner les histogrammes
-    TCanvas* canvas = new TCanvas("canvas", "Var MC Signal vs Bkg", 800, 600);
-    canvas->SetFillColor(10);
-    canvas->SetFillStyle(4000);
-    canvas->SetBorderSize(2);
+ TH1F* htotMC  = new TH1F("htotMC","",nbin,xmin,xmax);
+ TH1F* htotData  = new TH1F("htotData","",nbin,xmin,xmax);
 
-    gPad->SetLeftMargin(0.15);
-    gPad->SetBottomMargin(0.15);
-    // Trouver les limites pour l'axe Y
-    double yMax = 0.0;
+  htotData->Sumw2();
+  htotMC->Sumw2();
 
-    // Dessiner les histogrammes sur le même canvas
-    for (size_t i = 0; i < histograms.size(); ++i) {
-        
-        if (i == 0) {
-            
-            histograms[i]->SetLineColor(colors[i]);
-            histograms[i]->SetLineWidth(2);
-            histograms[i]->SetLineStyle(1);
-            histograms[i]->SetMarkerStyle(76);
-            histograms[i]->SetMarkerSize(1);
-            histograms[i]->SetMarkerColor(colors[i]);
-            histograms[i]->Scale(1./histograms[i]->Integral());
-            histograms[i]->GetXaxis()->SetTitleSize(0.06);
-            histograms[i]->GetYaxis()->SetTitleSize(0.06);
-            histograms[i]->GetYaxis()->SetTitleOffset(1.5);
-            histograms[i]->SetTickLength(0.03, "XYZ");
-            histograms[i]->SetLabelOffset(0.002,"X");//0.007
-            histograms[i]->SetLabelOffset(0.007,"Y");
-            histograms[i]->SetLabelSize(0.042, "XYZ");
-            histograms[i]->SetLabelFont(42, "XYZ"); 
-            histograms[i]->SetTitleFont(42, "XYZ");
-            histograms[i]->SetTitleSize(0.05, "XYZ"); 
-            histograms[i]->SetTitleOffset(1.3,"Y");
-            histograms[i]->SetTitleOffset(1.1,"X");
-            histograms[i]->SetNdivisions(509,"XYZ");
-            histograms[i]->SetTitle("");
-            histograms[i]->GetXaxis()->SetTitle(xtitle);
-            histograms[i]->GetYaxis()->SetTitle(ytitle);
-            histograms[i]->Draw("HIST"); // Le premier histogramme
-            yMax = histograms[i]->GetMaximum();
 
-        } else {
+TH1F* g1_Data_emu = (TH1F*)gROOT->FindObject(DATAFILE[0]+htitleC);
 
-            histograms[i]->SetLineColor(colors[i]);
-            histograms[i]->SetLineWidth(2);
-            histograms[i]->SetLineStyle(1);
-            histograms[i]->SetMarkerStyle(76);
-            histograms[i]->SetMarkerSize(1);
-            histograms[i]->SetMarkerColor(colors[i]);
-            histograms[i]->Scale(1./histograms[i]->Integral());
-            histograms[i]->Draw("HIST SAME"); // Les suivants
-            double histMax = histograms[i]->GetMaximum();
-            if (histMax > yMax) yMax = histMax;
-        }
-    }
-    std::cout<<"ymax : _"<<yMax<<std::endl;
-    histograms[0]->SetMaximum(1.2 * yMax); // Ajouter un peu de marge
-    // Ajouter une légende
-    TLegend* legend = new TLegend(0.5, 0.6, 0.8, 0.85);
-    legend->SetHeader(Legheader);
-    legend->SetBorderSize(0);
-    legend->SetFillStyle(0);
-    legend->SetFillColor(kWhite);
-    legend->SetTextFont(42);
-    legend->SetTextSize(0.03);
-    for (size_t i = 0; i < histograms.size(); ++i) {
-        legend->AddEntry(histograms[i], Names[i], "l");
-    }
-    legend->Draw();
+ TH1F* g1_DY = (TH1F*)gROOT->FindObject(MCFILE[0]+htitleC);//ok
+ TH1F* g2_DY = (TH1F*)gROOT->FindObject(MCFILE[1]+htitleC);//ok
+ TH1F*  h_DY = new TH1F("h_DY","",nbin,xmin,xmax);
 
-//------Start of Copy Paste
-TString cmsText     = "CMS";
-float cmsTextFont   = 61;  // default is helvetic-bold
 
-bool writeExtraText = true;
-TString extraText   = "Simulation";
-float extraTextFont = 52;  // default is helvetica-italics
+ TH1F* g1_VV = (TH1F*)gROOT->FindObject(MCFILE[9]+htitleC);//ok
+ TH1F* g2_VV = (TH1F*)gROOT->FindObject(MCFILE[10]+htitleC);//ok
+ TH1F* g3_VV = (TH1F*)gROOT->FindObject(MCFILE[11]+htitleC);//ok
+ TH1F*  h_VV = new TH1F("h_VV","",nbin,xmin,xmax);
 
-// text sizes and text offsets with respect to the top frame
-// in unit of the top margin size
-float lumiTextSize     = 0.6;
-float lumiTextOffset   = 0.2;
-float cmsTextSize      = 0.75;
-float cmsTextOffset    = 0.1;  // only used in outOfFrame version
+TH1F* g1_ST = (TH1F*)gROOT->FindObject(MCFILE[4]+htitleC);//ok
+ TH1F* g2_ST = (TH1F*)gROOT->FindObject(MCFILE[5]+htitleC);//ok
+ TH1F*  h_ST = new TH1F("h_ST","",nbin,xmin,xmax);
 
-float relPosX    = 0.045;
-float relPosY    = 0.035;
-float relExtraDY = 1.2;
+ TH1F* g1_TT = (TH1F*)gROOT->FindObject(MCFILE[2]+htitleC);//ok
+TH1F* g2_TT = (TH1F*)gROOT->FindObject(MCFILE[3]+htitleC);//ok
+ TH1F*  h_TT = new TH1F("h_TT","",nbin,xmin,xmax);
 
-// ratio of "CMS" and extra text size
-float extraOverCmsTextSize  = 0.76;
+ TH1F* g1_TTV = (TH1F*)gROOT->FindObject(MCFILE[6]+htitleC);//ok
+ TH1F* g2_TTV = (TH1F*)gROOT->FindObject(MCFILE[7]+htitleC);//ok
+ TH1F* g3_TTV = (TH1F*)gROOT->FindObject(MCFILE[8]+htitleC);//ok
+ TH1F*  h_TTV = new TH1F("h_TTV","",nbin,xmin,xmax);
 
-TString lumi_13TeV = "";//137 fb^{-1}
-TString lumi_sqrtS = "2018";
-TString lumiText = lumi_13TeV+lumi_sqrtS;
-  float H = canvas->GetWh();
-  float W = canvas->GetWw();
-  float l = canvas->GetLeftMargin();
-  float t = canvas->GetTopMargin();
-  float r = canvas->GetRightMargin();
-  float b = canvas->GetBottomMargin();
+ TH1F* g1_LLP = (TH1F*)gROOT->FindObject(LLPFILE[0]+htitleC);//ok
+ TH1F* h1_LLP = new TH1F("h1_LLP","",nbin,xmin,xmax);
+ TH1F* g2_LLP = (TH1F*)gROOT->FindObject(LLPFILE[1]+htitleC);//ok
+ TH1F* h2_LLP = new TH1F("h2_LLP","",nbin,xmin,xmax);
+ TH1F* g3_LLP = (TH1F*)gROOT->FindObject(LLPFILE[2]+htitleC);//ok
+ TH1F* h3_LLP = new TH1F("h3_LLP","",nbin,xmin,xmax);
 
-  TLatex latex;
-  latex.SetNDC();
-  latex.SetTextAngle(0);
-  latex.SetTextColor(kBlack);    
+// *****************************************************************************
 
-  float extraTextSize = extraOverCmsTextSize*cmsTextSize;
+ pad1->cd();
 
-  latex.SetTextFont(42);
-  latex.SetTextAlign(31); 
-  latex.SetTextSize(lumiTextSize*t);    
-  latex.DrawLatex(1-r,1-t+lumiTextOffset*t,lumiText);
+    f1_DY_MUMU->cd();
+    g1_DY = (TH1F*)gROOT->FindObject(MCFILE[0]+htitleC);
+    h_DY = new TH1F("h_DY","",nbin,xmin,xmax);
+    h_DY->Add(g1_DY, h_DY, 1,0);
 
-      latex.SetTextFont(cmsTextFont);
-      latex.SetTextAlign(11); 
-      latex.SetTextSize(cmsTextSize*t);    
-      latex.DrawLatex(l,1-t+lumiTextOffset*t,cmsText);
+    f2_DY_MUMU->cd();
+    g2_DY = (TH1F*)gROOT->FindObject(MCFILE[1]+htitleC);
+    h_DY->Add(g2_DY, h_DY, 1, 1);
 
-float posX_=0;
-  float posY_=0;
-  int iPosX = 3;
-  if( iPosX%10<=1 )
+    f1_VV_MUMU->cd();
+    g1_VV = (TH1F*)gROOT->FindObject(MCFILE[9]+htitleC);
+    h_VV = new TH1F("h_VV","",nbin,xmin,xmax);
+    h_VV->Add(g1_VV, h_VV, 1,0);
+
+    f2_VV_MUMU->cd();
+    g2_VV = (TH1F*)gROOT->FindObject(MCFILE[10]+htitleC);
+    h_VV->Add(g2_VV, h_VV, 1, 1);
+
+    f3_VV_MUMU->cd();
+    g3_VV = (TH1F*)gROOT->FindObject(MCFILE[11]+htitleC);
+    h_VV->Add(g3_VV, h_VV, 1, 1);
+
+    f1_TTV_MUMU->cd();
+    g1_TTV = (TH1F*)gROOT->FindObject(MCFILE[6]+htitleC);
+    h_TTV = new TH1F("h_TTV","",nbin,xmin,xmax);
+    h_TTV->Add(g1_TTV, h_TTV, 1,0);
+
+    f2_TTV_MUMU->cd();
+    g2_TTV = (TH1F*)gROOT->FindObject(MCFILE[7]+htitleC);
+    h_TTV->Add(g2_TTV, h_TTV, 1, 1);
+
+    f3_TTV_MUMU->cd();
+    g3_TTV = (TH1F*)gROOT->FindObject(MCFILE[8]+htitleC);
+    h_TTV->Add(g3_TTV, h_TTV, 1, 1);
+
+    h_ST = new TH1F("h_ST","",nbin,xmin,xmax);
+    f1_ST_MUMU->cd();
+    g1_ST = (TH1F*)gROOT->FindObject(MCFILE[4]+htitleC);
+    h_ST->Add(g1_ST, h_ST, 1,0);
+
+    f2_ST_MUMU->cd();
+    g2_ST = (TH1F*)gROOT->FindObject(MCFILE[5]+htitleC);
+    h_ST->Add(g2_ST, h_ST, 1, 1);
+
+    f1_TT_MUMU->cd();
+    g1_TT = (TH1F*)gROOT->FindObject(MCFILE[2]+htitleC);
+
+    h_TT = new TH1F("h_TT","",nbin,xmin,xmax);
+    h_TT->Add(g1_TT, h_TT, 1,0);
+
+    f2_TT_MUMU->cd();
+    g2_TT = (TH1F*)gROOT->FindObject(MCFILE[3]+htitleC);
+    h_TT->Add(g2_TT, h_TT, 1,1);
+
+h_DY->Scale(1./h_DY->Integral(0,-1));
+h_VV->Scale(1./h_VV->Integral(0,-1));
+h_TTV->Scale(1./h_TTV->Integral(0,-1));
+h_ST->Scale(1./h_ST->Integral(0,-1));
+h_TT->Scale(1./h_TT->Integral(0,-1));
+
+ htotData = new TH1F("htotData","",nbin,xmin,xmax);
+
+f1_Data_mumu->cd();
+g1_Data_emu = (TH1F*)gROOT->FindObject(DATAFILE[0]+htitleC);
+htotData->Add(g1_Data_emu, htotData, 1, 0);
+
+htotData->Draw("PE1same");
+htotData->SetMarkerStyle(20);
+htotData->SetMarkerSize(0);
+htotData->SetMarkerColor(kWhite);
+htotData->SetLineColor(kWhite);
+htotData->SetLineWidth(1);
+htotData->SetTickLength(0.03, "YZ");
+htotData->SetTickLength(0.03,"X");
+htotData->SetLabelOffset(0.015,"X");
+htotData->SetLabelOffset(0.007,"Y");
+htotData->SetLabelSize(0.045, "XYZ");
+htotData->SetLabelFont(42, "XYZ"); 
+htotData->SetTitleSize(0.055, "XYZ"); 
+htotData->SetTitleFont(42, "XYZ");
+htotData->SetTitleOffset(1.2,"X"); 
+htotData->SetTitleOffset(1.3,"Y");
+htotData->GetXaxis()->SetTitle(xtitle);
+htotData->GetXaxis()->SetTitleColor(1);
+htotData->GetYaxis()->SetTitle(ytitle);
+htotData->GetYaxis()->SetTitleColor(1);
+htotData->Scale(1./htotData->Integral(0,-1));
+// htotData->GetXaxis()->SetRangeUser(0,20);
+if (logy)
     {
-      posX_ =   l + relPosX*(1-l-r);
+        htotData->SetMinimum(1); 
+        htotData->SetMaximum(htotData->GetMaximum()*100); 
     }
-  else if( iPosX%10==2 )
+else 
     {
-      posX_ =  l + 0.5*(1-l-r);
+        htotData->SetMinimum(0); 
+        htotData->SetMaximum(0.6); 
     }
-  else if( iPosX%10==3 )
-    {
-      posX_ =  1-r - relPosX*(1-l-r);
-    }
-   posY_ = 1-t - relPosY*(1-t-b);
-  	  if( writeExtraText ) 
-	    {
-         posX_ =   l +  relPosX*(1-l-r);
-         posY_ =   1-t+lumiTextOffset*t;
-        int alignY_=3;
-         int alignX_=2;
-         if( iPosX/10==0 ) alignX_=1;
-         if( iPosX==0    ) alignX_=1;
-         if( iPosX==0    ) alignY_=1;
-         if( iPosX/10==1 ) alignX_=1;
-         if( iPosX/10==2 ) alignX_=2;
-         if( iPosX/10==3 ) alignX_=3;
-         //if( iPosX == 0  ) relPosX = 0.12;
-         int align_ = 10*alignX_ + alignY_;
-      latex.SetTextFont(extraTextFont);
-      latex.SetTextSize(extraTextSize*t);
-      latex.SetTextAlign(11);
-      latex.DrawLatex(posX_+0.08, posY_, extraText);
-	    }
-    canvas->Update();
-    // Sauvegarder le canvas (optionnel)
-    // canvas->SaveAs("output.pdf");
-    canvas->SaveAs(histName+extraTXT+".pdf");
 
+
+
+    f1_LLP->cd();
+    
+    g1_LLP = (TH1F*)gROOT->FindObject(LLPFILE[0]+htitleC);
+    g1_LLP->Sumw2();
+    h1_LLP = new TH1F("h1_LLP","",nbin,xmin,xmax);
+    h1_LLP->Add(g1_LLP, h1_LLP, 1,0);
+
+    f2_LLP->cd();
+    g2_LLP = (TH1F*)gROOT->FindObject(LLPFILE[1]+htitleC);
+    g2_LLP->Sumw2();
+    h2_LLP = new TH1F("h2_LLP","",nbin,xmin,xmax);
+    h2_LLP->Add(g2_LLP, h2_LLP, 1,0);
+
+    f3_LLP->cd();
+    
+    g3_LLP = (TH1F*)gROOT->FindObject(LLPFILE[2]+htitleC);
+    g3_LLP->Sumw2();
+    h3_LLP = new TH1F("h3_LLP","",nbin,xmin,xmax);
+    h3_LLP->Add(g3_LLP, h3_LLP, 1,0);
+
+
+    h1_LLP->Draw("HEsame"); 
+    h1_LLP->SetLineColor(kRed-1);
+    h1_LLP->SetLineStyle(2);
+    h1_LLP->SetLineWidth(2);
+
+    h2_LLP->Draw("HEsame"); 
+    h2_LLP->SetLineColor(kRed-2);
+    h2_LLP->SetLineStyle(3);
+    h2_LLP->SetLineWidth(2);
+
+    h3_LLP->Draw("HEsame");
+    h3_LLP->SetLineColor(kRed-3);
+    h3_LLP->SetLineStyle(4);
+    h3_LLP->SetLineWidth(2);
+
+    h1_LLP->Scale(1./h1_LLP->Integral(0,-1));
+    h2_LLP->Scale(1./h2_LLP->Integral(0,-1));
+    h3_LLP->Scale(1./h3_LLP->Integral(0,-1));
+
+    h_DY->Draw("HEsame"); 
+    h_DY->SetLineColor(ColorBlue);
+    h_DY->SetLineStyle(1);
+    h_DY->SetLineWidth(2);
+
+    h_TT->Draw("HEsame");
+    h_TT->SetLineColor(ColorRed);
+    h_TT->SetLineStyle(1);
+    h_TT->SetLineWidth(2);
+
+
+  float LEGY1 = 0.50;
+  float LEGY2 = 0.89;
+  float legsize = 0.06;
+  float legsize2 = 0.04;
+  LEGY1 = 0.6;
+  LEGY2 = 0.89;
+  leg = new TLegend(0.4,LEGY1,0.89,LEGY2);
+  leg->SetBorderSize(0);
+  leg->SetFillColor(kWhite);
+  leg->SetTextFont(42);
+  leg->SetTextSize(0.045);
+  leg->SetMargin(0.2);
+  // leg->AddEntry(htotData, "#mu#mu data SR","PE1");
+  leg->AddEntry(h_DY, "DY","L");
+  leg->AddEntry(h_TT, "t#bar{t}","L");
+  leg->AddEntry(h1_LLP," m^{"+CTAU[0]+" cm}_{#tilde{#mu} (#tilde{#chi}^{0})} = "+MSUON[0]+" ("+MNEU[0]+") GeV","L");
+  leg->AddEntry(h2_LLP," m^{"+CTAU[1]+" cm}_{#tilde{#mu} (#tilde{#chi}^{0})} = "+MSUON[1]+" ("+MNEU[1]+") GeV","L");
+  leg->AddEntry(h3_LLP," m^{"+CTAU[2]+" cm}_{#tilde{#mu} (#tilde{#chi}^{0})} = "+MSUON[2]+" ("+MNEU[2]+") GeV","L");
+  leg->Draw();
+
+
+PlotCMSv3(pad1,Year,false);
+
+// !! --------------------------
+// !! --------------------------
+// !! --------------------------
+
+// *****************************************************************************
+// *****************************************************************************
+
+  TString namele =  Name+"_"+Plots;
+  namele += "_"+Year;
+  c1->SaveAs(namele+".pdf");
+
+  return c1;
 }
