@@ -6,9 +6,8 @@ FlyingTop
 
 // ---------------- DisplacedTop analysis code ----------------- //
 
-// contact me @: paul.vaucelle@iphc.cnrs.fr -------------- //
+// contact me @: paul-vaucelle@orange.fr -------------- //
 
-// --------------- or paul.vaucelle@cern.ch --------------------- //
 
 // ---------------- Supervisor : Daniel Bloch -------------------- //
 
